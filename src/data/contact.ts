@@ -1,0 +1,36 @@
+import type { Icon } from '@phosphor-icons/react'
+import { EnvelopeIcon, GithubLogoIcon, LinkedinLogoIcon, XLogoIcon } from '@phosphor-icons/react'
+
+export interface ContactLink {
+  id: string
+  labelKey: string
+  url: string
+  icon: Icon
+}
+
+export const contactLinks: ContactLink[] = [
+  {
+    id: 'email',
+    labelKey: 'email',
+    url: 'mailto:s.kolbusz@outlook.com',
+    icon: EnvelopeIcon,
+  },
+  {
+    id: 'linkedin',
+    labelKey: 'linkedin',
+    url: 'https://linkedin.com/in/skolbusz',
+    icon: LinkedinLogoIcon,
+  },
+  {
+    id: 'github',
+    labelKey: 'github',
+    url: 'https://github.com/skolbusz',
+    icon: GithubLogoIcon,
+  },
+  {
+    id: 'twitter',
+    labelKey: 'twitter',
+    url: 'https://x.com/s_kolbusz',
+    icon: XLogoIcon,
+  },
+]

@@ -1,0 +1,420 @@
+@import 'tailwindcss';
+
+/* Exclude .agent directory from Tailwind scanning */
+@source not '../../.agent';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Design System: Warm Neutrals + Emerald Accent
+ * Using OKLCH for perceptually uniform color interpolation
+ */
+
+/* Light Theme (default) */
+:root {
+  /* Backgrounds - warm cream/ivory */
+  --background: oklch(0.985 0.005 85);
+  --foreground: oklch(0.2 0.015 55);
+
+  /* Card surfaces */
+  --card: oklch(0.98 0.004 85);
+  --card-foreground: oklch(0.2 0.015 55);
+
+  /* Primary - emerald accent (#10B981 converted) */
+  --primary: oklch(0.69 0.18 162);
+  --primary-foreground: oklch(0.985 0.005 85);
+
+  /* Secondary - warm neutral */
+  --secondary: oklch(0.92 0.01 85);
+  --secondary-foreground: oklch(0.2 0.015 55);
+
+  /* Muted - deeper warm gray for better contrast */
+  --muted: oklch(0.9 0.01 85);
+  --muted-foreground: oklch(0.4 0.02 55);
+
+  /* Accent - emerald tint */
+  --accent: oklch(0.92 0.05 162);
+  --accent-foreground: oklch(0.25 0.05 162);
+
+  /* Destructive - warm red */
+  --destructive: oklch(0.55 0.22 27);
+  --destructive-foreground: oklch(0.98 0.01 27);
+
+  /* Borders & inputs */
+  --border: oklch(0.85 0.01 85);
+  --input: oklch(0.85 0.01 85);
+  --ring: oklch(0.69 0.18 162);
+
+  /* Inverted primary */
+  --cursor: oklch(0.53 0.18 349.05);
+
+  /* Radius tokens (shadcn-compatible) */
+  --radius: 0.5rem;
+}
+
+/* Dark Theme */
+.dark,
+[data-theme='dark'] {
+  /* Backgrounds - warm espresso/charcoal */
+  --background: oklch(0.15 0.01 65);
+  --foreground: oklch(0.95 0.008 85);
+
+  /* Card surfaces */
+  --card: oklch(0.18 0.008 65);
+  --card-foreground: oklch(0.95 0.008 85);
+
+  /* Primary - emerald (#34D399 converted) */
+  --primary: oklch(0.78 0.17 162);
+  --primary-foreground: oklch(0.15 0.03 162);
+
+  /* Secondary - warm charcoal */
+  --secondary: oklch(0.22 0.01 65);
+  --secondary-foreground: oklch(0.9 0.01 85);
+
+  /* Muted - warm dark gray */
+  --muted: oklch(0.25 0.008 65);
+  --muted-foreground: oklch(0.75 0.015 85);
+
+  /* Accent - emerald tint for dark */
+  --accent: oklch(0.28 0.06 162);
+  --accent-foreground: oklch(0.95 0.04 162);
+
+  /* Destructive */
+  --destructive: oklch(0.5 0.2 27);
+  --destructive-foreground: oklch(0.95 0.01 27);
+
+  /* Borders & inputs */
+  --border: oklch(0.28 0.008 65);
+  --input: oklch(0.28 0.008 65);
+  --ring: oklch(0.78 0.17 162);
+  --cursor: oklch(0.78 0.17 162);
+}
+
+/* Tailwind CSS 4 Theme Configuration */
+@theme inline {
+  /* Colors - mapped from CSS custom properties */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-cursor: var(--cursor);
+
+  /* Emerald palette for direct use */
+  --color-emerald-50: oklch(0.97 0.04 162);
+  --color-emerald-100: oklch(0.94 0.07 162);
+  --color-emerald-200: oklch(0.88 0.11 162);
+  --color-emerald-300: oklch(0.82 0.14 162);
+  --color-emerald-400: oklch(0.78 0.17 162);
+  --color-emerald-500: oklch(0.72 0.18 162);
+  --color-emerald-600: oklch(0.62 0.16 162);
+  --color-emerald-700: oklch(0.52 0.14 162);
+  --color-emerald-800: oklch(0.42 0.11 162);
+  --color-emerald-900: oklch(0.32 0.08 162);
+
+  /* Typography */
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-serif), ui-serif, Georgia, serif;
+  --font-mono: var(--font-mono), ui-monospace, monospace;
+
+  /* Border radius */
+  --radius-sm: calc(var(--radius) - 0.25rem);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 0.25rem);
+  --radius-xl: calc(var(--radius) + 0.5rem);
+  --radius-2xl: calc(var(--radius) + 1rem);
+}
+
+/* Book Texture Utility */
+@utility book-paper {
+  position: relative;
+  background-color: var(--background);
+}
+
+.book-paper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('/images/textures/paper.svg');
+  opacity: 0.4;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  z-index: 0;
+}
+
+.dark .book-paper::before {
+  opacity: 0.15;
+  mix-blend-mode: soft-light;
+  background-color: transparent; /* Ensure SVG overlay works on dark */
+}
+
+/* Modern Custom Scrollbar (CSS-only, high performance) */
+html {
+  scrollbar-gutter: stable;
+  scrollbar-color: oklch(0.72 0.18 162 / 0.4) transparent;
+  scrollbar-width: thin;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Chrome, Edge, and Safari */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: oklch(0.72 0.18 162 / 0.3);
+  border-radius: 20px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+  transition: background-color 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: oklch(0.72 0.18 162 / 0.6);
+  background-clip: content-box;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+/* Lenis Recommended CSS */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* Selection color with emerald accent */
+::selection {
+  background: oklch(0.78 0.17 162 / 0.3);
+}
+
+/* Global Focus Ring */
+:focus-visible {
+  outline: none;
+  @apply ring-ring ring-offset-background rounded-sm ring-2 ring-offset-8;
+}
+
+@utility glass {
+  @apply border-border rounded-md border bg-white/10 shadow-xl backdrop-blur-md dark:bg-black/20;
+}
+
+@utility glass-button {
+  @apply cursor-pointer rounded-md text-neutral-600 transition-colors hover:bg-white/20 hover:text-neutral-800 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-emerald-500 dark:text-neutral-400 dark:hover:text-white;
+}
+
+@utility grid-lines {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Hide default cursor on desktop where custom cursor is active */
+@media (min-width: 768px) {
+  body {
+    cursor: none;
+  }
+
+  a,
+  button,
+  [role='button'],
+  input,
+  select,
+  textarea {
+    cursor: none;
+  }
+}
+
+/* Print optimization */
+@media print {
+  @page {
+    size: A4;
+    margin: 15mm; /* Browser handles margins for all pages */
+  }
+
+  html,
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 10pt;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Force visibility on ALL structural containers and elements */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide UI elements */
+  nav,
+  .settings-dock, /* Now targeted correctly */
+  .print-hidden,
+  button,
+  .cv-print-button,
+  nextjs-portal,
+  [data-nextjs-toast] {
+    display: none !important;
+  }
+
+  /* Reset basic visibility for content path */
+  html,
+  body,
+  #page-transition-container,
+  main {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: static !important;
+  }
+
+  /* Ensure text elements are visible and keep their layout */
+  div,
+  section,
+  article,
+  aside,
+  p,
+  h1,
+  h2,
+  h3,
+  span,
+  li,
+  ul {
+    opacity: 1 !important;
+    visibility: visible !important;
+    filter: none !important;
+    transform: none !important;
+  }
+
+  /* Target the content specifically */
+  #cv-content {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important; /* Remove internal padding, rely on @page */
+    width: 100% !important; /* Fill the margin-constrained area */
+    max-width: none !important;
+    min-height: auto !important;
+    box-shadow: none !important;
+    background: white !important;
+    position: static !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Allow natural line-level splitting across pages */
+  .cv-entry,
+  section,
+  p,
+  li,
+  h1,
+  h2,
+  h3 {
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+
+  /* Force grid layout in print */
+  #cv-content .grid {
+    display: grid !important;
+  }
+
+  /* Ensure columns allow natural pagination */
+  .cv-main-col,
+  .cv-side-col,
+  .cv-timeline {
+    display: block !important;
+  }
+
+  /* Force black text for contrast */
+  .text-muted-foreground {
+    color: #374151 !important;
+  }
+
+  .text-foreground {
+    color: #000000 !important;
+  }
+
+  /* Emerald accents in print */
+  .text-emerald-500,
+  .text-emerald-600,
+  .text-emerald-400 {
+    color: #059669 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Icon styles in print */
+  svg {
+    stroke-width: 1.5 !important;
+  }
+
+  /* Timeline dots should be visible */
+  .cv-entry .absolute {
+    background-color: #059669 !important;
+    border-color: #059669 !important;
+    display: block !important;
+  }
+}
+
+/* CV Theme Isolation - Always Light */
+#cv-content {
+  color-scheme: light;
+  --background: oklch(0.985 0.005 85);
+  --foreground: oklch(0.2 0.015 55);
+  --muted: oklch(0.9 0.01 85);
+  --muted-foreground: oklch(0.4 0.02 55);
+  --border: oklch(0.85 0.01 85);
+  --card: oklch(0.98 0.004 85);
+  --card-foreground: oklch(0.2 0.015 55);
+  /* Override dark mode */
+
+  .text-foreground {
+    color: oklch(0.2 0.015 55);
+  }
+
+  .text-muted-foreground {
+    color: oklch(0.4 0.02 55);
+  }
+}

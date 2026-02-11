@@ -1,0 +1,266 @@
+'use client'
+
+import { useRef } from 'react'
+
+import { useTranslations } from 'next-intl'
+import Image from 'next/image'
+
+import { useGSAP } from '@gsap/react'
+import { ArrowLeftIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
+
+import { Button } from '@/components/ui/Button'
+import type { PortfolioEntry } from '@/data/projects-en'
+import { useRouter } from '@/i18n/navigation'
+import { ANIMATION } from '@/lib/constants/animations'
+import { gsap } from '@/lib/gsap'
+
+import { ProjectNav } from './ProjectNav'
+
+interface RoleCaseStudyProps {
+  project: PortfolioEntry
+  prevProject?: PortfolioEntry
+  nextProject?: PortfolioEntry
+}
+
+export function RoleCaseStudy({ project, prevProject, nextProject }: RoleCaseStudyProps) {
+  const t = useTranslations('projectsBook')
+  const cs = useTranslations('projectsBook.caseStudy')
+  const router = useRouter()
+  const mainRef = useRef<HTMLElement>(null)
+
+  useGSAP(
+    () => {
+      if (!mainRef.current) return
+
+      // Hero content
+      gsap.fromTo(
+        mainRef.current.querySelector('[data-cs-hero-content]'),
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: ANIMATION.duration.slow,
+          ease: ANIMATION.ease.outStrong,
+          delay: 0.3,
+        }
+      )
+
+      // Timeline entries
+      const timelineItems = mainRef.current.querySelectorAll('[data-timeline-item]')
+      timelineItems.forEach((item) => {
+        gsap.fromTo(
+          item,
+          { opacity: 0, x: -20 },
+          {
+            opacity: 1,
+            x: 0,
+            duration: ANIMATION.duration.medium,
+            ease: ANIMATION.ease.outStrong,
+            scrollTrigger: {
+              trigger: item,
+              start: 'top 80%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        )
+      })
+
+      // Sections
+      const sections = mainRef.current.querySelectorAll('[data-cs-section]')
+      sections.forEach((section) => {
+        gsap.fromTo(
+          section,
+          { opacity: 0, y: 30 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: ANIMATION.duration.medium,
+            ease: ANIMATION.ease.outStrong,
+            scrollTrigger: {
+              trigger: section,
+              start: 'top 80%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        )
+      })
+    },
+    { scope: mainRef }
+  )
+
+  const phases = project.phases ?? []
+  const timelinePeriods = project.timeline ?? []
+
+  return (
+    <article ref={mainRef} className="min-h-screen">
+      {/* Fixed back button */}
+      <div className="fixed top-6 left-6 z-50">
+        <Button
+          variant="outline-glass"
+          size="md"
+          onClick={() => router.push('/projects')}
+          leftIcon={<ArrowLeftIcon weight="bold" className="size-4" />}
+        >
+          {t('backToProjects')}
+        </Button>
+      </div>
+
+      {/* ---- Hero ---- */}
+      <header className="relative flex h-[70vh] items-end overflow-hidden sm:h-[80vh]">
+        <Image
+          src={project.heroImage}
+          alt={project.title}
+          fill
+          sizes="100vw"
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent" />
+
+        <div
+          data-cs-hero-content
+          className="relative z-10 w-full px-6 pb-10 opacity-0 sm:px-12 lg:px-20 lg:pb-16"
+        >
+          <div className="mb-3 flex items-center gap-3 font-mono text-xs tracking-widest text-white/60 uppercase">
+            <span>{t(`categories.${project.category}`)}</span>
+            <span className="opacity-40">·</span>
+            <span>{project.year}</span>
+            <span className="opacity-40">·</span>
+            <span>{t('roleLabel')}</span>
+          </div>
+
+          <h1 className="font-serif text-4xl font-light tracking-tight text-white sm:text-5xl lg:text-7xl">
+            {project.title}
+          </h1>
+
+          <p className="mt-3 max-w-xl text-lg leading-relaxed text-white/70 sm:text-xl">
+            {project.subtitle}
+          </p>
+
+          {project.liveUrl && (
+            <a
+              href={project.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-5 inline-flex items-center gap-2 font-mono text-xs tracking-widest text-white/50 uppercase transition-colors hover:text-white"
+            >
+              {t('visitSiteLabel')}
+              <ArrowSquareOutIcon weight="duotone" className="size-4" />
+            </a>
+          )}
+        </div>
+      </header>
+
+      {/* ---- Meta row ---- */}
+      <section
+        data-cs-section
+        className="border-border border-b px-6 py-8 opacity-0 sm:px-12 lg:px-20"
+      >
+        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2">
+          <div>
+            <span className="text-muted-foreground block font-mono text-[11px] tracking-widest uppercase">
+              {cs('techLabel')}
+            </span>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {project.techStack.map((tech) => (
+                <span
+                  key={tech}
+                  className="border-border text-muted-foreground rounded-sm border px-2 py-0.5 text-xs"
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div>
+            <span className="text-muted-foreground block font-mono text-[11px] tracking-widest uppercase">
+              {t(`categories.${project.category}`)}
+            </span>
+            <span className="mt-1 block text-sm">{project.tagline}</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ---- Pull quote ---- */}
+      {project.pullQuotes?.[0] && (
+        <section data-cs-section className="px-6 py-16 opacity-0 sm:px-12 sm:py-20 lg:px-20">
+          <blockquote className="border-primary/40 text-muted-foreground mx-auto max-w-3xl border-l-2 pl-6 font-serif text-xl leading-relaxed italic sm:text-2xl lg:text-3xl">
+            &ldquo;{project.pullQuotes[0]}&rdquo;
+          </blockquote>
+        </section>
+      )}
+
+      {/* ---- Career Timeline ---- */}
+      <section
+        data-cs-section
+        className="bg-secondary/20 px-6 py-12 opacity-0 sm:px-12 sm:py-16 lg:px-20"
+      >
+        <div className="mx-auto max-w-3xl">
+          <h2 className="text-primary mb-10 font-mono text-xs tracking-widest uppercase">
+            {cs('timelineTitle')}
+          </h2>
+
+          <div className="border-border relative border-l pl-8 sm:pl-10">
+            {phases.map((phase, i) => {
+              const period = timelinePeriods[i]?.period
+
+              return (
+                <div
+                  key={phase.title}
+                  data-timeline-item
+                  className="relative pb-12 opacity-0 last:pb-0"
+                >
+                  {/* Dot */}
+                  <div className="border-primary bg-background absolute top-1 -left-9.25 size-2.5 rounded-full border-2 sm:-left-11.25" />
+
+                  {/* Period badge */}
+                  {period && (
+                    <span className="text-muted-foreground mb-2 inline-block font-mono text-[11px] tracking-widest">
+                      {period}
+                    </span>
+                  )}
+
+                  <h3 className="font-serif text-xl font-light sm:text-2xl">{phase.title}</h3>
+
+                  <p className="text-muted-foreground mt-2 text-sm leading-relaxed sm:text-base">
+                    {phase.description}
+                  </p>
+
+                  {/* Highlights */}
+                  {phase.highlights.length > 0 && (
+                    <ul className="mt-4 space-y-2">
+                      {phase.highlights.map((highlight) => (
+                        <li
+                          key={highlight}
+                          className="text-foreground/70 flex items-start gap-2 text-sm"
+                        >
+                          <span className="bg-primary/60 mt-1.5 block size-1 shrink-0 rounded-full" />
+                          {highlight}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ---- Second pull quote ---- */}
+      {project.pullQuotes?.[1] && (
+        <section
+          data-cs-section
+          className="border-border border-t px-6 py-16 opacity-0 sm:px-12 sm:py-20 lg:px-20"
+        >
+          <blockquote className="border-primary/40 text-muted-foreground mx-auto max-w-3xl border-l-2 pl-6 font-serif text-lg leading-relaxed italic sm:text-xl">
+            &ldquo;{project.pullQuotes[1]}&rdquo;
+          </blockquote>
+        </section>
+      )}
+
+      {/* ---- Project navigation ---- */}
+      <ProjectNav prevProject={prevProject} nextProject={nextProject} />
+    </article>
+  )
+}

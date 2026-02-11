@@ -1,0 +1,82 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+
+import { usePathname } from '@/i18n/navigation'
+
+export function useActiveSection(sectionIds: string[]) {
+  const pathname = usePathname()
+
+  // Initialize with hash if present to avoid jump
+  const [activeSection, setActiveSection] = useState<string>(() => {
+    if (typeof window !== 'undefined' && window.location.hash) {
+      const hashId = window.location.hash.replace('#', '')
+      if (sectionIds.includes(hashId)) return hashId
+    }
+    return ''
+  })
+
+  useEffect(() => {
+    // Only run on the homepage
+    const isHome = pathname === '/' || pathname === '/en' || pathname === '/pl'
+    if (!isHome) return
+
+    let observer: IntersectionObserver | null = null
+    let intervalId: NodeJS.Timeout | null = null
+
+    const init = () => {
+      const elements = sectionIds
+        .map((id) => document.getElementById(id))
+        .filter(Boolean) as HTMLElement[]
+
+      if (elements.length > 0) {
+        if (!observer) {
+          observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  setActiveSection(entry.target.id)
+                }
+              })
+            },
+            {
+              rootMargin: '-50% 0px -50% 0px',
+              threshold: 0,
+            }
+          )
+        }
+
+        elements.forEach((el) => observer?.observe(el))
+
+        // If we found all of them, we can stop polling
+        if (elements.length === sectionIds.length && intervalId) {
+          clearInterval(intervalId)
+        }
+        return true
+      }
+      return false
+    }
+
+    // Try to init immediately
+    const initialized = init()
+
+    if (!initialized) {
+      intervalId = setInterval(init, 250)
+    }
+
+    // Safety timeout to stop polling
+    const timeoutId = setTimeout(() => {
+      if (intervalId) clearInterval(intervalId)
+    }, 5000)
+
+    return () => {
+      observer?.disconnect()
+      if (intervalId) clearInterval(intervalId)
+      clearTimeout(timeoutId)
+    }
+  }, [pathname, sectionIds])
+
+  // Clear active section if not on home
+  const isHome = pathname === '/' || pathname === '/en' || pathname === '/pl'
+  return isHome ? activeSection : ''
+}

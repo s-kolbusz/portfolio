@@ -1,0 +1,65 @@
+'use client'
+
+import { useEffect, useRef, useState } from 'react'
+
+import { PortfolioEntry } from '@/data/projects-en'
+
+import { ProjectHoverPreview } from './ProjectHoverPreview'
+import { ProjectItem } from './ProjectItem'
+
+interface ProjectListProps {
+  projects: PortfolioEntry[]
+}
+
+export function ProjectList({ projects }: ProjectListProps) {
+  const [openId, setOpenId] = useState<string | null>(null)
+  const [activeImage, setActiveImage] = useState<string | null>(null)
+  const [isVisible, setIsVisible] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting)
+        // Immediately kill active image when section is out of view
+        if (!entry.isIntersecting) {
+          setActiveImage(null)
+        }
+      },
+      {
+        threshold: 0, // Trigger as soon as even 1px is visible/hidden
+        rootMargin: '0px',
+      }
+    )
+
+    observer.observe(container)
+    return () => observer.disconnect()
+  }, [])
+
+  const handleToggle = (id: string) => {
+    setOpenId(openId === id ? null : id)
+  }
+
+  return (
+    <div ref={containerRef} className="relative" onMouseLeave={() => setActiveImage(null)}>
+      <div className="hidden md:block">
+        <ProjectHoverPreview activeImage={activeImage} isVisible={isVisible} />
+      </div>
+
+      <div className="flex flex-col">
+        {projects.map((project) => (
+          <ProjectItem
+            key={project.id}
+            project={project}
+            isOpen={openId === project.id}
+            onToggle={() => handleToggle(project.id)}
+            onHover={setActiveImage}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
