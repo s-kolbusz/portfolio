@@ -105,7 +105,7 @@ export function BookTableOfContents({ entries, onNavigate }: BookTableOfContents
                 </span>
 
                 {/* Title */}
-                <span className="group-hover:text-primary flex-1 font-serif text-3xl font-light tracking-tight transition-all group-hover:translate-x-1">
+                <span className="group-hover:text-primary flex-1 font-serif text-4xl font-light tracking-tight transition-all group-hover:translate-x-1">
                   {entry.title}
                 </span>
 
