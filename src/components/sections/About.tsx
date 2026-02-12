@@ -5,7 +5,6 @@ import React, { useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 
-import { useGSAP } from '@gsap/react'
 import { ArrowRightIcon } from '@phosphor-icons/react'
 
 import { BaseSection } from '@/components/ui/BaseSection'
@@ -13,7 +12,6 @@ import { SkillTag } from '@/components/ui/SkillTag'
 import { skillCategories } from '@/data/skills'
 import { useRevealAnimation } from '@/hooks/useRevealAnimation'
 import { useSafeAnimation } from '@/lib/constants/animations'
-import { gsap } from '@/lib/gsap'
 
 export const About: React.FC = () => {
   const t = useTranslations('about')
@@ -24,31 +22,32 @@ export const About: React.FC = () => {
 
   const ANIMATION = useSafeAnimation()
 
-  useRevealAnimation(contentRef, { stagger: ANIMATION.stagger.slow, scope: containerRef })
-  useRevealAnimation(statsRef, { x: -20, y: 0, scope: containerRef })
-
-  useGSAP(
-    () => {
-      if (imageContainerRef.current) {
-        gsap.fromTo(
-          imageContainerRef.current,
-          { clipPath: 'inset(0% 0% 100% 0%)' },
-          {
-            clipPath: 'inset(0% 0% 0% 0%)',
+  useRevealAnimation(containerRef, [
+    {
+      animations: [
+        {
+          target: contentRef,
+          options: { stagger: ANIMATION.stagger.slow },
+        },
+        {
+          target: imageContainerRef,
+          options: {
+            clipPath: {
+              from: 'inset(0% 0% 100% 0%)',
+              to: 'inset(0% 0% 0% 0%)',
+            },
             duration: ANIMATION.duration.slow,
             ease: ANIMATION.ease.inOut,
-            delay: ANIMATION.delay.short,
-            scrollTrigger: {
-              toggleActions: ANIMATION.scrollTrigger.toggleActions,
-              trigger: containerRef.current,
-              start: 'top 80%',
-            },
-          }
-        )
-      }
+            position: '<0.1',
+          },
+        },
+        {
+          target: statsRef,
+          options: { x: -20, y: 0, position: '<0.3' },
+        },
+      ],
     },
-    { scope: containerRef }
-  )
+  ])
 
   return (
     <BaseSection

@@ -9,8 +9,8 @@ import { useGSAP } from '@gsap/react'
 import { ArrowDownIcon } from '@phosphor-icons/react'
 
 import { Button } from '@/components/ui/Button'
-import { useMedia } from '@/hooks/useMedia'
-import { useRevealAnimation } from '@/hooks/useRevealAnimation'
+import { usePrefersReducedMotion } from '@/hooks/useMedia'
+import { useReveal } from '@/hooks/useRevealAnimation'
 import { ANIMATION } from '@/lib/constants/animations'
 import { gsap } from '@/lib/gsap'
 
@@ -27,7 +27,8 @@ export function Hero() {
   const ctaRef = useRef<HTMLDivElement>(null)
   const ctaIconRef = useRef<SVGSVGElement>(null)
   const caretRef = useRef<HTMLSpanElement>(null)
-  const prefersReducedMotion = useMedia('(prefers-reduced-motion: reduce)')
+  const prefersReducedMotion = usePrefersReducedMotion()
+  const reveal = useReveal()
 
   const name = t('name')
   const splitName = useMemo(() => {
@@ -45,9 +46,6 @@ export function Hero() {
     ))
   }, [name])
 
-  useRevealAnimation(roleRef, { delay: 1, scope: headerRef })
-  useRevealAnimation(ctaRef, { delay: 1.5, scope: headerRef, y: 20 })
-
   useGSAP(
     () => {
       const chars = gsap.utils.toArray<HTMLElement>('.char')
@@ -56,6 +54,8 @@ export function Hero() {
       if (prefersReducedMotion) {
         gsap.set(chars, { opacity: 1 })
         gsap.set(caretRef.current, { opacity: 0 })
+        reveal(roleRef)
+        reveal(ctaRef, { y: 20 })
         return
       }
 
@@ -103,6 +103,10 @@ export function Hero() {
         )
       })
 
+      // Reveal role and CTA after typing
+      reveal(roleRef, { timeline: tl, delay: 0.3 })
+      reveal(ctaRef, { timeline: tl, delay: 0.2, y: 20, position: '<0.1' })
+
       // Blinking caret effect loop
       const blinkingCaret = gsap.to(caretRef.current, {
         opacity: 0,
@@ -133,7 +137,7 @@ export function Hero() {
         })
       }
     },
-    { scope: containerRef }
+    { scope: containerRef, dependencies: [prefersReducedMotion] }
   )
 
   const handleCtaClick = () => {

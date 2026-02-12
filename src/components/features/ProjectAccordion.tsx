@@ -11,6 +11,7 @@ import { ArrowUpRightIcon } from '@phosphor-icons/react'
 import gsap from 'gsap'
 
 import { PortfolioEntry } from '@/data/projects-en'
+import { useReveal } from '@/hooks/useRevealAnimation'
 import { ANIMATION } from '@/lib/constants/animations'
 
 interface ProjectAccordionProps {
@@ -22,6 +23,7 @@ export function ProjectAccordion({ project, isOpen }: ProjectAccordionProps) {
   const t = useTranslations('projects')
   const containerRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
+  const reveal = useReveal()
 
   useGSAP(() => {
     if (isOpen) {
@@ -31,18 +33,11 @@ export function ProjectAccordion({ project, isOpen }: ProjectAccordionProps) {
         duration: ANIMATION.duration.fast,
         ease: ANIMATION.ease.out,
       })
-      gsap.fromTo(
-        contentRef.current?.children || [],
-        { opacity: 0, y: 30 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: ANIMATION.duration.medium,
-          stagger: ANIMATION.stagger.tight,
-          delay: 0.1,
-          ease: ANIMATION.ease.out,
-        }
-      )
+
+      reveal(contentRef, {
+        delay: 0.1,
+        stagger: ANIMATION.stagger.tight,
+      })
     } else {
       gsap.to(containerRef.current, {
         height: 0,

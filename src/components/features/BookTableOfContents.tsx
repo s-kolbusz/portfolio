@@ -5,10 +5,10 @@ import { useCallback, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 
-import { useGSAP } from '@gsap/react'
 import { StarIcon } from '@phosphor-icons/react'
 
 import { PortfolioEntry } from '@/data/projects-en'
+import { useRevealAnimation } from '@/hooks/useRevealAnimation'
 import { ANIMATION } from '@/lib/constants/animations'
 import { gsap } from '@/lib/gsap'
 
@@ -23,37 +23,33 @@ export function BookTableOfContents({ entries, onNavigate }: BookTableOfContents
   const containerRef = useRef<HTMLDivElement>(null)
   const previewRef = useRef<HTMLDivElement>(null)
 
-  useGSAP(
-    () => {
-      if (!containerRef.current) return
-
-      gsap.fromTo(
-        containerRef.current.querySelector('[data-toc-title]'),
-        { opacity: 0, y: 30 },
+  useRevealAnimation(containerRef, [
+    {
+      animations: [
         {
-          opacity: 1,
-          y: 0,
-          duration: ANIMATION.duration.medium,
-          ease: ANIMATION.ease.outStrong,
-          delay: ANIMATION.delay.short,
-        }
-      )
-
-      gsap.fromTo(
-        containerRef.current.querySelectorAll('[data-toc-entry]'),
-        { opacity: 0, x: -20 },
+          target: containerRef,
+          options: {
+            selector: '[data-toc-title]',
+            y: 30,
+            duration: ANIMATION.duration.medium,
+            ease: ANIMATION.ease.outStrong,
+            delay: ANIMATION.delay.short,
+          },
+        },
         {
-          opacity: 1,
-          x: 0,
-          duration: ANIMATION.duration.fast,
-          ease: ANIMATION.ease.out,
-          stagger: ANIMATION.stagger.normal,
-          delay: ANIMATION.delay.medium,
-        }
-      )
+          target: containerRef,
+          options: {
+            selector: '[data-toc-entry]',
+            x: -20,
+            duration: ANIMATION.duration.fast,
+            ease: ANIMATION.ease.out,
+            stagger: ANIMATION.stagger.normal,
+            position: '<0.2',
+          },
+        },
+      ],
     },
-    { scope: containerRef }
-  )
+  ])
 
   const handleHover = useCallback((id: string | null) => {
     setHoveredId(id)

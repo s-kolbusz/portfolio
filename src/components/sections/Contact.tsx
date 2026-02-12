@@ -21,13 +21,23 @@ export function Contact() {
 
   const ANIMATION = useSafeAnimation()
 
-  useRevealAnimation(headerRef, { scope: sectionRef })
-  useRevealAnimation(linksRef, {
-    y: 40,
-    start: 'top 85%',
-    stagger: ANIMATION.stagger.slow,
-    scope: sectionRef,
-  })
+  useRevealAnimation(sectionRef, [
+    {
+      start: 'top 85%',
+      animations: [
+        { target: headerRef },
+        {
+          target: linksRef,
+          options: {
+            x: -60,
+            y: 0,
+            stagger: ANIMATION.stagger.slow,
+            position: '<0.2',
+          },
+        },
+      ],
+    },
+  ])
 
   const currentYear = new Date().getFullYear()
 

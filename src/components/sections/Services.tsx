@@ -24,18 +24,19 @@ export function Services() {
 
   const ANIMATION = useSafeAnimation()
 
-  useRevealAnimation(headerRef, { scope: sectionRef })
-  useRevealAnimation(gridRef, { y: 40, start: 'top 95%', scope: sectionRef })
-  useRevealAnimation(processRef, {
-    start: 'top 80%',
-    stagger: ANIMATION.stagger.slow,
-    scope: sectionRef,
-  })
-  useRevealAnimation(processStepsRef, {
-    start: 'top 75%',
-    stagger: ANIMATION.stagger.slow,
-    scope: processRef,
-  })
+  useRevealAnimation(sectionRef, [
+    {
+      animations: [
+        { target: headerRef },
+        { target: gridRef, options: { y: 40, position: '<0.2' } },
+        { target: processRef, options: { stagger: ANIMATION.stagger.slow } },
+        {
+          target: processStepsRef,
+          options: { stagger: ANIMATION.stagger.slow, position: '<0.2' },
+        },
+      ],
+    },
+  ])
 
   const handleServiceClick = () => {
     const contactSection = document.getElementById('contact')

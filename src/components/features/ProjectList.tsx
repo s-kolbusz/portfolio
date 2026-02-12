@@ -21,7 +21,13 @@ export function ProjectList({ projects }: ProjectListProps) {
   const listRef = useRef<HTMLDivElement>(null)
 
   const ANIMATION = useSafeAnimation()
-  useRevealAnimation(listRef, { stagger: ANIMATION.stagger.slow, scope: containerRef })
+
+  useRevealAnimation(containerRef, [
+    {
+      trigger: listRef,
+      animations: [{ target: listRef, options: { stagger: ANIMATION.stagger.slow } }],
+    },
+  ])
 
   useEffect(() => {
     const container = containerRef.current

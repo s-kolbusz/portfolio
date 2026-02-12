@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/Button'
 import type { PortfolioEntry } from '@/data/projects-en'
 import { useRevealAnimation } from '@/hooks/useRevealAnimation'
 import { useRouter } from '@/i18n/navigation'
-import { ANIMATION } from '@/lib/constants/animations'
+import { useSafeAnimation } from '@/lib/constants/animations'
 
 import { Lightbox } from '../ui/Lightbox'
 import { ProjectNav } from './ProjectNav'
@@ -27,26 +27,33 @@ export function ProjectCaseStudy({ project, prevProject, nextProject }: ProjectC
   const cs = useTranslations('projectsBook.caseStudy')
   const router = useRouter()
   const mainRef = useRef<HTMLElement>(null)
+  const ANIMATION = useSafeAnimation()
 
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
 
-  // 1. Hero Animation
-  useRevealAnimation(mainRef, {
-    selector: '[data-cs-hero-content]',
-    y: 40,
-    duration: ANIMATION.duration.slow,
-    delay: 0.3,
-  })
+  useRevealAnimation(mainRef, [
+    {
+      animations: [
+        {
+          target: mainRef,
+          options: {
+            selector: '[data-cs-hero-content]',
+            y: 40,
+            duration: ANIMATION.duration.slow,
+            delay: 0.3,
+          },
+        },
+      ],
+    },
+  ])
 
-  // 2. Sections Reveal
   useRevealAnimation(mainRef, {
     selector: '[data-cs-section]',
     y: 30,
     once: false,
   })
 
-  // 3. Gallery Reveal
   useRevealAnimation(mainRef, {
     selector: '[data-cs-gallery-item]',
     y: 20,

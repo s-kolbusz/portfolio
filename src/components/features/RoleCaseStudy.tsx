@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/Button'
 import type { PortfolioEntry } from '@/data/projects-en'
 import { useRevealAnimation } from '@/hooks/useRevealAnimation'
 import { useRouter } from '@/i18n/navigation'
-import { ANIMATION } from '@/lib/constants/animations'
+import { useSafeAnimation } from '@/lib/constants/animations'
 
 import { ProjectNav } from './ProjectNav'
 
@@ -26,23 +26,30 @@ export function RoleCaseStudy({ project, prevProject, nextProject }: RoleCaseStu
   const cs = useTranslations('projectsBook.caseStudy')
   const router = useRouter()
   const mainRef = useRef<HTMLElement>(null)
+  const ANIMATION = useSafeAnimation()
 
-  // 1. Hero Content Reveal
-  useRevealAnimation(mainRef, {
-    selector: '[data-cs-hero-content]',
-    y: 40,
-    duration: ANIMATION.duration.slow,
-    delay: 0.3,
-  })
+  useRevealAnimation(mainRef, [
+    {
+      animations: [
+        {
+          target: mainRef,
+          options: {
+            selector: '[data-cs-hero-content]',
+            y: 40,
+            duration: ANIMATION.duration.slow,
+            delay: 0.3,
+          },
+        },
+      ],
+    },
+  ])
 
-  // 2. Timeline Reveal
   useRevealAnimation(mainRef, {
     selector: '[data-timeline-item]',
     x: -20,
     once: false,
   })
 
-  // 3. Sections Reveal
   useRevealAnimation(mainRef, {
     selector: '[data-cs-section]',
     y: 30,

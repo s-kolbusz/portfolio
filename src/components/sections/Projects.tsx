@@ -26,11 +26,14 @@ export function Projects({ locale }: ProjectsProps) {
 
   const projects = getFeaturedProjects(locale as Locale)
 
-  // 1. Editorial Header Reveal
-  useRevealAnimation(headerRef)
-
-  // 2. Case Studies List Reveal
-  useRevealAnimation(contentRef, { y: 40, stagger: 0.5, scope: sectionRef })
+  useRevealAnimation(sectionRef, [
+    {
+      animations: [
+        { target: headerRef },
+        { target: contentRef, options: { y: 40, stagger: 0.5, position: '<0.3' } },
+      ],
+    },
+  ])
 
   return (
     <BaseSection

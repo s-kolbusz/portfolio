@@ -22,28 +22,40 @@ export const CVLayout: React.FC<CVLayoutProps> = ({ data }) => {
 
   const ANIMATION = useSafeAnimation()
 
-  // 1. Header Reveal
-  useRevealAnimation(containerRef, {
-    selector: '.cv-header > *',
-    delay: 0.4,
-    stagger: ANIMATION.stagger.normal,
-  })
-
-  // 2. Main Column Reveal
-  useRevealAnimation(containerRef, {
-    selector: '.cv-main-col > *',
-    delay: 0.6,
-    stagger: ANIMATION.stagger.loose,
-  })
-
-  // 3. Side Column Reveal
-  useRevealAnimation(containerRef, {
-    selector: '.cv-side-col > *',
-    delay: 0.8,
-    x: 20,
-    y: 0,
-    stagger: ANIMATION.stagger.normal,
-  })
+  useRevealAnimation(containerRef, [
+    {
+      animations: [
+        {
+          target: containerRef,
+          options: {
+            selector: '.cv-header > *',
+            delay: 0.4,
+            stagger: ANIMATION.stagger.normal,
+          },
+        },
+        {
+          target: containerRef,
+          options: {
+            selector: '.cv-main-col > *',
+            delay: 0.2,
+            stagger: ANIMATION.stagger.loose,
+            position: '<0.2',
+          },
+        },
+        {
+          target: containerRef,
+          options: {
+            selector: '.cv-side-col > *',
+            delay: 0.2,
+            x: 20,
+            y: 0,
+            stagger: ANIMATION.stagger.normal,
+            position: '<0.4',
+          },
+        },
+      ],
+    },
+  ])
 
   return (
     <div

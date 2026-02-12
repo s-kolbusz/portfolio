@@ -9,6 +9,7 @@ import { useGSAP } from '@gsap/react'
 import { ArrowRightIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
 
 import { PortfolioEntry } from '@/data/projects-en'
+import { useReveal } from '@/hooks/useRevealAnimation'
 import { Link } from '@/i18n/navigation'
 import { ANIMATION } from '@/lib/constants/animations'
 import { gsap } from '@/lib/gsap'
@@ -21,70 +22,72 @@ interface BookSpreadProps {
 export function BookSpread({ entry, index }: BookSpreadProps) {
   const t = useTranslations('projectsBook')
   const panelRef = useRef<HTMLDivElement>(null)
+  const reveal = useReveal()
 
   useGSAP(
     () => {
       if (!panelRef.current) return
       const tl = gsap.timeline({ paused: true })
 
+      reveal('[data-spread-number]', {
+        timeline: tl,
+        y: 30,
+        ease: ANIMATION.ease.outStrong,
+      })
+
+      reveal('[data-spread-title]', {
+        timeline: tl,
+        y: 20,
+        ease: ANIMATION.ease.outStrong,
+        position: '-=0.7',
+      })
+
+      reveal('[data-spread-subtitle]', {
+        timeline: tl,
+        y: 15,
+        duration: ANIMATION.duration.fast,
+        position: '-=0.5',
+      })
+
       tl.fromTo(
-        panelRef.current.querySelector('[data-spread-number]'),
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: ANIMATION.duration.medium, ease: ANIMATION.ease.outStrong }
+        panelRef.current.querySelectorAll('[data-spread-pill]'),
+        { opacity: 0, scale: 0.8 },
+        {
+          opacity: 1,
+          scale: 1,
+          duration: ANIMATION.duration.fast,
+          ease: ANIMATION.ease.back,
+          stagger: ANIMATION.stagger.tight,
+        },
+        '-=0.4'
       )
-        .fromTo(
-          panelRef.current.querySelector('[data-spread-title]'),
-          { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, duration: ANIMATION.duration.medium, ease: ANIMATION.ease.outStrong },
-          '-=0.7'
-        )
-        .fromTo(
-          panelRef.current.querySelector('[data-spread-subtitle]'),
-          { opacity: 0, y: 15 },
-          { opacity: 1, y: 0, duration: ANIMATION.duration.fast, ease: ANIMATION.ease.out },
-          '-=0.5'
-        )
-        .fromTo(
-          panelRef.current.querySelectorAll('[data-spread-pill]'),
-          { opacity: 0, scale: 0.8 },
-          {
-            opacity: 1,
-            scale: 1,
-            duration: ANIMATION.duration.fast,
-            ease: ANIMATION.ease.back,
-            stagger: ANIMATION.stagger.tight,
-          },
-          '-=0.4'
-        )
-        .fromTo(
-          panelRef.current.querySelector('[data-spread-quote]'),
-          { opacity: 0, x: -20 },
-          { opacity: 1, x: 0, duration: ANIMATION.duration.medium, ease: ANIMATION.ease.out },
-          '-=0.3'
-        )
-        .fromTo(
-          panelRef.current.querySelectorAll('[data-spread-link]'),
-          { opacity: 0, y: 10 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: ANIMATION.duration.fast,
-            ease: ANIMATION.ease.out,
-            stagger: ANIMATION.stagger.normal,
-          },
-          '-=0.6'
-        )
-        .fromTo(
-          panelRef.current.querySelector('[data-spread-image]'),
-          { opacity: 0, scale: 1.05 },
-          {
-            opacity: 1,
-            scale: 1,
-            duration: ANIMATION.duration.slow,
-            ease: ANIMATION.ease.outStrong,
-          },
-          0
-        )
+
+      reveal('[data-spread-quote]', {
+        timeline: tl,
+        x: -20,
+        y: 0,
+        position: '-=0.3',
+      })
+
+      reveal('[data-spread-link]', {
+        timeline: tl,
+        y: 10,
+        duration: ANIMATION.duration.fast,
+        stagger: ANIMATION.stagger.normal,
+        position: '-=0.6',
+      })
+
+      tl.fromTo(
+        panelRef.current.querySelector('[data-spread-image]'),
+        { opacity: 0, scale: 1.05 },
+        {
+          opacity: 1,
+          scale: 1,
+          duration: ANIMATION.duration.slow,
+          ease: ANIMATION.ease.outStrong,
+        },
+        0
+      )
 
       // Use IntersectionObserver to trigger
       const observer = new IntersectionObserver(
