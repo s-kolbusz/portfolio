@@ -1,10 +1,9 @@
 'use client'
 
-import { ReactNode, useMemo, useRef, useState } from 'react'
+import { ReactNode, useMemo, useState } from 'react'
 
 import { useTranslations } from 'next-intl'
 
-import { useGSAP } from '@gsap/react'
 import {
   DropIcon,
   FireIcon,
@@ -14,54 +13,12 @@ import {
   SunIcon,
   WavesIcon,
 } from '@phosphor-icons/react'
-import gsap from 'gsap'
 
+import { AnimatedNumber } from '@/components/ui/AnimatedNumber'
 import { Select } from '@/components/ui/Select'
 import { Slider } from '@/components/ui/Slider'
 import { BUILD_VOLUME_X, BUILD_VOLUME_Y, BUILD_VOLUME_Z, MATERIALS } from '@/data/materials'
-import { useMedia } from '@/hooks/useMedia'
 import { calculatePrintCost } from '@/lib/calculate-print'
-
-// Helper for animating numbers
-const AnimatedValue = ({
-  value,
-  formatter = (v) => v.toString(),
-  className,
-}: {
-  value: number
-  formatter?: (v: number) => string | number
-  className?: string
-}) => {
-  const ref = useRef<HTMLSpanElement>(null)
-  const valueRef = useRef(value)
-  const prefersReducedMotion = useMedia('(prefers-reduced-motion: reduce)')
-
-  useGSAP(() => {
-    if (prefersReducedMotion) {
-      if (ref.current) {
-        ref.current.textContent = formatter(value).toString()
-      }
-      return
-    }
-
-    gsap.to(valueRef, {
-      current: value,
-      duration: 0.5,
-      ease: 'power2.out',
-      onUpdate: () => {
-        if (ref.current) {
-          ref.current.textContent = formatter(valueRef.current).toString()
-        }
-      },
-    })
-  }, [value, prefersReducedMotion])
-
-  return (
-    <span ref={ref} className={className}>
-      {formatter(value)}
-    </span>
-  )
-}
 
 const MATERIAL_ICONS: Record<string, ReactNode> = {
   pla: <LeafIcon weight="duotone" className="size-4" />,
@@ -142,7 +99,7 @@ export const CalculatorPanel = () => {
             value={dimensions.x}
             valueDisplay={
               <span className="font-mono">
-                <AnimatedValue value={dimensions.x} formatter={(v) => v.toFixed(1)} /> cm
+                <AnimatedNumber value={dimensions.x} formatter={(v) => v.toFixed(1)} /> cm
               </span>
             }
             onChange={(e) => handleDimensionChange('x', parseFloat(e.target.value))}
@@ -157,7 +114,7 @@ export const CalculatorPanel = () => {
             value={dimensions.y}
             valueDisplay={
               <span className="font-mono">
-                <AnimatedValue value={dimensions.y} formatter={(v) => v.toFixed(1)} /> cm
+                <AnimatedNumber value={dimensions.y} formatter={(v) => v.toFixed(1)} /> cm
               </span>
             }
             onChange={(e) => handleDimensionChange('y', parseFloat(e.target.value))}
@@ -172,7 +129,7 @@ export const CalculatorPanel = () => {
             value={dimensions.z}
             valueDisplay={
               <span className="font-mono">
-                <AnimatedValue value={dimensions.z} formatter={(v) => v.toFixed(1)} /> cm
+                <AnimatedNumber value={dimensions.z} formatter={(v) => v.toFixed(1)} /> cm
               </span>
             }
             onChange={(e) => handleDimensionChange('z', parseFloat(e.target.value))}
@@ -210,7 +167,7 @@ export const CalculatorPanel = () => {
             value={infill}
             valueDisplay={
               <span className="font-mono">
-                <AnimatedValue value={infill} formatter={(v) => Math.round(v)} />%
+                <AnimatedNumber value={infill} formatter={(v) => Math.round(v)} />%
               </span>
             }
             onChange={(e) => setInfill(parseInt(e.target.value))}
@@ -229,7 +186,7 @@ export const CalculatorPanel = () => {
               {t('output.material_cost')}
             </span>
             <div className="font-mono text-4xl font-light tracking-tight tabular-nums">
-              <AnimatedValue value={result.materialCost} formatter={formatCurrency} />
+              <AnimatedNumber value={result.materialCost} formatter={formatCurrency} />
             </div>
           </div>
 
@@ -238,7 +195,7 @@ export const CalculatorPanel = () => {
               {t('output.time_cost')}
             </span>
             <div className="font-mono text-4xl font-light tracking-tight tabular-nums">
-              <AnimatedValue value={result.timeEstimate} formatter={formatTime} />
+              <AnimatedNumber value={result.timeEstimate} formatter={formatTime} />
             </div>
           </div>
         </div>
@@ -249,7 +206,7 @@ export const CalculatorPanel = () => {
               {t('output.total')}
             </span>
             <div className="font-serif text-6xl font-light tracking-tight tabular-nums">
-              <AnimatedValue value={result.totalCost} formatter={formatCurrency} />
+              <AnimatedNumber value={result.totalCost} formatter={formatCurrency} />
             </div>
           </div>
         </div>
