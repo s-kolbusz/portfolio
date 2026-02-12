@@ -115,7 +115,7 @@
     "landing-page": {
       "label": "Landing Page",
       "title": "Skuteczna Strona Sprzedażowa",
-      "price": "€850",
+      "price": "3500 zł",
       "unit": "inwestycja stała",
       "features": {
         "0": "Treści oparte na psychologii sprzedaży",
@@ -129,7 +129,7 @@
     "website": {
       "label": "Strona Firmowa",
       "title": "Platforma Autorytetu Marki",
-      "price": "€1 800",
+      "price": "8000 zł",
       "unit": "inwestycja bazowa",
       "features": {
         "0": "Wielostronicowy design pod konwersję",
@@ -143,7 +143,7 @@
     "web-app": {
       "label": "SaaS / Aplikacja",
       "title": "MVP Gotowe na Rynek",
-      "price": "€3 900",
+      "price": "18 000 zł",
       "unit": "pakiet startowy",
       "features": {
         "0": "Szybki cykl rozwoju (4-6 tygodni)",
@@ -157,7 +157,7 @@
     "hourly": {
       "label": "Konsultacje",
       "title": "Ekspert Techniczny na żądanie",
-      "price": "€60",
+      "price": "250 zł",
       "unit": "za godzinę",
       "features": {
         "0": "Rozwiązywanie krytycznych problemów",

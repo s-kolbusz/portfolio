@@ -78,7 +78,7 @@ export const metadata: Metadata = {
     description:
       'Full-stack developer and 3D printing enthusiast specializing in cinematic web experiences.',
     images: ['/images/sebastian_kolbusz_caricature.avif'],
-    creator: '@skolbusz',
+    creator: '@s-kolbusz',
   },
   robots: {
     index: true,

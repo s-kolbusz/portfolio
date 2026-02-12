@@ -35,6 +35,7 @@ export function ProjectAccordion({ project, isOpen }: ProjectAccordionProps) {
       })
 
       reveal(contentRef, {
+        start: 'top 100%',
         delay: 0.1,
         stagger: ANIMATION.stagger.tight,
       })
