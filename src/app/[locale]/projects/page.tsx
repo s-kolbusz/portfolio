@@ -25,7 +25,7 @@ export default async function ProjectsPage({ params }: Props) {
   const projects = getProjects(locale as Locale)
 
   return (
-    <>
+    <main id="main-content">
       {/* Desktop: horizontal book */}
       <div className="hidden lg:block">
         <ProjectBook projects={projects} />
@@ -45,12 +45,12 @@ export default async function ProjectsPage({ params }: Props) {
             itemListElement: projects.map((project, index) => ({
               '@type': 'ListItem',
               position: index + 1,
-              url: `https://sebastiankolbusz.com/${locale}/projects/${project.id}`,
+              url: `https://kolbusz.xyz/${locale}/projects/${project.id}`,
               name: project.title,
             })),
           }),
         }}
       />
-    </>
+    </main>
   )
 }

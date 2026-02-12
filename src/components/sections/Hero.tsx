@@ -5,12 +5,11 @@ import { useMemo, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import dynamic from 'next/dynamic'
 
-import { useGSAP } from '@gsap/react'
 import { ArrowDownIcon } from '@phosphor-icons/react'
 
 import { Button } from '@/components/ui/Button'
-import { ANIMATION } from '@/lib/constants/animations'
-import { gsap } from '@/lib/gsap'
+import { useHeroAnimation } from '@/hooks/useHeroAnimation'
+import { usePrefersReducedMotion } from '@/hooks/useMedia'
 
 const HeroScene = dynamic(() => import('@/components/canvas/HeroScene'), {
   ssr: false,
@@ -25,6 +24,16 @@ export function Hero() {
   const ctaRef = useRef<HTMLDivElement>(null)
   const ctaIconRef = useRef<SVGSVGElement>(null)
   const caretRef = useRef<HTMLSpanElement>(null)
+  const prefersReducedMotion = usePrefersReducedMotion()
+
+  useHeroAnimation({
+    containerRef,
+    caretRef,
+    roleRef,
+    ctaRef,
+    ctaIconRef,
+    prefersReducedMotion,
+  })
 
   const name = t('name')
   const splitName = useMemo(() => {
@@ -41,119 +50,6 @@ export function Hero() {
       </span>
     ))
   }, [name])
-
-  useGSAP(
-    () => {
-      const chars = gsap.utils.toArray<HTMLElement>('.char')
-      if (chars.length === 0) return
-
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none none',
-          once: true,
-        },
-      })
-
-      // Initial state
-      gsap.set(chars, { opacity: 0 })
-      gsap.set(caretRef.current, { opacity: 1 })
-
-      // 1. Natural typing effect for name
-      // We calculate all positions once to avoid layout thrashing
-      const parentRect = caretRef.current?.parentElement?.getBoundingClientRect() || {
-        left: 0,
-        top: 0,
-      }
-
-      chars.forEach((char, i) => {
-        const delay = i === 0 ? 0.4 : 0.03 + Math.random() * 0.12
-        const charRect = char.getBoundingClientRect()
-        const targetX = charRect.right - parentRect.left
-        const targetY = charRect.top - parentRect.top
-
-        tl.to(
-          char,
-          {
-            opacity: 1,
-            duration: 0.01,
-          },
-          `+=${delay}`
-        )
-
-        tl.set(
-          caretRef.current,
-          {
-            x: targetX,
-            y: targetY,
-          },
-          '<'
-        )
-      })
-
-      // Blinking caret effect loop
-      const blinkingCaret = gsap.to(caretRef.current, {
-        opacity: 0,
-        duration: 0.4,
-        repeat: -1,
-        yoyo: true,
-        ease: 'steps(1)',
-      })
-
-      // Cleanup caret
-      tl.add(() => {
-        blinkingCaret.kill()
-      })
-      tl.to(caretRef.current, {
-        opacity: 0,
-        duration: 0.4,
-        delay: ANIMATION.delay.medium,
-      })
-
-      // 2. Role & Tagline Reveal
-      if (roleRef.current) {
-        tl.fromTo(
-          roleRef.current,
-          { y: 30, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: ANIMATION.duration.medium,
-            ease: ANIMATION.ease.outStrong,
-          },
-          '-=0.2'
-        )
-      }
-
-      // 3. CTA Fade In
-      if (ctaRef.current) {
-        tl.fromTo(
-          ctaRef.current,
-          { y: 20, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: ANIMATION.duration.medium,
-            ease: ANIMATION.ease.outStrong,
-          },
-          '-=0.8'
-        )
-      }
-
-      // 4. Arrow Bounce
-      if (ctaIconRef.current) {
-        gsap.to(ctaIconRef.current, {
-          y: 6,
-          duration: 1.5,
-          repeat: -1,
-          yoyo: true,
-          ease: 'power1.inOut',
-        })
-      }
-    },
-    { scope: containerRef }
-  )
 
   const handleCtaClick = () => {
     const element = document.getElementById('about')
@@ -175,8 +71,11 @@ export function Hero() {
       <div className="relative z-10 flex max-w-6xl flex-col items-center gap-8 text-center">
         <div ref={headerRef} className="relative inline-block">
           {/* Name with Typewriter */}
-          <h1 className="font-serif text-6xl leading-[0.9] font-semibold tracking-tight text-balance md:text-8xl lg:text-9xl">
-            {splitName}
+          <h1
+            className="font-serif text-6xl leading-[0.9] font-semibold tracking-tight text-balance md:text-8xl lg:text-9xl"
+            aria-label={name}
+          >
+            <span aria-hidden="true">{splitName}</span>
           </h1>
           {/* Caret */}
           <span
@@ -187,7 +86,7 @@ export function Hero() {
         </div>
 
         {/* Role & Tagline */}
-        <div ref={roleRef} className="flex max-w-3xl flex-col gap-4 opacity-0">
+        <div ref={roleRef} className="flex max-w-3xl flex-col gap-4">
           <h2 className="font-mono text-xl font-medium md:text-3xl">{t('role')}</h2>
           <p className="text-muted-foreground font-serif text-xl italic md:text-3xl">
             {t('tagline')}
@@ -195,7 +94,7 @@ export function Hero() {
         </div>
 
         {/* CTA */}
-        <div ref={ctaRef} className="opacity-0">
+        <div ref={ctaRef}>
           <Button
             onClick={handleCtaClick}
             size="lg"

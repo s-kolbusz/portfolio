@@ -63,7 +63,7 @@ export default async function ProjectDetailPage({ params }: Props) {
             image: project.heroImage,
             dateCreated: project.year,
             category: project.category,
-            url: `https://sebastiankolbusz.com/${locale}/projects/${project.id}`,
+            url: `https://kolbusz.xyz/${locale}/projects/${project.id}`,
             author: {
               '@type': 'Person',
               name: 'Sebastian Kolbusz',

@@ -7,6 +7,7 @@ import { useTheme } from 'next-themes'
 
 import { MoonIcon, SunIcon } from '@phosphor-icons/react'
 
+import { Button } from '@/components/ui/Button'
 import { usePathname, useRouter } from '@/i18n/navigation'
 
 export function SettingsDock() {
@@ -36,9 +37,10 @@ export function SettingsDock() {
   return (
     <div className="settings-dock glass fixed top-6 right-6 z-50 flex items-center gap-1 p-1.5">
       {/* Theme Toggle */}
-      <button
+      <Button
+        variant="glass"
+        size="icon"
         onClick={toggleTheme}
-        className="glass-button flex h-10 w-10 items-center justify-center"
         aria-label="Toggle theme"
       >
         {resolvedTheme === 'dark' ? (
@@ -46,18 +48,19 @@ export function SettingsDock() {
         ) : (
           <SunIcon weight="duotone" className="h-5 w-5" />
         )}
-      </button>
+      </Button>
 
       <div className="bg-border h-4 w-px" />
 
       {/* Language Switcher */}
-      <button
+      <Button
+        variant="glass"
+        size="icon"
         onClick={toggleLocale}
-        className="glass-button flex h-10 w-10 items-center justify-center"
         aria-label="Switch language"
       >
         {locale.toUpperCase()}
-      </button>
+      </Button>
     </div>
   )
 }

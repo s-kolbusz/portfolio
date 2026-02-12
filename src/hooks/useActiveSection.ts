@@ -7,19 +7,20 @@ import { usePathname } from '@/i18n/navigation'
 export function useActiveSection(sectionIds: string[]) {
   const pathname = usePathname()
 
-  // Initialize with hash if present to avoid jump
-  const [activeSection, setActiveSection] = useState<string>(() => {
-    if (typeof window !== 'undefined' && window.location.hash) {
-      const hashId = window.location.hash.replace('#', '')
-      if (sectionIds.includes(hashId)) return hashId
-    }
-    return ''
-  })
+  const [activeSection, setActiveSection] = useState<string>('')
 
   useEffect(() => {
     // Only run on the homepage
     const isHome = pathname === '/' || pathname === '/en' || pathname === '/pl'
     if (!isHome) return
+
+    // Set initial hash if present
+    if (window.location.hash) {
+      const hashId = window.location.hash.replace('#', '')
+      if (sectionIds.includes(hashId)) {
+        setActiveSection(hashId)
+      }
+    }
 
     let observer: IntersectionObserver | null = null
     let intervalId: NodeJS.Timeout | null = null

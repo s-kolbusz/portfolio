@@ -4,17 +4,20 @@ import { useEffect, useRef } from 'react'
 
 import { useGSAP } from '@gsap/react'
 
-import { useMedia } from '@/hooks/useMedia'
-import { useCursorStore, CursorVariant } from '@/lib/cursor-store'
+import { useCursorInteractions } from '@/hooks/useCursorInteractions'
+import { useMedia, usePrefersReducedMotion } from '@/hooks/useMedia'
+import { useCursorStore } from '@/lib/cursor-store'
 import { gsap } from '@/lib/gsap'
 
 export default function CustomCursor() {
-  // Check for fine pointer (mouse) using useSyncExternalStore to avoid cascading renders
-  const isEnabled = useMedia('(pointer: fine)')
+  const prefersReducedMotion = usePrefersReducedMotion()
+  const isEnabled = useMedia('(pointer: fine)') && !prefersReducedMotion
 
   // Use selectors for actions only to avoid re-renders on state changes
-  const setVariant = useCursorStore((state) => state.setVariant)
   const setMagneticTarget = useCursorStore((state) => state.setMagneticTarget)
+
+  // Initialize cursor interactions (global listeners)
+  useCursorInteractions()
 
   const cursorRef = useRef<HTMLDivElement>(null)
   const ringRef = useRef<HTMLDivElement>(null)
@@ -100,87 +103,6 @@ export default function CustomCursor() {
     window.addEventListener('mousemove', onMouseMove)
     return () => window.removeEventListener('mousemove', onMouseMove)
   }, [])
-
-  // Track which slider is currently being dragged
-  const activeSliderRef = useRef<HTMLInputElement | null>(null)
-
-  // Global event delegation for data-cursor attributes
-  useEffect(() => {
-    const onMouseOver = (e: MouseEvent) => {
-      const target = e.target as HTMLElement
-      const cursorEl = target.closest('[data-cursor]') as HTMLElement
-
-      if (cursorEl) {
-        const type = cursorEl.getAttribute('data-cursor')
-        if (type) {
-          setVariant(type as CursorVariant)
-          if (type === 'button' || type === 'card' || type === 'project') {
-            setMagneticTarget(cursorEl)
-          }
-        }
-      } else if (target.tagName === 'A' || target.tagName === 'BUTTON') {
-        setVariant('button')
-        setMagneticTarget(target)
-      } else if (target.tagName === 'INPUT' && (target as HTMLInputElement).type === 'range') {
-        setVariant('button')
-        setMagneticTarget(target)
-      }
-    }
-
-    const onMouseOut = (e: MouseEvent) => {
-      const target = e.target as HTMLElement
-      const related = e.relatedTarget as HTMLElement
-      const cursorEl = target.closest('[data-cursor]')
-      const relatedCursorEl = related?.closest?.('[data-cursor]')
-
-      // Don't reset if we're actively dragging a slider
-      if (activeSliderRef.current) return
-
-      if (cursorEl && !relatedCursorEl) {
-        setVariant('default')
-        setMagneticTarget(null)
-      } else if (
-        (target.tagName === 'A' ||
-          target.tagName === 'BUTTON' ||
-          (target.tagName === 'INPUT' && (target as HTMLInputElement).type === 'range')) &&
-        !related?.closest('a, button, input[type="range"]')
-      ) {
-        setVariant('default')
-        setMagneticTarget(null)
-      }
-    }
-
-    // Slider drag: switch to 'slider' variant (hides dot) on mousedown
-    const onMouseDown = (e: MouseEvent) => {
-      const target = e.target as HTMLElement
-      if (target.tagName === 'INPUT' && (target as HTMLInputElement).type === 'range') {
-        activeSliderRef.current = target as HTMLInputElement
-        setVariant('slider')
-        setMagneticTarget(target)
-      }
-    }
-
-    // Slider release: restore default, dot fade-in is delayed in variant
-    // handler so GSAP can lerp it to the real mouse position first
-    const onMouseUp = () => {
-      if (!activeSliderRef.current) return
-      activeSliderRef.current = null
-      setVariant('default')
-      setMagneticTarget(null)
-    }
-
-    window.addEventListener('mouseover', onMouseOver)
-    window.addEventListener('mouseout', onMouseOut)
-    window.addEventListener('mousedown', onMouseDown)
-    window.addEventListener('mouseup', onMouseUp)
-
-    return () => {
-      window.removeEventListener('mouseover', onMouseOver)
-      window.removeEventListener('mouseout', onMouseOut)
-      window.removeEventListener('mousedown', onMouseDown)
-      window.removeEventListener('mouseup', onMouseUp)
-    }
-  }, [setVariant, setMagneticTarget])
 
   // Animation Loop
   useGSAP(() => {

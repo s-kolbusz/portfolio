@@ -5,15 +5,16 @@ import { useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 
-import { useGSAP } from '@gsap/react'
 import { ArrowLeftIcon, ArrowUpRightIcon, StarIcon } from '@phosphor-icons/react'
 
 import { Button } from '@/components/ui/Button'
 import { PortfolioEntry } from '@/data/projects-en'
+import { useRevealAnimation } from '@/hooks/useRevealAnimation'
 import { Link } from '@/i18n/navigation'
 import { useRouter } from '@/i18n/navigation'
 import { ANIMATION } from '@/lib/constants/animations'
-import { gsap } from '@/lib/gsap'
+
+import { ProjectMeta } from './ProjectMeta'
 
 interface ProjectCardStackProps {
   projects: PortfolioEntry[]
@@ -24,43 +25,37 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
   const router = useRouter()
   const containerRef = useRef<HTMLDivElement>(null)
 
-  useGSAP(
-    () => {
-      if (!containerRef.current) return
-
-      gsap.fromTo(
-        containerRef.current.querySelector('[data-stack-header]'),
-        { opacity: 0, y: 30 },
+  useRevealAnimation(containerRef, [
+    {
+      animations: [
         {
-          opacity: 1,
-          y: 0,
-          duration: ANIMATION.duration.medium,
-          ease: ANIMATION.ease.outStrong,
-          delay: ANIMATION.delay.short,
-        }
-      )
-
-      const items = containerRef.current.querySelectorAll('[data-stack-item]')
-      items.forEach((item) => {
-        gsap.fromTo(
-          item,
-          { opacity: 0, y: 40 },
-          {
-            opacity: 1,
-            y: 0,
+          target: containerRef,
+          options: {
+            selector: '[data-stack-header]',
+            y: 30,
             duration: ANIMATION.duration.medium,
             ease: ANIMATION.ease.outStrong,
-            scrollTrigger: {
-              trigger: item,
-              start: 'top 85%',
-              toggleActions: 'play none none reverse',
-            },
-          }
-        )
-      })
+            delay: ANIMATION.delay.short,
+          },
+        },
+      ],
     },
-    { scope: containerRef }
-  )
+    {
+      trigger: '[data-stack-item]',
+      start: 'top 85%',
+      animations: [
+        {
+          target: containerRef,
+          options: {
+            selector: '[data-stack-item]',
+            y: 40,
+            duration: ANIMATION.duration.medium,
+            ease: ANIMATION.ease.outStrong,
+          },
+        },
+      ],
+    },
+  ])
 
   return (
     <main ref={containerRef} className="min-h-screen px-6 pt-20 pb-12 sm:px-8">
@@ -99,17 +94,11 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
                 </div>
 
                 {/* Year + tech — matching homepage accordion */}
-                <div className="text-muted-foreground mt-1.5 flex items-center gap-3 font-mono text-[11px] tracking-widest">
-                  <span className="text-primary uppercase">{entry.year}</span>
-                  <span className="opacity-30">/</span>
-                  <div className="flex gap-2.5 overflow-hidden">
-                    {entry.techStack.slice(0, 3).map((tech) => (
-                      <span key={tech} className="shrink-0 uppercase">
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                <ProjectMeta
+                  year={entry.year}
+                  techStack={entry.techStack}
+                  className="mt-1.5 text-[11px]"
+                />
               </div>
 
               {/* Category */}

@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import CustomCursor from '@/components/ui/CustomCursor'
 import { DockNav } from '@/components/ui/DockNav'
 import { SettingsDock } from '@/components/ui/SettingsDock'
+import { SkipToMain } from '@/components/ui/SkipToMain'
 import { SmoothScroller } from '@/components/ui/SmoothScroller'
 import { routing } from '@/i18n/routing'
 
@@ -33,6 +34,7 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   return (
     <NextIntlClientProvider messages={messages}>
+      <SkipToMain />
       <CustomCursor />
       <SmoothScroller />
       <SettingsDock />

@@ -1,3 +1,5 @@
+import { usePrefersReducedMotion } from '@/hooks/useMedia'
+
 export const ANIMATION = {
   duration: {
     fast: 0.6,
@@ -30,3 +32,34 @@ export const ANIMATION = {
     toggleActions: 'play none none reverse',
   },
 } as const
+
+/**
+ * Helper to get animation values that respect prefers-reduced-motion
+ * @param prefersReducedMotion Boolean from useMedia('(prefers-reduced-motion: reduce)')
+ */
+export const useSafeAnimation = () => {
+  const prefersReducedMotion = usePrefersReducedMotion()
+
+  if (!prefersReducedMotion) return ANIMATION
+
+  return {
+    ...ANIMATION,
+    duration: {
+      fast: 0.3,
+      medium: 0.4,
+      slow: 0.5,
+      verySlow: 0.6,
+    },
+    stagger: {
+      tight: 0,
+      normal: 0,
+      loose: 0,
+      slow: 0,
+    },
+    ease: {
+      ...ANIMATION.ease,
+      elastic: 'power2.out',
+      back: 'power2.out',
+    },
+  }
+}

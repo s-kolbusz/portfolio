@@ -9,7 +9,9 @@ import { useGSAP } from '@gsap/react'
 import { ArrowLeftIcon, ArrowRightIcon, XIcon } from '@phosphor-icons/react'
 import { gsap } from 'gsap'
 
+import { Button } from '@/components/ui/Button'
 import { MediaItem } from '@/data/projects'
+import { useFocusTrap } from '@/hooks/useFocusTrap'
 import { useScrollStore } from '@/lib/store'
 
 interface LightboxProps {
@@ -116,7 +118,10 @@ export function Lightbox({ images, initialIndex, isOpen, onClose }: LightboxProp
     setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))
   }
 
-  // Keyboard navigation & Focus Trap
+  // Focus Trap
+  useFocusTrap(overlayRef, isOpen)
+
+  // Keyboard navigation
   useEffect(() => {
     if (!isOpen) return
 
@@ -124,32 +129,6 @@ export function Lightbox({ images, initialIndex, isOpen, onClose }: LightboxProp
       if (e.key === 'Escape') onClose()
       if (e.key === 'ArrowLeft') showPrev()
       if (e.key === 'ArrowRight') showNext()
-
-      // Focus Trap
-      if (e.key === 'Tab') {
-        const focusableElements = overlayRef.current?.querySelectorAll(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        )
-
-        if (!focusableElements || focusableElements.length === 0) return
-
-        const firstElement = focusableElements[0] as HTMLElement
-        const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement
-
-        if (e.shiftKey) {
-          // Shift + Tab: Wrap from first to last
-          if (document.activeElement === firstElement) {
-            e.preventDefault()
-            lastElement.focus()
-          }
-        } else {
-          // Tab: Wrap from last to first
-          if (document.activeElement === lastElement) {
-            e.preventDefault()
-            firstElement.focus()
-          }
-        }
-      }
     }
 
     window.addEventListener('keydown', handleKeyDown)
@@ -177,37 +156,43 @@ export function Lightbox({ images, initialIndex, isOpen, onClose }: LightboxProp
         <span className="font-mono text-xs tracking-widest text-white/70">
           {currentIndex + 1} / {images.length}
         </span>
-        <button
+        <Button
+          variant="outline-glass"
+          size="icon"
           onClick={onClose}
-          className="rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none"
           aria-label="Close lightbox"
+          className="rounded-full border-transparent bg-white/10 p-2 text-white hover:bg-white/20 focus-visible:rounded-full! focus-visible:ring-offset-0!"
         >
           <XIcon weight="bold" className="size-5" />
-        </button>
+        </Button>
       </div>
 
       {/* Nav Buttons */}
-      <button
+      <Button
+        variant="outline-glass"
+        size="icon"
         onClick={(e) => {
           e.stopPropagation()
           showPrev()
         }}
-        className="absolute top-1/2 left-4 z-10 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white transition-colors hover:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none sm:left-8"
+        className="absolute top-1/2 left-4 z-10 -translate-y-1/2 rounded-full border-transparent bg-white/10 p-3 text-white hover:bg-white/20 focus-visible:rounded-full! focus-visible:ring-offset-0! sm:left-8"
         aria-label="Previous image"
       >
         <ArrowLeftIcon weight="bold" className="size-6" />
-      </button>
+      </Button>
 
-      <button
+      <Button
+        variant="outline-glass"
+        size="icon"
         onClick={(e) => {
           e.stopPropagation()
           showNext()
         }}
-        className="absolute top-1/2 right-4 z-10 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white transition-colors hover:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none sm:right-8"
+        className="absolute top-1/2 right-4 z-10 -translate-y-1/2 rounded-full border-transparent bg-white/10 p-3 text-white hover:bg-white/20 focus-visible:rounded-full! focus-visible:ring-offset-0! sm:right-8"
         aria-label="Next image"
       >
         <ArrowRightIcon weight="bold" className="size-6" />
-      </button>
+      </Button>
 
       {/* Image Container */}
       <div

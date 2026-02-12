@@ -5,14 +5,13 @@ import { useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 
-import { useGSAP } from '@gsap/react'
 import { ArrowLeftIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
 
 import { Button } from '@/components/ui/Button'
 import type { PortfolioEntry } from '@/data/projects-en'
+import { useRevealAnimation } from '@/hooks/useRevealAnimation'
 import { useRouter } from '@/i18n/navigation'
-import { ANIMATION } from '@/lib/constants/animations'
-import { gsap } from '@/lib/gsap'
+import { useSafeAnimation } from '@/lib/constants/animations'
 
 import { Lightbox } from '../ui/Lightbox'
 import { ProjectNav } from './ProjectNav'
@@ -28,75 +27,44 @@ export function ProjectCaseStudy({ project, prevProject, nextProject }: ProjectC
   const cs = useTranslations('projectsBook.caseStudy')
   const router = useRouter()
   const mainRef = useRef<HTMLElement>(null)
+  const ANIMATION = useSafeAnimation()
 
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
+
+  useRevealAnimation(mainRef, [
+    {
+      animations: [
+        {
+          target: mainRef,
+          options: {
+            selector: '[data-cs-hero-content]',
+            y: 40,
+            duration: ANIMATION.duration.slow,
+            delay: 0.3,
+          },
+        },
+      ],
+    },
+  ])
+
+  useRevealAnimation(mainRef, {
+    selector: '[data-cs-section]',
+    y: 30,
+    once: false,
+  })
+
+  useRevealAnimation(mainRef, {
+    selector: '[data-cs-gallery-item]',
+    y: 20,
+    stagger: 0.1,
+    once: false,
+  })
 
   const openLightbox = (index: number) => {
     setLightboxIndex(index)
     setLightboxOpen(true)
   }
-
-  useGSAP(
-    () => {
-      if (!mainRef.current) return
-
-      // Hero content animation
-      gsap.fromTo(
-        mainRef.current.querySelector('[data-cs-hero-content]'),
-        { opacity: 0, y: 40 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: ANIMATION.duration.slow,
-          ease: ANIMATION.ease.outStrong,
-          delay: 0.3,
-        }
-      )
-
-      // Scroll-triggered sections
-      const sections = mainRef.current.querySelectorAll('[data-cs-section]')
-      sections.forEach((section) => {
-        gsap.fromTo(
-          section,
-          { opacity: 0, y: 30 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: ANIMATION.duration.medium,
-            ease: ANIMATION.ease.outStrong,
-            scrollTrigger: {
-              trigger: section,
-              start: 'top 80%',
-              toggleActions: 'play none none reverse',
-            },
-          }
-        )
-      })
-
-      // Gallery images
-      const galleryItems = mainRef.current.querySelectorAll('[data-cs-gallery-item]')
-      galleryItems.forEach((item, i) => {
-        gsap.fromTo(
-          item,
-          { opacity: 0, y: 20 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: ANIMATION.duration.medium,
-            ease: ANIMATION.ease.outStrong,
-            delay: i * 0.1,
-            scrollTrigger: {
-              trigger: item,
-              start: 'top 85%',
-              toggleActions: 'play none none reverse',
-            },
-          }
-        )
-      })
-    },
-    { scope: mainRef }
-  )
 
   const caseStudySections = [
     { key: 'problemTitle', content: project.problem },

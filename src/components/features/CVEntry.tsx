@@ -18,10 +18,7 @@ export const CVEntry: React.FC<CVEntryProps> = ({
   highlights,
 }) => {
   return (
-    <div className="cv-entry group relative pb-[15pt] pl-[18pt] last:pb-0">
-      {/* Timeline marker */}
-      <div className="bg-background absolute top-[4pt] left-0 z-10 size-[7.5pt] rounded-full border-2 border-emerald-400 transition-colors group-hover:bg-emerald-400 print:bg-emerald-400" />
-
+    <div className="cv-entry group relative pb-[15pt] last:pb-0">
       <div className="flex flex-col gap-[2pt]">
         <div className="flex flex-wrap items-baseline justify-between gap-x-[10pt]">
           <h3 className="text-foreground font-serif text-[12pt] font-semibold">{title}</h3>

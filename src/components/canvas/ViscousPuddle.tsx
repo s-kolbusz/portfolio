@@ -7,6 +7,8 @@ import { useTheme } from 'next-themes'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
+import { usePrefersReducedMotion } from '@/hooks/useMedia'
+
 const vertexShader = /* glsl */ `
   varying vec2 vUv;
   void main() {
@@ -123,6 +125,7 @@ export function ViscousPuddle() {
   const { viewport, size } = useThree()
   const { resolvedTheme } = useTheme()
   const isPointerInsideWindow = useRef(false)
+  const prefersReducedMotion = usePrefersReducedMotion()
 
   // Mobile check
   const isMobile = size.width < 768
@@ -180,8 +183,10 @@ export function ViscousPuddle() {
   useFrame((state, delta) => {
     if (!meshRef.current || !materialRef.current) return
 
-    // 1. Robust Time Update
-    materialRef.current.uniforms.uTime.value += Math.min(delta, 0.05)
+    // 1. Robust Time Update - stop if reduced motion
+    if (!prefersReducedMotion) {
+      materialRef.current.uniforms.uTime.value += Math.min(delta, 0.05)
+    }
 
     // Fade in opacity
     materialRef.current.uniforms.uOpacity.value = THREE.MathUtils.lerp(
@@ -190,8 +195,8 @@ export function ViscousPuddle() {
       0.1
     )
 
-    // 2. Parallax Effect
-    const rawScroll = typeof window !== 'undefined' ? window.scrollY : 0
+    // 2. Parallax Effect - disabled if reduced motion
+    const rawScroll = typeof window !== 'undefined' && !prefersReducedMotion ? window.scrollY : 0
     // Clamp the scroll value used for parallax to prevent extreme transformations
     const currentScroll = Math.min(rawScroll, size.height * 1.5)
 
@@ -239,10 +244,10 @@ export function ViscousPuddle() {
     materialRef.current.uniforms.uColor.value.lerp(targetColor, 0.05)
 
     // 5. Mouse Interaction & Merging
-    const lerpFactor = isPointerInsideWindow.current ? 0.06 : 0.02
+    const lerpFactor = isPointerInsideWindow.current && !prefersReducedMotion ? 0.06 : 0.02
 
-    // If mobile or pointer outside, force center
-    if (isMobile || !isPointerInsideWindow.current) {
+    // If mobile or pointer outside or reduced motion, force center
+    if (isMobile || !isPointerInsideWindow.current || prefersReducedMotion) {
       targetMouseRef.current.set(0.5, 0.5)
     }
 

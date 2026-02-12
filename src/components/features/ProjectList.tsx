@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { PortfolioEntry } from '@/data/projects-en'
+import { useRevealAnimation } from '@/hooks/useRevealAnimation'
+import { useSafeAnimation } from '@/lib/constants/animations'
 
 import { ProjectHoverPreview } from './ProjectHoverPreview'
 import { ProjectItem } from './ProjectItem'
@@ -16,6 +18,16 @@ export function ProjectList({ projects }: ProjectListProps) {
   const [activeImage, setActiveImage] = useState<string | null>(null)
   const [isVisible, setIsVisible] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const listRef = useRef<HTMLDivElement>(null)
+
+  const ANIMATION = useSafeAnimation()
+
+  useRevealAnimation(containerRef, [
+    {
+      trigger: listRef,
+      animations: [{ target: listRef, options: { stagger: ANIMATION.stagger.slow } }],
+    },
+  ])
 
   useEffect(() => {
     const container = containerRef.current
@@ -49,7 +61,7 @@ export function ProjectList({ projects }: ProjectListProps) {
         <ProjectHoverPreview activeImage={activeImage} isVisible={isVisible} />
       </div>
 
-      <div className="flex flex-col">
+      <div className="flex flex-col" ref={listRef}>
         {projects.map((project) => (
           <ProjectItem
             key={project.id}

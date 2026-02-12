@@ -4,11 +4,10 @@ import React, { useRef } from 'react'
 
 import { useTranslations } from 'next-intl'
 
-import { useGSAP } from '@gsap/react'
-import gsap from 'gsap'
-
 import { SkillTag } from '@/components/ui/SkillTag'
 import { CVData } from '@/data/cv'
+import { useRevealAnimation } from '@/hooks/useRevealAnimation'
+import { useSafeAnimation } from '@/lib/constants/animations'
 
 import { CVHeader } from './CVHeader'
 import { CVTimeline } from './CVTimeline'
@@ -21,43 +20,42 @@ export const CVLayout: React.FC<CVLayoutProps> = ({ data }) => {
   const t = useTranslations('cv')
   const containerRef = useRef<HTMLDivElement>(null)
 
-  useGSAP(
-    () => {
-      // Staggered reveal for content sections
-      const tl = gsap.timeline({ delay: 0.4 })
+  const ANIMATION = useSafeAnimation()
 
-      tl.from('.cv-header > *', {
-        opacity: 0,
-        y: 20,
-        stagger: 0.1,
-        duration: 0.8,
-        ease: 'power2.out',
-      })
-        .from(
-          '.cv-main-col > *',
-          {
-            opacity: 0,
-            y: 20,
-            stagger: 0.15,
-            duration: 0.8,
-            ease: 'power2.out',
+  useRevealAnimation(containerRef, [
+    {
+      animations: [
+        {
+          target: containerRef,
+          options: {
+            selector: '.cv-header > *',
+            delay: 0.4,
+            stagger: ANIMATION.stagger.normal,
           },
-          '-=0.6'
-        )
-        .from(
-          '.cv-side-col > *',
-          {
-            opacity: 0,
+        },
+        {
+          target: containerRef,
+          options: {
+            selector: '.cv-main-col > *',
+            delay: 0.2,
+            stagger: ANIMATION.stagger.loose,
+            position: '<0.2',
+          },
+        },
+        {
+          target: containerRef,
+          options: {
+            selector: '.cv-side-col > *',
+            delay: 0.2,
             x: 20,
-            stagger: 0.1,
-            duration: 0.8,
-            ease: 'power2.out',
+            y: 0,
+            stagger: ANIMATION.stagger.normal,
+            position: '<0.4',
           },
-          '-=0.6'
-        )
+        },
+      ],
     },
-    { scope: containerRef }
-  )
+  ])
 
   return (
     <div
@@ -70,14 +68,14 @@ export const CVLayout: React.FC<CVLayoutProps> = ({ data }) => {
         <CVHeader name={data.name} title={data.title} contact={data.contact} />
       </div>
 
-      <div className="grid grid-cols-1 gap-10 md:grid-cols-[1fr_200px] md:gap-10 print:grid-cols-[1fr_200px] print:gap-10">
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_140px] print:grid-cols-[1fr_140px]">
         {/* Main Column */}
-        <div className="cv-main-col flex flex-col gap-8">
-          <section className="flex flex-col gap-3 md:mb-[20pt] md:gap-[8pt] print:mb-[20pt] print:gap-[8pt]">
-            <h2 className="text-foreground font-serif text-2xl font-bold md:text-[16pt] print:text-[16pt]">
+        <div className="cv-main-col mr-[20pt] flex flex-col print:mr-[20pt]">
+          <section className="mb-[10pt] flex flex-col print:mb-[10pt]">
+            <h2 className="text-foreground font-serif text-lg font-bold md:text-[16pt] print:text-[16pt]">
               {t('summary')}
             </h2>
-            <p className="text-muted-foreground/90 text-sm leading-relaxed md:text-[10pt] md:leading-[1.4] print:text-[10pt] print:leading-[1.4]">
+            <p className="text-muted-foreground/90 text-xs leading-relaxed md:text-[9pt] md:leading-[1.4] print:text-[9pt] print:leading-[1.4]">
               {data.summary}
             </p>
           </section>
@@ -86,18 +84,18 @@ export const CVLayout: React.FC<CVLayoutProps> = ({ data }) => {
         </div>
 
         {/* Side Column */}
-        <aside className="cv-side-col flex flex-col gap-8">
-          <section className="flex flex-col gap-5 md:mb-[20pt] md:gap-4 print:mb-[20pt] print:gap-4">
+        <aside className="cv-side-col flex flex-col">
+          <section className="flex flex-col md:mb-[10pt] print:mb-[10pt]">
             <h2 className="text-foreground font-serif text-xl font-bold md:text-[14pt] print:text-[14pt]">
               {t('skills')}
             </h2>
-            <div className="flex flex-col gap-6 md:gap-4 print:gap-4">
+            <div className="flex flex-col md:gap-[10pt] print:gap-[10pt]">
               {data.skills.map((skillGroup, index) => (
-                <div key={index} className="flex flex-col gap-3 md:gap-2 print:gap-2">
+                <div key={index} className="flex flex-col md:gap-[10pt] print:gap-[10pt]">
                   <h3 className="text-primary/80 text-xs font-bold tracking-widest uppercase md:text-[8pt] print:text-[8pt]">
                     {skillGroup.category}
                   </h3>
-                  <div className="flex flex-wrap gap-2 md:gap-[4pt] print:gap-[4pt]">
+                  <div className="flex flex-wrap gap-[4pt] print:gap-[4pt]">
                     {skillGroup.items.map((skill, sIndex) => (
                       <SkillTag key={sIndex} name={skill} />
                     ))}
@@ -107,11 +105,11 @@ export const CVLayout: React.FC<CVLayoutProps> = ({ data }) => {
             </div>
           </section>
 
-          <section className="flex flex-col gap-4 md:gap-4 print:gap-4">
+          <section className="flex flex-col">
             <h2 className="text-foreground font-serif text-xl font-bold md:text-[14pt] print:text-[14pt]">
               {t('languages')}
             </h2>
-            <div className="flex flex-col gap-2 md:gap-2 print:gap-2">
+            <div className="flex flex-col">
               {data.languages.map((lang, index) => (
                 <div
                   key={index}

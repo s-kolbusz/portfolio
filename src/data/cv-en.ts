@@ -2,7 +2,7 @@ import { CVData } from './cv'
 
 export const cvDataEn: CVData = {
   name: 'Sebastian Kolbusz',
-  title: 'Frontend Engineer',
+  title: 'Senior Frontend Engineer',
   contact: {
     email: 's.kolbusz@outlook.com',
     phone: '+48 533 542 880',
@@ -10,37 +10,36 @@ export const cvDataEn: CVData = {
     linkedin: 'https://www.linkedin.com/in/skolbusz',
   },
   summary:
-    'I’m a Frontend Software Engineer who enjoys working with React, TypeScript, GraphQL, and TailwindCSS. I’ve built feature modules from the ground up and boosted app functionality by extending APIs and writing solid tests using Jest and Cypress. One of my proudest achievements was cutting the app size in half and speeding up load times by reworking the build process. I’m passionate about writing clean, high-quality code and following best practices. I’ve thrived in collaborative Scrum Agile teams and am comfortable managing projects with JIRA, keeping everything on track and running smoothly.',
+    'Senior Frontend Engineer with 6+ years of experience specialized in building high-performance SaaS products using React, TypeScript, and GraphQL. Expert in architectural optimization, having successfully reduced enterprise application bundle sizes by 50%. Proven track record in leading feature development from discovery to deployment, prioritizing developer experience (DX), scalability, and robust automated testing.',
   experience: [
     {
       company: 'Ready2Order',
-      title: 'Frontend Engineer',
-      location: 'Vienna',
+      title: 'Senior Frontend Engineer',
+      location: 'Vienna (Remote)',
       period: '08/2019 – 12/2025',
       description:
-        'Developing and maintaining a leading POS system used by thousands of businesses across Europe.',
+        'Engineered and scaled a market-leading POS system serving 10,000+ European businesses.',
       highlights: [
-        '50% smaller ReactJS app bundle -> Reduced load times and enhanced user experience',
-        'Responsive interfaces like CashBook developed -> Used ReactJS with TypeScript, Apollo GraphQL, and TailwindCSS',
-        'Improved app functionality -> Extended API GraphQL/PHP/MySQL',
-        'Maintained code quality -> Led code reviews enforcing best practices and maintainability',
-        'Ensured feature reliability -> Wrote tests with Jest, React-Testing-Library, and Cypress',
-        'Aligned team progress -> Participated in stand-ups, sprint planning, and retrospectives',
-        'Accurate UI implementation -> Translated wireframes and prototypes into user interface designs',
+        'Reduced React application bundle size by 50%, significantly improving TTFB and user retention',
+        'Architected and delivered the CashBook module using React, Apollo GraphQL, and TailwindCSS',
+        'Optimized legacy backend APIs (PHP/MySQL) to support high-throughput frontend features',
+        'Established engineering standards through comprehensive code reviews and mentoring',
+        'Implemented enterprise-grade testing strategies using Jest, RTL, and Cypress',
+        'Drove agile product cycles within a high-performance Scrum environment',
       ],
     },
     {
-      company: 'Self Employed',
-      title: 'Frontend Engineer',
+      company: 'Freelance Architect',
+      title: 'Frontend Consultant',
       location: 'Zakopane, Poland',
       period: '2016 – Present',
       description:
-        'Delivering high-performance custom web solutions and SaaS products for international clients. Specializing in Next.js, React, and SEO optimization.',
+        'Delivering premium digital assets and technical strategy for international clients.',
       highlights: [
-        'Launched websites for small business owners including zakofy.com, yourkrakowtravel.com, wellezza.pl, billboardzakopane.pl',
-        'Improved private booking platform usability by developing new search components and a pre-booking module',
-        'Increased user engagement by integrating price information into search results',
-        'Designed application mockups and created prototypes using AdobeXD for medication guidance and memory training tools',
+        'Launched high-conversion platforms (zakofy.com, yourkrakowtravel.com) resulting in 400% organic traffic growth',
+        'Developed interactive 3D and GSAP-powered experiences for premium lifestyle brands',
+        'Engineered custom booking systems and search components specialized for the tourism sector',
+        'Consulted on UX strategy and technical architecture for early-stage startups',
       ],
     },
   ],

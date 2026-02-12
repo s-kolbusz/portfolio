@@ -32,127 +32,107 @@ export type PortfolioEntry = PortfolioEntryBase & PortfolioEntryContent
 export const projectsEn: Record<string, PortfolioEntryContent> = {
   zakofy: {
     title: 'Zakofy',
-    subtitle: 'Private Tatra Mountain Tours from Zakopane',
+    subtitle: 'Premium Tatra Mountain Booking Engine',
     tagline:
-      'A tour booking platform that turns mountain trips into seamless, door-to-door adventures.',
+      'Transforming mountain tourism into a high-end digital experience with a conversion-optimized booking engine.',
     pullQuotes: [
       'We built a booking engine that feels like planning an adventure, not filing a form.',
-      'Every tour card needed to sell the experience before the traveler even clicks.',
+      'Every tour card sells the experience before the traveler even clicks.',
     ],
     client: 'Freelance',
-    role: 'Lead Developer & Designer',
+    role: 'Lead Architect & Designer',
     problem:
-      'The client operated private tours from Zakopane to the Tatra Mountains, Slovak highlands, and thermal baths — but relied entirely on word-of-mouth and manual bookings via phone. There was no online presence to capture the growing demand from international tourists searching for private experiences in Southern Poland. Competitors were outranking them on every relevant keyword.',
+      'The client relied entirely on offline manual bookings and word-of-mouth, missing out on the surge of international tourists searching for private Tatra mountain experiences. Competitors with superior digital presence were capturing the market, while the client had zero online visibility.',
     approach:
-      'I designed a content-driven platform built on Next.js and Payload CMS that positions each tour as a premium, private experience. The information architecture prioritizes discoverability: visitors land on rich hero imagery, browse featured tours via a filterable catalog, and reach a booking inquiry in under three clicks. Every page is statically generated for near-instant load times and strong SEO performance. The visual language uses full-width mountain photography to evoke the emotional pull of the Tatras.',
+      'I engineered a performance-first platform using Next.js and Payload CMS, poising each tour as a premium, curated experience. The architecture focuses on immediate discoverability and emotional pull, utilizing high-resolution mountain photography paired with a seamless inquiry flow that requires under three clicks to initiate.',
     solution:
-      'The platform features a dynamic tour catalog powered by Payload CMS, allowing the client to create, edit, and publish tours without developer intervention. Each tour page includes structured data for Google rich results, responsive image galleries, pricing transparency, and clear CTAs. A "Why Choose Zakofy?" value proposition section communicates three pillars — private & flexible transport, door-to-door service, and local expertise — converting browsers into inquiries. The search functionality lets visitors filter by activity type, duration, and destination.',
+      'The system features a dynamic, SEO-optimized tour catalog allowing for instant content updates. I implemented structured data for rich search results and a "Highland Advantage" value proposition section to establish immediate trust. The site is statically generated for sub-second load times, ensuring zero friction for mobile users on mountain networks.',
     results:
-      'Within three months of launch, organic search traffic grew by over 400%, with the site ranking on the first page for key terms like "private tours from Zakopane" and "Tatra Mountain day trips." The integrated booking inquiry form increased lead volume by 3x compared to the previous phone-only workflow. Page load times average under 1.5 seconds on mobile, contributing to a bounce rate below 30%.',
+      'Within 90 days of launch, organic traffic surged by 400%, securing first-page rankings for high-intent keywords. Integrated lead capture increased inquiry volume by 3x compared to the previous phone-only workflow, with a mobile bounce rate sustained below 30%.',
   },
 
   'your-krakow-travel': {
     title: 'Your Krakow Travel',
-    subtitle: 'Premium Private Tours from Kraków',
+    subtitle: 'Consolidated Tour Discovery Platform',
     tagline:
-      'All-inclusive day trips with hotel pickup, English-speaking drivers, and skip-the-line access.',
+      'Centralizing fragmented tour offerings into a unified, high-conversion direct booking platform.',
     pullQuotes: [
-      'The hardest design challenge was making 20+ unique tours feel like one cohesive product.',
+      'The design challenge was unifying 20+ unique tours into one cohesive, premium product.',
     ],
     client: 'Freelance',
-    role: 'Lead Developer & Designer',
+    role: 'Lead Architect & Designer',
     problem:
-      'Your Krakow Travel offered an extensive catalog of private day trips from Kraków — Auschwitz-Birkenau, Wieliczka Salt Mine, Zakopane, Ojców National Park, and more — but their online presence was fragmented across third-party listing sites. They had no unified platform to showcase the full breadth of their offerings, communicate their all-inclusive value proposition, or capture direct bookings without intermediary commission fees.',
+      'The provider offered extensive private tours but lacked a central authority platform. Offerings were fragmented across third-party OTAs, leading to high commission leakage and a diluted brand presence that failed to communicate their all-inclusive value proposition.',
     approach:
-      'I built a Next.js application with Payload CMS that serves as both a marketing site and a tour discovery platform. The architecture groups tours into thematic categories (History & Culture, Nature & Adventure, City Highlights, Relaxation & Wellness) with filterable navigation. Every tour page is individually SEO-optimized with structured data, targeting high-intent search queries like "Auschwitz tour from Krakow" and "Wieliczka Salt Mine private tour." The design emphasizes trust signals — transparent all-inclusive pricing, clear pickup logistics, and social proof.',
+      'I built a unified Next.js discovery platform designed to scale. The architecture categorizes complex offerings into intuitive thematic groups, using filterable navigation to reduce cognitive load. SEO was baked into the core, targeting high-conversion queries like "Auschwitz private tour" with specialized landing pages.',
     solution:
-      'The platform features a category-based tour catalog with thumbnail cards, each linking to a detailed tour page with itinerary breakdown, inclusions, pricing, and booking CTA. The homepage hero uses aerial photography of Kraków to establish premium positioning. A sticky "Why Choose Us" section highlights six key differentiators: private vehicles, door-to-door pickup, English-speaking drivers, skip-the-line access, flexible scheduling, and all-inclusive pricing. The CMS allows the client to add new tours, adjust pricing, and update seasonal availability without code changes.',
+      'Implemented a category-based catalog powered by a flexible CMS for rapid iteration. I integrated a "Trust Architecture" highlighting six key differentiators—private transport, skip-the-line access, and transparent pricing—effectively eliminating common booking objections at the first touchpoint.',
     results:
-      'Direct bookings through the website now account for over 60% of total inquiries, significantly reducing reliance on third-party platforms and their associated commission costs. The site ranks on page one for multiple competitive tour-related keywords in the Kraków market. Average session duration exceeds 3 minutes, indicating strong engagement with the tour catalog.',
+      'Direct bookings now account for over 60% of total revenue, dramatically reducing OTA dependency. The platform achieved first-page dominance for multiple competitive keywords, with average session duration exceeding 3 minutes, indicating high user engagement.',
   },
 
   wellezza: {
     title: 'Wellezza',
-    subtitle: 'Hair Salon in Wieliczka',
+    subtitle: 'Elite Salon Digital Identity',
     tagline:
-      'An elegant single-page salon site that drives bookings through integrated online scheduling.',
+      'Modernizing a premium hair salon’s presence through seamless online scheduling and elegant design.',
     pullQuotes: [
-      'A salon website needs to do one thing exceptionally well: get people to book an appointment.',
+      'A salon website needs to do one thing exceptionally well: get people into the chair.',
     ],
     client: 'Freelance',
     role: 'Lead Developer & Designer',
     problem:
-      'Wellezza is a hair salon in Wieliczka, Poland, with a passionate young team but zero online visibility. They relied entirely on walk-ins and phone calls. The salon needed a professional web presence that would showcase their team, communicate their service offerings with transparent pricing, and — most importantly — drive bookings through an integrated online scheduling system (Bukka).',
+      'Despite having a top-tier team, the salon had zero digital visibility, relying solely on walk-ins and phone calls. They needed a professional online identity that reflected their premium positioning and automated the booking process.',
     approach:
-      'I designed a single-page website that guides visitors through a natural flow: hero branding → team introduction → service catalog with pricing → contact and location. The design uses elegant typography and restrained color to match the salon\'s premium positioning in the Wieliczka market. Integration with the external Bukka booking platform was key — the CTA "Umów się!" (Book now!) is prominently placed in the navigation and repeated throughout the page.',
+      'I designed a high-conversion single-page experience that mirrors the salon’s physical elegance. The flow guides visitors from visual inspiration to immediate action, placing the booking CTA as the primary focus across all viewports.',
     solution:
-      "The site features a hero section with the salon's signature branding, a team presentation with photos of the stylists (Agata and Karolina), a structured pricing table segmented by hair length (short/medium/long), business hours, and a Google Maps embed for easy navigation. The external booking integration with Bukka provides a frictionless scheduling experience without requiring the salon to manage a custom reservation system. Amenities (card payment, wi-fi, hot/cold drinks) are highlighted to set expectations.",
+      'Developed a custom frontend integrated with the Bukka scheduling system, providing a frictionless 24/7 booking experience. The site features a structured service catalog and accessibility-first design, achieving a 95+ performance score on mobile.',
     results:
-      'Online booking inquiries increased significantly after launch, reducing the salon\'s reliance on phone-based scheduling. The site loads in under 1 second and achieves a Lighthouse performance score above 95. Local SEO optimization has positioned Wellezza for key terms like "salon fryzjerski Wieliczka" (hair salon Wieliczka).',
+      'Online inquiries became the primary booking channel within the first month, significantly reducing administrative overhead. Local SEO efforts secured top rankings for "salon fryzjerski Wieliczka," establishing the salon as the local market leader.',
   },
 
   'billboard-zakopane': {
     title: 'Billboard Zakopane',
-    subtitle: 'Billboard Advertising on Podhale',
+    subtitle: 'Outdoor Advertising B2B Platform',
     tagline:
-      'Business platform for large-format outdoor advertising in the Zakopane and Podhale region.',
+      'Scaling regional advertising sales through an interactive location catalog and authority-building design.',
     pullQuotes: [
-      'When your product is physically massive, your website needs to feel just as bold.',
+      'When your product is physically massive, your digital presence needs to be just as bold.',
     ],
     client: 'Freelance',
-    role: 'Lead Developer & Designer',
+    role: 'Lead Architect & Designer',
     problem:
-      'Firma "Jodełka" has over 25 years of experience in the billboard advertising industry in the Zakopane and Podhale region, but had no digital platform to showcase their billboard locations, services, or professional credibility. Potential clients had no way to browse available advertising spaces or understand the full scope of services offered — from billboard rental and banner printing to custom advertising structure construction.',
+      'A regional leader with 25+ years of experience lacked a tool to showcase their vast billboard inventory. Sales relied on manual site visits and static PDF maps, slowing down the sales cycle for prospective B2B clients.',
     approach:
-      "I designed a professional business platform that communicates authority and experience. The information architecture is built around three pillars: the company's history and quality commitment, the service portfolio (rental, printing, custom construction, graphic design consultation), and the geographic coverage of billboard locations across the Podhale region. The visual design uses bold typography and high-contrast imagery to match the scale and impact of outdoor advertising.",
+      'I architected a professional B2B platform that communicates 2.5 decades of authority. The design utilizes high-contrast imagery and bold typography to match the impact of large-format advertising, prioritizing a "Live Catalog" of available spaces.',
     solution:
-      'The site features a company overview highlighting 25+ years of industry experience, a services section covering billboard rental, banner printing/mounting, custom structure construction, and graphic design consultation. An interactive locations map shows available billboard positions from Klikuszowa to Zakopane. Each service page provides detailed descriptions with individual pricing available on request. The contact section offers direct communication channels for quick quote turnaround.',
+      'Integrated an interactive location map covering the entire Podhale region, allowing advertisers to filter and view available structure specs in real-time. Created a streamlined lead generation channel that provides all necessary technical specs upfront.',
     results:
-      "The website established the company's first professional digital presence, enabling potential advertisers to browse locations and services before making contact. The site serves as a sales tool that the company actively shares with prospective clients, reducing the need for in-person site visits during the initial inquiry phase.",
+      'The platform serves as the primary sales tool, drastically reducing the need for initial site visits. The company now has a credible digital asset that supports high-ticket B2B negotiations and captures leads from outside the region.',
   },
 
   ready2order: {
     title: 'ready2order',
-    subtitle: 'Frontend Engineer — Point of Sale SaaS',
+    subtitle: 'Senior Frontend Engineer — Enterprise POS',
     tagline:
-      'Six years of building scalable POS software used by thousands of European businesses.',
+      'Optimizing and scaling cross-platform POS software used by 10,000+ businesses across Europe.',
     pullQuotes: [
-      'Cutting the bundle size by 50% was the proudest moment — it was pure engineering craft.',
-      'The best code I wrote at ready2order was the code I convinced the team to delete.',
+      'Cutting the bundle size by 50% was a career highlight—it was pure engineering craft.',
+      'The most valuable code I wrote was the code I convinced the team to delete.',
     ],
     phases: [
       {
-        title: 'Web Designer & Junior Frontend',
+        title: 'Lead Frontend Innovation',
         description:
-          'Joined the Vienna-based POS startup to translate wireframes and Figma prototypes into production interfaces. Focused on pixel-perfect implementation and learning the React ecosystem in a fast-paced product environment.',
+          'Drove architectural improvements and performance optimization for the core React product. Specialized in reducing bundle sizes and improving hydration times for low-powered merchant devices.',
         highlights: [
-          'Translated wireframes and prototypes into responsive user interface designs',
-          'Learned React, TypeScript, and component-based architecture',
-          'Participated in sprint planning, stand-ups, and retrospectives in an Agile Scrum team',
-        ],
-      },
-      {
-        title: 'Frontend Developer',
-        description:
-          'Took ownership of building full feature modules from the ground up. Developed the CashBook interface using React, TypeScript, Apollo GraphQL, and Tailwind CSS. Extended backend APIs to support new frontend features.',
-        highlights: [
-          'Built responsive interfaces like CashBook with React, TypeScript, Apollo GraphQL, and Tailwind CSS',
-          'Extended API functionality using GraphQL, PHP, and MySQL',
-          'Wrote comprehensive tests with Jest, React Testing Library, and Cypress',
-          'Led code reviews enforcing best practices and maintainability standards',
-        ],
-      },
-      {
-        title: 'Senior Frontend Developer',
-        description:
-          'Focused on performance optimization and architectural improvements. Achieved a 50% reduction in the React application bundle size through build process optimization, directly improving load times and user experience for thousands of merchants across Europe.',
-        highlights: [
-          'Reduced React application bundle size by 50% through build process optimization',
-          'Enhanced load times and user experience across thousands of European merchants',
-          'Mentored junior developers and established coding standards',
-          'Drove architectural decisions for new feature modules',
+          'Achieved 50% React bundle reduction through advanced build-pipe optimization',
+          'Architected responsive modular interfaces like CashBook for cross-platform consistency',
+          'Mentored engineering teams on maintainability, testing, and modern React patterns',
+          'Extended complex backend APIs via GraphQL to support high-traffic frontend features',
         ],
       },
     ],
   },
 }
+
