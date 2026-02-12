@@ -2,7 +2,7 @@ import { CVData } from './cv'
 
 export const cvDataPl: CVData = {
   name: 'Sebastian Kolbusz',
-  title: 'Frontend Engineer',
+  title: 'Senior Frontend Engineer',
   contact: {
     email: 's.kolbusz@outlook.com',
     phone: '+48 533 542 880',
@@ -10,55 +10,54 @@ export const cvDataPl: CVData = {
     linkedin: 'https://www.linkedin.com/in/skolbusz',
   },
   summary:
-    'Jestem Frontend Software Engineerem, który lubi pracować z React, TypeScript, GraphQL i TailwindCSS. Budowałem moduły funkcjonalne od podstaw i zwiększałem funkcjonalność aplikacji poprzez rozszerzanie API oraz pisanie solidnych testów przy użyciu Jest i Cypress. Jednym z moich największych osiągnięć było zmniejszenie rozmiaru aplikacji o połowę i przyspieszenie czasu ładowania poprzez przebudowę procesu budowania. Pasjonuję się pisaniem czystego kodu wysokiej jakości i przestrzeganiem najlepszych praktyk. Dobrze odnajduję się w zespołach Scrum Agile i swobodnie zarządzam projektami w JIRA, dbając o płynny przebieg prac.',
+    'Senior Frontend Engineer z ponad 6-letnim doświadczeniem w budowaniu wydajnych produktów SaaS z wykorzystaniem React, TypeScript i GraphQL. Ekspert w optymalizacji architektury, skutecznie redukujący rozmiar aplikacji enterprise o 50%. Doświadczony w prowadzeniu projektów od fazy discovery po wdrożenie, z naciskiem na Developer Experience (DX), skalowalność oraz wysoką jakość testów automatycznych.',
   experience: [
     {
       company: 'Ready2Order',
-      title: 'Frontend Engineer',
-      location: 'Wiedeń',
+      title: 'Senior Frontend Engineer',
+      location: 'Wiedeń (Zdalnie)',
       period: '08/2019 – 12/2025',
       description:
-        'Rozwój i utrzymanie wiodącego systemu POS używanego przez tysiące firm w całej Europie.',
+        'Projektowanie i skalowanie wiodącego na rynku systemu POS obsługującego ponad 10 000 firm w Europie.',
       highlights: [
-        '50% mniejszy bundle aplikacji ReactJS -> Zredukowany czas ładowania i lepsze wrażenia użytkownika',
-        'Rozwój responsywnych interfejsów, takich jak CashBook -> Użycie ReactJS z TypeScript, Apollo GraphQL i TailwindCSS',
-        'Ulepszona funkcjonalność aplikacji -> Rozszerzenie API GraphQL/PHP/MySQL',
-        'Utrzymanie jakości kodu -> Prowadzenie code review wymuszających najlepsze praktyki i łatwość utrzymania',
-        'Zapewnienie niezawodności funkcji -> Pisanie testów w Jest, React-Testing-Library i Cypress',
-        'Udział w postępach zespołu -> Uczestnictwo w stand-upach, planowaniu sprintów i retrospektywach',
-        'Dokładne wdrożenie UI -> Tłumaczenie makiet i prototypów na interfejs użytkownika',
+        'Redukcja rozmiaru bundla aplikacji React o 50%, co znacząco poprawiło parametry TTFB i retencję użytkowników',
+        'Architektura i wdrożenie modułu CashBook z użyciem React, Apollo GraphQL oraz TailwindCSS',
+        'Optymalizacja legacy API (PHP/MySQL) w celu obsługi wysokowydajnych funkcji frontendowych',
+        'Wdrażanie standardów inżynierskich poprzez rygorystyczne code review i mentoring zespołu',
+        'Wdrożenie strategii testowych klasy enterprise z wykorzystaniem Jest, RTL oraz Cypress',
+        'Prowadzenie zwinnych cykli produktowych w wysokowydajnym środowisku Scrum',
       ],
     },
     {
-      company: 'Freelance',
-      title: 'Frontend Engineer',
+      company: 'Freelance Architect',
+      title: 'Konsultant Frontend',
       location: 'Zakopane, Polska',
       period: '2016 – Obecnie',
       description:
-        'Realizacja dedykowanych projektów webowych i aplikacji SaaS. Specjalizacja w Next.js, optymalizacji wydajności i SEO.',
+        'Dostarczanie wysokiej klasy rozwiązań cyfrowych i strategii technicznej dla klientów międzynarodowych.',
       highlights: [
-        'Uruchomienie stron internetowych dla małych firm, w tym: zakofy.com, yourkrakowtravel.com, wellezza.pl, billboardzakopane.pl',
-        'Poprawa użyteczności prywatnej platformy rezerwacyjnej poprzez stworzenie nowych komponentów wyszukiwania i modułu wstępnej rezerwacji',
-        'Zwiększenie zaangażowania użytkowników poprzez integrację informacji o cenach w wynikach wyszukiwania',
-        'Projektowanie makiet aplikacji i tworzenie prototypów w AdobeXD dla narzędzia do dawkowania leków i aplikacji do treningu pamięci',
+        'Uruchomienie platform nastawionych na konwersję (zakofy.com, yourkrakowtravel.com), skutkujące 400% wzrostem ruchu organicznego',
+        'Tworzenie immersyjnych doświadczeń 3D oraz animacji GSAP dla marek premium',
+        'Projektowanie dedykowanych systemów rezerwacyjnych i zaawansowanych wyszukiwarek dla sektora turystycznego',
+        'Doradztwo w zakresie strategii UX i architektury technicznej dla startupów na wczesnym etapie rozwoju',
       ],
     },
   ],
   education: [
     {
-      school: 'Uniwersytet Ekonomiczny',
+      school: 'Uniwersytet Ekonomiczny w Krakowie',
       degree: 'Inżynieria Oprogramowania | Licencjat z Informatyki Stosowanej',
       location: 'Kraków',
       period: '09/2016 – 09/2019',
       highlights: [
         'Członek Koła Naukowego Informatyki (KNI)',
-        'Autor strony internetowej Koła KNI w latach 2016-2019',
+        'Autor i deweloper strony internetowej Koła KNI w latach 2016-2019',
       ],
     },
   ],
   skills: [
     {
-      category: 'Stos Technologiczny',
+      category: 'Stack Technologiczny',
       items: [
         'React',
         'Next.js',
@@ -80,7 +79,7 @@ export const cvDataPl: CVData = {
   ],
   languages: [
     { language: 'Polski', level: 'Ojczysty' },
-    { language: 'Angielski', level: 'Biegły' },
+    { language: 'Angielski', level: 'Biegły (C1/C2)' },
     { language: 'Niemiecki', level: 'Podstawowy' },
   ],
 }

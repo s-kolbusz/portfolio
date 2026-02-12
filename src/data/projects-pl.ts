@@ -3,124 +3,104 @@ import type { PortfolioEntryContent } from './projects-en'
 export const projectsPl: Record<string, PortfolioEntryContent> = {
   zakofy: {
     title: 'Zakofy',
-    subtitle: 'Prywatne wycieczki z Zakopanego w Tatry',
+    subtitle: 'System rezerwacyjny klasy Premium',
     tagline:
-      'Platforma rezerwacji wycieczek, która zamienia górskie wypady w bezproblemowe przygody door-to-door.',
+      'Nowoczesny system rezerwacji dla turystyki górskiej, zaprojektowany z myślą o maksymalnej konwersji.',
     pullQuotes: [
-      'Zbudowaliśmy silnik rezerwacji, który przypomina planowanie przygody, a nie wypełnianie formularza.',
-      'Każda karta wycieczki musiała sprzedać doświadczenie, zanim turysta w ogóle kliknie.',
+      'Zbudowaliśmy system, który sprawia, że planowanie wycieczki jest początkiem przygody, a nie formalnością.',
+      'Każda karta wycieczki sprzedaje emocje jeszcze przed pierwszym kliknięciem.',
     ],
     client: 'Freelance',
-    role: 'Lead Developer & Designer',
+    role: 'Główny Architekt i Projektant',
     problem:
-      'Klient organizował prywatne wycieczki z Zakopanego w Tatry, na Słowację i do term — ale opierał się wyłącznie na poleceniach i ręcznych rezerwacjach telefonicznych. Nie istniała żadna obecność online, by przechwycić rosnący popyt ze strony międzynarodowych turystów szukających prywatnych doświadczeń w Małopolsce. Konkurencja wyprzedzała ich na każde istotne słowo kluczowe.',
+      'Klient polegał wyłącznie na rezerwacjach telefonicznych, tracąc potencjał płynący z rosnącej liczby turystów zagranicznych szukających prywatnych wypraw w Tatry. Brak widoczności w sieci sprawiał, że rynek przejmowała konkurencja z lepszym zapleczem cyfrowym.',
     approach:
-      'Zaprojektowałem platformę opartą na treściach, zbudowaną na Next.js i Payload CMS, która pozycjonuje każdą wycieczkę jako doświadczenie premium. Architektura informacji priorytetyzuje odkrywalność: odwiedzający trafiają na bogatą fotografię górską, przeglądają polecane wycieczki przez filtrowalny katalog i docierają do zapytania o rezerwację w mniej niż trzech kliknięciach. Każda strona jest statycznie generowana, zapewniając błyskawiczne ładowanie i silną wydajność SEO.',
+      'Zaprojektowałem platformę nastawioną na wydajność, wykorzystując Next.js oraz Payload CMS. Pozycjonuje ona każdą wyprawę jako unikalne doświadczenie premium. Architektura skupia się na natychmiastowej odkrywalności i budowaniu więzi emocjonalnej poprzez wysokiej jakości fotografię i uproszczony proces zapytania.',
     solution:
-      'Platforma oferuje dynamiczny katalog wycieczek zasilany przez Payload CMS, umożliwiając klientowi tworzenie, edytowanie i publikowanie wycieczek bez udziału programisty. Każda strona wycieczki zawiera dane strukturalne dla wyników Google, responsywne galerie zdjęć, przejrzystość cenową i jasne CTA. Sekcja „Dlaczego Zakofy?" komunikuje trzy filary — prywatny i elastyczny transport, serwis door-to-door i lokalną ekspertyzę — konwertując przeglądających w zapytania.',
+      'System oferuje dynamiczny, zoptymalizowany pod SEO katalog wypraw z możliwością błyskawicznej aktualizacji treści. Wdrożyłem dane strukturalne dla wyników wyszukiwania oraz sekcję „Highland Advantage”, budującą zaufanie. Strona generowana statycznie zapewnia czas ładowania poniżej sekundy, co jest kluczowe dla użytkowników mobilnych.',
     results:
-      'W ciągu trzech miesięcy od uruchomienia ruch z wyszukiwarek wzrósł o ponad 400%, a strona plasowała się na pierwszej stronie dla kluczowych fraz jak „prywatne wycieczki z Zakopanego" i „jednodniowe wycieczki w Tatry." Zintegrowany formularz zapytań zwiększył wolumen leadów 3x w porównaniu do poprzedniego workflow opartego na telefonie.',
+      'W ciągu 90 dni od wdrożenia ruch organiczny wzrósł o 400%. Zintegrowany system pozyskiwania leadów zwiększył liczbę zapytań 3-krotnie w stosunku do wcześniejszego modelu, przy współczynniku odrzuceń na mobile poniżej 30%.',
   },
 
   'your-krakow-travel': {
     title: 'Your Krakow Travel',
-    subtitle: 'Prywatne wycieczki premium z Krakowa',
+    subtitle: 'Zintegrowana Platforma Odkrywania Wycieczek',
     tagline:
-      'Wycieczki all-inclusive z odbiorem z hotelu, anglojęzycznymi kierowcami i biletami bez kolejek.',
+      'Skuteczna platforma rezerwacji bezpośrednich, konsolidująca rozproszoną ofertę wycieczek premium.',
     pullQuotes: [
-      'Najtrudniejszym wyzwaniem projektowym było sprawienie, by 20+ unikalnych wycieczek wyglądało jak jeden spójny produkt.',
+      'Wyzwanie polegało na połączeniu ponad 20 unikalnych wypraw w jeden spójny produkt klasy premium.',
     ],
     client: 'Freelance',
-    role: 'Lead Developer & Designer',
+    role: 'Główny Architekt i Projektant',
     problem:
-      'Your Krakow Travel oferowało rozległy katalog prywatnych wycieczek jednodniowych z Krakowa — Auschwitz-Birkenau, Kopalnia Soli w Wieliczce, Zakopane, Ojcowski Park Narodowy i więcej — ale ich obecność online była rozproszona po zewnętrznych portalach. Nie posiadali zunifikowanej platformy do prezentacji pełnej oferty, komunikowania propozycji wartości all-inclusive czy przechwytywania bezpośrednich rezerwacji bez prowizji pośredników.',
+      'Dostawca oferował bogaty katalog wycieczek, ale brakowało mu centralnej platformy. Oferta rozproszona na portalach zewnętrznych (OTA) generowała wysokie prowizje i utrudniała budowanie silnej marki all-inclusive.',
     approach:
-      'Zbudowałem aplikację Next.js z Payload CMS, służącą zarówno jako strona marketingowa, jak i platforma odkrywania wycieczek. Architektura grupuje wycieczki w kategorie tematyczne z filtrowalną nawigacją. Każda strona wycieczki jest indywidualnie zoptymalizowana pod SEO z danymi strukturalnymi, celując w zapytania o wysokim zamiarze zakupowym. Design kładzie nacisk na sygnały zaufania — przejrzystą cenę all-inclusive, jasną logistykę odbioru i dowody społeczne.',
+      'Zbudowałem zunifikowaną platformę na Next.js, zaprojektowaną z myślą o skalowaniu. Architektura kategoryzuje złożoną ofertę w intuicyjne grupy, redukując obciążenie poznawcze użytkownika. SEO celuje w zapytania o wysokiej intencji zakupowej poprzez dedykowane strony landing page.',
     solution:
-      'Platforma oferuje katalog wycieczek oparty na kategoriach z miniaturami, linkującymi do szczegółowych stron z rozbiciem tras, wliczonymi usługami, cenami i CTA rezerwacji. Hero strony głównej wykorzystuje zdjęcia lotnicze Krakowa, by ustanowić pozycjonowanie premium. Sekcja „Dlaczego My?" wyróżnia sześć kluczowych wyróżników: prywatne pojazdy, odbiór door-to-door, anglojęzycznych kierowców, bilety bez kolejek, elastyczne terminy i cenę all-inclusive.',
+      'Wdrożyłem katalog zasilany elastycznym systemem CMS. Zintegrowana „Architektura Zaufania” wyróżnia kluczowe przewagi — jak prywatny transport i przejrzyste ceny — eliminując obiekcje rezerwacyjne już przy pierwszym kontakcie.',
     results:
-      'Bezpośrednie rezerwacje przez stronę stanowią teraz ponad 60% wszystkich zapytań, znacząco redukując zależność od platform zewnętrznych i związanych z nimi prowizji. Strona plasuje się na pierwszej stronie dla wielu konkurencyjnych fraz związanych z wycieczkami na rynku krakowskim.',
+      'Rezerwacje bezpośrednie stanowią obecnie ponad 60% przychodów, drastycznie zmniejszając zależność od pośredników. Platforma zdominowała wyniki wyszukiwania dla wielu konkurencyjnych fraz, a średni czas sesji przekracza 3 minuty.',
   },
 
   wellezza: {
     title: 'Wellezza',
-    subtitle: 'Salon fryzjerski w Wieliczce',
+    subtitle: 'Cyfrowa Tożsamość Salonu Premium',
     tagline:
-      'Elegancka strona wizytówka salonu, która napędza rezerwacje przez zintegrowane planowanie online.',
+      'Elegancki design i płynny system rezerwacji online, które zmodernizowały wizerunek renomowanego salonu.',
     pullQuotes: [
-      'Strona salonu musi robić jedną rzecz wyjątkowo dobrze: przekonać ludzi do umówienia wizyty.',
+      'Strona salonu musi robić jedną rzecz perfekcyjnie: sprowadzać klientów prosto na fotel.',
     ],
     client: 'Freelance',
-    role: 'Lead Developer & Designer',
+    role: 'Lead Developer i Projektant',
     problem:
-      'Wellezza to salon fryzjerski w Wieliczce z pełnym pasji, młodym zespołem, ale zerową widocznością online. Opierał się wyłącznie na wizytach bez umówienia i telefonach. Salon potrzebował profesjonalnej obecności w sieci, która zaprezentuje zespół, skomunikuje ofertę usługową z przejrzystym cennikiem i — najważniejsze — napędzi rezerwacje przez zintegrowany system planowania online (Bukka).',
+      'Mimo posiadania zespołu topowych stylistów, salon nie posiadał profesjonalnej wizytówki online. Poleganie wyłącznie na telefonach ograniczało potencjał rozwoju i utrudniało komunikację oferty premium.',
     approach:
-      'Zaprojektowałem stronę jednostronicową, która prowadzi odwiedzających przez naturalny przepływ: branding hero → prezentacja zespołu → katalog usług z cenami → kontakt i lokalizacja. Design wykorzystuje elegancką typografię i stonowane kolory, dopasowane do pozycjonowania premium salonu na rynku wielickim. Integracja z zewnętrzną platformą Bukka była kluczowa — CTA „Umów się!" jest wyeksponowane w nawigacji i powtarzane na całej stronie.',
+      'Zaprojektowałem skuteczną stronę typu Single Page, która przenosi elegancję salonu do sieci. Przepływ użytkownika prowadzi od wizualnej inspiracji do działania, eksponując przycisk rezerwacji na każdym etapie przeglądania.',
     solution:
-      'Strona zawiera sekcję hero z autorskim brandingiem salonu, prezentację zespołu ze zdjęciami stylistek (Agata i Karolina), ustrukturyzowaną tabelę cenową podzieloną na długość włosów (krótkie/średnie/długie), godziny otwarcia i osadzoną mapę Google dla łatwej nawigacji. Integracja z Bukka zapewnia bezproblemowe planowanie wizyt bez konieczności zarządzania własnym systemem rezerwacji.',
+      'Stworzyłem frontend zintegrowany z systemem Bukka, zapewniając bezproblemowe zapisy 24/7. Strona posiada ustrukturyzowany cennik i jest w pełni responsywna, osiągając wynik wydajności Lighthouse powyżej 95.',
     results:
-      'Zapytania o rezerwację online znacząco wzrosły po uruchomieniu, redukując zależność salonu od planowania telefonicznego. Strona ładuje się w poniżej 1 sekundy i osiąga wynik Lighthouse powyżej 95. Optymalizacja lokalnego SEO pozycjonuje Wellezza na kluczowe frazy jak „salon fryzjerski Wieliczka."',
+      'Zapisy online stały się głównym kanałem rezerwacji już w pierwszym miesiącu. Działania Local SEO zapewniły topowe pozycje na frazę „salon fryzjerski Wieliczka”, budując pozycję lokalnego lidera.',
   },
 
   'billboard-zakopane': {
     title: 'Billboard Zakopane',
-    subtitle: 'Reklama wielkoformatowa na Podhalu',
-    tagline: 'Platforma biznesowa dla reklamy outdoorowej w regionie Zakopanego i Podhala.',
+    subtitle: 'Platforma B2B Reklamy Zewnętrznej',
+    tagline:
+      'Interaktywny katalog lokalizacji i profesjonalny design, które zrewolucjonizowały sprzedaż reklam regionalnych.',
     pullQuotes: [
-      'Kiedy twój produkt jest fizycznie ogromny, twoja strona musi być równie odważna.',
+      'Kiedy Twój produkt jest fizycznie ogromny, Twoja obecność cyfrowa musi być równie odważna.',
     ],
     client: 'Freelance',
-    role: 'Lead Developer & Designer',
+    role: 'Główny Architekt i Projektant',
     problem:
-      'Firma „Jodełka" ma ponad 25 lat doświadczenia w branży reklamy billboardowej w regionie Zakopanego i Podhala, ale nie posiadała platformy cyfrowej do prezentacji lokalizacji billboardów, usług czy profesjonalnej wiarygodności. Potencjalni klienci nie mieli możliwości przeglądania dostępnych powierzchni reklamowych ani zrozumienia pełnego zakresu usług — od wynajmu billboardów i druku banerów po budowę niestandardowych konstrukcji reklamowych.',
+      'Lider branży z 25-letnim stażem nie posiadał narzędzia do prezentacji swoich zasobów. Sprzedaż opierała się na wizjach lokalnych i statycznych mapach, co znacząco wydłużało proces decyzyjny klientów.',
     approach:
-      'Zaprojektowałem profesjonalną platformę biznesową komunikującą autorytet i doświadczenie. Architektura informacji zbudowana jest wokół trzech filarów: historii firmy i zobowiązania do jakości, portfolio usługowego (wynajem, druk, budowa na zamówienie, konsultacje graficzne) oraz zasięgu geograficznego lokalizacji billboardów na Podhalu.',
+      'Zaprojektowałem platformę B2B, która komunikuje wieloletnie doświadczenie firmy. Design wykorzystuje wysoki kontrast i odważną typografię, priorytetyzując interaktywny wykaz dostępnych powierzchni.',
     solution:
-      'Strona zawiera przegląd firmy podkreślający 25+ lat doświadczenia branżowego, sekcję usługową obejmującą wynajem billboardów, druk/montaż banerów, budowę konstrukcji na zamówienie oraz konsultacje projektów graficznych. Interaktywna mapa lokalizacji pokazuje dostępne pozycje billboardów od Klikuszowej po Zakopane. Sekcja kontaktowa oferuje bezpośrednie kanały komunikacji.',
+      'Zintegrowałem mapę regionu Podhala, pozwalającą reklamodawcom filtrować i sprawdzać parametry konstrukcji w czasie rzeczywistym. Stworzyłem uproszczony kanał kontaktu, dostarczający komplet specyfikacji technicznych.',
     results:
-      'Strona ustanowiła pierwszą profesjonalną obecność cyfrową firmy, umożliwiając potencjalnym reklamodawcom przeglądanie lokalizacji i usług przed nawiązaniem kontaktu. Serwis służy jako narzędzie sprzedażowe aktywnie udostępniane potencjalnym klientom.',
+      'Platforma stała się kluczowym narzędziem sprzedażowym, eliminując potrzebę wstępnych wizyt w terenie. Firma zyskała wiarygodne aktywo wspierające negocjacje z dużymi markami spoza regionu.',
   },
 
   ready2order: {
     title: 'ready2order',
-    subtitle: 'Frontend Engineer — System POS SaaS',
+    subtitle: 'Senior Frontend Engineer — Systemy Enterprise POS',
     tagline:
-      'Sześć lat budowania skalowalnego oprogramowania POS używanego przez tysiące europejskich firm.',
+      'Optymalizacja i skalowanie oprogramowania POS używanego przez ponad 10 000 firm w Europie.',
     pullQuotes: [
-      'Zmniejszenie bundla o 50% było momentem największej dumy — to był czysty kunszt inżynierski.',
-      'Najlepszy kod, jaki napisałem w ready2order, to kod, który przekonałem zespół do usunięcia.',
+      'Zredukowanie rozmiaru aplikacji web o 50% to czysty kunszt inżynierski i jeden z moich kluczowych sukcesów.',
+      'Najwartościowszy kod, jaki napisałem, to ten, do którego usunięcia przekonałem zespół.',
     ],
     phases: [
       {
-        title: 'Web Designer & Junior Frontend',
+        title: 'Lead Frontend Innovation',
         description:
-          "Dołączyłem do wiedeńskiego startupu POS, by przekładać wireframe'y i prototypy Figma na produkcyjne interfejsy. Skupiłem się na implementacji pixel-perfect i nauce ekosystemu React w dynamicznym środowisku produktowym.",
+          'Kierowanie usprawnieniami architektonicznymi i optymalizacją wydajności głównego produktu React. Specjalizacja w redukcji rozmiaru paczek aplikacji i poprawie czasu interaktywności dla urządzeń o niskiej mocy obliczeniowej.',
         highlights: [
-          "Przekładałem wireframe'y i prototypy na responsywne interfejsy użytkownika",
-          'Opanowałem React, TypeScript i architekturę komponentową',
-          'Uczestniczyłem w planowaniu sprintów, stand-upach i retrospektywach w zespole Agile Scrum',
-        ],
-      },
-      {
-        title: 'Frontend Developer',
-        description:
-          'Przejąłem odpowiedzialność za budowanie pełnych modułów funkcjonalnych. Zbudowałem interfejs CashBook używając React, TypeScript, Apollo GraphQL i Tailwind CSS. Rozszerzałem API backendowe o nowe funkcje frontendowe.',
-        highlights: [
-          'Zbudowałem responsywne interfejsy jak CashBook z React, TypeScript, Apollo GraphQL i Tailwind CSS',
-          'Rozszerzyłem funkcjonalność API używając GraphQL, PHP i MySQL',
-          'Pisałem kompleksowe testy z Jest, React Testing Library i Cypress',
-          'Prowadziłem przeglądy kodu egzekwując najlepsze praktyki i standardy utrzymywalności',
-        ],
-      },
-      {
-        title: 'Senior Frontend Developer',
-        description:
-          'Skupiłem się na optymalizacji wydajności i ulepszeniach architektonicznych. Osiągnąłem 50% redukcję rozmiaru bundla aplikacji React poprzez optymalizację procesu budowania, bezpośrednio poprawiając czasy ładowania i doświadczenie użytkownika dla tysięcy merchentów w Europie.',
-        highlights: [
-          'Zredukowałem rozmiar bundla aplikacji React o 50% przez optymalizację procesu budowania',
-          'Poprawiłem czasy ładowania i UX dla tysięcy europejskich merchentów',
-          'Mentorowałem młodszych developerów i ustanawiałem standardy kodowania',
-          'Podejmowałem decyzje architektoniczne dla nowych modułów funkcjonalnych',
+          'Osiągnięcie 50% redukcji rozmiaru aplikacji React dzięki zaawansowanej optymalizacji build-pipe',
+          'Architektura responsywnych, modułowych interfejsów dla spójności między różnymi systemami',
+          'Mentoring zespołów inżynierskich w zakresie wzorców React, testowania i czystego kodu',
+          'Rozbudowa złożonych API backendowych (GraphQL) dla wsparcia funkcji o wysokim obciążeniu',
         ],
       },
     ],

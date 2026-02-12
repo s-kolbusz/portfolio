@@ -73,10 +73,7 @@ export const About: React.FC = () => {
         {/* Body Text - Clean Sans */}
         <div className="text-muted-foreground flex flex-col gap-6 font-sans text-lg leading-relaxed">
           <p>{t('philosophy.details')}</p>
-          <p>
-            I treat engineering as a craft. It&apos;s not just about writing code; it&apos;s about
-            creating digital environments that feel natural, responsive, and human.
-          </p>
+          <p>{t('philosophy.craft_details')}</p>
         </div>
 
         {/* Signature / Philosophy Marker */}
