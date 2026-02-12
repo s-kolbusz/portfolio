@@ -118,13 +118,13 @@ export function ProjectBook({ projects }: ProjectBookProps) {
         style={{ scrollbarWidth: 'none' }}
       >
         {/* ToC panel */}
-        <div data-book-panel>
+        <div data-book-panel id="book-panel-0">
           <BookTableOfContents entries={projects} onNavigate={scrollToPanel} />
         </div>
 
         {/* Project spreads */}
         {projects.map((project, i) => (
-          <div key={project.id} data-book-panel>
+          <div key={project.id} data-book-panel id={`book-panel-${i + 1}`}>
             <BookSpread entry={project} index={i} />
           </div>
         ))}

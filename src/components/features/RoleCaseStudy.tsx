@@ -5,14 +5,13 @@ import { useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 
-import { useGSAP } from '@gsap/react'
 import { ArrowLeftIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
 
 import { Button } from '@/components/ui/Button'
 import type { PortfolioEntry } from '@/data/projects-en'
+import { useRevealAnimation } from '@/hooks/useRevealAnimation'
 import { useRouter } from '@/i18n/navigation'
 import { ANIMATION } from '@/lib/constants/animations'
-import { gsap } from '@/lib/gsap'
 
 import { ProjectNav } from './ProjectNav'
 
@@ -28,65 +27,27 @@ export function RoleCaseStudy({ project, prevProject, nextProject }: RoleCaseStu
   const router = useRouter()
   const mainRef = useRef<HTMLElement>(null)
 
-  useGSAP(
-    () => {
-      if (!mainRef.current) return
+  // 1. Hero Content Reveal
+  useRevealAnimation(mainRef, {
+    selector: '[data-cs-hero-content]',
+    y: 40,
+    duration: ANIMATION.duration.slow,
+    delay: 0.3,
+  })
 
-      // Hero content
-      gsap.fromTo(
-        mainRef.current.querySelector('[data-cs-hero-content]'),
-        { opacity: 0, y: 40 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: ANIMATION.duration.slow,
-          ease: ANIMATION.ease.outStrong,
-          delay: 0.3,
-        }
-      )
+  // 2. Timeline Reveal
+  useRevealAnimation(mainRef, {
+    selector: '[data-timeline-item]',
+    x: -20,
+    once: false,
+  })
 
-      // Timeline entries
-      const timelineItems = mainRef.current.querySelectorAll('[data-timeline-item]')
-      timelineItems.forEach((item) => {
-        gsap.fromTo(
-          item,
-          { opacity: 0, x: -20 },
-          {
-            opacity: 1,
-            x: 0,
-            duration: ANIMATION.duration.medium,
-            ease: ANIMATION.ease.outStrong,
-            scrollTrigger: {
-              trigger: item,
-              start: 'top 80%',
-              toggleActions: 'play none none reverse',
-            },
-          }
-        )
-      })
-
-      // Sections
-      const sections = mainRef.current.querySelectorAll('[data-cs-section]')
-      sections.forEach((section) => {
-        gsap.fromTo(
-          section,
-          { opacity: 0, y: 30 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: ANIMATION.duration.medium,
-            ease: ANIMATION.ease.outStrong,
-            scrollTrigger: {
-              trigger: section,
-              start: 'top 80%',
-              toggleActions: 'play none none reverse',
-            },
-          }
-        )
-      })
-    },
-    { scope: mainRef }
-  )
+  // 3. Sections Reveal
+  useRevealAnimation(mainRef, {
+    selector: '[data-cs-section]',
+    y: 30,
+    once: false,
+  })
 
   const phases = project.phases ?? []
   const timelinePeriods = project.timeline ?? []

@@ -57,7 +57,13 @@ export function ProjectAccordion({ project, isOpen }: ProjectAccordionProps) {
   const highlights = project.pullQuotes || []
 
   return (
-    <div ref={containerRef} className="h-0 overflow-hidden">
+    <div
+      ref={containerRef}
+      className="h-0 overflow-hidden"
+      id={`project-content-${project.id}`}
+      role="region"
+      aria-labelledby={`project-trigger-${project.id}`}
+    >
       <div
         ref={contentRef}
         className="grid grid-cols-1 gap-12 pt-4 pb-12 md:grid-cols-12 md:gap-24 md:pt-8 md:pb-16"

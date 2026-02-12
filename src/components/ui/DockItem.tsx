@@ -6,6 +6,7 @@ import { useGSAP } from '@gsap/react'
 import type { Icon } from '@phosphor-icons/react'
 import gsap from 'gsap'
 
+import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
 
 import { DockTooltip } from './DockTooltip'
@@ -52,17 +53,18 @@ export function DockItem({
   }
 
   return (
-    <button
+    <Button
       ref={itemRef}
+      variant="glass"
+      size="icon"
       onClick={onClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className={cn(
-        'group glass-button relative flex h-10 w-10 origin-right items-center justify-center lg:h-12 lg:w-12',
+        'group relative flex origin-right items-center justify-center lg:h-12 lg:w-12',
         className
       )}
       aria-label={label}
-      data-cursor="button"
     >
       {/* Background hover effect */}
       <div className="absolute inset-0 rounded-md bg-emerald-500/0 transition-colors duration-300 group-hover:bg-emerald-500/10" />
@@ -77,6 +79,6 @@ export function DockItem({
       />
 
       <DockTooltip label={label} isVisible={isHovered} />
-    </button>
+    </Button>
   )
 }

@@ -10,6 +10,7 @@ import { useScrollStore } from '@/lib/store'
 import { cn } from '@/lib/utils'
 
 import { ProjectAccordion } from './ProjectAccordion'
+import { ProjectMeta } from './ProjectMeta'
 
 interface ProjectItemProps {
   project: PortfolioEntry
@@ -74,22 +75,18 @@ export function ProjectItem({ project, isOpen, onToggle, onHover }: ProjectItemP
         onClick={handleClick}
         className="flex w-full items-center justify-between py-8 text-left transition-all outline-none md:py-10"
         aria-expanded={isOpen}
+        aria-controls={`project-content-${project.id}`}
+        id={`project-trigger-${project.id}`}
       >
         <div className="flex flex-col gap-3">
           <span className="text-foreground font-serif text-3xl font-light transition-transform duration-500 group-hover:translate-x-4 md:text-5xl lg:text-6xl">
             {project.title}
           </span>
-          <div className="text-muted-foreground flex items-center gap-4 font-mono text-xs tracking-widest transition-transform duration-500 group-hover:translate-x-6">
-            <span className="text-primary uppercase">{project.year}</span>
-            <span className="opacity-30">/</span>
-            <div className="flex gap-3">
-              {project.techStack.slice(0, 3).map((tech) => (
-                <span key={tech} className="uppercase">
-                  {tech}
-                </span>
-              ))}
-            </div>
-          </div>
+          <ProjectMeta
+            year={project.year}
+            techStack={project.techStack}
+            className="transition-transform duration-500 group-hover:translate-x-6"
+          />
         </div>
 
         <div className="flex items-center gap-8">

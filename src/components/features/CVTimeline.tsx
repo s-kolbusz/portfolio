@@ -21,42 +21,24 @@ interface CVTimelineProps {
 export const CVTimeline: React.FC<CVTimelineProps> = ({ experience, education }) => {
   const t = useTranslations('cv')
   const containerRef = useRef<HTMLDivElement>(null)
-  const lineRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!lineRef.current || !containerRef.current) return
+    if (!containerRef.current) return
 
     const ctx = gsap.context(() => {
-      // Animate the timeline line drawing
-      gsap.fromTo(
-        lineRef.current,
-        { scaleY: 0 },
-        {
-          scaleY: 1,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: containerRef.current,
-            start: 'top 70%',
-            end: 'bottom 80%',
-            scrub: 0.5,
-          },
-        }
-      )
-
-      // Animate each entry fading in
       const entries = gsap.utils.toArray<HTMLElement>('.cv-entry')
       entries.forEach((entry) => {
         gsap.fromTo(
           entry,
-          { opacity: 0, x: -10 },
+          { opacity: 0, x: -20 },
           {
             opacity: 1,
             x: 0,
-            duration: 0.6,
+            duration: 0.8,
             ease: 'power2.out',
             scrollTrigger: {
               trigger: entry,
-              start: 'top 85%',
+              start: 'top 90%',
               toggleActions: 'play none none none',
             },
           }
@@ -69,12 +51,6 @@ export const CVTimeline: React.FC<CVTimelineProps> = ({ experience, education })
 
   return (
     <div ref={containerRef} className="relative flex flex-col gap-6 md:gap-5 print:gap-5">
-      {/* Central vertical line */}
-      <div
-        ref={lineRef}
-        className="absolute top-2 bottom-4 left-1.5 w-px origin-top bg-emerald-500/30 print:hidden"
-      />
-
       <section className="flex flex-col gap-4 md:gap-4 print:gap-4">
         <h2 className="text-foreground font-serif text-xl font-bold md:text-[14pt] print:text-[14pt]">
           {t('experience')}

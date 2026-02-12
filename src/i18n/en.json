@@ -3,6 +3,9 @@
     "title": "Sebastian Kolbusz | Portfolio",
     "description": "Full-stack developer and 3D printing enthusiast"
   },
+  "actions": {
+    "skip_to_main": "Skip to main content"
+  },
   "nav": {
     "hero": "Home",
     "about": "About",
@@ -28,7 +31,7 @@
     "name": "Sebastian Kolbusz",
     "role": "Frontend Engineer",
     "tagline": "Building immersive digital experiences with code and creativity.",
-    "cta": "View My Work"
+    "cta": "Get to know me"
   },
   "about": {
     "title": "The Craft & Context",

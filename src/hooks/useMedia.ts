@@ -13,3 +13,8 @@ export const useMedia = (mediaString: string) =>
     () => window.matchMedia(mediaString).matches,
     () => false
   )
+
+export const useIsMobile = () => useMedia('(max-width: 767px)')
+export const useIsTablet = () => useMedia('(min-width: 768px) and (max-width: 1023px)')
+export const useIsDesktop = () => useMedia('(min-width: 1024px)')
+export const usePrefersReducedMotion = () => useMedia('(prefers-reduced-motion: reduce)')

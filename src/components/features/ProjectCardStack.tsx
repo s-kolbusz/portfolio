@@ -15,6 +15,8 @@ import { useRouter } from '@/i18n/navigation'
 import { ANIMATION } from '@/lib/constants/animations'
 import { gsap } from '@/lib/gsap'
 
+import { ProjectMeta } from './ProjectMeta'
+
 interface ProjectCardStackProps {
   projects: PortfolioEntry[]
 }
@@ -99,17 +101,11 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
                 </div>
 
                 {/* Year + tech — matching homepage accordion */}
-                <div className="text-muted-foreground mt-1.5 flex items-center gap-3 font-mono text-[11px] tracking-widest">
-                  <span className="text-primary uppercase">{entry.year}</span>
-                  <span className="opacity-30">/</span>
-                  <div className="flex gap-2.5 overflow-hidden">
-                    {entry.techStack.slice(0, 3).map((tech) => (
-                      <span key={tech} className="shrink-0 uppercase">
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                <ProjectMeta
+                  year={entry.year}
+                  techStack={entry.techStack}
+                  className="mt-1.5 text-[11px]"
+                />
               </div>
 
               {/* Category */}

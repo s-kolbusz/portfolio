@@ -9,6 +9,8 @@ import { useGSAP } from '@gsap/react'
 import { ArrowDownIcon } from '@phosphor-icons/react'
 
 import { Button } from '@/components/ui/Button'
+import { useMedia } from '@/hooks/useMedia'
+import { useRevealAnimation } from '@/hooks/useRevealAnimation'
 import { ANIMATION } from '@/lib/constants/animations'
 import { gsap } from '@/lib/gsap'
 
@@ -25,6 +27,7 @@ export function Hero() {
   const ctaRef = useRef<HTMLDivElement>(null)
   const ctaIconRef = useRef<SVGSVGElement>(null)
   const caretRef = useRef<HTMLSpanElement>(null)
+  const prefersReducedMotion = useMedia('(prefers-reduced-motion: reduce)')
 
   const name = t('name')
   const splitName = useMemo(() => {
@@ -42,10 +45,19 @@ export function Hero() {
     ))
   }, [name])
 
+  useRevealAnimation(roleRef, { delay: 1, scope: headerRef })
+  useRevealAnimation(ctaRef, { delay: 1.5, scope: headerRef, y: 20 })
+
   useGSAP(
     () => {
       const chars = gsap.utils.toArray<HTMLElement>('.char')
       if (chars.length === 0) return
+
+      if (prefersReducedMotion) {
+        gsap.set(chars, { opacity: 1 })
+        gsap.set(caretRef.current, { opacity: 0 })
+        return
+      }
 
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -60,8 +72,7 @@ export function Hero() {
       gsap.set(chars, { opacity: 0 })
       gsap.set(caretRef.current, { opacity: 1 })
 
-      // 1. Natural typing effect for name
-      // We calculate all positions once to avoid layout thrashing
+      // Natural typing effect for name
       const parentRect = caretRef.current?.parentElement?.getBoundingClientRect() || {
         left: 0,
         top: 0,
@@ -111,36 +122,6 @@ export function Hero() {
         delay: ANIMATION.delay.medium,
       })
 
-      // 2. Role & Tagline Reveal
-      if (roleRef.current) {
-        tl.fromTo(
-          roleRef.current,
-          { y: 30, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: ANIMATION.duration.medium,
-            ease: ANIMATION.ease.outStrong,
-          },
-          '-=0.2'
-        )
-      }
-
-      // 3. CTA Fade In
-      if (ctaRef.current) {
-        tl.fromTo(
-          ctaRef.current,
-          { y: 20, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: ANIMATION.duration.medium,
-            ease: ANIMATION.ease.outStrong,
-          },
-          '-=0.8'
-        )
-      }
-
       // 4. Arrow Bounce
       if (ctaIconRef.current) {
         gsap.to(ctaIconRef.current, {
@@ -187,7 +168,7 @@ export function Hero() {
         </div>
 
         {/* Role & Tagline */}
-        <div ref={roleRef} className="flex max-w-3xl flex-col gap-4 opacity-0">
+        <div ref={roleRef} className="flex max-w-3xl flex-col gap-4">
           <h2 className="font-mono text-xl font-medium md:text-3xl">{t('role')}</h2>
           <p className="text-muted-foreground font-serif text-xl italic md:text-3xl">
             {t('tagline')}
@@ -195,7 +176,7 @@ export function Hero() {
         </div>
 
         {/* CTA */}
-        <div ref={ctaRef} className="opacity-0">
+        <div ref={ctaRef}>
           <Button
             onClick={handleCtaClick}
             size="lg"

@@ -19,6 +19,7 @@ import gsap from 'gsap'
 import { Select } from '@/components/ui/Select'
 import { Slider } from '@/components/ui/Slider'
 import { BUILD_VOLUME_X, BUILD_VOLUME_Y, BUILD_VOLUME_Z, MATERIALS } from '@/data/materials'
+import { useMedia } from '@/hooks/useMedia'
 import { calculatePrintCost } from '@/lib/calculate-print'
 
 // Helper for animating numbers
@@ -33,8 +34,16 @@ const AnimatedValue = ({
 }) => {
   const ref = useRef<HTMLSpanElement>(null)
   const valueRef = useRef(value)
+  const prefersReducedMotion = useMedia('(prefers-reduced-motion: reduce)')
 
   useGSAP(() => {
+    if (prefersReducedMotion) {
+      if (ref.current) {
+        ref.current.textContent = formatter(value).toString()
+      }
+      return
+    }
+
     gsap.to(valueRef, {
       current: value,
       duration: 0.5,
@@ -45,7 +54,7 @@ const AnimatedValue = ({
         }
       },
     })
-  }, [value])
+  }, [value, prefersReducedMotion])
 
   return (
     <span ref={ref} className={className}>

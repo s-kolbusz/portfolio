@@ -3,10 +3,13 @@
     "title": "Sebastian Kolbusz | Portfolio",
     "description": "Programista Full-Stack i entuzjasta druku 3D"
   },
+  "actions": {
+    "skip_to_main": "Przejdź do treści"
+  },
   "nav": {
     "hero": "Start",
     "about": "O mnie",
-    "projects": "Prace",
+    "projects": "Projekty",
     "services": "Usługi",
     "calculator": "Druk 3D",
     "contact": "Kontakt",
@@ -28,7 +31,7 @@
     "name": "Sebastian Kolbusz",
     "role": "Frontend Engineer",
     "tagline": "Tworzę immersyjne doświadczenia cyfrowe z pasją i kodem.",
-    "cta": "Zobacz moje prace"
+    "cta": "Poznaj mnie"
   },
   "about": {
     "title": "Rzemiosło i Kontekst",

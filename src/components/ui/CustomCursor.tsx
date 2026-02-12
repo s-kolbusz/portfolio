@@ -4,13 +4,13 @@ import { useEffect, useRef } from 'react'
 
 import { useGSAP } from '@gsap/react'
 
-import { useMedia } from '@/hooks/useMedia'
+import { useMedia, usePrefersReducedMotion } from '@/hooks/useMedia'
 import { useCursorStore, CursorVariant } from '@/lib/cursor-store'
 import { gsap } from '@/lib/gsap'
 
 export default function CustomCursor() {
-  // Check for fine pointer (mouse) using useSyncExternalStore to avoid cascading renders
-  const isEnabled = useMedia('(pointer: fine)')
+  const prefersReducedMotion = usePrefersReducedMotion()
+  const isEnabled = useMedia('(pointer: fine)') && !prefersReducedMotion
 
   // Use selectors for actions only to avoid re-renders on state changes
   const setVariant = useCursorStore((state) => state.setVariant)
@@ -110,7 +110,13 @@ export default function CustomCursor() {
       const target = e.target as HTMLElement
       const cursorEl = target.closest('[data-cursor]') as HTMLElement
 
-      if (cursorEl) {
+      // Check if element is visible enough to interact with
+      const isVisible = (el: HTMLElement) => {
+        const style = window.getComputedStyle(el)
+        return parseFloat(style.opacity) > 0.9 && style.visibility !== 'hidden'
+      }
+
+      if (cursorEl && isVisible(cursorEl)) {
         const type = cursorEl.getAttribute('data-cursor')
         if (type) {
           setVariant(type as CursorVariant)
@@ -118,10 +124,14 @@ export default function CustomCursor() {
             setMagneticTarget(cursorEl)
           }
         }
-      } else if (target.tagName === 'A' || target.tagName === 'BUTTON') {
+      } else if ((target.tagName === 'A' || target.tagName === 'BUTTON') && isVisible(target)) {
         setVariant('button')
         setMagneticTarget(target)
-      } else if (target.tagName === 'INPUT' && (target as HTMLInputElement).type === 'range') {
+      } else if (
+        target.tagName === 'INPUT' &&
+        (target as HTMLInputElement).type === 'range' &&
+        isVisible(target)
+      ) {
         setVariant('button')
         setMagneticTarget(target)
       }
