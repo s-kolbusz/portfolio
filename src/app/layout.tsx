@@ -2,9 +2,12 @@ import type { Metadata } from 'next'
 import { Fraunces, JetBrains_Mono } from 'next/font/google'
 import localFont from 'next/font/local'
 
-import './globals.css'
+import { SpeedInsights } from '@vercel/speed-insights/next'
+
 import { JsonLd } from '@/components/SEO/JsonLd'
 import { ThemeProvider } from '@/components/theme-provider'
+
+import './globals.css'
 
 const satoshi = localFont({
   src: [
@@ -112,6 +115,7 @@ export default function RootLayout({
           <JsonLd />
           {children}
         </ThemeProvider>
+        <SpeedInsights />
       </body>
     </html>
   )
