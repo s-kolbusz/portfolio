@@ -6,13 +6,11 @@ import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { useGSAP } from '@gsap/react'
 import { ArrowUpRightIcon } from '@phosphor-icons/react'
-import gsap from 'gsap'
 
 import { PortfolioEntry } from '@/data/projects-en'
-import { useReveal } from '@/hooks/useRevealAnimation'
 import { ANIMATION } from '@/lib/constants/animations'
+import { gsap, useGSAP } from '@/lib/gsap'
 
 interface ProjectAccordionProps {
   project: PortfolioEntry
@@ -23,22 +21,35 @@ export function ProjectAccordion({ project, isOpen }: ProjectAccordionProps) {
   const t = useTranslations('projects')
   const containerRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
-  const reveal = useReveal()
 
   useGSAP(() => {
     if (isOpen) {
       const height = contentRef.current?.offsetHeight || 0
-      gsap.to(containerRef.current, {
+      const tl = gsap.timeline()
+
+      tl.to(containerRef.current, {
         height,
         duration: ANIMATION.duration.fast,
         ease: ANIMATION.ease.out,
       })
 
-      reveal(contentRef, {
-        start: 'top 100%',
-        delay: 0.1,
-        stagger: ANIMATION.stagger.tight,
-      })
+      if (contentRef.current) {
+        tl.fromTo(
+          contentRef.current.children,
+          {
+            y: 20,
+            opacity: 0,
+          },
+          {
+            y: 0,
+            opacity: 1,
+            duration: ANIMATION.duration.medium,
+            ease: ANIMATION.ease.out,
+            stagger: ANIMATION.stagger.tight,
+          },
+          '<0.1'
+        )
+      }
     } else {
       gsap.to(containerRef.current, {
         height: 0,

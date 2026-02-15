@@ -4,10 +4,8 @@ import React, { useRef, useEffect } from 'react'
 
 import { useTranslations } from 'next-intl'
 
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
 import { CVExperience, CVEducation } from '@/data/cv'
+import { gsap, ScrollTrigger } from '@/lib/gsap'
 
 import { CVEntry } from './CVEntry'
 

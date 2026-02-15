@@ -22,12 +22,13 @@ export function ProjectList({ projects }: ProjectListProps) {
 
   const ANIMATION = useSafeAnimation()
 
-  useRevealAnimation(containerRef, [
-    {
-      trigger: listRef,
-      animations: [{ target: listRef, options: { stagger: ANIMATION.stagger.slow } }],
-    },
-  ])
+  useRevealAnimation(listRef, {
+    y: 0,
+    x: -100,
+    stagger: ANIMATION.stagger.slow,
+    scope: containerRef,
+    start: 'top bottom',
+  })
 
   useEffect(() => {
     const container = containerRef.current

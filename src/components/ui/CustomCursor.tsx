@@ -2,11 +2,10 @@
 
 import { useEffect, useRef } from 'react'
 
-import { useGSAP } from '@gsap/react'
-
 import { useCursorInteractions } from '@/hooks/useCursorInteractions'
 import { useMedia, usePrefersReducedMotion } from '@/hooks/useMedia'
 import { useCursorStore } from '@/lib/cursor-store'
+import { useGSAP } from '@/lib/gsap'
 import { gsap } from '@/lib/gsap'
 
 export default function CustomCursor() {

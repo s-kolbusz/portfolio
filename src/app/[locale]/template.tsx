@@ -1,10 +1,7 @@
 'use client'
 
-import { useGSAP } from '@gsap/react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
 import { usePrefersReducedMotion } from '@/hooks/useMedia'
+import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap'
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger)

@@ -23,6 +23,7 @@ export function Projects({ locale }: ProjectsProps) {
   const sectionRef = useRef<HTMLElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
+  const footerRef = useRef<HTMLDivElement>(null)
 
   const projects = getFeaturedProjects(locale as Locale)
 
@@ -30,7 +31,8 @@ export function Projects({ locale }: ProjectsProps) {
     {
       animations: [
         { target: headerRef },
-        { target: contentRef, options: { y: 40, stagger: 0.5, position: '<0.3' } },
+        // { target: contentRef, options: { y: 0, x: -100 } },
+        { target: footerRef },
       ],
     },
   ])
@@ -51,7 +53,7 @@ export function Projects({ locale }: ProjectsProps) {
       </div>
 
       {/* Footer Link */}
-      <div className="flex justify-center md:justify-end">
+      <div ref={footerRef} className="flex justify-center md:justify-end">
         <Button
           href="/projects"
           variant="ghost"

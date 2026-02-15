@@ -5,8 +5,7 @@ import { useEffect } from 'react'
 import Lenis from 'lenis'
 
 import { usePrefersReducedMotion } from '@/hooks/useMedia'
-import { gsap } from '@/lib/gsap'
-import { ScrollTrigger } from '@/lib/gsap'
+import { gsap, ScrollTrigger } from '@/lib/gsap'
 import { useScrollStore } from '@/lib/store'
 
 export function SmoothScroller() {
@@ -46,7 +45,7 @@ export function SmoothScroller() {
       lenis.destroy()
       gsap.ticker.remove(tickerCallback)
     }
-  }, [setLenis])
+  }, [setLenis, prefersReducedMotion])
 
   return null
 }

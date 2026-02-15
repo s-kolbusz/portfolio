@@ -4,7 +4,6 @@ import { useRef, useState, useEffect, useMemo } from 'react'
 
 import { useTranslations } from 'next-intl'
 
-import { useGSAP } from '@gsap/react'
 import {
   BriefcaseIcon,
   CubeIcon,
@@ -14,10 +13,10 @@ import {
   HouseIcon,
   UserIcon,
 } from '@phosphor-icons/react'
-import gsap from 'gsap'
 
 import { useActiveSection } from '@/hooks/useActiveSection'
 import { usePathname, useRouter } from '@/i18n/navigation'
+import { gsap, useGSAP } from '@/lib/gsap'
 
 import { DockItem } from './DockItem'
 

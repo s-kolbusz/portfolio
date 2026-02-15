@@ -2,11 +2,10 @@
 
 import { useRef, useState } from 'react'
 
-import { useGSAP } from '@gsap/react'
 import type { Icon } from '@phosphor-icons/react'
-import gsap from 'gsap'
 
 import { Button } from '@/components/ui/Button'
+import { gsap, useGSAP } from '@/lib/gsap'
 import { cn } from '@/lib/utils'
 
 import { DockTooltip } from './DockTooltip'

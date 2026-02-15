@@ -5,14 +5,13 @@ import { useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 
-import { useGSAP } from '@gsap/react'
 import { ArrowRightIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
 
 import { PortfolioEntry } from '@/data/projects-en'
 import { useReveal } from '@/hooks/useRevealAnimation'
 import { Link } from '@/i18n/navigation'
 import { ANIMATION } from '@/lib/constants/animations'
-import { gsap } from '@/lib/gsap'
+import { gsap, useGSAP } from '@/lib/gsap'
 
 interface BookSpreadProps {
   entry: PortfolioEntry

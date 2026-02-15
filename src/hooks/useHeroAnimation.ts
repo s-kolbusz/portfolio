@@ -1,10 +1,8 @@
 import { RefObject } from 'react'
 
-import { useGSAP } from '@gsap/react'
-
 import { useReveal } from '@/hooks/useRevealAnimation'
 import { ANIMATION } from '@/lib/constants/animations'
-import { gsap } from '@/lib/gsap'
+import { gsap, useGSAP } from '@/lib/gsap'
 
 interface UseHeroAnimationProps {
   containerRef: RefObject<HTMLElement | null>

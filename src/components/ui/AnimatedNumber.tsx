@@ -2,11 +2,9 @@
 
 import { useRef } from 'react'
 
-import { useGSAP } from '@gsap/react'
-import gsap from 'gsap'
-
 import { usePrefersReducedMotion } from '@/hooks/useMedia'
 import { useSafeAnimation } from '@/lib/constants/animations'
+import { gsap, useGSAP } from '@/lib/gsap'
 
 interface AnimatedNumberProps {
   value: number

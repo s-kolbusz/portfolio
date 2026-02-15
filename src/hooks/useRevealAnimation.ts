@@ -1,10 +1,8 @@
 'use client'
 
-import { useGSAP } from '@gsap/react'
-
 import { usePrefersReducedMotion } from '@/hooks/useMedia'
 import { useSafeAnimation } from '@/lib/constants/animations'
-import { gsap } from '@/lib/gsap'
+import { gsap, useGSAP } from '@/lib/gsap'
 
 /**
  * Valid targets for reveal animations.
@@ -107,7 +105,7 @@ function resolveTarget(target: RevealTarget): gsap.TweenTarget {
  * @param target - The element(s) to animate.
  * @param options - Configuration options including motion preferences and animation constants.
  */
-export function reveal<T extends HTMLElement>(
+export function reveal(
   target: RevealTarget,
   options: RevealOptions & {
     prefersReducedMotion: boolean

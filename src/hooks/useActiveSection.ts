@@ -18,7 +18,7 @@ export function useActiveSection(sectionIds: string[]) {
     if (window.location.hash) {
       const hashId = window.location.hash.replace('#', '')
       if (sectionIds.includes(hashId)) {
-        setActiveSection(hashId)
+        setTimeout(() => setActiveSection(hashId), 0)
       }
     }
 
