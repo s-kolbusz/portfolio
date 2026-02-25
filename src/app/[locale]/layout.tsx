@@ -2,11 +2,8 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getMessages, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 
-import CustomCursor from '@/components/ui/CustomCursor'
-import { DockNav } from '@/components/ui/DockNav'
-import { SettingsDock } from '@/components/ui/SettingsDock'
+import { ClientOverlays } from '@/components/ui/ClientOverlays'
 import { SkipToMain } from '@/components/ui/SkipToMain'
-import { SmoothScroller } from '@/components/ui/SmoothScroller'
 import { routing } from '@/i18n/routing'
 
 type Props = {
@@ -35,10 +32,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <NextIntlClientProvider messages={messages}>
       <SkipToMain />
-      <CustomCursor />
-      <SmoothScroller />
-      <SettingsDock />
-      <DockNav />
+      <ClientOverlays />
       {children}
     </NextIntlClientProvider>
   )

@@ -106,7 +106,7 @@ export function DockNav() {
       const currentOpacity = gsap.getProperty(indicatorRef.current, 'opacity')
 
       if (currentOpacity === 0) {
-        gsap.set(indicatorRef.current, { top: top })
+        gsap.set(indicatorRef.current, { y: top })
         gsap.to(indicatorRef.current, {
           opacity: 1,
           duration: 0.3,
@@ -117,7 +117,7 @@ export function DockNav() {
           duration: 0.4,
           ease: 'back.out(1.2)',
           opacity: 1,
-          top: top,
+          y: top,
         })
       }
     } else if (indicatorRef.current) {
@@ -140,7 +140,7 @@ export function DockNav() {
       const currentOpacity = gsap.getProperty(mobileIndicatorRef.current, 'opacity')
 
       if (currentOpacity === 0) {
-        gsap.set(mobileIndicatorRef.current, { left: left })
+        gsap.set(mobileIndicatorRef.current, { x: left })
         gsap.to(mobileIndicatorRef.current, {
           opacity: 1,
           duration: 0.3,
@@ -151,7 +151,7 @@ export function DockNav() {
           duration: 0.4,
           ease: 'back.out(1.2)',
           opacity: 1,
-          left: left,
+          x: left,
         })
       }
     } else if (mobileIndicatorRef.current) {
@@ -171,7 +171,7 @@ export function DockNav() {
           const style = window.getComputedStyle(dockRef.current)
           if (style.display !== 'none') {
             const top = getIndicatorTop(activeItemIndex)
-            gsap.set(indicatorRef.current, { top: top, opacity: 1 })
+            gsap.set(indicatorRef.current, { y: top, opacity: 1 })
           } else {
             gsap.set(indicatorRef.current, { opacity: 0 })
           }
@@ -182,7 +182,7 @@ export function DockNav() {
           const style = window.getComputedStyle(mobileDockRef.current)
           if (style.display !== 'none') {
             const left = getIndicatorLeft(activeItemIndex)
-            gsap.set(mobileIndicatorRef.current, { left: left, opacity: 1 })
+            gsap.set(mobileIndicatorRef.current, { x: left, opacity: 1 })
           } else {
             gsap.set(mobileIndicatorRef.current, { opacity: 0 })
           }
@@ -231,8 +231,7 @@ export function DockNav() {
         {/* Active Indicator (Pill next to dock) */}
         <div
           ref={indicatorRef}
-          className="absolute -right-1 h-8 w-1 -translate-y-1/2 rounded-full bg-emerald-500 opacity-0 shadow-lg shadow-emerald-500"
-          style={{ top: '50%' }}
+          className="absolute top-0 -right-1 h-8 w-1 -translate-y-1/2 rounded-full bg-emerald-500 opacity-0 shadow-lg shadow-emerald-500"
         />
 
         {NAV_ITEMS.map((item, index) => (
@@ -260,8 +259,7 @@ export function DockNav() {
         {/* Active Indicator (Pill below dock items) */}
         <div
           ref={mobileIndicatorRef}
-          className="absolute -bottom-1 h-1 w-8 -translate-x-1/2 rounded-full bg-emerald-500 opacity-0 shadow-lg shadow-emerald-500"
-          style={{ left: '50%' }}
+          className="absolute left-0 -bottom-1 h-1 w-8 -translate-x-1/2 rounded-full bg-emerald-500 opacity-0 shadow-lg shadow-emerald-500"
         />
 
         {NAV_ITEMS.map((item, index) => (

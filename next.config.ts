@@ -5,6 +5,16 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
+  productionBrowserSourceMaps: true,
+  experimental: {
+    optimizePackageImports: [
+      '@phosphor-icons/react',
+      'gsap',
+      'three',
+      '@react-three/fiber',
+      '@react-three/drei'
+    ],
+  },
 }
 
 export default withNextIntl(nextConfig)

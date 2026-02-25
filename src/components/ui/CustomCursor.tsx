@@ -23,8 +23,24 @@ export default function CustomCursor() {
 
   // Transient state for the ticker to read without causing re-renders
   const magneticTargetRef = useRef<HTMLElement | null>(null)
+  const targetRectRef = useRef({ left: 0, top: 0, width: 0, height: 0 })
   const mouse = useRef({ x: 0, y: 0 })
   const hasMoved = useRef(false)
+
+  const updateTargetRect = () => {
+    if (magneticTargetRef.current && magneticTargetRef.current.isConnected) {
+      targetRectRef.current = magneticTargetRef.current.getBoundingClientRect()
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener('scroll', updateTargetRect, { passive: true })
+    window.addEventListener('resize', updateTargetRect)
+    return () => {
+      window.removeEventListener('scroll', updateTargetRect)
+      window.removeEventListener('resize', updateTargetRect)
+    }
+  }, [])
 
   // Subscribe to store changes manually to handle visual updates
   useEffect(() => {
@@ -38,6 +54,7 @@ export default function CustomCursor() {
       // Handle magnetic target changes
       if (state.magneticTarget !== prevState.magneticTarget) {
         magneticTargetRef.current = state.magneticTarget
+        updateTargetRect()
 
         if (state.magneticTarget && ringRef.current) {
           const style = window.getComputedStyle(state.magneticTarget)
@@ -92,8 +109,8 @@ export default function CustomCursor() {
       mouse.current.x = e.clientX
       mouse.current.y = e.clientY
       if (!hasMoved.current) {
-        hasMoved.current = true
         if (cursorRef.current && ringRef.current) {
+          hasMoved.current = true
           gsap.to([cursorRef.current, ringRef.current], { opacity: 1, duration: 0.3 })
         }
       }
@@ -126,40 +143,45 @@ export default function CustomCursor() {
       let targetHeight = DEFAULT_SIZE
 
       if (currentTarget) {
-        // Check if element is still in DOM and visible
-        if (!currentTarget.isConnected || currentTarget.getBoundingClientRect().width === 0) {
+        // Check if element is still in DOM
+        if (!currentTarget.isConnected) {
           setMagneticTarget(null)
           magneticTargetRef.current = null
         } else {
-          const rect = currentTarget.getBoundingClientRect()
-          let centerX = rect.left + rect.width / 2
-          const centerY = rect.top + rect.height / 2
-          let w = rect.width + 20
-          let h = rect.height + 20
+          const rect = targetRectRef.current
+          if (rect.width === 0) {
+            setMagneticTarget(null)
+            magneticTargetRef.current = null
+          } else {
+            let centerX = rect.left + rect.width / 2
+            const centerY = rect.top + rect.height / 2
+            let w = rect.width + 20
+            let h = rect.height + 20
 
-          // Special handling for range sliders to follow the thumb
-          if (
-            currentTarget.tagName === 'INPUT' &&
-            (currentTarget as HTMLInputElement).type === 'range'
-          ) {
-            const input = currentTarget as HTMLInputElement
-            const min = parseFloat(input.min || '0')
-            const max = parseFloat(input.max || '100')
-            const val = parseFloat(input.value)
-            const percent = (val - min) / (max - min)
+            // Special handling for range sliders to follow the thumb
+            if (
+              currentTarget.tagName === 'INPUT' &&
+              (currentTarget as HTMLInputElement).type === 'range'
+            ) {
+              const input = currentTarget as HTMLInputElement
+              const min = parseFloat(input.min || '0')
+              const max = parseFloat(input.max || '100')
+              const val = parseFloat(input.value)
+              const percent = (val - min) / (max - min)
 
-            // 12px is a common thumb width, but we'll approximate
-            const thumbPadding = 12
-            const trackWidth = rect.width - thumbPadding * 2
-            centerX = rect.left + thumbPadding + percent * trackWidth
-            w = 30
-            h = 30
+              // 12px is a common thumb width, but we'll approximate
+              const thumbPadding = 12
+              const trackWidth = rect.width - thumbPadding * 2
+              centerX = rect.left + thumbPadding + percent * trackWidth
+              w = 30
+              h = 30
+            }
+
+            ringTargetX = centerX
+            ringTargetY = centerY
+            targetWidth = w
+            targetHeight = h
           }
-
-          ringTargetX = centerX
-          ringTargetY = centerY
-          targetWidth = w
-          targetHeight = h
         }
       }
 

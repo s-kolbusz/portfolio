@@ -1,13 +1,27 @@
 'use client'
 
-import { Suspense } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 
-import { Environment, Preload } from '@react-three/drei'
+import { Preload } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 
 import { ViscousPuddle } from './ViscousPuddle'
 
 export default function HeroScene() {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    // Delay WebGL initialization to unblock the main thread during hydration.
+    // This allows FCP and LCP to fire immediately.
+    const timer = setTimeout(() => {
+      setMounted(true)
+    }, 100)
+    
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (!mounted) return null
+
   return (
     <div className="absolute inset-0 z-0 h-full w-full">
       <Canvas
@@ -18,11 +32,6 @@ export default function HeroScene() {
         gl={{ antialias: true, alpha: true }}
       >
         <Suspense fallback={null}>
-          <Environment preset="studio" />
-          <ambientLight intensity={0.5} />
-          <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
-          <pointLight position={[-10, -10, -10]} />
-
           <ViscousPuddle />
 
           <Preload all />

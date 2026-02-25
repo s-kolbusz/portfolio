@@ -42,9 +42,9 @@ export function ProjectHoverPreview({ activeImage, isVisible }: ProjectHoverPrev
     const xTo = gsap.quickTo(container, 'x', { duration: 0.6, ease: 'power3.out' })
     const yTo = gsap.quickTo(container, 'y', { duration: 0.6, ease: 'power3.out' })
 
-    // Initialize position to center of screen
-    const centerX = window.innerWidth / 2 - container.offsetWidth / 2
-    const centerY = window.innerHeight / 2 - container.offsetHeight / 2
+    // Initialize position to center of screen (approximate dimensions to avoid reading layout)
+    const centerX = window.innerWidth / 2 - 150
+    const centerY = window.innerHeight / 2 - 100
     gsap.set(container, { x: centerX, y: centerY })
 
     const onMove = (e: MouseEvent) => {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, useEffect, useState } from 'react'
 
 import { useTranslations } from 'next-intl'
 import dynamic from 'next/dynamic'
@@ -25,6 +25,15 @@ export function Hero() {
   const ctaIconRef = useRef<SVGSVGElement>(null)
   const caretRef = useRef<HTMLSpanElement>(null)
   const prefersReducedMotion = usePrefersReducedMotion()
+
+  // Delay the loading of the heavy 3D scene to free up main thread during hydration
+  const [showScene, setShowScene] = useState(false)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowScene(true)
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [])
 
   useHeroAnimation({
     containerRef,
@@ -56,6 +65,9 @@ export function Hero() {
     element?.scrollIntoView({ behavior: 'smooth' })
   }
 
+  // Delay the loading of the heavy 3D scene to free up main thread during hydration
+  // (State and effect initialized at top of component)
+
   return (
     <section
       id="hero"
@@ -64,7 +76,7 @@ export function Hero() {
     >
       {/* 3D Background */}
       <div className="absolute inset-0 z-0 select-none">
-        <HeroScene />
+        {showScene && <HeroScene />}
       </div>
 
       {/* Content */}

@@ -94,8 +94,9 @@ export const About: React.FC = () => {
               alt="Sebastian Kolbusz"
               fill
               className="object-cover"
-              sizes="(max-width: 768px) 100vw, 40vw"
-              priority
+              sizes="(max-width: 768px) 384px, 600px"
+              quality={65}
+              loading="lazy"
             />
           </div>
 

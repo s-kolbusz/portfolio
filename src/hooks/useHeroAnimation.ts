@@ -45,19 +45,20 @@ export function useHeroAnimation({
         },
       })
 
-      // Initial state
-      gsap.set(chars, { opacity: 0 })
-      gsap.set(caretRef.current, { opacity: 1 })
-
-      // Natural typing effect for name
+      // READ phase: Get all bounding rects before applying any mutations
       const parentRect = caretRef.current?.parentElement?.getBoundingClientRect() || {
         left: 0,
         top: 0,
       }
+      const charRects = chars.map((char) => char.getBoundingClientRect())
+
+      // WRITE phase: Now we can safely mutate the DOM without triggering a reflow
+      gsap.set(chars, { opacity: 0 })
+      gsap.set(caretRef.current, { opacity: 1 })
 
       chars.forEach((char, i) => {
         const delay = i === 0 ? 0.4 : 0.03 + Math.random() * 0.12
-        const charRect = char.getBoundingClientRect()
+        const charRect = charRects[i]
         const targetX = charRect.right - parentRect.left
         const targetY = charRect.top - parentRect.top
 

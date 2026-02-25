@@ -1,11 +1,15 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server'
+import dynamic from 'next/dynamic'
 
-import { About } from '@/components/sections/About'
-import { Contact } from '@/components/sections/Contact'
 import { Hero } from '@/components/sections/Hero'
-import { PrintCalculator } from '@/components/sections/PrintCalculator'
-import { Projects } from '@/components/sections/Projects'
-import { Services } from '@/components/sections/Services'
+
+const About = dynamic(() => import('@/components/sections/About').then((mod) => mod.About))
+const Projects = dynamic(() => import('@/components/sections/Projects').then((mod) => mod.Projects))
+const Services = dynamic(() => import('@/components/sections/Services').then((mod) => mod.Services))
+const PrintCalculator = dynamic(() =>
+  import('@/components/sections/PrintCalculator').then((mod) => mod.PrintCalculator)
+)
+const Contact = dynamic(() => import('@/components/sections/Contact').then((mod) => mod.Contact))
 
 export async function generateMetadata(props: { params: Promise<{ locale: string }> }) {
   const params = await props.params
@@ -24,10 +28,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
   setRequestLocale(locale)
 
   return (
-    <main
-      id="main-content"
-      className="flex min-h-screen flex-col items-center justify-between"
-    >
+    <main id="main-content" className="flex min-h-screen flex-col items-center justify-between">
       <Hero />
       <About />
       <Projects locale={locale} />

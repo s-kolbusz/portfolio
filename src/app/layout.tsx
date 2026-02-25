@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Fraunces, JetBrains_Mono } from 'next/font/google'
 import localFont from 'next/font/local'
+import Script from 'next/script'
 
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
@@ -104,6 +105,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <Script
+        src="https://analytics.ahrefs.com/analytics.js"
+        data-key="ZiCDAnF3YKPsXbehJaY74w"
+        async
+      />
       <body
         className={`${satoshi.variable} ${fraunces.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >
