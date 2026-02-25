@@ -1,7 +1,6 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Fraunces, JetBrains_Mono } from 'next/font/google'
 import localFont from 'next/font/local'
-import Script from 'next/script'
 
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
@@ -40,8 +39,25 @@ const jetbrainsMono = JetBrains_Mono({
   display: 'swap',
 })
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#faf9f5' },
+    { media: '(prefers-color-scheme: dark)', color: '#161616' },
+  ],
+}
+
 export const metadata: Metadata = {
-  metadataBase: new URL('https://kolbusz.xyz'),
+  metadataBase: new URL('https://www.kolbusz.xyz'),
+  alternates: {
+    canonical: '/',
+    languages: {
+      en: '/en',
+      pl: '/pl',
+    },
+  },
   title: {
     default: 'Sebastian Kolbusz | Full-stack Developer',
     template: '%s | Sebastian Kolbusz',
@@ -51,6 +67,8 @@ export const metadata: Metadata = {
   keywords: [
     'Sebastian Kolbusz',
     'Full-stack Developer',
+    'Freelance Frontend Engineer',
+    'SaaS Developer',
     'Portfolio',
     '3D Printing',
     'React',
@@ -60,10 +78,15 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: 'Sebastian Kolbusz' }],
   creator: 'Sebastian Kolbusz',
+  icons: {
+    icon: '/icon.svg',
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://kolbusz.xyz',
+    url: 'https://www.kolbusz.xyz/en',
     siteName: 'Sebastian Kolbusz Portfolio',
     title: 'Sebastian Kolbusz | Full-stack Developer',
     description:
@@ -105,11 +128,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <Script
-        src="https://analytics.ahrefs.com/analytics.js"
-        data-key="ZiCDAnF3YKPsXbehJaY74w"
-        async
-      />
       <body
         className={`${satoshi.variable} ${fraunces.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >

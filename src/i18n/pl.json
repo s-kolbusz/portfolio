@@ -265,5 +265,11 @@
   },
   "footer": {
     "copyright": "© {year} Sebastian Kolbusz. Engineered for performance."
+  },
+  "notFound": {
+    "title": "404",
+    "subtitle": "Strona nie znaleziona",
+    "description": "Strona, której szukasz, mogła zostać usunięta, zmieniła nazwę lub jest tymczasowo niedostępna.",
+    "returnHome": "Wróć na stronę główną"
   }
 }

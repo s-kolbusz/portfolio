@@ -88,14 +88,14 @@ export const About: React.FC = () => {
       <div className="flex flex-col gap-12 lg:col-span-5 lg:pl-12">
         {/* Image with Mask Effect */}
         <div className="relative" ref={imageContainerRef}>
-          <div className="bg-muted transition-[filter, --webkit-filter] relative aspect-3/4 w-full overflow-hidden duration-700 hover:grayscale-0 lg:grayscale">
+          <div className="bg-muted transition-[filter, --webkit-filter] relative aspect-[2/3] w-full overflow-hidden duration-700 hover:grayscale-0 lg:grayscale">
             <Image
               src="/images/sebastian_kolbusz_caricature.avif"
               alt="Sebastian Kolbusz"
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 384px, 600px"
-              quality={65}
+              width={400}
+              height={600}
+              className="h-full w-full object-cover"
+              quality={75}
               loading="lazy"
             />
           </div>
