@@ -1,8 +1,6 @@
 @import 'tailwindcss';
-@import './utilities.css';
 
-/* Exclude .agent directory from Tailwind scanning */
-@source not '../../.agent';
+@import './utilities.css';
 
 @custom-variant dark (&:where(.dark, .dark *));
 

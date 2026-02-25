@@ -42,7 +42,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
+  maximumScale: 5,
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#faf9f5' },
     { media: '(prefers-color-scheme: dark)', color: '#161616' },
@@ -52,10 +52,11 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.kolbusz.xyz'),
   alternates: {
-    canonical: '/',
+    canonical: '/en',
     languages: {
       en: '/en',
       pl: '/pl',
+      'x-default': '/en',
     },
   },
   title: {

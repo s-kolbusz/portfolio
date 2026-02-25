@@ -2,7 +2,6 @@
 
 import { Suspense, useEffect, useState } from 'react'
 
-import { Preload } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 
 import { ViscousPuddle } from './ViscousPuddle'
@@ -16,7 +15,7 @@ export default function HeroScene() {
     const timer = setTimeout(() => {
       setMounted(true)
     }, 100)
-    
+
     return () => clearTimeout(timer)
   }, [])
 
@@ -25,16 +24,14 @@ export default function HeroScene() {
   return (
     <div className="absolute inset-0 z-0 h-full w-full">
       <Canvas
-        shadows
+        shadows={false}
         frameloop="always"
-        dpr={[1, 2]}
+        dpr={[1, 1.5]}
         camera={{ position: [0, 5, 0], fov: 45 }}
-        gl={{ antialias: true, alpha: true }}
+        gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
       >
         <Suspense fallback={null}>
           <ViscousPuddle />
-
-          <Preload all />
         </Suspense>
       </Canvas>
     </div>

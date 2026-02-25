@@ -20,7 +20,7 @@ export function Hero() {
   const t = useTranslations('hero')
   const containerRef = useRef<HTMLElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
-  const roleRef = useRef<HTMLDivElement>(null)
+  // const roleRef = useRef<HTMLDivElement>(null)
   const ctaRef = useRef<HTMLDivElement>(null)
   const ctaIconRef = useRef<SVGSVGElement>(null)
   const caretRef = useRef<HTMLSpanElement>(null)
@@ -38,7 +38,7 @@ export function Hero() {
   useHeroAnimation({
     containerRef,
     caretRef,
-    roleRef,
+    // roleRef,
     ctaRef,
     ctaIconRef,
     prefersReducedMotion,
@@ -75,9 +75,7 @@ export function Hero() {
       className="bg-background text-foreground relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden px-6 pt-20"
     >
       {/* 3D Background */}
-      <div className="absolute inset-0 z-0 select-none">
-        {showScene && <HeroScene />}
-      </div>
+      <div className="absolute inset-0 z-0 select-none">{showScene && <HeroScene />}</div>
 
       {/* Content */}
       <div className="relative z-10 flex max-w-6xl flex-col items-center gap-8 text-center">
@@ -98,7 +96,8 @@ export function Hero() {
         </div>
 
         {/* Role & Tagline */}
-        <div ref={roleRef} className="flex max-w-3xl flex-col gap-4">
+        {/* <div ref={roleRef} className="flex max-w-3xl flex-col gap-4"> */}
+        <div className="flex max-w-3xl flex-col gap-4">
           <h2 className="font-mono text-xl font-medium md:text-3xl">{t('role')}</h2>
           <p className="text-muted-foreground font-serif text-xl italic md:text-3xl">
             {t('tagline')}

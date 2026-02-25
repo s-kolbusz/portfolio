@@ -226,7 +226,7 @@ export function ProjectCaseStudy({ project, prevProject, nextProject }: ProjectC
                     src={item.url}
                     alt={item.alt}
                     fill
-                    sizes="(max-width: 640px) 100vw, 50vw"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 512px"
                     className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                   />
                   {/* Hover overlay hint */}

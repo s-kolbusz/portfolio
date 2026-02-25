@@ -12,7 +12,8 @@ const nextConfig: NextConfig = {
       'gsap',
       'three',
       '@react-three/fiber',
-      '@react-three/drei'
+      '@react-three/drei',
+      'lenis'
     ],
   },
 }

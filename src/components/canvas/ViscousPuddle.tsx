@@ -5,7 +5,7 @@ import { useRef, useEffect, useMemo } from 'react'
 import { useTheme } from 'next-themes'
 
 import { useFrame, useThree } from '@react-three/fiber'
-import * as THREE from 'three'
+import { Color, MathUtils, Mesh, ShaderMaterial, Vector2 } from 'three'
 
 import { usePrefersReducedMotion } from '@/hooks/useMedia'
 
@@ -120,8 +120,8 @@ const fragmentShader = /* glsl */ `
 `
 
 export function ViscousPuddle() {
-  const meshRef = useRef<THREE.Mesh>(null)
-  const materialRef = useRef<THREE.ShaderMaterial>(null)
+  const meshRef = useRef<Mesh>(null)
+  const materialRef = useRef<ShaderMaterial>(null)
   const { viewport, size } = useThree()
   const { resolvedTheme } = useTheme()
   const isPointerInsideWindow = useRef(false)
@@ -131,8 +131,8 @@ export function ViscousPuddle() {
   const isMobile = size.width < 768
 
   // Mouse state - initialize to center
-  const mouseRef = useRef(new THREE.Vector2(0.5, 0.5))
-  const targetMouseRef = useRef(new THREE.Vector2(0.5, 0.5))
+  const mouseRef = useRef(new Vector2(0.5, 0.5))
+  const targetMouseRef = useRef(new Vector2(0.5, 0.5))
 
   // Global mouse tracking
   useEffect(() => {
@@ -168,9 +168,9 @@ export function ViscousPuddle() {
   const uniforms = useMemo(
     () => ({
       uTime: { value: 0 },
-      uMouse: { value: new THREE.Vector2(0.5, 0.5) },
-      uResolution: { value: new THREE.Vector2(size.width, size.height) },
-      uColor: { value: new THREE.Color('#34D399') },
+      uMouse: { value: new Vector2(0.5, 0.5) },
+      uResolution: { value: new Vector2(size.width, size.height) },
+      uColor: { value: new Color('#34D399') },
       uScale: { value: 1.0 },
       uOpacity: { value: 0.0 },
     }),
@@ -189,7 +189,7 @@ export function ViscousPuddle() {
     }
 
     // Fade in opacity
-    materialRef.current.uniforms.uOpacity.value = THREE.MathUtils.lerp(
+    materialRef.current.uniforms.uOpacity.value = MathUtils.lerp(
       materialRef.current.uniforms.uOpacity.value,
       1.0,
       0.1
@@ -201,7 +201,7 @@ export function ViscousPuddle() {
     const currentScroll = Math.min(rawScroll, size.height * 1.5)
 
     // Faster lerp to prevent the "waiting" feel when returning from far away
-    lerpScroll.current = THREE.MathUtils.lerp(lerpScroll.current, currentScroll, 0.15)
+    lerpScroll.current = MathUtils.lerp(lerpScroll.current, currentScroll, 0.15)
 
     // Snap if very close to avoid micro-updates and lag feel
     if (Math.abs(lerpScroll.current - currentScroll) < 0.1) {
@@ -229,7 +229,7 @@ export function ViscousPuddle() {
     }
 
     const targetScale = isMobile ? 0.6 : 1.0
-    materialRef.current.uniforms.uScale.value = THREE.MathUtils.lerp(
+    materialRef.current.uniforms.uScale.value = MathUtils.lerp(
       materialRef.current.uniforms.uScale.value,
       targetScale,
       0.1
@@ -238,8 +238,7 @@ export function ViscousPuddle() {
     // 4. Color / Theme Update
     // Light Theme: Perfect Vibrant brand emerald (#34D399)
     // Dark Theme: Balanced Emerald-Teal mix (#12b893) to match #00c681 family
-    const targetColor =
-      resolvedTheme === 'dark' ? new THREE.Color('#12b893') : new THREE.Color('#34D399')
+    const targetColor = resolvedTheme === 'dark' ? new Color('#12b893') : new Color('#34D399')
 
     materialRef.current.uniforms.uColor.value.lerp(targetColor, 0.05)
 

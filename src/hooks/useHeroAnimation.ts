@@ -7,7 +7,7 @@ import { gsap, useGSAP } from '@/lib/gsap'
 interface UseHeroAnimationProps {
   containerRef: RefObject<HTMLElement | null>
   caretRef: RefObject<HTMLSpanElement | null>
-  roleRef: RefObject<HTMLDivElement | null>
+  // roleRef: RefObject<HTMLDivElement | null>
   ctaRef: RefObject<HTMLDivElement | null>
   ctaIconRef: RefObject<SVGSVGElement | null>
   prefersReducedMotion: boolean
@@ -16,7 +16,7 @@ interface UseHeroAnimationProps {
 export function useHeroAnimation({
   containerRef,
   caretRef,
-  roleRef,
+  // roleRef,
   ctaRef,
   ctaIconRef,
   prefersReducedMotion,
@@ -31,7 +31,7 @@ export function useHeroAnimation({
       if (prefersReducedMotion) {
         gsap.set(chars, { opacity: 1 })
         gsap.set(caretRef.current, { opacity: 0 })
-        reveal(roleRef)
+        // reveal(roleRef)
         reveal(ctaRef, { y: 20 })
         return
       }
@@ -82,7 +82,7 @@ export function useHeroAnimation({
       })
 
       // Reveal role and CTA after typing
-      reveal(roleRef, { timeline: tl, delay: 0.3 })
+      // reveal(roleRef, { timeline: tl, delay: 0.3 })
       reveal(ctaRef, { timeline: tl, delay: 0.2, y: 20, position: '<0.1' })
 
       // Blinking caret effect loop

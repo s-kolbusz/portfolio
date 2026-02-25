@@ -136,7 +136,7 @@ export function ProjectAccordion({ project, isOpen }: ProjectAccordionProps) {
               alt={project.title}
               fill
               className="object-cover transition-transform duration-1000 group-hover:scale-105"
-              sizes="(max-width: 768px) 100vw, 40vw"
+              sizes="(max-width: 768px) 100vw, (max-width: 1280px) 40vw, 460px"
             />
             {/* Tech Overlay matching About section */}
             <div className="absolute top-4 right-4 font-mono text-[10px] tracking-tighter text-white/80 uppercase mix-blend-difference">

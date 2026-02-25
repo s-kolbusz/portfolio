@@ -113,7 +113,7 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
                 src={entry.heroImage}
                 alt={entry.title}
                 fill
-                sizes="(max-width: 640px) 100vw, 50vw"
+                sizes="(max-width: 1280px) 100vw, 1200px"
                 className="object-cover"
               />
               <div className="absolute top-2 right-2 font-mono text-[9px] tracking-tighter text-white/60 uppercase mix-blend-difference">
