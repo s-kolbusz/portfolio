@@ -9,7 +9,7 @@ import { ArrowLeftIcon, ArrowUpRightIcon, StarIcon } from '@phosphor-icons/react
 
 import { Button } from '@/components/ui/Button'
 import { PortfolioEntry } from '@/data/projects-en'
-import { useRevealAnimation } from '@/hooks/useRevealAnimation'
+import { useTimeline } from '@/hooks/useTimeline'
 import { Link } from '@/i18n/navigation'
 import { useRouter } from '@/i18n/navigation'
 import { ANIMATION } from '@/lib/constants/animations'
@@ -24,38 +24,25 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
   const t = useTranslations('projectsBook')
   const router = useRouter()
   const containerRef = useRef<HTMLDivElement>(null)
+  const headerRef = useRef<HTMLDivElement>(null)
+  const listRef = useRef<HTMLDivElement>(null)
 
-  useRevealAnimation(containerRef, [
-    {
-      animations: [
-        {
-          target: containerRef,
-          options: {
-            selector: '[data-stack-header]',
-            y: 30,
-            duration: ANIMATION.duration.medium,
-            ease: ANIMATION.ease.outStrong,
-            delay: ANIMATION.delay.short,
-          },
-        },
-      ],
-    },
-    {
-      trigger: '[data-stack-item]',
+  useTimeline(containerRef, { id: 'project-card-stack' }, (reveal) => {
+    reveal(headerRef, {
+      selector: '[data-stack-header]',
+      y: 30,
+      duration: ANIMATION.duration.medium,
+      ease: ANIMATION.ease.outStrong,
+      delay: ANIMATION.delay.short,
+    })
+    reveal(listRef, {
+      selector: '[data-stack-item]',
+      y: 40,
+      duration: ANIMATION.duration.medium,
+      ease: ANIMATION.ease.outStrong,
       start: 'top 85%',
-      animations: [
-        {
-          target: containerRef,
-          options: {
-            selector: '[data-stack-item]',
-            y: 40,
-            duration: ANIMATION.duration.medium,
-            ease: ANIMATION.ease.outStrong,
-          },
-        },
-      ],
-    },
-  ])
+    })
+  })
 
   return (
     <main ref={containerRef} className="min-h-screen px-6 pt-20 pb-12 sm:px-8">
@@ -72,15 +59,19 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
       </div>
 
       {/* Header */}
-      <div data-stack-header className="mb-10 opacity-0">
-        <h1 className="font-serif text-3xl font-light tracking-tight sm:text-4xl">{t('title')}</h1>
-        <p className="text-muted-foreground mt-2 max-w-sm text-sm leading-relaxed">
-          {t('subtitle')}
-        </p>
+      <div ref={headerRef}>
+        <div data-stack-header className="mb-10 opacity-0">
+          <h1 className="font-serif text-3xl font-light tracking-tight sm:text-4xl">
+            {t('title')}
+          </h1>
+          <p className="text-muted-foreground mt-2 max-w-sm text-sm leading-relaxed">
+            {t('subtitle')}
+          </p>
+        </div>
       </div>
 
       {/* Project list */}
-      <div className="divide-border divide-y">
+      <div ref={listRef} className="divide-border divide-y">
         {projects.map((entry) => (
           <article key={entry.id} data-stack-item className="group py-6 opacity-0 first:pt-0">
             {/* Title row */}

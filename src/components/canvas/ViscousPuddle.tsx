@@ -411,7 +411,7 @@ export function ViscousPuddle() {
     <canvas
       ref={canvasRef}
       className="absolute inset-0 h-full w-full will-change-transform"
-      style={{ opacity: 0, transition: 'opacity 1.8s cubic-bezier(0.16, 1, 0.3, 1)' }}
+      style={{ opacity: 0, transition: 'opacity 1.5s ease-out' }}
       aria-hidden="true"
     />
   )

@@ -67,6 +67,7 @@
     "intro": "I treat every line of code as a business investment. My focus is on creating robust, accessible, and high-performance systems that solve real-world challenges. From rapid MVP prototyping to optimizing enterprise-grade SaaS, I build digital experiences designed to last and perform.",
     "viewAll": "Explore All Work",
     "visitSite": "Launch Project",
+    "explore": "Explore Case Study",
     "highlights_label": "Core Achievements",
     "stack_label": "Technical Stack",
     "zakofy": {
@@ -273,4 +274,3 @@
     "returnHome": "Return to Home"
   }
 }
-

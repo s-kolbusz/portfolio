@@ -10,8 +10,8 @@ import { BaseSection } from '@/components/ui/BaseSection'
 import { Button } from '@/components/ui/Button'
 import { EditorialHeader } from '@/components/ui/EditorialHeader'
 import { services } from '@/data/services'
-import { useRevealAnimation } from '@/hooks/useRevealAnimation'
-import { useSafeAnimation } from '@/lib/constants/animations'
+import { useTimeline } from '@/hooks/useTimeline'
+import { ANIMATION } from '@/lib/constants/animations'
 import { cn } from '@/lib/utils'
 
 export function Services() {
@@ -22,21 +22,12 @@ export function Services() {
   const processRef = useRef<HTMLDivElement>(null)
   const processStepsRef = useRef<HTMLDivElement>(null)
 
-  const ANIMATION = useSafeAnimation()
-
-  useRevealAnimation(sectionRef, [
-    {
-      animations: [
-        { target: headerRef },
-        { target: gridRef, options: { y: 40, position: '<0.2' } },
-        { target: processRef, options: { stagger: ANIMATION.stagger.slow } },
-        {
-          target: processStepsRef,
-          options: { stagger: ANIMATION.stagger.slow, position: '<0.2' },
-        },
-      ],
-    },
-  ])
+  useTimeline(sectionRef, { id: 'services' }, (reveal) => {
+    reveal(headerRef)
+    reveal(gridRef, { y: 100, stagger: ANIMATION.stagger.slow })
+    reveal(processRef, { stagger: ANIMATION.stagger.slow })
+    reveal(processStepsRef, { stagger: ANIMATION.stagger.slow })
+  })
 
   const handleServiceClick = () => {
     const contactSection = document.getElementById('contact')
@@ -65,7 +56,7 @@ export function Services() {
               key={service.id}
               onClick={handleServiceClick}
               className={cn(
-                'group bg-card hover:shadow-primary/5 relative flex flex-col justify-between gap-10 border p-8 text-left transition-all duration-500 hover:shadow-2xl md:p-10',
+                'group bg-card hover:shadow-primary/5 relative flex flex-col justify-between gap-10 border p-8 text-left transition-[color,border-color,box-shadow] duration-500 hover:shadow-2xl md:p-10',
                 isPopular
                   ? 'border-primary/50 shadow-primary/5 hover:border-primary shadow-lg'
                   : 'border-border hover:border-primary/50'
@@ -144,8 +135,8 @@ export function Services() {
       </div>
 
       {/* Process / Workflow Section */}
-      <div className="border-border border-t pt-12">
-        <div ref={processRef} className="mb-12 flex flex-col gap-4">
+      <div ref={processRef} className="mb-12 flex flex-col gap-4">
+        <div className="border-border border-t pt-12">
           <h3 className="font-serif text-3xl font-light md:text-4xl">{t('process.title')}</h3>
           <p className="text-muted-foreground max-w-xl font-sans text-lg">{t('process.intro')}</p>
         </div>

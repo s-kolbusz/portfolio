@@ -10,8 +10,8 @@ import { CalculatorPanel } from '@/components/features/CalculatorPanel'
 import { BaseSection } from '@/components/ui/BaseSection'
 import { Button } from '@/components/ui/Button'
 import { EditorialHeader } from '@/components/ui/EditorialHeader'
-import { useRevealAnimation } from '@/hooks/useRevealAnimation'
-import { useSafeAnimation } from '@/lib/constants/animations'
+import { useTimeline } from '@/hooks/useTimeline'
+import { ANIMATION } from '@/lib/constants/animations'
 
 export const PrintCalculator = () => {
   const t = useTranslations('calculator')
@@ -20,35 +20,17 @@ export const PrintCalculator = () => {
   const panelRef = useRef<HTMLDivElement>(null)
   const ctaRef = useRef<HTMLDivElement>(null)
 
-  const ANIMATION = useSafeAnimation()
-
-  useRevealAnimation(sectionRef, [
-    {
-      animations: [
-        { target: headerRef },
-        {
-          target: panelRef,
-          options: {
-            clipPath: {
-              from: 'inset(0 50% 0 50%)',
-              to: 'inset(0 0% 0 0%)',
-            },
-            y: 0,
-            duration: ANIMATION.duration.slow,
-            ease: ANIMATION.ease.inOut,
-            position: '<0.2',
-          },
-        },
-        {
-          target: ctaRef,
-          options: {
-            stagger: ANIMATION.stagger.slow,
-            position: '<0.4',
-          },
-        },
-      ],
-    },
-  ])
+  useTimeline(sectionRef, { id: 'calculator' }, (reveal) => {
+    reveal(headerRef)
+    reveal(panelRef, {
+      self: true,
+      clipPath: { from: 'inset(0 50% 0 50%)', to: 'inset(0 0% 0 0%)' },
+      y: 0,
+      duration: ANIMATION.duration.slow,
+      ease: ANIMATION.ease.inOut,
+    })
+    reveal(ctaRef, { stagger: ANIMATION.stagger.slow })
+  })
 
   return (
     <BaseSection

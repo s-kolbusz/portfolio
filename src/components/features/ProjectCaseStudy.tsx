@@ -9,9 +9,9 @@ import { ArrowLeftIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
 
 import { Button } from '@/components/ui/Button'
 import type { PortfolioEntry } from '@/data/projects-en'
-import { useRevealAnimation } from '@/hooks/useRevealAnimation'
+import { useTimeline } from '@/hooks/useTimeline'
 import { useRouter } from '@/i18n/navigation'
-import { useSafeAnimation } from '@/lib/constants/animations'
+import { ANIMATION } from '@/lib/constants/animations'
 
 import { Lightbox } from '../ui/Lightbox'
 import { ProjectNav } from './ProjectNav'
@@ -27,44 +27,14 @@ export function ProjectCaseStudy({ project, prevProject, nextProject }: ProjectC
   const cs = useTranslations('projectsBook.caseStudy')
   const router = useRouter()
   const mainRef = useRef<HTMLElement>(null)
-  const ANIMATION = useSafeAnimation()
+  const heroContentRef = useRef<HTMLDivElement>(null)
+  const metaRef = useRef<HTMLElement>(null)
+  const quoteRef = useRef<HTMLElement>(null)
+  const galleryRef = useRef<HTMLElement>(null)
+  const secondQuoteRef = useRef<HTMLElement>(null)
 
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
-
-  useRevealAnimation(mainRef, [
-    {
-      animations: [
-        {
-          target: mainRef,
-          options: {
-            selector: '[data-cs-hero-content]',
-            y: 40,
-            duration: ANIMATION.duration.slow,
-            delay: 0.3,
-          },
-        },
-      ],
-    },
-  ])
-
-  useRevealAnimation(mainRef, {
-    selector: '[data-cs-section]',
-    y: 30,
-    once: false,
-  })
-
-  useRevealAnimation(mainRef, {
-    selector: '[data-cs-gallery-item]',
-    y: 20,
-    stagger: 0.1,
-    once: false,
-  })
-
-  const openLightbox = (index: number) => {
-    setLightboxIndex(index)
-    setLightboxOpen(true)
-  }
 
   const caseStudySections = [
     { key: 'problemTitle', content: project.problem },
@@ -73,6 +43,46 @@ export function ProjectCaseStudy({ project, prevProject, nextProject }: ProjectC
     { key: 'resultsTitle', content: project.results },
   ].filter((s) => s.content)
 
+  useTimeline(mainRef, { id: 'project-case-study' }, (reveal) => {
+    // Hero text — animates on page load with 0.3s delay
+    reveal(heroContentRef, {
+      duration: ANIMATION.duration.slow,
+      delay: 0.3,
+    })
+
+    // Meta row — tight after hero, visible right below it
+    reveal(metaRef, {
+      self: true,
+      y: 20,
+      start: 'top 95%',
+    })
+
+    // Pull quote
+    reveal(quoteRef, { self: true, y: 30 })
+
+    // Case study sections
+    caseStudySections.forEach((section, i) => {
+      reveal(`[data-case-study-section-index="${i}"]`, {
+        self: true,
+        y: 0,
+        x: -50,
+      })
+    })
+
+    // Gallery items
+    reveal(galleryRef, {
+      self: true,
+      y: 20,
+    })
+    // Second quote
+    reveal(secondQuoteRef, { self: true, y: 30 })
+  })
+
+  const openLightbox = (index: number) => {
+    setLightboxIndex(index)
+    setLightboxOpen(true)
+  }
+
   return (
     <article ref={mainRef} className="min-h-screen">
       {/* Fixed back button */}
@@ -80,10 +90,10 @@ export function ProjectCaseStudy({ project, prevProject, nextProject }: ProjectC
         <Button
           variant="outline-glass"
           size="md"
-          onClick={() => router.push('/projects')}
+          onClick={() => router.back()}
           leftIcon={<ArrowLeftIcon weight="bold" className="size-4" />}
         >
-          {t('backToProjects')}
+          {t('backLabel')}
         </Button>
       </div>
 
@@ -102,8 +112,8 @@ export function ProjectCaseStudy({ project, prevProject, nextProject }: ProjectC
 
         {/* Hero content */}
         <div
-          data-cs-hero-content
-          className="relative z-10 w-full px-6 pb-10 opacity-0 sm:px-12 lg:px-20 lg:pb-16"
+          ref={heroContentRef}
+          className="relative z-10 w-full px-6 pb-10 sm:px-12 lg:px-20 lg:pb-16"
         >
           {/* Category + year */}
           <div className="mb-3 flex items-center gap-3 font-mono text-xs tracking-widest text-white/60 uppercase">
@@ -135,10 +145,7 @@ export function ProjectCaseStudy({ project, prevProject, nextProject }: ProjectC
       </header>
 
       {/* ---- Meta row ---- */}
-      <section
-        data-cs-section
-        className="border-border border-b px-6 py-8 opacity-0 sm:px-12 lg:px-20"
-      >
+      <section ref={metaRef} className="border-border border-b px-6 py-8 sm:px-12 lg:px-20">
         <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-3">
           {project.client && (
             <div>
@@ -176,7 +183,7 @@ export function ProjectCaseStudy({ project, prevProject, nextProject }: ProjectC
 
       {/* ---- Tagline / Pull quote ---- */}
       {project.pullQuotes?.[0] && (
-        <section data-cs-section className="px-6 py-16 opacity-0 sm:px-12 sm:py-20 lg:px-20">
+        <section ref={quoteRef} className="px-6 py-16 sm:px-12 sm:py-20 lg:px-20">
           <blockquote className="border-primary/40 text-muted-foreground mx-auto max-w-3xl border-l-2 pl-6 font-serif text-xl leading-relaxed italic sm:text-2xl lg:text-3xl">
             &ldquo;{project.pullQuotes[0]}&rdquo;
           </blockquote>
@@ -186,9 +193,10 @@ export function ProjectCaseStudy({ project, prevProject, nextProject }: ProjectC
       {/* ---- Case study sections ---- */}
       {caseStudySections.map((section, i) => (
         <section
+          data-case-study-section
+          data-case-study-section-index={i}
           key={section.key}
-          data-cs-section
-          className={`px-6 py-12 opacity-0 sm:px-12 sm:py-16 lg:px-20 ${
+          className={`px-6 py-12 sm:px-12 sm:py-16 lg:px-20 ${
             i % 2 === 0 ? 'bg-secondary/20' : ''
           }`}
         >
@@ -207,7 +215,7 @@ export function ProjectCaseStudy({ project, prevProject, nextProject }: ProjectC
 
       {/* ---- Gallery ---- */}
       {project.gallery.length > 0 && (
-        <section data-cs-section className="px-6 py-12 opacity-0 sm:px-12 sm:py-16 lg:px-20">
+        <section ref={galleryRef} className="px-6 py-12 sm:px-12 sm:py-16 lg:px-20">
           <div className="mx-auto max-w-5xl">
             <h2 className="text-muted-foreground mb-8 font-mono text-xs tracking-widest uppercase">
               {cs('galleryTitle')}
@@ -217,10 +225,9 @@ export function ProjectCaseStudy({ project, prevProject, nextProject }: ProjectC
                 <button
                   type="button"
                   key={item.url}
-                  data-cs-gallery-item
                   onClick={() => openLightbox(index)}
                   aria-label={cs('viewImageLabel', { alt: item.alt })}
-                  className="group bg-secondary focus:ring-primary relative aspect-video cursor-zoom-in overflow-hidden opacity-0 focus:ring-2 focus:ring-offset-2 focus:outline-none"
+                  className="group bg-secondary focus:ring-primary relative aspect-video cursor-zoom-in overflow-hidden focus:ring-2 focus:ring-offset-2 focus:outline-none"
                 >
                   <Image
                     src={item.url}
@@ -229,7 +236,6 @@ export function ProjectCaseStudy({ project, prevProject, nextProject }: ProjectC
                     sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 512px"
                     className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                   />
-                  {/* Hover overlay hint */}
                   <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
                 </button>
               ))}
@@ -241,8 +247,8 @@ export function ProjectCaseStudy({ project, prevProject, nextProject }: ProjectC
       {/* ---- Second pull quote ---- */}
       {project.pullQuotes?.[1] && (
         <section
-          data-cs-section
-          className="border-border border-t px-6 py-16 opacity-0 sm:px-12 sm:py-20 lg:px-20"
+          ref={secondQuoteRef}
+          className="border-border border-t px-6 py-16 sm:px-12 sm:py-20 lg:px-20"
         >
           <blockquote className="border-primary/40 text-muted-foreground mx-auto max-w-3xl border-l-2 pl-6 font-serif text-lg leading-relaxed italic sm:text-xl">
             &ldquo;{project.pullQuotes[1]}&rdquo;

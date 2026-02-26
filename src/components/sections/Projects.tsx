@@ -11,7 +11,7 @@ import { BaseSection } from '@/components/ui/BaseSection'
 import { Button } from '@/components/ui/Button'
 import { EditorialHeader } from '@/components/ui/EditorialHeader'
 import { getFeaturedProjects } from '@/data/get-projects'
-import { useRevealAnimation } from '@/hooks/useRevealAnimation'
+import { useTimeline } from '@/hooks/useTimeline'
 import { Locale } from '@/i18n/routing'
 
 interface ProjectsProps {
@@ -27,15 +27,11 @@ export function Projects({ locale }: ProjectsProps) {
 
   const projects = getFeaturedProjects(locale as Locale)
 
-  useRevealAnimation(sectionRef, [
-    {
-      animations: [
-        { target: headerRef },
-        // { target: contentRef, options: { y: 0, x: -100 } },
-        { target: footerRef },
-      ],
-    },
-  ])
+  useTimeline(sectionRef, { id: 'projects' }, (reveal) => {
+    reveal(headerRef)
+    reveal(contentRef, { self: true, y: 30 })
+    reveal(footerRef, { self: true })
+  })
 
   return (
     <BaseSection

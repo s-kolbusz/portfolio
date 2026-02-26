@@ -73,7 +73,7 @@ export function ProjectItem({ project, isOpen, onToggle, onHover }: ProjectItemP
     >
       <button
         onClick={handleClick}
-        className="flex w-full items-center justify-between py-8 text-left transition-all outline-none md:py-10"
+        className="flex w-full items-center justify-between py-8 text-left outline-none md:py-10"
         aria-expanded={isOpen}
         aria-controls={`project-content-${project.id}`}
         id={`project-trigger-${project.id}`}
@@ -93,7 +93,7 @@ export function ProjectItem({ project, isOpen, onToggle, onHover }: ProjectItemP
           <CaretDownIcon
             weight="light"
             className={cn(
-              'text-muted-foreground/40 size-8 transition-all duration-500 md:size-12',
+              'text-muted-foreground/40 size-8 transition-[color,transform] duration-500 md:size-12',
               isOpen && 'text-primary rotate-180',
               'group-hover:text-primary group-hover:scale-110'
             )}

@@ -8,9 +8,10 @@ import Link from 'next/link'
 
 import { ArrowUpRightIcon } from '@phosphor-icons/react'
 
+import { Button } from '@/components/ui/Button'
 import { PortfolioEntry } from '@/data/projects-en'
 import { ANIMATION } from '@/lib/constants/animations'
-import { gsap, useGSAP } from '@/lib/gsap'
+import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap'
 
 interface ProjectAccordionProps {
   project: PortfolioEntry
@@ -23,9 +24,14 @@ export function ProjectAccordion({ project, isOpen }: ProjectAccordionProps) {
   const contentRef = useRef<HTMLDivElement>(null)
 
   useGSAP(() => {
+    if (!containerRef.current || !contentRef.current) return
+
     if (isOpen) {
-      const height = contentRef.current?.offsetHeight || 0
+      const height = contentRef.current.offsetHeight || 0
       const tl = gsap.timeline()
+
+      // Disable pointer events on the whole container during animation
+      gsap.set(containerRef.current, { pointerEvents: 'none' })
 
       tl.to(containerRef.current, {
         height,
@@ -33,28 +39,44 @@ export function ProjectAccordion({ project, isOpen }: ProjectAccordionProps) {
         ease: ANIMATION.ease.out,
       })
 
-      if (contentRef.current) {
-        tl.fromTo(
-          contentRef.current.children,
-          {
-            y: 20,
-            opacity: 0,
-          },
-          {
-            y: 0,
-            opacity: 1,
-            duration: ANIMATION.duration.medium,
-            ease: ANIMATION.ease.out,
-            stagger: ANIMATION.stagger.tight,
-          },
-          '<0.1'
-        )
-      }
+      tl.fromTo(
+        contentRef.current.children,
+        {
+          y: 20,
+          opacity: 0,
+        },
+        {
+          y: 0,
+          opacity: 1,
+          duration: ANIMATION.duration.medium,
+          ease: ANIMATION.ease.out,
+          stagger: ANIMATION.stagger.tight,
+        },
+        '<0.1'
+      )
+
+      // Re-enable pointer events and refresh ScrollTrigger positions after open
+      tl.call(() => {
+        if (containerRef.current) {
+          containerRef.current.style.pointerEvents = 'auto'
+        }
+        ScrollTrigger.refresh()
+      })
     } else {
+      // Disable pointer events during close
+      gsap.set(containerRef.current, { pointerEvents: 'none' })
+
       gsap.to(containerRef.current, {
         height: 0,
         duration: ANIMATION.duration.fast,
         ease: ANIMATION.ease.inOut,
+        onComplete: () => {
+          if (containerRef.current) {
+            containerRef.current.style.pointerEvents = 'auto'
+          }
+          // Refresh ScrollTrigger positions after layout shift
+          ScrollTrigger.refresh()
+        },
       })
     }
   }, [isOpen])
@@ -127,6 +149,9 @@ export function ProjectAccordion({ project, isOpen }: ProjectAccordionProps) {
               )}
             </div>
           </div>
+          <Button variant="secondary" size="lg" href={`/projects/${project.id}`}>
+            {t('explore')}
+          </Button>
         </div>
 
         <div className="md:col-span-5">

@@ -10,8 +10,8 @@ import { ArrowRightIcon } from '@phosphor-icons/react'
 import { BaseSection } from '@/components/ui/BaseSection'
 import { SkillTag } from '@/components/ui/SkillTag'
 import { skillCategories } from '@/data/skills'
-import { useRevealAnimation } from '@/hooks/useRevealAnimation'
-import { useSafeAnimation } from '@/lib/constants/animations'
+import { useTimeline } from '@/hooks/useTimeline'
+import { ANIMATION } from '@/lib/constants/animations'
 
 export const About: React.FC = () => {
   const t = useTranslations('about')
@@ -20,35 +20,16 @@ export const About: React.FC = () => {
   const contentRef = useRef<HTMLDivElement>(null)
   const statsRef = useRef<HTMLDivElement>(null)
 
-  const ANIMATION = useSafeAnimation()
-
-  useRevealAnimation(containerRef, [
-    {
-      animations: [
-        {
-          target: contentRef,
-          options: { stagger: ANIMATION.stagger.slow },
-        },
-        {
-          target: imageContainerRef,
-          options: {
-            clipPath: {
-              from: 'inset(0% 0% 100% 0%)',
-              to: 'inset(0% 0% 0% 0%)',
-            },
-            duration: ANIMATION.duration.slow,
-            ease: ANIMATION.ease.inOut,
-            stagger: ANIMATION.stagger.slow,
-            position: '<0.1',
-          },
-        },
-        {
-          target: statsRef,
-          options: { x: -20, y: 0 },
-        },
-      ],
-    },
-  ])
+  useTimeline(containerRef, { id: 'about' }, (reveal) => {
+    reveal(contentRef, { stagger: ANIMATION.stagger.slow })
+    reveal(imageContainerRef, {
+      self: true,
+      clipPath: { from: 'inset(0% 0% 100% 0%)', to: 'inset(0% 0% 0% 0%)' },
+      duration: ANIMATION.duration.slow,
+      ease: ANIMATION.ease.inOut,
+    })
+    reveal(statsRef, { x: -20, y: 0 })
+  })
 
   return (
     <BaseSection
@@ -88,7 +69,7 @@ export const About: React.FC = () => {
       <div className="flex flex-col gap-12 lg:col-span-5 lg:pl-12">
         {/* Image with Mask Effect */}
         <div className="relative" ref={imageContainerRef}>
-          <div className="bg-muted transition-[filter, --webkit-filter] relative aspect-[2/3] w-full overflow-hidden duration-700 hover:grayscale-0 lg:grayscale">
+          <div className="bg-muted transition-[filter, --webkit-filter] relative aspect-2/3 w-full overflow-hidden duration-700 hover:grayscale-0 lg:grayscale">
             <Image
               src="/images/sebastian_kolbusz_caricature.avif"
               alt="Sebastian Kolbusz"

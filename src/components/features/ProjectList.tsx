@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { PortfolioEntry } from '@/data/projects-en'
-import { useRevealAnimation } from '@/hooks/useRevealAnimation'
-import { useSafeAnimation } from '@/lib/constants/animations'
+import { useTimeline } from '@/hooks/useTimeline'
+import { ANIMATION } from '@/lib/constants/animations'
 
 import { ProjectHoverPreview } from './ProjectHoverPreview'
 import { ProjectItem } from './ProjectItem'
@@ -20,14 +20,12 @@ export function ProjectList({ projects }: ProjectListProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
 
-  const ANIMATION = useSafeAnimation()
-
-  useRevealAnimation(listRef, {
-    y: 0,
-    x: -100,
-    stagger: ANIMATION.stagger.slow,
-    scope: containerRef,
-    start: 'top bottom',
+  useTimeline(containerRef, { id: 'project-list' }, (reveal) => {
+    reveal(listRef, {
+      y: 0,
+      x: -100,
+      stagger: ANIMATION.stagger.slow,
+    })
   })
 
   useEffect(() => {
@@ -37,13 +35,12 @@ export function ProjectList({ projects }: ProjectListProps) {
     const observer = new IntersectionObserver(
       ([entry]) => {
         setIsVisible(entry.isIntersecting)
-        // Immediately kill active image when section is out of view
         if (!entry.isIntersecting) {
           setActiveImage(null)
         }
       },
       {
-        threshold: 0, // Trigger as soon as even 1px is visible/hidden
+        threshold: 0,
         rootMargin: '0px',
       }
     )

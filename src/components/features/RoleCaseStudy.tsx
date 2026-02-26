@@ -9,9 +9,9 @@ import { ArrowLeftIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
 
 import { Button } from '@/components/ui/Button'
 import type { PortfolioEntry } from '@/data/projects-en'
-import { useRevealAnimation } from '@/hooks/useRevealAnimation'
+import { useTimeline } from '@/hooks/useTimeline'
 import { useRouter } from '@/i18n/navigation'
-import { useSafeAnimation } from '@/lib/constants/animations'
+import { ANIMATION } from '@/lib/constants/animations'
 
 import { ProjectNav } from './ProjectNav'
 
@@ -26,34 +26,25 @@ export function RoleCaseStudy({ project, prevProject, nextProject }: RoleCaseStu
   const cs = useTranslations('projectsBook.caseStudy')
   const router = useRouter()
   const mainRef = useRef<HTMLElement>(null)
-  const ANIMATION = useSafeAnimation()
+  const heroContentRef = useRef<HTMLDivElement>(null)
+  const sectionsRef = useRef<HTMLDivElement>(null)
+  const timelineRef = useRef<HTMLDivElement>(null)
 
-  useRevealAnimation(mainRef, [
-    {
-      animations: [
-        {
-          target: mainRef,
-          options: {
-            selector: '[data-cs-hero-content]',
-            y: 40,
-            duration: ANIMATION.duration.slow,
-            delay: 0.3,
-          },
-        },
-      ],
-    },
-  ])
-
-  useRevealAnimation(mainRef, {
-    selector: '[data-timeline-item]',
-    x: -20,
-    once: false,
-  })
-
-  useRevealAnimation(mainRef, {
-    selector: '[data-cs-section]',
-    y: 30,
-    once: false,
+  useTimeline(mainRef, { id: 'role-case-study' }, (reveal) => {
+    reveal(heroContentRef, {
+      y: 40,
+      duration: ANIMATION.duration.slow,
+      delay: 0.3,
+    })
+    reveal(sectionsRef, {
+      selector: '[data-cs-section]',
+      y: 30,
+    })
+    reveal(timelineRef, {
+      selector: '[data-timeline-item]',
+      x: -20,
+      y: 0,
+    })
   })
 
   const phases = project.phases ?? []
@@ -86,6 +77,7 @@ export function RoleCaseStudy({ project, prevProject, nextProject }: RoleCaseStu
         <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent" />
 
         <div
+          ref={heroContentRef}
           data-cs-hero-content
           className="relative z-10 w-full px-6 pb-10 opacity-0 sm:px-12 lg:px-20 lg:pb-16"
         >
@@ -119,50 +111,50 @@ export function RoleCaseStudy({ project, prevProject, nextProject }: RoleCaseStu
         </div>
       </header>
 
-      {/* ---- Meta row ---- */}
-      <section
-        data-cs-section
-        className="border-border border-b px-6 py-8 opacity-0 sm:px-12 lg:px-20"
-      >
-        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2">
-          <div>
-            <span className="text-muted-foreground block font-mono text-[11px] tracking-widest uppercase">
-              {cs('techLabel')}
-            </span>
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {project.techStack.map((tech) => (
-                <span
-                  key={tech}
-                  className="border-border text-muted-foreground rounded-sm border px-2 py-0.5 text-xs"
-                >
-                  {tech}
-                </span>
-              ))}
+      {/* ---- Sections wrapper ---- */}
+      <div ref={sectionsRef}>
+        {/* ---- Meta row ---- */}
+        <section
+          data-cs-section
+          className="border-border border-b px-6 py-8 opacity-0 sm:px-12 lg:px-20"
+        >
+          <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2">
+            <div>
+              <span className="text-muted-foreground block font-mono text-[11px] tracking-widest uppercase">
+                {cs('techLabel')}
+              </span>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {project.techStack.map((tech) => (
+                  <span
+                    key={tech}
+                    className="border-border text-muted-foreground rounded-sm border px-2 py-0.5 text-xs"
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div>
+              <span className="text-muted-foreground block font-mono text-[11px] tracking-widest uppercase">
+                {t(`categories.${project.category}`)}
+              </span>
+              <span className="mt-1 block text-sm">{project.tagline}</span>
             </div>
           </div>
-          <div>
-            <span className="text-muted-foreground block font-mono text-[11px] tracking-widest uppercase">
-              {t(`categories.${project.category}`)}
-            </span>
-            <span className="mt-1 block text-sm">{project.tagline}</span>
-          </div>
-        </div>
-      </section>
-
-      {/* ---- Pull quote ---- */}
-      {project.pullQuotes?.[0] && (
-        <section data-cs-section className="px-6 py-16 opacity-0 sm:px-12 sm:py-20 lg:px-20">
-          <blockquote className="border-primary/40 text-muted-foreground mx-auto max-w-3xl border-l-2 pl-6 font-serif text-xl leading-relaxed italic sm:text-2xl lg:text-3xl">
-            &ldquo;{project.pullQuotes[0]}&rdquo;
-          </blockquote>
         </section>
-      )}
+
+        {/* ---- Pull quote ---- */}
+        {project.pullQuotes?.[0] && (
+          <section data-cs-section className="px-6 py-16 opacity-0 sm:px-12 sm:py-20 lg:px-20">
+            <blockquote className="border-primary/40 text-muted-foreground mx-auto max-w-3xl border-l-2 pl-6 font-serif text-xl leading-relaxed italic sm:text-2xl lg:text-3xl">
+              &ldquo;{project.pullQuotes[0]}&rdquo;
+            </blockquote>
+          </section>
+        )}
+      </div>
 
       {/* ---- Career Timeline ---- */}
-      <section
-        data-cs-section
-        className="bg-secondary/20 px-6 py-12 opacity-0 sm:px-12 sm:py-16 lg:px-20"
-      >
+      <section ref={timelineRef} className="bg-secondary/20 px-6 py-12 sm:px-12 sm:py-16 lg:px-20">
         <div className="mx-auto max-w-3xl">
           <h2 className="text-primary mb-10 font-mono text-xs tracking-widest uppercase">
             {cs('timelineTitle')}

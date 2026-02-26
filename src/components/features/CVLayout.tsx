@@ -6,8 +6,8 @@ import { useTranslations } from 'next-intl'
 
 import { SkillTag } from '@/components/ui/SkillTag'
 import { CVData } from '@/data/cv'
-import { useRevealAnimation } from '@/hooks/useRevealAnimation'
-import { useSafeAnimation } from '@/lib/constants/animations'
+import { useTimeline } from '@/hooks/useTimeline'
+import { ANIMATION } from '@/lib/constants/animations'
 
 import { CVHeader } from './CVHeader'
 import { CVTimeline } from './CVTimeline'
@@ -19,43 +19,26 @@ interface CVLayoutProps {
 export const CVLayout: React.FC<CVLayoutProps> = ({ data }) => {
   const t = useTranslations('cv')
   const containerRef = useRef<HTMLDivElement>(null)
+  const headerRef = useRef<HTMLDivElement>(null)
+  const mainColRef = useRef<HTMLDivElement>(null)
+  const sideColRef = useRef<HTMLElement>(null)
 
-  const ANIMATION = useSafeAnimation()
-
-  useRevealAnimation(containerRef, [
-    {
-      animations: [
-        {
-          target: containerRef,
-          options: {
-            selector: '.cv-header > *',
-            delay: 0.4,
-            stagger: ANIMATION.stagger.normal,
-          },
-        },
-        {
-          target: containerRef,
-          options: {
-            selector: '.cv-main-col > *',
-            delay: 0.2,
-            stagger: ANIMATION.stagger.loose,
-            position: '<0.2',
-          },
-        },
-        {
-          target: containerRef,
-          options: {
-            selector: '.cv-side-col > *',
-            delay: 0.2,
-            x: 20,
-            y: 0,
-            stagger: ANIMATION.stagger.normal,
-            position: '<0.4',
-          },
-        },
-      ],
-    },
-  ])
+  useTimeline(containerRef, { id: 'cv' }, (reveal) => {
+    reveal(headerRef, {
+      delay: 0.4,
+      stagger: ANIMATION.stagger.normal,
+    })
+    reveal(mainColRef, {
+      delay: 0.2,
+      stagger: ANIMATION.stagger.loose,
+    })
+    reveal(sideColRef, {
+      delay: 0.2,
+      x: 20,
+      y: 0,
+      stagger: ANIMATION.stagger.normal,
+    })
+  })
 
   return (
     <div
@@ -64,13 +47,13 @@ export const CVLayout: React.FC<CVLayoutProps> = ({ data }) => {
       className="bg-card mx-auto w-full max-w-[210mm] p-6 shadow-2xl transition-all duration-300 md:min-h-[297mm] md:p-[15mm] print:min-h-0 print:w-full print:max-w-none print:bg-white print:p-0 print:shadow-none print:[print-color-adjust:exact]!"
       style={{ boxSizing: 'border-box' }}
     >
-      <div className="cv-header">
+      <div ref={headerRef} className="cv-header">
         <CVHeader name={data.name} title={data.title} contact={data.contact} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-[1fr_140px] print:grid-cols-[1fr_140px]">
         {/* Main Column */}
-        <div className="cv-main-col mr-[20pt] flex flex-col print:mr-[20pt]">
+        <div ref={mainColRef} className="cv-main-col mr-[20pt] flex flex-col print:mr-[20pt]">
           <section className="mb-[10pt] flex flex-col print:mb-[10pt]">
             <h2 className="text-foreground font-serif text-lg font-bold md:text-[16pt] print:text-[16pt]">
               {t('summary')}
@@ -84,7 +67,7 @@ export const CVLayout: React.FC<CVLayoutProps> = ({ data }) => {
         </div>
 
         {/* Side Column */}
-        <aside className="cv-side-col flex flex-col">
+        <aside ref={sideColRef} className="cv-side-col flex flex-col">
           <section className="flex flex-col md:mb-[10pt] print:mb-[10pt]">
             <h2 className="text-foreground font-serif text-xl font-bold md:text-[14pt] print:text-[14pt]">
               {t('skills')}

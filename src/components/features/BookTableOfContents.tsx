@@ -8,7 +8,7 @@ import Image from 'next/image'
 import { StarIcon } from '@phosphor-icons/react'
 
 import { PortfolioEntry } from '@/data/projects-en'
-import { useRevealAnimation } from '@/hooks/useRevealAnimation'
+import { useTimeline } from '@/hooks/useTimeline'
 import { ANIMATION } from '@/lib/constants/animations'
 import { gsap } from '@/lib/gsap'
 
@@ -22,34 +22,24 @@ export function BookTableOfContents({ entries, onNavigate }: BookTableOfContents
   const [hoveredId, setHoveredId] = useState<string | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const previewRef = useRef<HTMLDivElement>(null)
+  const titleRef = useRef<HTMLDivElement>(null)
+  const listRef = useRef<HTMLOListElement>(null)
 
-  useRevealAnimation(containerRef, [
-    {
-      animations: [
-        {
-          target: containerRef,
-          options: {
-            selector: '[data-toc-title]',
-            y: 30,
-            duration: ANIMATION.duration.medium,
-            ease: ANIMATION.ease.outStrong,
-            delay: ANIMATION.delay.short,
-          },
-        },
-        {
-          target: containerRef,
-          options: {
-            selector: '[data-toc-entry]',
-            x: -20,
-            duration: ANIMATION.duration.fast,
-            ease: ANIMATION.ease.out,
-            stagger: ANIMATION.stagger.normal,
-            position: '<0.2',
-          },
-        },
-      ],
-    },
-  ])
+  useTimeline(containerRef, { id: 'book-toc' }, (reveal) => {
+    reveal(titleRef, {
+      y: 30,
+      duration: ANIMATION.duration.medium,
+      ease: ANIMATION.ease.outStrong,
+      delay: ANIMATION.delay.short,
+    })
+    reveal(listRef, {
+      x: -20,
+      y: 0,
+      duration: ANIMATION.duration.fast,
+      ease: ANIMATION.ease.out,
+      stagger: ANIMATION.stagger.normal,
+    })
+  })
 
   const handleHover = useCallback((id: string | null) => {
     setHoveredId(id)
@@ -72,23 +62,19 @@ export function BookTableOfContents({ entries, onNavigate }: BookTableOfContents
     >
       {/* Left — entry list */}
       <div className="flex w-1/2 flex-col justify-center px-12 xl:px-16 2xl:px-20">
-        <h1
-          data-toc-title
-          className="mb-10 font-serif text-5xl font-light tracking-tight opacity-0 xl:text-6xl"
-        >
-          {t('title')}
-        </h1>
+        <div ref={titleRef}>
+          <h1 className="mb-10 font-serif text-5xl font-light tracking-tight xl:text-6xl">
+            {t('title')}
+          </h1>
 
-        <p
-          data-toc-title
-          className="text-muted-foreground mb-8 max-w-md text-base leading-relaxed opacity-0"
-        >
-          {t('subtitle')}
-        </p>
+          <p className="text-muted-foreground mb-8 max-w-md text-base leading-relaxed">
+            {t('subtitle')}
+          </p>
+        </div>
 
-        <ol className="divide-border/50 divide-y">
+        <ol ref={listRef} className="divide-border/50 divide-y">
           {entries.map((entry, i) => (
-            <li key={entry.id} data-toc-entry className="opacity-0">
+            <li key={entry.id}>
               <button
                 onClick={() => onNavigate(i + 1)}
                 onMouseEnter={() => handleHover(entry.id)}

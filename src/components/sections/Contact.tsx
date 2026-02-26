@@ -9,8 +9,8 @@ import { ArrowUpRightIcon } from '@phosphor-icons/react'
 import { BaseSection } from '@/components/ui/BaseSection'
 import { EditorialHeader } from '@/components/ui/EditorialHeader'
 import { contactLinks } from '@/data/contact'
-import { useRevealAnimation } from '@/hooks/useRevealAnimation'
-import { useSafeAnimation } from '@/lib/constants/animations'
+import { useTimeline } from '@/hooks/useTimeline'
+import { ANIMATION } from '@/lib/constants/animations'
 
 export function Contact() {
   const t = useTranslations('contact')
@@ -19,25 +19,14 @@ export function Contact() {
   const headerRef = useRef<HTMLDivElement>(null)
   const linksRef = useRef<HTMLDivElement>(null)
 
-  const ANIMATION = useSafeAnimation()
-
-  useRevealAnimation(sectionRef, [
-    {
-      start: 'top 85%',
-      animations: [
-        { target: headerRef },
-        {
-          target: linksRef,
-          options: {
-            x: -60,
-            y: 0,
-            stagger: ANIMATION.stagger.slow,
-            position: '<0.2',
-          },
-        },
-      ],
-    },
-  ])
+  useTimeline(sectionRef, { id: 'contact' }, (reveal) => {
+    reveal(headerRef)
+    reveal(linksRef, {
+      x: -60,
+      y: 0,
+      stagger: ANIMATION.stagger.slow,
+    })
+  })
 
   const currentYear = new Date().getFullYear()
 
