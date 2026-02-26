@@ -47,7 +47,7 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <html lang={routing.defaultLocale} suppressHydrationWarning>
+    <html suppressHydrationWarning>
       <body
         className={`${satoshi.variable} ${fraunces.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >

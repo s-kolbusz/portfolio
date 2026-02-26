@@ -1,11 +1,9 @@
-import React from 'react'
-
 export const JsonLd = () => {
   const personSchema = {
     '@context': 'https://schema.org',
     '@type': 'Person',
     name: 'Sebastian Kolbusz',
-    url: 'https://kolbusz.xyz',
+    url: 'https://www.kolbusz.xyz',
     jobTitle: 'Full-stack Developer',
     sameAs: [
       'https://github.com/skolbusz',
@@ -27,7 +25,7 @@ export const JsonLd = () => {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'Sebastian Kolbusz Portfolio',
-    url: 'https://kolbusz.xyz',
+    url: 'https://www.kolbusz.xyz',
     author: {
       '@type': 'Person',
       name: 'Sebastian Kolbusz',

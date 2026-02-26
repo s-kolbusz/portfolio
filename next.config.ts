@@ -7,7 +7,6 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   productionBrowserSourceMaps: true,
   experimental: {
-    optimizeCss: true,
     optimizePackageImports: ['@phosphor-icons/react', 'gsap', 'lenis', '@base-ui/react'],
   },
 }
