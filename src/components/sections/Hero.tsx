@@ -1,9 +1,8 @@
 'use client'
 
-import { useMemo, useRef, useEffect, useState } from 'react'
+import { useMemo, useRef, useEffect, useState, lazy, Suspense } from 'react'
 
 import { useTranslations } from 'next-intl'
-import dynamic from 'next/dynamic'
 
 import { ArrowDownIcon } from '@phosphor-icons/react'
 
@@ -11,10 +10,7 @@ import { Button } from '@/components/ui/Button'
 import { useHeroAnimation } from '@/hooks/useHeroAnimation'
 import { usePrefersReducedMotion } from '@/hooks/useMedia'
 
-const HeroScene = dynamic(() => import('@/components/canvas/HeroScene'), {
-  ssr: false,
-  loading: () => null,
-})
+const HeroScene = lazy(() => import('@/components/canvas/HeroScene'))
 
 export function Hero() {
   const t = useTranslations('hero')
@@ -29,11 +25,12 @@ export function Hero() {
   // Delay the loading of the heavy 3D scene to free up main thread during hydration
   const [showScene, setShowScene] = useState(false)
   useEffect(() => {
+    if (prefersReducedMotion) return
     const timer = setTimeout(() => {
       setShowScene(true)
     }, 500)
     return () => clearTimeout(timer)
-  }, [])
+  }, [prefersReducedMotion])
 
   useHeroAnimation({
     containerRef,
@@ -75,7 +72,13 @@ export function Hero() {
       className="bg-background text-foreground relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden px-6 pt-20"
     >
       {/* 3D Background */}
-      <div className="absolute inset-0 z-0 select-none">{showScene && <HeroScene />}</div>
+      <div className="absolute inset-0 z-0 select-none">
+        {showScene && (
+          <Suspense fallback={null}>
+            <HeroScene />
+          </Suspense>
+        )}
+      </div>
 
       {/* Content */}
       <div className="relative z-10 flex max-w-6xl flex-col items-center gap-8 text-center">

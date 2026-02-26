@@ -10,6 +10,8 @@ type Props = {
   params: Promise<{ locale: string }>
 }
 
+import { getMetadataAlternates } from '@/lib/utils'
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'projectsBook' })
@@ -17,6 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${t('title')} | Sebastian Kolbusz`,
     description: t('subtitle'),
+    alternates: getMetadataAlternates('/projects', locale),
   }
 }
 

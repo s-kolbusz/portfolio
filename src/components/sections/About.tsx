@@ -94,6 +94,7 @@ export const About: React.FC = () => {
               alt="Sebastian Kolbusz"
               width={400}
               height={600}
+              sizes="(max-width: 1024px) 100vw, 400px"
               className="h-full w-full object-cover"
               quality={75}
               loading="lazy"

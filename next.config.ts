@@ -7,13 +7,15 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   productionBrowserSourceMaps: true,
   experimental: {
+    optimizeCss: true,
     optimizePackageImports: [
       '@phosphor-icons/react',
       'gsap',
       'three',
       '@react-three/fiber',
       '@react-three/drei',
-      'lenis'
+      'lenis',
+      '@base-ui/react',
     ],
   },
 }

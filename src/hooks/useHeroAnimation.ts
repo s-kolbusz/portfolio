@@ -1,8 +1,7 @@
 import { RefObject } from 'react'
 
-import { useReveal } from '@/hooks/useRevealAnimation'
 import { ANIMATION } from '@/lib/constants/animations'
-import { gsap, useGSAP } from '@/lib/gsap'
+import { gsap, useGSAP } from '@/lib/gsap-core'
 
 interface UseHeroAnimationProps {
   containerRef: RefObject<HTMLElement | null>
@@ -21,8 +20,6 @@ export function useHeroAnimation({
   ctaIconRef,
   prefersReducedMotion,
 }: UseHeroAnimationProps) {
-  const reveal = useReveal()
-
   useGSAP(
     () => {
       const chars = gsap.utils.toArray<HTMLElement>('.char')
@@ -31,19 +28,14 @@ export function useHeroAnimation({
       if (prefersReducedMotion) {
         gsap.set(chars, { opacity: 1 })
         gsap.set(caretRef.current, { opacity: 0 })
-        // reveal(roleRef)
-        reveal(ctaRef, { y: 20 })
+        gsap.set(ctaRef.current, { y: 0, opacity: 1 })
         return
       }
 
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none none',
-          once: true,
-        },
-      })
+      // Initial state
+      gsap.set(ctaRef.current, { y: 20, opacity: 0 })
+
+      const tl = gsap.timeline({ delay: 0.1 }) // Just run it, it's at the very top of the page!
 
       // READ phase: Get all bounding rects before applying any mutations
       const parentRect = caretRef.current?.parentElement?.getBoundingClientRect() || {
@@ -81,9 +73,17 @@ export function useHeroAnimation({
         )
       })
 
-      // Reveal role and CTA after typing
-      // reveal(roleRef, { timeline: tl, delay: 0.3 })
-      reveal(ctaRef, { timeline: tl, delay: 0.2, y: 20, position: '<0.1' })
+      // Reveal CTA after typing
+      tl.to(
+        ctaRef.current,
+        {
+          y: 0,
+          opacity: 1,
+          duration: ANIMATION.duration.medium,
+          ease: ANIMATION.ease.out,
+        },
+        '<0.1'
+      )
 
       // Blinking caret effect loop
       const blinkingCaret = gsap.to(caretRef.current, {

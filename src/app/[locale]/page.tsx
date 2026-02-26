@@ -11,6 +11,8 @@ const PrintCalculator = dynamic(() =>
 )
 const Contact = dynamic(() => import('@/components/sections/Contact').then((mod) => mod.Contact))
 
+import { getMetadataAlternates } from '@/lib/utils'
+
 export async function generateMetadata(props: { params: Promise<{ locale: string }> }) {
   const params = await props.params
   const { locale } = params
@@ -21,6 +23,7 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
       absolute: t('title'),
     },
     description: t('description'),
+    alternates: getMetadataAlternates('/', locale),
   }
 }
 

@@ -16,6 +16,8 @@ export function generateStaticParams() {
   return routing.locales.flatMap((locale) => slugs.map((slug) => ({ locale, slug })))
 }
 
+import { getMetadataAlternates } from '@/lib/utils'
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params
   const project = getProject(slug, locale as Locale)
@@ -26,6 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${project.title} | Sebastian Kolbusz`,
     description: project.subtitle,
+    alternates: getMetadataAlternates(`/projects/${slug}`, locale),
     openGraph: {
       title: project.title,
       description: project.tagline,

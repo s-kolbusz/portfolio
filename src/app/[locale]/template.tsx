@@ -2,7 +2,7 @@
 
 import { usePrefersReducedMotion } from '@/hooks/useMedia'
 import { ANIMATION } from '@/lib/constants/animations'
-import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap'
+import { gsap, useGSAP } from '@/lib/gsap-core'
 
 export default function Template({ children }: { children: React.ReactNode }) {
   const prefersReducedMotion = usePrefersReducedMotion()
@@ -15,7 +15,9 @@ export default function Template({ children }: { children: React.ReactNode }) {
       duration: prefersReducedMotion ? ANIMATION.duration.fast : ANIMATION.duration.slow,
       ease: ANIMATION.ease.out,
       onComplete: () => {
-        ScrollTrigger.refresh()
+        import('@/lib/gsap').then(({ ScrollTrigger }) => {
+          ScrollTrigger.refresh()
+        })
       },
     })
   }, [prefersReducedMotion])

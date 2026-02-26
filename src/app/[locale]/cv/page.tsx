@@ -14,6 +14,8 @@ type Props = {
   params: Promise<{ locale: string }>
 }
 
+import { getMetadataAlternates } from '@/lib/utils'
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'Metadata' })
@@ -21,6 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${t('title')} | CV`,
     description: t('description'),
+    alternates: getMetadataAlternates('/cv', locale),
   }
 }
 
