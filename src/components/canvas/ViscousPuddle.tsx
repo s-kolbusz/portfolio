@@ -1,49 +1,46 @@
 'use client'
 
-import { useRef, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 
 import { useTheme } from 'next-themes'
 
-import { useFrame, useThree } from '@react-three/fiber'
-import { Color, MathUtils, Mesh, ShaderMaterial, Vector2 } from 'three'
-
 import { usePrefersReducedMotion } from '@/hooks/useMedia'
 
-const vertexShader = /* glsl */ `
-  varying vec2 vUv;
+// ─── GLSL Shaders ───────────────────────────────────────────────────────
+
+const VERTEX_SRC = /* glsl */ `#version 300 es
+  in vec2 aPosition;
+  out vec2 vUv;
   void main() {
-    vUv = uv;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    vUv = aPosition * 0.5 + 0.5;
+    gl_Position = vec4(aPosition, 0.0, 1.0);
   }
 `
 
-const fragmentShader = /* glsl */ `
+const FRAGMENT_SRC = /* glsl */ `#version 300 es
+  precision highp float;
+
   uniform float uTime;
   uniform vec2 uMouse;
   uniform vec2 uResolution;
   uniform vec3 uColor;
   uniform float uScale;
   uniform float uOpacity;
-  
-  varying vec2 vUv;
 
-  // --------------------------------------------------------
+  in vec2 vUv;
+  out vec4 fragColor;
+
   // SDF Primitives & Operations
-  // --------------------------------------------------------
-  
   float sdCircle(vec2 p, float r) {
     return length(p) - r;
   }
 
-  // Smooth Min (Metaball blending)
   float smin(float a, float b, float k) {
     float h = clamp(0.5 + 0.5 * (b - a) / k, 0.0, 1.0);
     return mix(b, a, h) - k * h * (1.0 - h);
   }
 
-  // --------------------------------------------------------
-  // Noise (Simplex 2D)
-  // --------------------------------------------------------
+  // Simplex 2D Noise
   vec3 permute(vec3 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
   float snoise(vec2 v){
     const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
@@ -77,198 +74,345 @@ const fragmentShader = /* glsl */ `
     // 1. Main Blob (Breathing)
     float breathe = sin(uTime * 0.3) * 0.03;
     vec2 mainPos = vec2(0.0, 0.0);
-    
+
     // Subtle wandering
     mainPos.x += snoise(vec2(uTime * 0.1, 0.0)) * 0.15;
     mainPos.y += snoise(vec2(0.0, uTime * 0.15)) * 0.15;
-    
+
     // Apply uScale to radius
     float d1 = sdCircle(uv - mainPos, (0.75 + breathe) * uScale);
 
     // 2. Mouse Blob (Interaction)
     vec2 mouseUV = uMouse * 2.0 - 1.0;
     mouseUV.x *= uResolution.x / uResolution.y;
-    
+
     float d2 = sdCircle(uv - mouseUV, 0.25 * uScale);
 
     // 3. Blend (Metaballs)
-    float d = smin(d1, d2, 0.6 * uScale); 
+    float d = smin(d1, d2, 0.6 * uScale);
 
     // 4. Domain Warping (Organic Edge)
     float noise = snoise(uv * 1.5 + uTime * 0.15);
     d += noise * 0.04 * uScale;
 
     // 5. Coloring & Surface Tension
-    // Smoothstep for slightly softer edge (surface tension look)
     float alpha = smoothstep(0.04, -0.04, d);
-    
-    // Internal gradient for liquid volume feel
-    // High-frequency dither and wide range to eliminate banding
+
+    // Internal gradient: only applied deep inside the blob
+    // At edges (alpha near 0), color stays at uColor to avoid grey boundary
     float dither = snoise(uv * 200.0) * 0.025;
-    float shadow = smoothstep(-0.8 * uScale, 0.6 * uScale, d + dither);
-    
-    // Mix between highlight and deeper core while keeping base color integrity
-    vec3 highlight = uColor * 1.1;
-    vec3 core = uColor * 0.8;
-    vec3 finalColor = mix(highlight, core, shadow);
-    
-    // Vignette/Falloff for transparency
-    float opacity = alpha * 0.65 * uOpacity; 
-    
-    gl_FragColor = vec4(finalColor, opacity);
+    float depthFactor = smoothstep(0.0, -0.5 * uScale, d + dither);
+
+    // Core is slightly darker for depth; edge stays at true uColor
+    vec3 finalColor = mix(uColor, uColor * 0.85, depthFactor);
+
+    float opacity = alpha * uOpacity;
+
+    fragColor = vec4(finalColor, opacity);
   }
 `
 
+// ─── WebGL Helpers ──────────────────────────────────────────────────────
+
+function compileShader(gl: WebGL2RenderingContext, type: number, src: string) {
+  const shader = gl.createShader(type)!
+  gl.shaderSource(shader, src)
+  gl.compileShader(shader)
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    const info = gl.getShaderInfoLog(shader)
+    gl.deleteShader(shader)
+    throw new Error(`Shader compile error: ${info}`)
+  }
+  return shader
+}
+
+function createProgram(gl: WebGL2RenderingContext, vsSrc: string, fsSrc: string) {
+  const vs = compileShader(gl, gl.VERTEX_SHADER, vsSrc)
+  const fs = compileShader(gl, gl.FRAGMENT_SHADER, fsSrc)
+  const program = gl.createProgram()!
+  gl.attachShader(program, vs)
+  gl.attachShader(program, fs)
+  gl.linkProgram(program)
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    const info = gl.getProgramInfoLog(program)
+    gl.deleteProgram(program)
+    throw new Error(`Program link error: ${info}`)
+  }
+  gl.detachShader(program, vs)
+  gl.detachShader(program, fs)
+  gl.deleteShader(vs)
+  gl.deleteShader(fs)
+  return program
+}
+
+/** Linear interpolation */
+function lerp(a: number, b: number, t: number) {
+  return a + (b - a) * t
+}
+
+/** Parse hex color (#RRGGBB) to [r, g, b] in 0–1 range */
+function hexToRgb(hex: string): [number, number, number] {
+  const n = parseInt(hex.replace('#', ''), 16)
+  return [(n >> 16) / 255, ((n >> 8) & 0xff) / 255, (n & 0xff) / 255]
+}
+
+const LIGHT_COLOR = hexToRgb('#7ec58e')
+const DARK_COLOR = hexToRgb('#135534')
+
+// Fullscreen quad (2 triangles)
+// prettier-ignore
+const QUAD_VERTICES = new Float32Array([
+  -1, -1,
+   1, -1,
+  -1,  1,
+  -1,  1,
+   1, -1,
+   1,  1,
+])
+
+// ─── Component ──────────────────────────────────────────────────────────
+
 export function ViscousPuddle() {
-  const meshRef = useRef<Mesh>(null)
-  const materialRef = useRef<ShaderMaterial>(null)
-  const { viewport, size } = useThree()
+  const canvasRef = useRef<HTMLCanvasElement>(null)
   const { resolvedTheme } = useTheme()
-  const isPointerInsideWindow = useRef(false)
   const prefersReducedMotion = usePrefersReducedMotion()
 
-  // Mobile check
-  const isMobile = size.width < 768
-
-  // Mouse state - initialize to center
-  const mouseRef = useRef(new Vector2(0.5, 0.5))
-  const targetMouseRef = useRef(new Vector2(0.5, 0.5))
-
-  // Global mouse tracking
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      isPointerInsideWindow.current = true
-      const x = e.clientX / window.innerWidth
-      const y = 1.0 - e.clientY / window.innerHeight
-      targetMouseRef.current.set(x, y)
-    }
-
-    const handleMouseLeave = () => {
-      isPointerInsideWindow.current = false
-    }
-
-    const handleMouseEnter = () => {
-      isPointerInsideWindow.current = true
-    }
-
-    // Only add listeners if NOT mobile
-    if (!isMobile) {
-      window.addEventListener('mousemove', handleMouseMove)
-      document.addEventListener('mouseleave', handleMouseLeave)
-      document.addEventListener('mouseenter', handleMouseEnter)
-    }
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove)
-      document.removeEventListener('mouseleave', handleMouseLeave)
-      document.removeEventListener('mouseenter', handleMouseEnter)
-    }
-  }, [isMobile])
-
-  const uniforms = useMemo(
-    () => ({
-      uTime: { value: 0 },
-      uMouse: { value: new Vector2(0.5, 0.5) },
-      uResolution: { value: new Vector2(size.width, size.height) },
-      uColor: { value: new Color('#34D399') },
-      uScale: { value: 1.0 },
-      uOpacity: { value: 0.0 },
-    }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
-
-  const lerpScroll = useRef(0)
-
-  useFrame((state, delta) => {
-    if (!meshRef.current || !materialRef.current) return
-
-    // 1. Robust Time Update - stop if reduced motion
-    if (!prefersReducedMotion) {
-      materialRef.current.uniforms.uTime.value += Math.min(delta, 0.05)
-    }
-
-    // Fade in opacity
-    materialRef.current.uniforms.uOpacity.value = MathUtils.lerp(
-      materialRef.current.uniforms.uOpacity.value,
-      1.0,
-      0.1
-    )
-
-    // 2. Parallax Effect - disabled if reduced motion
-    const rawScroll = typeof window !== 'undefined' && !prefersReducedMotion ? window.scrollY : 0
-    // Clamp the scroll value used for parallax to prevent extreme transformations
-    const currentScroll = Math.min(rawScroll, size.height * 1.5)
-
-    // Faster lerp to prevent the "waiting" feel when returning from far away
-    lerpScroll.current = MathUtils.lerp(lerpScroll.current, currentScroll, 0.15)
-
-    // Snap if very close to avoid micro-updates and lag feel
-    if (Math.abs(lerpScroll.current - currentScroll) < 0.1) {
-      lerpScroll.current = currentScroll
-    }
-
-    // Cinematic Parallax: Stronger vertical shift + subtle horizontal drift
-    // Stronger Z displacement (vertical on screen)
-    meshRef.current.position.z = lerpScroll.current * 0.0045
-    // meshRef.current.position.x = Math.sin(lerpScroll.current * 0.001) * 0.5
-
-    // Scale up slightly as we scroll down to feel like it's coming closer/expanding
-    const scrollScale = 1.0 + lerpScroll.current * 0.0015
-    meshRef.current.scale.set(viewport.width * scrollScale, viewport.height * scrollScale, 1)
-
-    // Stronger vertical tilt
-    meshRef.current.rotation.x = -Math.PI / 2 + lerpScroll.current * 0.0005
-
-    // 3. Sync resolution & Scale
-    if (
-      materialRef.current.uniforms.uResolution.value.x !== size.width ||
-      materialRef.current.uniforms.uResolution.value.y !== size.height
-    ) {
-      materialRef.current.uniforms.uResolution.value.set(size.width, size.height)
-    }
-
-    const targetScale = isMobile ? 0.6 : 1.0
-    materialRef.current.uniforms.uScale.value = MathUtils.lerp(
-      materialRef.current.uniforms.uScale.value,
-      targetScale,
-      0.1
-    )
-
-    // 4. Color / Theme Update
-    // Light Theme: Perfect Vibrant brand emerald (#34D399)
-    // Dark Theme: Balanced Emerald-Teal mix (#12b893) to match #00c681 family
-    const targetColor = resolvedTheme === 'dark' ? new Color('#12b893') : new Color('#34D399')
-
-    materialRef.current.uniforms.uColor.value.lerp(targetColor, 0.05)
-
-    // 5. Mouse Interaction & Merging
-    const lerpFactor = isPointerInsideWindow.current && !prefersReducedMotion ? 0.06 : 0.02
-
-    // If mobile or pointer outside or reduced motion, force center
-    if (isMobile || !isPointerInsideWindow.current || prefersReducedMotion) {
-      targetMouseRef.current.set(0.5, 0.5)
-    }
-
-    mouseRef.current.lerp(targetMouseRef.current, lerpFactor)
-    materialRef.current.uniforms.uMouse.value.copy(mouseRef.current)
+  // Mutable state refs (avoid re-renders)
+  const stateRef = useRef({
+    mouseX: 0.5,
+    mouseY: 0.5,
+    targetMouseX: 0.5,
+    targetMouseY: 0.5,
+    pointerInside: false,
+    isMobile: false,
+    isInView: true,
+    lerpScroll: 0,
+    time: 0,
+    colorR: LIGHT_COLOR[0],
+    colorG: LIGHT_COLOR[1],
+    colorB: LIGHT_COLOR[2],
+    scale: 1.0,
+    opacity: 0.0,
+    // Scroll-based transforms (applied via CSS)
+    scrollY: 0,
+    cssTranslateY: 0,
+    cssScale: 1.0,
   })
 
+  // Theme ref kept in sync
+  const themeRef = useRef(resolvedTheme)
+  themeRef.current = resolvedTheme
+
+  // Reduced motion ref
+  const reducedMotionRef = useRef(prefersReducedMotion)
+  reducedMotionRef.current = prefersReducedMotion
+
+  // Resize handler
+  const handleResize = useCallback((canvas: HTMLCanvasElement) => {
+    const dpr = Math.min(window.devicePixelRatio, 1.5)
+    const w = canvas.clientWidth
+    const h = canvas.clientHeight
+    canvas.width = Math.round(w * dpr)
+    canvas.height = Math.round(h * dpr)
+    stateRef.current.isMobile = w < 768
+  }, [])
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    // ── Init WebGL2 ──
+    const gl = canvas.getContext('webgl2', {
+      alpha: true,
+      antialias: false,
+      premultipliedAlpha: false,
+      powerPreference: 'high-performance',
+      depth: false,
+      stencil: false,
+    })
+    if (!gl) {
+      console.warn('WebGL2 not supported')
+      return
+    }
+
+    // ── Compile program ──
+    const program = createProgram(gl, VERTEX_SRC, FRAGMENT_SRC)
+
+    // ── Setup fullscreen quad VAO ──
+    const vao = gl.createVertexArray()!
+    gl.bindVertexArray(vao)
+
+    const vbo = gl.createBuffer()!
+    gl.bindBuffer(gl.ARRAY_BUFFER, vbo)
+    gl.bufferData(gl.ARRAY_BUFFER, QUAD_VERTICES, gl.STATIC_DRAW)
+
+    const aPosition = gl.getAttribLocation(program, 'aPosition')
+    gl.enableVertexAttribArray(aPosition)
+    gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0)
+
+    gl.bindVertexArray(null)
+
+    // ── Get uniform locations ──
+    gl.useProgram(program)
+    const uTime = gl.getUniformLocation(program, 'uTime')
+    const uMouse = gl.getUniformLocation(program, 'uMouse')
+    const uResolution = gl.getUniformLocation(program, 'uResolution')
+    const uColor = gl.getUniformLocation(program, 'uColor')
+    const uScale = gl.getUniformLocation(program, 'uScale')
+    const uOpacity = gl.getUniformLocation(program, 'uOpacity')
+
+    // ── GL state ──
+    gl.enable(gl.BLEND)
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+
+    // ── Initial sizing ──
+    handleResize(canvas)
+
+    // ── Trigger CSS fade-in (needs a frame delay for transition to work) ──
+    requestAnimationFrame(() => {
+      canvas.style.opacity = '1'
+    })
+
+    // ── Intersection Observer (pause when off-screen) ──
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        stateRef.current.isInView = entry.isIntersecting
+      },
+      { threshold: 0 }
+    )
+    observer.observe(canvas)
+
+    // ── Mouse listeners — use canvas-relative coordinates ──
+    const onMouseMove = (e: MouseEvent) => {
+      stateRef.current.pointerInside = true
+      // Get position relative to the canvas element
+      const rect = canvas.getBoundingClientRect()
+      stateRef.current.targetMouseX = (e.clientX - rect.left) / rect.width
+      stateRef.current.targetMouseY = 1.0 - (e.clientY - rect.top) / rect.height
+    }
+    const onMouseLeave = () => {
+      stateRef.current.pointerInside = false
+    }
+    const onMouseEnter = () => {
+      stateRef.current.pointerInside = true
+    }
+
+    if (!stateRef.current.isMobile) {
+      window.addEventListener('mousemove', onMouseMove)
+      document.addEventListener('mouseleave', onMouseLeave)
+      document.addEventListener('mouseenter', onMouseEnter)
+    }
+
+    // ── Resize listener ──
+    const onResize = () => handleResize(canvas)
+    window.addEventListener('resize', onResize)
+
+    // ── Animation loop ──
+    let raf = 0
+    let lastTime = performance.now()
+
+    const render = (now: number) => {
+      raf = requestAnimationFrame(render)
+
+      const s = stateRef.current
+      if (!s.isInView) {
+        lastTime = now
+        return
+      }
+
+      const rawDelta = (now - lastTime) / 1000
+      const delta = Math.min(rawDelta, 0.05)
+      lastTime = now
+
+      // Time
+      if (!reducedMotionRef.current) {
+        s.time += delta
+      }
+
+      // Fluid fade-in: slow exponential approach (matches viscous feel)
+      // Takes ~2s to reach full opacity with this factor
+      s.opacity = lerp(s.opacity, 1.0, 0.025)
+
+      // Scale (mobile vs desktop)
+      const targetScale = s.isMobile ? 0.6 : 1.0
+      s.scale = lerp(s.scale, targetScale, 0.1)
+
+      // Color (theme-aware, using actual OKLCH primary values)
+      const target = themeRef.current === 'dark' ? DARK_COLOR : LIGHT_COLOR
+      s.colorR = lerp(s.colorR, target[0], 0.05)
+      s.colorG = lerp(s.colorG, target[1], 0.05)
+      s.colorB = lerp(s.colorB, target[2], 0.05)
+
+      // Mouse (lerp towards target or center)
+      const lerpFactor = s.pointerInside && !reducedMotionRef.current ? 0.06 : 0.02
+      if (s.isMobile || !s.pointerInside || reducedMotionRef.current) {
+        s.targetMouseX = 0.5
+        s.targetMouseY = 0.5
+      }
+      s.mouseX = lerp(s.mouseX, s.targetMouseX, lerpFactor)
+      s.mouseY = lerp(s.mouseY, s.targetMouseY, lerpFactor)
+
+      // ── Scroll-based transforms (CSS on canvas element) ──
+      if (!reducedMotionRef.current) {
+        const rawScroll = typeof window !== 'undefined' ? window.scrollY : 0
+        const clampedScroll = Math.min(rawScroll, canvas.clientHeight * 1.5)
+
+        // Smooth lerp for scroll
+        s.lerpScroll = lerp(s.lerpScroll, clampedScroll, 0.15)
+        if (Math.abs(s.lerpScroll - clampedScroll) < 0.1) {
+          s.lerpScroll = clampedScroll
+        }
+
+        // Parallax: strong vertical shift + scale-up as user scrolls
+        const targetTranslateY = s.lerpScroll * 1.5
+        const targetCssScale = 1.0 + s.lerpScroll * 0.0025
+
+        s.cssTranslateY = lerp(s.cssTranslateY, targetTranslateY, 0.2)
+        s.cssScale = lerp(s.cssScale, targetCssScale, 0.2)
+
+        canvas.style.transform = `translateY(${s.cssTranslateY}px) scale(${s.cssScale})`
+      }
+
+      // ── Draw ──
+      gl.viewport(0, 0, canvas.width, canvas.height)
+      gl.clearColor(0, 0, 0, 0)
+      gl.clear(gl.COLOR_BUFFER_BIT)
+
+      gl.useProgram(program)
+      gl.uniform1f(uTime, s.time)
+      gl.uniform2f(uMouse, s.mouseX, s.mouseY)
+      gl.uniform2f(uResolution, canvas.clientWidth, canvas.clientHeight)
+      gl.uniform3f(uColor, s.colorR, s.colorG, s.colorB)
+      gl.uniform1f(uScale, s.scale)
+      gl.uniform1f(uOpacity, s.opacity)
+
+      gl.bindVertexArray(vao)
+      gl.drawArrays(gl.TRIANGLES, 0, 6)
+      gl.bindVertexArray(null)
+    }
+
+    raf = requestAnimationFrame(render)
+
+    // ── Cleanup ──
+    return () => {
+      cancelAnimationFrame(raf)
+      observer.disconnect()
+      window.removeEventListener('mousemove', onMouseMove)
+      document.removeEventListener('mouseleave', onMouseLeave)
+      document.removeEventListener('mouseenter', onMouseEnter)
+      window.removeEventListener('resize', onResize)
+      gl.deleteBuffer(vbo)
+      gl.deleteVertexArray(vao)
+      gl.deleteProgram(program)
+    }
+  }, [handleResize])
+
   return (
-    <mesh
-      ref={meshRef}
-      rotation={[-Math.PI / 2, 0, 0]}
-      scale={[viewport.width, viewport.height, 1]}
-    >
-      <planeGeometry args={[1, 1]} />
-      <shaderMaterial
-        ref={materialRef}
-        vertexShader={vertexShader}
-        fragmentShader={fragmentShader}
-        uniforms={uniforms}
-        transparent={true}
-        depthWrite={false}
-      />
-    </mesh>
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 h-full w-full will-change-transform"
+      style={{ opacity: 0, transition: 'opacity 1.8s cubic-bezier(0.16, 1, 0.3, 1)' }}
+      aria-hidden="true"
+    />
   )
 }

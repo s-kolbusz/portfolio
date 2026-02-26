@@ -1,15 +1,18 @@
 'use client'
 
-import { Suspense, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
-import { Canvas } from '@react-three/fiber'
+import { usePrefersReducedMotion } from '@/hooks/useMedia'
 
 import { ViscousPuddle } from './ViscousPuddle'
 
 export default function HeroScene() {
   const [mounted, setMounted] = useState(false)
+  const prefersReducedMotion = usePrefersReducedMotion()
 
   useEffect(() => {
+    if (prefersReducedMotion) return
+
     // Delay WebGL initialization to unblock the main thread during hydration.
     // This allows FCP and LCP to fire immediately.
     const timer = setTimeout(() => {
@@ -17,23 +20,13 @@ export default function HeroScene() {
     }, 100)
 
     return () => clearTimeout(timer)
-  }, [])
+  }, [prefersReducedMotion])
 
   if (!mounted) return null
 
   return (
     <div className="absolute inset-0 z-0 h-full w-full">
-      <Canvas
-        shadows={false}
-        frameloop="always"
-        dpr={[1, 1.5]}
-        camera={{ position: [0, 5, 0], fov: 45 }}
-        gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
-      >
-        <Suspense fallback={null}>
-          <ViscousPuddle />
-        </Suspense>
-      </Canvas>
+      <ViscousPuddle />
     </div>
   )
 }

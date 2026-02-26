@@ -115,7 +115,6 @@ export function ProjectBook({ projects }: ProjectBookProps) {
         ref={scrollRef}
         data-lenis-prevent
         className="flex h-dvh snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain"
-        style={{ scrollbarWidth: 'none' }}
       >
         {/* ToC panel */}
         <div data-book-panel id="book-panel-0">

@@ -8,10 +8,10 @@ export default function Template({ children }: { children: React.ReactNode }) {
   const prefersReducedMotion = usePrefersReducedMotion()
 
   useGSAP(() => {
-    gsap.from('#page-transition-container', {
-      opacity: 0,
-      filter: prefersReducedMotion ? 'none' : 'blur(20px)',
-      y: prefersReducedMotion ? 0 : 10,
+    gsap.to('#page-transition-container', {
+      opacity: 1,
+      filter: 'none',
+      y: 0,
       duration: prefersReducedMotion ? ANIMATION.duration.fast : ANIMATION.duration.slow,
       ease: ANIMATION.ease.out,
       onComplete: () => {
@@ -23,7 +23,15 @@ export default function Template({ children }: { children: React.ReactNode }) {
   }, [prefersReducedMotion])
 
   return (
-    <div id="page-transition-container" className="w-full">
+    <div
+      id="page-transition-container"
+      style={{
+        width: '100%',
+        opacity: 0,
+        filter: 'blur(20px)',
+        y: 16,
+      }}
+    >
       {children}
     </div>
   )
