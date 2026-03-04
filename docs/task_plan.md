@@ -34,12 +34,12 @@
 
 **Required Skills:** `test-driven-development`, `systematic-debugging`
 
-- [ ] Remove or quarantine deprecated `projects` export from `src/data/projects.ts`.
-- [ ] Remove or migrate unused `cvData` in `src/data/cv.ts` so one canonical CV source remains.
-- [ ] Tighten `get-projects.ts` typing (`Locale` and entry ID completeness) to avoid runtime gaps.
-- [ ] Add compile-time checks that every portfolio entry has localized content in both locales.
-- [ ] Add unit tests for `getProjects`, `getProject`, and `getFeaturedProjects`.
-- [ ] Add unit tests for `calculatePrintCost` including boundary and sanity scenarios.
+- [x] Remove or quarantine deprecated `projects` export from `src/data/projects.ts`.
+- [x] Remove or migrate unused `cvData` in `src/data/cv.ts` so one canonical CV source remains.
+- [x] Tighten `get-projects.ts` typing (`Locale` and entry ID completeness) to avoid runtime gaps.
+- [x] Add compile-time checks that every portfolio entry has localized content in both locales.
+- [x] Add unit tests for `getProjects`, `getProject`, and `getFeaturedProjects`.
+- [x] Add unit tests for `calculatePrintCost` including boundary and sanity scenarios.
 
 ---
 

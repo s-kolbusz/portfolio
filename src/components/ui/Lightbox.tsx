@@ -14,7 +14,7 @@ import { gsap, useGSAP } from '@/lib/gsap'
 import { useScrollStore } from '@/lib/store'
 
 interface LightboxProps {
-  images: MediaItem[]
+  images: readonly MediaItem[]
   initialIndex: number
   isOpen: boolean
   onClose: () => void

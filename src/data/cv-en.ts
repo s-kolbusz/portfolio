@@ -1,4 +1,4 @@
-import { CVData } from './cv'
+import type { CVData } from './cv'
 
 export const cvDataEn: CVData = {
   name: 'Sebastian Kolbusz',

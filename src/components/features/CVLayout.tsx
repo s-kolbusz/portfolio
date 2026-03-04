@@ -5,7 +5,7 @@ import React, { useRef } from 'react'
 import { useTranslations } from 'next-intl'
 
 import { SkillTag } from '@/components/ui/SkillTag'
-import { CVData } from '@/data/cv'
+import type { CVData } from '@/data/cv'
 import { useTimeline } from '@/hooks/useTimeline'
 import { ANIMATION } from '@/lib/constants/animations'
 

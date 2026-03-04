@@ -21,20 +21,20 @@ export interface PortfolioEntryBase {
   type: EntryType
   year: string
   category: Category
-  techStack: string[]
+  techStack: readonly string[]
   heroImage: string
-  gallery: MediaItem[]
+  gallery: readonly MediaItem[]
   featured: boolean
   order: number
   liveUrl?: string
-  timeline?: RolePhase[]
+  timeline?: readonly RolePhase[]
 }
 
 // ---------------------------------------------------------------------------
 // Entries — order determines book page sequence
 // ---------------------------------------------------------------------------
 
-export const portfolioEntries: PortfolioEntryBase[] = [
+export const portfolioEntries = [
   {
     id: 'zakofy',
     type: 'project',
@@ -145,55 +145,6 @@ export const portfolioEntries: PortfolioEntryBase[] = [
     liveUrl: 'https://ready2order.com',
     timeline: [{ period: '2019–2020' }, { period: '2020–2022' }, { period: '2022–2025' }],
   },
-]
+] as const satisfies readonly PortfolioEntryBase[]
 
-// ---------------------------------------------------------------------------
-// Backward-compatible exports for existing homepage components
-// (ProjectList, ProjectItem, ProjectAccordion)
-// These will be removed in Phase 4 when components migrate to the new types.
-// ---------------------------------------------------------------------------
-
-export interface Project {
-  id: string
-  title: string
-  year: string
-  tech: string[]
-  url: string
-  image: string
-}
-
-/** @deprecated Use `getProjects(locale)` from `@/data/get-projects` instead */
-export const projects: Project[] = [
-  {
-    id: 'zakofy',
-    title: 'Zakofy',
-    year: '2026',
-    tech: ['Next.js', 'Payload CMS', 'Tailwind CSS'],
-    url: 'https://zakofy.com',
-    image: '/images/projects/zakofy.avif',
-  },
-  {
-    id: 'your-krakow-travel',
-    title: 'Your Krakow Travel',
-    year: '2025',
-    tech: ['Next.js', 'Payload CMS', 'Tailwind CSS'],
-    url: 'https://yourkrakowtravel.com',
-    image: '/images/projects/yourkrakowtravel.avif',
-  },
-  {
-    id: 'wellezza',
-    title: 'Wellezza',
-    year: '2024',
-    tech: ['Next.js', 'Tailwind CSS', 'GSAP'],
-    url: 'https://wellezza.pl',
-    image: '/images/projects/wellezza.avif',
-  },
-  {
-    id: 'billboard-zakopane',
-    title: 'Billboard Zakopane',
-    year: '2023',
-    tech: ['Next.js', 'Tailwind CSS'],
-    url: 'https://billboardzakopane.pl',
-    image: '/images/projects/billboard.avif',
-  },
-]
+export type PortfolioEntryId = (typeof portfolioEntries)[number]['id']
