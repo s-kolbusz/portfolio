@@ -5,50 +5,50 @@ import { notFound } from 'next/navigation'
 import { ProjectCaseStudy } from '@/components/features/ProjectCaseStudy'
 import { RoleCaseStudy } from '@/components/features/RoleCaseStudy'
 import { getProject, getProjects } from '@/data/get-projects'
-import { Locale, routing } from '@/i18n/routing'
+import { requireRoutingLocale } from '@/i18n/locale'
+import { routing } from '@/i18n/routing'
+import { serializeJsonLd } from '@/lib/json-ld'
+import { buildProjectDetailPageMetadata } from '@/lib/page-metadata'
+import { toAbsoluteSiteUrl } from '@/lib/site'
 
 type Props = {
   params: Promise<{ locale: string; slug: string }>
 }
+
+export const dynamicParams = false
+export const dynamic = 'force-static'
 
 export function generateStaticParams() {
   const slugs = getProjects('en').map((p) => p.id)
   return routing.locales.flatMap((locale) => slugs.map((slug) => ({ locale, slug })))
 }
 
-import { getMetadataAlternates } from '@/lib/utils'
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale, slug } = await params
-  const project = getProject(slug, locale as Locale)
+  const { locale: localeParam, slug } = await params
+  const locale = requireRoutingLocale(localeParam)
+  const project = getProject(slug, locale)
   if (!project) return {}
 
   const t = await getTranslations({ locale, namespace: 'projectsBook' })
 
-  return {
-    title: `${project.title} | Sebastian Kolbusz`,
-    description: project.subtitle,
-    alternates: getMetadataAlternates(`/projects/${slug}`, locale),
-    openGraph: {
-      title: project.title,
-      description: project.tagline,
-      images: [project.heroImage],
-    },
-    other: {
-      'article:section': t(`categories.${project.category}`),
-    },
-  }
+  return buildProjectDetailPageMetadata({
+    locale,
+    slug,
+    project,
+    categoryLabel: t(`categories.${project.category}`),
+  })
 }
 
 export default async function ProjectDetailPage({ params }: Props) {
-  const { locale, slug } = await params
+  const { locale: localeParam, slug } = await params
+  const locale = requireRoutingLocale(localeParam)
 
   setRequestLocale(locale)
 
-  const project = getProject(slug, locale as Locale)
+  const project = getProject(slug, locale)
   if (!project) notFound()
 
-  const allProjects = getProjects(locale as Locale)
+  const allProjects = getProjects(locale)
   const currentIdx = allProjects.findIndex((p) => p.id === slug)
   const prevProject = currentIdx > 0 ? allProjects[currentIdx - 1] : undefined
   const nextProject = currentIdx < allProjects.length - 1 ? allProjects[currentIdx + 1] : undefined
@@ -58,7 +58,7 @@ export default async function ProjectDetailPage({ params }: Props) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+          __html: serializeJsonLd({
             '@context': 'https://schema.org',
             '@type': 'CreativeWork',
             headline: project.title,
@@ -66,7 +66,7 @@ export default async function ProjectDetailPage({ params }: Props) {
             image: project.heroImage,
             dateCreated: project.year,
             category: project.category,
-            url: `https://kolbusz.xyz/${locale}/projects/${project.id}`,
+            url: toAbsoluteSiteUrl(`/${locale}/projects/${project.id}`),
             author: {
               '@type': 'Person',
               name: 'Sebastian Kolbusz',

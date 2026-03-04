@@ -4,7 +4,6 @@ import { useRef } from 'react'
 
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
-import Link from 'next/link'
 
 import { ArrowUpRightIcon } from '@phosphor-icons/react'
 
@@ -133,7 +132,7 @@ export function ProjectAccordion({ project, isOpen }: ProjectAccordionProps) {
               </div>
 
               {project.liveUrl && (
-                <Link
+                <a
                   href={project.liveUrl}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -145,7 +144,7 @@ export function ProjectAccordion({ project, isOpen }: ProjectAccordionProps) {
                     weight="bold"
                     className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                   />
-                </Link>
+                </a>
               )}
             </div>
           </div>

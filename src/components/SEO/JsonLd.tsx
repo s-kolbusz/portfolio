@@ -1,9 +1,12 @@
+import { serializeJsonLd } from '@/lib/json-ld'
+import { SITE_AUTHOR, SITE_NAME, SITE_ORIGIN } from '@/lib/site'
+
 export const JsonLd = () => {
   const personSchema = {
     '@context': 'https://schema.org',
     '@type': 'Person',
-    name: 'Sebastian Kolbusz',
-    url: 'https://www.kolbusz.xyz',
+    name: SITE_AUTHOR,
+    url: SITE_ORIGIN,
     jobTitle: 'Full-stack Developer',
     sameAs: [
       'https://github.com/skolbusz',
@@ -24,11 +27,11 @@ export const JsonLd = () => {
   const websiteSchema = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'Sebastian Kolbusz Portfolio',
-    url: 'https://www.kolbusz.xyz',
+    name: SITE_NAME,
+    url: SITE_ORIGIN,
     author: {
       '@type': 'Person',
-      name: 'Sebastian Kolbusz',
+      name: SITE_AUTHOR,
     },
   }
 
@@ -36,11 +39,11 @@ export const JsonLd = () => {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(personSchema) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(websiteSchema) }}
       />
     </>
   )

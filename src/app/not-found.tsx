@@ -2,11 +2,11 @@ import { Metadata } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
 import { Fraunces, JetBrains_Mono } from 'next/font/google'
 import localFont from 'next/font/local'
-import Link from 'next/link'
 
 import { ThemeProvider } from '@/components/theme-provider'
 import { ClientOverlays } from '@/components/ui/ClientOverlays'
-import enMessages from '@/i18n/en.json'
+import enMessages from '@/i18n/messages/en.json'
+import { Link } from '@/i18n/navigation'
 import { routing } from '@/i18n/routing'
 
 import './globals.css'
@@ -41,7 +41,7 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: '404 - Page Not Found | Sebastian Kolbusz',
+  title: '404 - Page Not Found',
   description: 'The page you are looking for does not exist.',
 }
 

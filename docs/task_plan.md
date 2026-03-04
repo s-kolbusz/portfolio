@@ -18,15 +18,15 @@
 
 **Required Skills:** `react-best-practices`, `systematic-debugging`, `test-driven-development`
 
-- [ ] Refactor locale ownership in `src/app/[locale]/layout.tsx` to validate locale and apply request-locale consistently.
-- [ ] Remove unused `params` warning and eliminate unnecessary locale casts (`locale as Locale`) where possible.
-- [ ] Ensure static rendering intent is explicit for locale routes and verify route output after build.
-- [ ] Replace direct `next/link` internal navigation with locale-aware wrappers in all localized routes/components.
-- [ ] Replace `next/head` usage in App Router root with App Router-native metadata/script strategy.
-- [ ] Add `lang` handling strategy on the root `<html>` element.
-- [ ] Standardize canonical host/domain across metadata and JSON-LD payloads.
-- [ ] Fix page title composition to avoid duplicating branding suffixes when template is applied.
-- [ ] Add metadata tests/snapshots for home, CV, projects index, and project detail pages.
+- [x] Refactor locale ownership in `src/app/[locale]/layout.tsx` to validate locale and apply request-locale consistently.
+- [x] Remove unused `params` warning and eliminate unnecessary locale casts (`locale as Locale`) where possible.
+- [x] Ensure static rendering intent is explicit for locale routes and verify route output after build.
+- [x] Replace direct `next/link` internal navigation with locale-aware wrappers in all localized routes/components.
+- [x] Replace `next/head` usage in App Router root with App Router-native metadata/script strategy.
+- [x] Add `lang` handling strategy on the root `<html>` element.
+- [x] Standardize canonical host/domain across metadata and JSON-LD payloads.
+- [x] Fix page title composition to avoid duplicating branding suffixes when template is applied.
+- [x] Add metadata tests/snapshots for home, CV, projects index, and project detail pages.
 
 ---
 

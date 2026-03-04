@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { getTranslations } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 
 import { ArrowLeftIcon } from '@phosphor-icons/react/dist/ssr'
 
@@ -9,26 +9,31 @@ import { BaseSection } from '@/components/ui/BaseSection'
 import { Button } from '@/components/ui/Button'
 import { cvDataEn } from '@/data/cv-en'
 import { cvDataPl } from '@/data/cv-pl'
+import { getLocaleFromParams } from '@/i18n/locale'
+import { buildCvPageMetadata } from '@/lib/page-metadata'
 
 type Props = {
   params: Promise<{ locale: string }>
 }
 
-import { getMetadataAlternates } from '@/lib/utils'
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale } = await params
-  const t = await getTranslations({ locale, namespace: 'Metadata' })
+  const locale = await getLocaleFromParams(params)
 
-  return {
-    title: `${t('title')} | CV`,
-    description: t('description'),
-    alternates: getMetadataAlternates('/cv', locale),
-  }
+  const [cvTranslations, metadataTranslations] = await Promise.all([
+    getTranslations({ locale, namespace: 'cv' }),
+    getTranslations({ locale, namespace: 'Metadata' }),
+  ])
+
+  return buildCvPageMetadata({
+    locale,
+    title: cvTranslations('title'),
+    description: metadataTranslations('description'),
+  })
 }
 
 export default async function CVPage({ params }: Props) {
-  const { locale } = await params
+  const locale = await getLocaleFromParams(params)
+  setRequestLocale(locale)
   const t = await getTranslations({ locale, namespace: 'cv' })
 
   const cvData = locale === 'pl' ? cvDataPl : cvDataEn

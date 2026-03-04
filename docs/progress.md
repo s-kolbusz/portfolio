@@ -2,25 +2,37 @@
 
 ## Current Phase
 
-- Phase: `Phase 1 - Baseline Quality Gates and Safety Rails`
+- Phase: `Phase 2 - i18n, Routing, and Metadata Architecture Fixes`
 - Status: `Completed`
-- Active Branch: `codex/refactor-phase-1-quality-gates`
+- Active Branch: `codex/refactoring`
 
-## Completed Items
+## Completed Items (Phase 2)
 
-- [x] Added `typecheck`, `test`, `test:watch`, `test:e2e`, and strict `lint:ci` scripts in `package.json`.
-- [x] Added unit/integration testing stack (`vitest`, `@testing-library/react`, `@testing-library/jest-dom`, `jsdom`) with `vitest.config.ts` and `vitest.setup.ts`.
-- [x] Added baseline test coverage with `src/lib/utils.test.ts` and `src/components/ui/SkillTag.test.tsx`.
-- [x] Added Playwright e2e scaffold (`playwright.config.ts`, `e2e/smoke.spec.ts`) and validated smoke test execution.
-- [x] Added CI workflow at `.github/workflows/ci.yml` for install, lint (warnings fail), typecheck, test, format check, and build.
-- [x] Enabled strict lint gate (`--max-warnings=0`) and removed active lint warning blocker in `src/app/[locale]/layout.tsx`.
-- [x] Ran Prettier and normalized formatting drift.
-- [x] Added temporary quality command documentation to `README.md`.
+- [x] Centralized locale validation/ownership with `src/i18n/locale.ts` and applied it in locale layout + localized pages.
+- [x] Updated `src/app/[locale]/layout.tsx` to validate locale, call `setRequestLocale(locale)`, and pass locale/messages through `NextIntlClientProvider`.
+- [x] Removed all `locale as Locale` casts in Phase 2 scope and tightened locale typing in route/component usage.
+- [x] Made static intent explicit for locale routes via `generateStaticParams`, `dynamicParams = false`, and `dynamic = 'force-static'`.
+- [x] Replaced direct `next/link` usage with locale-aware wrappers for internal links in localized flows; replaced external `next/link` usage with native anchors.
+- [x] Removed `next/head` from App Router root layout and kept JSON-LD in App Router-native script rendering.
+- [x] Added root `<html lang>` strategy: default server lang + client sync (`HtmlLangSync`) from active locale.
+- [x] Standardized site host/domain via `src/lib/site.ts` and reused it across root metadata + JSON-LD URLs.
+- [x] Fixed title composition by removing per-page branding suffixes where root metadata template already applies.
+- [x] Added metadata snapshot tests for home, CV, projects index, and project detail (`src/lib/page-metadata.test.ts`).
+
+## Verification Snapshot
+
+- `pnpm lint`: pass
+- `pnpm typecheck`: pass
+- `pnpm test`: pass (6 tests)
+- `pnpm format:check`: pass
+- `pnpm build`: pass
+- Build route output now shows locale routes as SSG (`●`) with generated static paths:
+  - `/[locale]` -> `/en`, `/pl`
+  - `/[locale]/cv` -> `/en/cv`, `/pl/cv`
+  - `/[locale]/projects` -> `/en/projects`, `/pl/projects`
+  - `/[locale]/projects/[slug]` -> prerendered localized project detail paths
 
 ## Errors Encountered (Log)
 
-- `2026-03-04`: Initial `pnpm lint` failed because dependencies were not installed (`eslint: command not found`).
-- `2026-03-04`: Resolved by running `pnpm install`; lint/typecheck/build were then executed successfully.
-- `2026-03-04`: `pnpm format:check` reports formatting drift in 9 files (tracked in findings and plan).
-- `2026-03-04`: First `pnpm test:e2e` run failed because Playwright browser binaries were missing.
-- `2026-03-04`: Resolved by running `pnpm exec playwright install chromium`; smoke test then passed.
+- `2026-03-04`: `pnpm format:check` initially failed on `src/lib/page-metadata.ts`.
+- `2026-03-04`: Resolved by formatting the file with Prettier and re-running checks.

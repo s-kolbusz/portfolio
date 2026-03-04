@@ -1,12 +1,13 @@
 import type { Metadata, Viewport } from 'next'
 import { Fraunces, JetBrains_Mono } from 'next/font/google'
 import localFont from 'next/font/local'
-import Head from 'next/head'
 
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 
 import { JsonLd } from '@/components/SEO/JsonLd'
+import { routing } from '@/i18n/routing'
+import { SITE_ORIGIN } from '@/lib/site'
 
 import './globals.css'
 
@@ -50,7 +51,7 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://www.kolbusz.xyz'),
+  metadataBase: new URL(SITE_ORIGIN),
   title: {
     default: 'Sebastian Kolbusz | Full-stack Developer',
     template: '%s | Sebastian Kolbusz',
@@ -79,7 +80,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://www.kolbusz.xyz/en',
+    url: `${SITE_ORIGIN}/en`,
     siteName: 'Sebastian Kolbusz Portfolio',
     title: 'Sebastian Kolbusz | Full-stack Developer',
     description:
@@ -116,13 +117,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html suppressHydrationWarning>
-      <Head>
-        <JsonLd />
-      </Head>
+    <html lang={routing.defaultLocale} suppressHydrationWarning>
       <body
         className={`${satoshi.variable} ${fraunces.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >
+        <JsonLd />
         {children}
 
         <SpeedInsights />
