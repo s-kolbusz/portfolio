@@ -26,10 +26,8 @@ export function BookPageDots({ total, current, onSelect }: BookPageDotsProps) {
           aria-controls={`book-panel-${i}`}
           onClick={() => onSelect(i)}
           className={cn(
-            'h-3 w-3 rounded-full p-0 transition-all duration-300 hover:bg-primary/20',
-            i === current
-              ? 'bg-primary scale-125'
-              : 'bg-muted-foreground/40 h-2 w-2'
+            'hover:bg-primary/20 h-3 w-3 rounded-full p-0 transition-all duration-300',
+            i === current ? 'bg-primary scale-125' : 'bg-muted-foreground/40 h-2 w-2'
           )}
         />
       ))}

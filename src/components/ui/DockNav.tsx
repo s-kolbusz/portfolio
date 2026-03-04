@@ -259,7 +259,7 @@ export function DockNav() {
         {/* Active Indicator (Pill below dock items) */}
         <div
           ref={mobileIndicatorRef}
-          className="absolute left-0 -bottom-1 h-1 w-8 -translate-x-1/2 rounded-full bg-emerald-500 opacity-0 shadow-lg shadow-emerald-500"
+          className="absolute -bottom-1 left-0 h-1 w-8 -translate-x-1/2 rounded-full bg-emerald-500 opacity-0 shadow-lg shadow-emerald-500"
         />
 
         {NAV_ITEMS.map((item, index) => (

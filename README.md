@@ -20,6 +20,24 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Quality Commands (Phase 1)
+
+- `pnpm lint` - Run ESLint checks.
+- `pnpm lint:ci` - Run ESLint with `--max-warnings=0` (same gate as CI).
+- `pnpm typecheck` - Run TypeScript type checking.
+- `pnpm test` - Run unit/integration tests with Vitest.
+- `pnpm test:watch` - Run Vitest in watch mode.
+- `pnpm test:e2e` - Run Playwright e2e tests.
+- `pnpm format` - Apply Prettier formatting.
+- `pnpm format:check` - Validate formatting.
+- `pnpm build` - Build the production app.
+
+Install Playwright browsers once before local e2e runs:
+
+```bash
+pnpm exec playwright install
+```
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
