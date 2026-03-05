@@ -14,7 +14,8 @@ These rules apply to all code in `src/` and are enforced in CI by:
 - Directory names must be `lowercase-kebab`.
 - Next.js special route segments are allowed: `[segment]`, `[[segment]]`, `(group)`, `@slot`.
 - React component files in `src/components/**` must use `PascalCase.tsx`.
-- Root-level shared hooks in `src/hooks` must use `useX.ts` or `useX.tsx`.
+- Hook modules in `src/hooks/**` that export `useX` hooks must use `useX.ts` or `useX.tsx`.
+- Utility modules in `src/components/**` that use `.ts` must use `kebab-case.ts`.
 - TypeScript module files in `src/data`, `src/i18n`, and `src/lib` must use `kebab-case.ts`.
 
 ## Directory Boundaries

@@ -7,8 +7,8 @@ import { useSafeAnimation } from '@/lib/constants/animations'
 import { useGSAP } from '@/lib/gsap'
 
 import { createReveal, REVEAL } from './reveal-engine'
-import { useTimelineStore } from './store'
 import type { RevealFn, RevealOptions, TimelineConfig, TimelineSetup } from './types'
+import { useTimelineStore } from './useTimelineStore'
 
 export function useTimeline<T extends HTMLElement>(
   ref: RefObject<T | null>,

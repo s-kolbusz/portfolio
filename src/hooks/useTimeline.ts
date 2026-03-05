@@ -1,8 +1,8 @@
 'use client'
 
-export { useStandaloneReveal, useTimeline } from './timeline/hooks'
+export { useStandaloneReveal, useTimeline } from './timeline/useTimeline'
 export { REVEAL } from './timeline/reveal-engine'
-export { useTimelineStore } from './timeline/store'
+export { useTimelineStore } from './timeline/useTimelineStore'
 export type {
   AnimationTarget,
   RevealFn,
