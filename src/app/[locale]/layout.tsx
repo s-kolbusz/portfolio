@@ -24,13 +24,13 @@ export default async function LocaleLayout({ children, params }: Props) {
   const locale = await getLocaleFromParams(params)
 
   setRequestLocale(locale)
-  const messages = await getMessages()
+  const messages = await getMessages({ locale })
 
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
       <NextIntlClientProvider locale={locale} messages={messages}>
         <HtmlLangSync />
-        <SkipToMain />
+        <SkipToMain locale={locale} />
         <div id="page-content-start" tabIndex={-1} className="outline-none" />
         <ClientOverlays />
         {children}

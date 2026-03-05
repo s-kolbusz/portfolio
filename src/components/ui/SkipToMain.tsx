@@ -1,7 +1,13 @@
 import { getTranslations } from 'next-intl/server'
 
-export async function SkipToMain() {
-  const t = await getTranslations('actions')
+import type { Locale } from '@/i18n/routing'
+
+type SkipToMainProps = {
+  locale: Locale
+}
+
+export async function SkipToMain({ locale }: SkipToMainProps) {
+  const t = await getTranslations({ locale, namespace: 'actions' })
   return (
     <a
       href="#page-content-start"

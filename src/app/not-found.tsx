@@ -59,7 +59,7 @@ export default function NotFound() {
           disableTransitionOnChange
         >
           <NextIntlClientProvider locale={routing.defaultLocale} messages={enMessages}>
-            <SkipToMain />
+            <SkipToMain locale="en" />
             <div id="page-content-start" tabIndex={-1} className="outline-none" />
             <ClientOverlays />
             <main
