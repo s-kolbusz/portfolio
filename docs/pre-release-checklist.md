@@ -5,6 +5,8 @@ Use this checklist before creating a release tag or deploying to production.
 ## 1. Required Automated Gates
 
 - [ ] `pnpm lint:ci`
+- [ ] `pnpm check:conventions`
+- [ ] `pnpm check:architecture`
 - [ ] `pnpm typecheck`
 - [ ] `pnpm test:coverage`
 - [ ] `pnpm test:e2e --workers=1`

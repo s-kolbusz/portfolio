@@ -25,7 +25,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          node-version: 24.14.0
           cache: pnpm
 
       - name: Install dependencies
@@ -33,6 +33,12 @@ jobs:
 
       - name: Lint (no warnings allowed)
         run: pnpm lint:ci
+
+      - name: Convention checks
+        run: pnpm check:conventions
+
+      - name: Architecture boundary checks
+        run: pnpm check:architecture
 
       - name: Typecheck
         run: pnpm typecheck
