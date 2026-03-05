@@ -19,6 +19,16 @@
 - Prioritization applied:
 - `High`: foundational architecture, naming, breaking route/content migrations, and final release hardening.
 - `Medium`: code-splitting optimization and UI/accessibility polish phases.
+- Baseline snapshot run for `WEB-50` captured evidence in `docs/refactor-round-2/artifacts/baseline-2026-03-05-web-50`:
+- `pnpm lint`: pass (exit `0`)
+- `pnpm typecheck`: fail (exit `2`)
+- `pnpm test`: pass (exit `0`)
+- `pnpm build`: fail (exit `1`)
+- Route map snapshot confirms current routes are still under `/[locale]/projects`, `/[locale]/projects/[slug]`, `/[locale]/cv`, and `/[locale]/design`.
+- File topology snapshot captured full `src` directory and file tree baseline.
+- Follow-up Linear issues opened from failures:
+- `WEB-82`: JsonLd import casing mismatch (`SEO` vs `seo`) breaking typecheck/build.
+- `WEB-83`: stale `.next/types/validator.ts` route module references in typecheck baseline.
 
 ## Technical Decisions
 
@@ -32,9 +42,10 @@
 
 ## Issues Encountered
 
-| Issue                                                                          | Resolution                                              |
-| ------------------------------------------------------------------------------ | ------------------------------------------------------- |
-| Linear project list query failed due complexity when milestones were requested | Retried with a lighter query and no milestone expansion |
+| Issue                                                                          | Resolution                                                                 |
+| ------------------------------------------------------------------------------ | -------------------------------------------------------------------------- |
+| Linear project list query failed due complexity when milestones were requested | Retried with a lighter query and no milestone expansion                    |
+| Shell backtick expansion corrupted first route-map/summary rendering command   | Regenerated artifacts with `printf`/plain paths and verified file contents |
 
 ## Resources
 
@@ -47,7 +58,13 @@
 - Linear epic: `https://linear.app/sebastian-kolbusz/issue/WEB-1/epic-0-program-bootstrap-and-baseline-lock`
 - Linear Epics 1-9: `WEB-10`..`WEB-18`
 - Linear Story range: `WEB-19`..`WEB-49`
-- Linear Task range: `WEB-50`..`WEB-81`
+- Linear Task range: `WEB-50`..`WEB-83`
+- Baseline summary: `docs/refactor-round-2/artifacts/baseline-2026-03-05-web-50/summary.md`
+- Baseline route map: `docs/refactor-round-2/artifacts/baseline-2026-03-05-web-50/route-map.md`
+- Baseline file topology: `docs/refactor-round-2/artifacts/baseline-2026-03-05-web-50/file-topology.txt`
+- Follow-up issues:
+- `https://linear.app/sebastian-kolbusz/issue/WEB-82/follow-up-fix-jsonld-import-casing-mismatch-breaking-typecheckbuild`
+- `https://linear.app/sebastian-kolbusz/issue/WEB-83/follow-up-resolve-stale-next-route-validator-module-references-in`
 
 ## Visual/Browser Findings
 

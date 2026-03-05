@@ -1,0 +1,8 @@
+$ pnpm lint
+START=2026-03-05T15:19:30Z
+
+> portfolio@0.1.0 lint /Users/sklbsz/Projects/portfolio/website
+> eslint .
+
+END=2026-03-05T15:19:34Z
+__EXIT_CODE__=0
