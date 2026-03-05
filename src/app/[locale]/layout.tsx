@@ -31,6 +31,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       <NextIntlClientProvider locale={locale} messages={messages}>
         <HtmlLangSync />
         <SkipToMain />
+        <div id="page-content-start" tabIndex={-1} className="outline-none" />
         <ClientOverlays />
         {children}
       </NextIntlClientProvider>

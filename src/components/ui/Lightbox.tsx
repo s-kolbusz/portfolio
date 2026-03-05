@@ -48,6 +48,15 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
     setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))
   }, [images.length])
 
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose()
+      if (event.key === 'ArrowLeft') showPrev()
+      if (event.key === 'ArrowRight') showNext()
+    },
+    [onClose, showPrev, showNext]
+  )
+
   useEffect(() => {
     previousFocus.current = document.activeElement as HTMLElement
     lenis?.stop()
@@ -115,17 +124,12 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
   // Focus Trap
   useFocusTrap(overlayRef, true)
 
-  // Keyboard navigation
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-      if (e.key === 'ArrowLeft') showPrev()
-      if (e.key === 'ArrowRight') showNext()
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
     }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [onClose, showPrev, showNext])
+  }, [handleKeyDown])
 
   if (!mounted) return null
 

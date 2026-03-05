@@ -14,6 +14,7 @@ type DockItemProps = {
   icon: Icon
   label: string
   isActive?: boolean
+  ariaCurrent?: 'location' | 'page'
   onClick?: () => void
   scale?: number
   onHover?: (isHovering: boolean) => void
@@ -24,6 +25,7 @@ export function DockItem({
   icon: Icon,
   label,
   isActive,
+  ariaCurrent,
   onClick,
   scale = 1,
   onHover,
@@ -56,6 +58,7 @@ export function DockItem({
       ref={itemRef}
       variant="glass"
       size="icon"
+      type="button"
       onClick={onClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -64,6 +67,7 @@ export function DockItem({
         className
       )}
       aria-label={label}
+      aria-current={ariaCurrent}
     >
       {/* Background hover effect */}
       <div className="absolute inset-0 rounded-md bg-emerald-500/0 transition-colors duration-300 group-hover:bg-emerald-500/10" />

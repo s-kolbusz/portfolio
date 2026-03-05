@@ -54,7 +54,7 @@ export default async function ProjectDetailPage({ params }: Props) {
   const nextProject = currentIdx < allProjects.length - 1 ? allProjects[currentIdx + 1] : undefined
 
   return (
-    <>
+    <main id="main-content">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -79,6 +79,6 @@ export default async function ProjectDetailPage({ params }: Props) {
       ) : (
         <ProjectCaseStudy project={project} prevProject={prevProject} nextProject={nextProject} />
       )}
-    </>
+    </main>
   )
 }

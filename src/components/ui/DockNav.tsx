@@ -117,6 +117,9 @@ export function DockNav() {
               icon={item.icon}
               isActive={activeItemIndex === index}
               label={t(item.id)}
+              ariaCurrent={
+                activeItemIndex === index ? (item.isPage ? 'page' : 'location') : undefined
+              }
               onClick={() => handleNavClick(item)}
               onHover={(isHovering) => setHoveredIndex(isHovering ? index : null)}
               scale={getHoverScale(index, hoveredIndex)}
@@ -143,6 +146,9 @@ export function DockNav() {
               icon={item.icon}
               isActive={activeItemIndex === index}
               label={t(item.id)}
+              ariaCurrent={
+                activeItemIndex === index ? (item.isPage ? 'page' : 'location') : undefined
+              }
               onClick={() => handleNavClick(item)}
             />
           </div>

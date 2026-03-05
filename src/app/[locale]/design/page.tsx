@@ -33,7 +33,7 @@ export default function DesignPage() {
   const emeralds = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900]
 
   return (
-    <main className="container mx-auto flex flex-col gap-20 px-6 py-24 lg:px-24">
+    <main id="main-content" className="container mx-auto flex flex-col gap-20 px-6 py-24 lg:px-24">
       <header className="flex flex-col gap-4">
         <h1 className="font-serif text-6xl font-light tracking-tight md:text-8xl">Design System</h1>
         <p className="text-muted-foreground font-mono text-sm tracking-widest uppercase">

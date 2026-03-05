@@ -45,7 +45,7 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
   })
 
   return (
-    <main ref={containerRef} className="min-h-screen px-6 pt-20 pb-12 sm:px-8">
+    <section ref={containerRef} className="min-h-screen px-6 pt-20 pb-12 sm:px-8">
       {/* Fixed back button */}
       <div className="fixed top-6 left-6 z-50">
         <Button
@@ -144,6 +144,6 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
           </article>
         ))}
       </div>
-    </main>
+    </section>
   )
 }

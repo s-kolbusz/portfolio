@@ -15,14 +15,17 @@ describe('dock-nav logic', () => {
   it('detects home routes', () => {
     expect(isHomeRoute('/')).toBe(true)
     expect(isHomeRoute('/en')).toBe(true)
+    expect(isHomeRoute('/en/')).toBe(true)
     expect(isHomeRoute('/pl')).toBe(true)
     expect(isHomeRoute('/cv')).toBe(false)
   })
 
   it('detects cv and projects pages', () => {
     expect(isCvRoute('/en/cv')).toBe(true)
+    expect(isCvRoute('/en/cv/')).toBe(true)
     expect(isCvRoute('/projects')).toBe(false)
     expect(isProjectsRoute('/en/projects')).toBe(true)
+    expect(isProjectsRoute('/en/projects/')).toBe(true)
     expect(isProjectsRoute('/')).toBe(false)
   })
 

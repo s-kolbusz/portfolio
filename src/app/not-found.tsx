@@ -5,6 +5,7 @@ import localFont from 'next/font/local'
 
 import { ThemeProvider } from '@/components/theme-provider'
 import { ClientOverlays } from '@/components/ui/ClientOverlays'
+import { SkipToMain } from '@/components/ui/SkipToMain'
 import enMessages from '@/i18n/messages/en.json'
 import { Link } from '@/i18n/navigation'
 import { routing } from '@/i18n/routing'
@@ -58,8 +59,13 @@ export default function NotFound() {
           disableTransitionOnChange
         >
           <NextIntlClientProvider locale={routing.defaultLocale} messages={enMessages}>
+            <SkipToMain />
+            <div id="page-content-start" tabIndex={-1} className="outline-none" />
             <ClientOverlays />
-            <div className="bg-background text-foreground flex min-h-screen flex-col items-center justify-center px-4 text-center font-sans">
+            <main
+              id="main-content"
+              className="bg-background text-foreground flex min-h-screen flex-col items-center justify-center px-4 text-center font-sans"
+            >
               <h1 className="mb-4 font-serif text-6xl">{enMessages.notFound.title}</h1>
               <h2 className="mb-8 font-mono text-2xl">{enMessages.notFound.subtitle}</h2>
               <p className="text-muted-foreground mb-8 max-w-md">
@@ -71,7 +77,7 @@ export default function NotFound() {
               >
                 {enMessages.notFound.returnHome}
               </Link>
-            </div>
+            </main>
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>

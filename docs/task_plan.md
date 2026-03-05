@@ -62,12 +62,12 @@
 
 **Required Skills:** `react-best-practices`, `react-ui`, `test-driven-development`
 
-- [ ] Rework global scrollbar/cursor suppression to be opt-in and scoped to specific experiences.
-- [ ] Audit keyboard/focus paths for overlays and nav components (`Lightbox`, `DockNav`, `ProjectBook`).
-- [ ] Ensure skip-link targets always exist on rendered pages, including not-found variants.
-- [ ] Normalize internal/external link semantics (locale-aware internal links, native anchors for external links).
-- [ ] Add accessibility checks (Playwright + axe or equivalent) for core routes.
-- [ ] Add reduced-motion behavior assertions for animation-heavy components.
+- [x] Rework global scrollbar/cursor suppression to be opt-in and scoped to specific experiences.
+- [x] Audit keyboard/focus paths for overlays and nav components (`Lightbox`, `DockNav`, `ProjectBook`).
+- [x] Ensure skip-link targets always exist on rendered pages, including not-found variants.
+- [x] Normalize internal/external link semantics (locale-aware internal links, native anchors for external links).
+- [x] Add accessibility checks (Playwright + axe or equivalent) for core routes.
+- [x] Add reduced-motion behavior assertions for animation-heavy components.
 
 ---
 

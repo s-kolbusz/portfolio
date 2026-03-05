@@ -1,6 +1,12 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  KeyboardEvent as ReactKeyboardEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 
 import { useTranslations } from 'next-intl'
 
@@ -59,28 +65,25 @@ export function ProjectBook({ projects }: ProjectBookProps) {
       if (!container || index < 0 || index >= totalPanels) return
 
       container.scrollTo({
-        left: index * window.innerWidth,
+        left: index * container.clientWidth,
         behavior: 'smooth',
       })
     },
     [totalPanels]
   )
 
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') {
-        e.preventDefault()
+  const handleBookKeyDown = useCallback(
+    (event: ReactKeyboardEvent<HTMLDivElement>) => {
+      if (event.key === 'ArrowRight') {
+        event.preventDefault()
         scrollToPanel(currentIndex + 1)
-      } else if (e.key === 'ArrowLeft') {
-        e.preventDefault()
+      } else if (event.key === 'ArrowLeft') {
+        event.preventDefault()
         scrollToPanel(currentIndex - 1)
       }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [currentIndex, scrollToPanel])
+    },
+    [currentIndex, scrollToPanel]
+  )
 
   // Back logic: ToC → homepage #projects, spread → scroll to ToC
   const handleBack = () => {
@@ -96,7 +99,9 @@ export function ProjectBook({ projects }: ProjectBookProps) {
       role="region"
       aria-roledescription="carousel"
       aria-label="Project Book"
-      className="book-paper relative"
+      tabIndex={0}
+      className="book-paper focus-visible:ring-ring focus-visible:ring-offset-background relative focus-visible:ring-2 focus-visible:ring-offset-4"
+      onKeyDown={handleBookKeyDown}
     >
       {/* Back button */}
       <div className="fixed top-6 left-6 z-50">
@@ -114,16 +119,29 @@ export function ProjectBook({ projects }: ProjectBookProps) {
       <div
         ref={scrollRef}
         data-lenis-prevent
-        className="flex h-dvh snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain"
+        className="hide-scrollbar flex h-dvh snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain"
       >
         {/* ToC panel */}
-        <div data-book-panel id="book-panel-0">
+        <div
+          data-book-panel
+          id="book-panel-0"
+          role="tabpanel"
+          aria-labelledby="book-tab-0"
+          tabIndex={currentIndex === 0 ? 0 : -1}
+        >
           <BookTableOfContents entries={projects} onNavigate={scrollToPanel} />
         </div>
 
         {/* Project spreads */}
         {projects.map((project, i) => (
-          <div key={project.id} data-book-panel id={`book-panel-${i + 1}`}>
+          <div
+            key={project.id}
+            data-book-panel
+            id={`book-panel-${i + 1}`}
+            role="tabpanel"
+            aria-labelledby={`book-tab-${i + 1}`}
+            tabIndex={currentIndex === i + 1 ? 0 : -1}
+          >
             <BookSpread entry={project} index={i} />
           </div>
         ))}
