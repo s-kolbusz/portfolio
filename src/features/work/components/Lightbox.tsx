@@ -8,9 +8,9 @@ import Image from 'next/image'
 import { ArrowLeftIcon, ArrowRightIcon, XIcon } from '@phosphor-icons/react'
 
 import { MediaItem } from '@/features/work/data/projects'
-import { useFocusTrap } from '@/hooks/useFocusTrap'
 import { gsap, useGSAP } from '@/lib/gsap'
-import { useScrollStore } from '@/lib/store'
+import { useFocusTrap } from '@/shared/hooks/useFocusTrap'
+import { useScrollStore } from '@/shared/lib/scroll-store'
 import { Button } from '@/shared/ui/Button'
 
 interface LightboxProps {

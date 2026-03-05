@@ -5,8 +5,8 @@ import React, { useRef } from 'react'
 import { useTranslations } from 'next-intl'
 
 import type { CVData } from '@/features/resume/data/cv'
-import { useTimeline } from '@/hooks/timeline/useTimeline'
-import { ANIMATION } from '@/lib/constants/animations'
+import { ANIMATION } from '@/shared/config/animations'
+import { useTimeline } from '@/shared/hooks/timeline/useTimeline'
 import { SkillTag } from '@/shared/ui/SkillTag'
 
 import { CVHeader } from './CVHeader'

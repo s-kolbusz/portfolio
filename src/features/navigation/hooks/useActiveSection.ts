@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 
 import { usePathname } from '@/i18n/navigation'
-import { isHomeRoute } from '@/lib/route-predicates'
+import { isHomeRoute } from '@/i18n/routing'
 
 export function useActiveSection(sectionIds: string[]) {
   const pathname = usePathname()

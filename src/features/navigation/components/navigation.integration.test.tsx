@@ -22,6 +22,7 @@ const navLabels = {
 } as const
 
 vi.mock('next-intl', () => ({
+  hasLocale: (locales: readonly string[], locale: string) => locales.includes(locale),
   useLocale: () => mockLocale,
   useTranslations: () => (key: string) => navLabels[key as keyof typeof navLabels] ?? key,
 }))
@@ -50,7 +51,7 @@ vi.mock('@/i18n/navigation', () => ({
   }),
 }))
 
-vi.mock('@/hooks/useActiveSection', () => ({
+vi.mock('@/features/navigation/hooks/useActiveSection', () => ({
   useActiveSection: () => mockActiveSection,
 }))
 

@@ -1,14 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
+import { isCvRoute, isHomeRoute, isProjectsRoute } from '@/i18n/routing'
+
 import {
   NAV_ITEMS,
   getActiveItemIndex,
   getDesktopIndicatorOffset,
   getHoverScale,
   getMobileIndicatorOffset,
-  isCvRoute,
-  isHomeRoute,
-  isProjectsRoute,
 } from './dock-nav-logic'
 
 describe('dock-nav logic', () => {

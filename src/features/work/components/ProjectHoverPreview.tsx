@@ -5,8 +5,8 @@ import { createPortal } from 'react-dom'
 
 import Image from 'next/image'
 
-import { useMedia } from '@/hooks/useMedia'
 import { gsap, useGSAP } from '@/lib/gsap'
+import { useMedia } from '@/shared/hooks/useMedia'
 
 interface ProjectHoverPreviewProps {
   image: string | null

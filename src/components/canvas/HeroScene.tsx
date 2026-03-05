@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 
-import { usePrefersReducedMotion } from '@/hooks/useMedia'
+import { usePrefersReducedMotion } from '@/shared/hooks/useMedia'
 
 import { ViscousPuddle } from './ViscousPuddle'
 

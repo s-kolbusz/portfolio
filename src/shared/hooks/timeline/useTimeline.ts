@@ -2,13 +2,13 @@
 
 import type { RefObject } from 'react'
 
-import { usePrefersReducedMotion } from '@/hooks/useMedia'
-import { useSafeAnimation } from '@/lib/constants/animations'
 import { useGSAP } from '@/lib/gsap'
+import { usePrefersReducedMotion } from '@/shared/hooks/useMedia'
+import { useSafeAnimation } from '@/shared/hooks/useSafeAnimation'
+import { useTimelineStore } from '@/shared/lib/timeline-store'
 
 import { createReveal, REVEAL } from './reveal-engine'
 import type { RevealFn, RevealOptions, TimelineConfig, TimelineSetup } from './types'
-import { useTimelineStore } from './useTimelineStore'
 
 export function useTimeline<T extends HTMLElement>(
   ref: RefObject<T | null>,

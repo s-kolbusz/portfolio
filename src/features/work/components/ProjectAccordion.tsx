@@ -8,8 +8,8 @@ import Image from 'next/image'
 import { ArrowUpRightIcon } from '@phosphor-icons/react'
 
 import { PortfolioEntry } from '@/features/work/data/projects-en'
-import { ANIMATION } from '@/lib/constants/animations'
 import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap'
+import { ANIMATION } from '@/shared/config/animations'
 import { Button } from '@/shared/ui/Button'
 
 interface ProjectAccordionProps {

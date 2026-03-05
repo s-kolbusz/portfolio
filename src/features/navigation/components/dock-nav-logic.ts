@@ -9,9 +9,7 @@ import {
   UserIcon,
 } from '@phosphor-icons/react'
 
-import { isCvRoute, isHomeRoute, isProjectsRoute } from '@/lib/route-predicates'
-
-export { isCvRoute, isHomeRoute, isProjectsRoute }
+import { isCvRoute, isHomeRoute } from '@/i18n/routing'
 
 export interface NavItem {
   href: string

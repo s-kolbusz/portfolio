@@ -4,9 +4,9 @@ import { useEffect } from 'react'
 
 import Lenis from 'lenis'
 
-import { usePrefersReducedMotion } from '@/hooks/useMedia'
 import { gsap, ScrollTrigger } from '@/lib/gsap'
-import { useScrollStore } from '@/lib/store'
+import { usePrefersReducedMotion } from '@/shared/hooks/useMedia'
+import { useScrollStore } from '@/shared/lib/scroll-store'
 
 export function SmoothScroller() {
   const setLenis = useScrollStore((state) => state.setLenis)
