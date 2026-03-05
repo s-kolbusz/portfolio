@@ -21,21 +21,29 @@ These rules apply to all code in `src/` and are enforced in CI by:
 ## Directory Boundaries
 
 - `src/app`: routing, layouts, and page entrypoints.
-- `src/components`: UI components and feature presentation.
-- `src/hooks`: reusable hooks.
-- `src/data`: static content and domain data helpers.
+- `src/features`: feature-owned modules (for example `work`, `resume`, `navigation`), each with local `components`, `data`, `hooks`, and `lib`.
+- `src/shared`: cross-feature modules (`ui`, `hooks`, `lib`, `config`) that are safe to reuse across routes/features.
+- `src/components`, `src/hooks`, `src/data`, `src/lib`: legacy layers kept temporarily for incremental migration.
 - `src/i18n`: locale routing and messages.
-- `src/lib`: shared framework-agnostic helpers.
 
 ## Import Boundaries
 
 The following import boundaries are hard rules:
 
 - `components` cannot import from `app`.
+- `features` cannot import from `app`.
+- `shared` cannot import from `app`, `components`, or `features`.
 - `hooks` cannot import from `app` or `components`.
 - `data` cannot import from `app`, `components`, or `hooks`.
 - `i18n` cannot import from `app`, `components`, or `hooks`.
 - `lib` cannot import from `app`.
+- Feature modules cannot import directly from another feature module (`features/<a>` cannot import `features/<b>`).
+
+## Incremental Migration Rule
+
+- During migration, feature/shared code may temporarily consume legacy `src/hooks`, `src/lib`, and `src/data` modules where equivalents are not yet moved.
+- New shared primitives should be authored in `src/shared/ui` instead of `src/components/ui`.
+- Migration steps are tracked in `docs/architecture/feature-first-migration.md`.
 
 ## Code-Splitting Policy
 

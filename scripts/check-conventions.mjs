@@ -59,6 +59,42 @@ function hasExportedHook(filePath) {
   return EXPORTED_HOOK_PATTERN.test(content)
 }
 
+function isComponentModule(relativePath) {
+  return (
+    relativePath.startsWith('components/') ||
+    /^features\/[^/]+\/components\//.test(relativePath) ||
+    relativePath.startsWith('shared/ui/')
+  )
+}
+
+function isHookModule(relativePath) {
+  return (
+    relativePath.startsWith('hooks/') ||
+    relativePath.startsWith('shared/hooks/') ||
+    /^features\/[^/]+\/hooks\//.test(relativePath)
+  )
+}
+
+function isComponentUtilityModule(relativePath) {
+  return (
+    relativePath.startsWith('components/') ||
+    /^features\/[^/]+\/components\//.test(relativePath) ||
+    relativePath.startsWith('shared/ui/')
+  )
+}
+
+function isDataOrLibModule(relativePath) {
+  return (
+    relativePath.startsWith('data/') ||
+    relativePath.startsWith('i18n/') ||
+    relativePath.startsWith('lib/') ||
+    relativePath.startsWith('shared/lib/') ||
+    relativePath.startsWith('shared/config/') ||
+    /^features\/[^/]+\/data\//.test(relativePath) ||
+    /^features\/[^/]+\/lib\//.test(relativePath)
+  )
+}
+
 function walkDirectory(currentPath) {
   const entries = readdirSync(currentPath, { withFileTypes: true })
 
@@ -87,47 +123,35 @@ function walkDirectory(currentPath) {
 
     const baseName = path.basename(entry.name, extension)
 
-    if (
-      relativePath.startsWith('components/') &&
-      extension === '.tsx' &&
-      !isTestFileBaseName(baseName) &&
-      !PASCAL_CASE_PATTERN.test(baseName)
-    ) {
-      errors.push(`Component files must use PascalCase in src/components: src/${relativePath}`)
-    }
-
-    const isHookModule = relativePath.startsWith('hooks/')
-    if (
-      isHookModule &&
-      !isTestFileBaseName(baseName) &&
-      hasExportedHook(absolutePath) &&
-      !HOOK_FILE_PATTERN.test(baseName)
-    ) {
-      errors.push(
-        `Hook modules exporting useX hooks must use useX file naming in src/hooks: src/${relativePath}`
-      )
-    }
-
-    if (extension === '.ts' && relativePath.startsWith('components/')) {
-      const normalizedName = stripKnownTestSuffix(baseName)
-      if (!KEBAB_CASE_PATTERN.test(normalizedName)) {
-        errors.push(
-          `Component utility TypeScript modules must use kebab-case file names: src/${relativePath}`
-        )
+    if (isComponentModule(relativePath) && extension === '.tsx' && !isTestFileBaseName(baseName)) {
+      if (!PASCAL_CASE_PATTERN.test(baseName)) {
+        errors.push(`React component files must use PascalCase: src/${relativePath}`)
       }
     }
 
     if (
-      extension === '.ts' &&
-      (relativePath.startsWith('data/') ||
-        relativePath.startsWith('i18n/') ||
-        relativePath.startsWith('lib/'))
+      isHookModule(relativePath) &&
+      !isTestFileBaseName(baseName) &&
+      hasExportedHook(absolutePath)
     ) {
+      if (!HOOK_FILE_PATTERN.test(baseName)) {
+        errors.push(
+          `Hook modules exporting useX hooks must use useX file naming: src/${relativePath}`
+        )
+      }
+    }
+
+    if (extension === '.ts' && isComponentUtilityModule(relativePath)) {
       const normalizedName = stripKnownTestSuffix(baseName)
       if (!KEBAB_CASE_PATTERN.test(normalizedName)) {
-        errors.push(
-          `Data/lib/i18n TypeScript modules must use kebab-case file names: src/${relativePath}`
-        )
+        errors.push(`Component utility TypeScript modules must use kebab-case: src/${relativePath}`)
+      }
+    }
+
+    if (extension === '.ts' && isDataOrLibModule(relativePath)) {
+      const normalizedName = stripKnownTestSuffix(baseName)
+      if (!KEBAB_CASE_PATTERN.test(normalizedName)) {
+        errors.push(`Data/lib/config TypeScript modules must use kebab-case: src/${relativePath}`)
       }
     }
   }
