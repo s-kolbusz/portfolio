@@ -9,6 +9,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "prepare": "git config core.hooksPath .githooks || true",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:ci": "eslint . --max-warnings=0",

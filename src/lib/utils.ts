@@ -8,9 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function getMetadataAlternates(path: string, currentLocale: Locale) {
-  const languages: Record<string, string> = {
-    'x-default': `/en${path === '/' ? '' : path}`,
-  }
+  const languages: Record<string, string> = {}
 
   routing.locales.forEach((locale) => {
     languages[locale] = `/${locale}${path === '/' ? '' : path}`
