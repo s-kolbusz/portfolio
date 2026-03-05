@@ -10,7 +10,7 @@ import { BaseSection } from '@/components/ui/BaseSection'
 import { Button } from '@/components/ui/Button'
 import { EditorialHeader } from '@/components/ui/EditorialHeader'
 import { services } from '@/data/services'
-import { useTimeline } from '@/hooks/useTimeline'
+import { useTimeline } from '@/hooks/timeline/useTimeline'
 import { ANIMATION } from '@/lib/constants/animations'
 import { cn } from '@/lib/utils'
 

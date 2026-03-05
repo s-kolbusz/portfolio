@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { PortfolioEntry } from '@/data/projects-en'
-import { useTimeline } from '@/hooks/useTimeline'
+import { useTimeline } from '@/hooks/timeline/useTimeline'
 import { ANIMATION } from '@/lib/constants/animations'
 
-import { getImageToRender } from './project-hover-preview/state'
+import { getImageToRender } from './project-hover-preview-state'
 import { ProjectHoverPreview } from './ProjectHoverPreview'
 import { ProjectItem } from './ProjectItem'
 

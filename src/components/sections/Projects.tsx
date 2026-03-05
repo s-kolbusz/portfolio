@@ -11,7 +11,7 @@ import { BaseSection } from '@/components/ui/BaseSection'
 import { Button } from '@/components/ui/Button'
 import { EditorialHeader } from '@/components/ui/EditorialHeader'
 import { getFeaturedProjects } from '@/data/get-projects'
-import { useTimeline } from '@/hooks/useTimeline'
+import { useTimeline } from '@/hooks/timeline/useTimeline'
 import type { Locale } from '@/i18n/routing'
 
 interface ProjectsProps {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { isItemOutsideViewport } from './scroll'
+import { isItemOutsideViewport } from './project-item-scroll'
 
 describe('project-item scroll visibility', () => {
   it('detects element below viewport', () => {

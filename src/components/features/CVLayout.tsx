@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl'
 
 import { SkillTag } from '@/components/ui/SkillTag'
 import type { CVData } from '@/data/cv'
-import { useTimeline } from '@/hooks/useTimeline'
+import { useTimeline } from '@/hooks/timeline/useTimeline'
 import { ANIMATION } from '@/lib/constants/animations'
 
 import { CVHeader } from './CVHeader'

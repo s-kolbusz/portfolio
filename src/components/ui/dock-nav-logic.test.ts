@@ -9,7 +9,7 @@ import {
   isCvRoute,
   isHomeRoute,
   isProjectsRoute,
-} from './logic'
+} from './dock-nav-logic'
 
 describe('dock-nav logic', () => {
   it('detects home routes', () => {

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { readdirSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import path from 'node:path'
 
 const PROJECT_ROOT = process.cwd()
@@ -8,7 +8,12 @@ const SRC_ROOT = path.join(PROJECT_ROOT, 'src')
 
 const KEBAB_CASE_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const PASCAL_CASE_PATTERN = /^[A-Z][A-Za-z0-9]*$/
-const ROOT_HOOK_PATTERN = /^use[A-Z][A-Za-z0-9]*$/
+const HOOK_FILE_PATTERN = /^use[A-Z][A-Za-z0-9]*$/
+const EXPORTED_HOOK_PATTERN = /\bexport\s+(?:async\s+)?(?:function|const)\s+use[A-Z][A-Za-z0-9]*/
+const NEXT_DYNAMIC_SEGMENT_PATTERN = /^\[[^/\]]+\]$/
+const NEXT_OPTIONAL_DYNAMIC_SEGMENT_PATTERN = /^\[\[[^/\]]+\]\]$/
+const NEXT_ROUTE_GROUP_PATTERN = /^\([^/]+\)$/
+const NEXT_SLOT_PATTERN = /^@[a-z0-9]+(?:-[a-z0-9]+)*$/
 
 const errors = []
 
@@ -16,14 +21,21 @@ function toPosixPath(filePath) {
   return filePath.split(path.sep).join('/')
 }
 
+function isLowercase(value) {
+  return value === value.toLowerCase()
+}
+
 function isAllowedDirectoryName(name) {
-  return (
-    KEBAB_CASE_PATTERN.test(name) ||
-    /^\[[^/\]]+\]$/.test(name) ||
-    /^\[\[[^/\]]+\]\]$/.test(name) ||
-    /^\([^/]+\)$/.test(name) ||
-    /^@[a-z0-9]+(?:-[a-z0-9]+)*$/.test(name)
-  )
+  if (KEBAB_CASE_PATTERN.test(name) || NEXT_SLOT_PATTERN.test(name)) {
+    return true
+  }
+
+  const isNextRouteSegment =
+    NEXT_DYNAMIC_SEGMENT_PATTERN.test(name) ||
+    NEXT_OPTIONAL_DYNAMIC_SEGMENT_PATTERN.test(name) ||
+    NEXT_ROUTE_GROUP_PATTERN.test(name)
+
+  return isNextRouteSegment && isLowercase(name)
 }
 
 function isTestFileBaseName(baseName) {
@@ -42,6 +54,11 @@ function stripKnownTestSuffix(baseName) {
   return baseName
 }
 
+function hasExportedHook(filePath) {
+  const content = readFileSync(filePath, 'utf8')
+  return EXPORTED_HOOK_PATTERN.test(content)
+}
+
 function walkDirectory(currentPath) {
   const entries = readdirSync(currentPath, { withFileTypes: true })
 
@@ -52,7 +69,7 @@ function walkDirectory(currentPath) {
     if (entry.isDirectory()) {
       if (!isAllowedDirectoryName(entry.name)) {
         errors.push(
-          `Directory names must be lowercase-kebab (or Next route segments): src/${relativePath}`
+          `Directory names must be lowercase-kebab (or lowercase Next route segments): src/${relativePath}`
         )
       }
       walkDirectory(absolutePath)
@@ -79,12 +96,25 @@ function walkDirectory(currentPath) {
       errors.push(`Component files must use PascalCase in src/components: src/${relativePath}`)
     }
 
+    const isHookModule = relativePath.startsWith('hooks/')
     if (
-      path.dirname(relativePath) === 'hooks' &&
+      isHookModule &&
       !isTestFileBaseName(baseName) &&
-      !ROOT_HOOK_PATTERN.test(baseName)
+      hasExportedHook(absolutePath) &&
+      !HOOK_FILE_PATTERN.test(baseName)
     ) {
-      errors.push(`Root shared hook files must use useX naming: src/${relativePath}`)
+      errors.push(
+        `Hook modules exporting useX hooks must use useX file naming in src/hooks: src/${relativePath}`
+      )
+    }
+
+    if (extension === '.ts' && relativePath.startsWith('components/')) {
+      const normalizedName = stripKnownTestSuffix(baseName)
+      if (!KEBAB_CASE_PATTERN.test(normalizedName)) {
+        errors.push(
+          `Component utility TypeScript modules must use kebab-case file names: src/${relativePath}`
+        )
+      }
     }
 
     if (
