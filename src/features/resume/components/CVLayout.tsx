@@ -4,10 +4,10 @@ import React, { useRef } from 'react'
 
 import { useTranslations } from 'next-intl'
 
-import { SkillTag } from '@/components/ui/SkillTag'
-import type { CVData } from '@/data/cv'
+import type { CVData } from '@/features/resume/data/cv'
 import { useTimeline } from '@/hooks/timeline/useTimeline'
 import { ANIMATION } from '@/lib/constants/animations'
+import { SkillTag } from '@/shared/ui/SkillTag'
 
 import { CVHeader } from './CVHeader'
 import { CVTimeline } from './CVTimeline'

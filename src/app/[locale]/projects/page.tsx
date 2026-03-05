@@ -1,9 +1,9 @@
 import { Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 
-import { ProjectBook } from '@/components/features/ProjectBook'
-import { ProjectCardStack } from '@/components/features/ProjectCardStack'
-import { getProjects } from '@/data/get-projects'
+import { ProjectBook } from '@/features/work/components/ProjectBook'
+import { ProjectCardStack } from '@/features/work/components/ProjectCardStack'
+import { getProjects } from '@/features/work/data/get-projects'
 import { getLocaleFromParams } from '@/i18n/locale'
 import { serializeJsonLd } from '@/lib/json-ld'
 import { buildProjectsPageMetadata } from '@/lib/page-metadata'

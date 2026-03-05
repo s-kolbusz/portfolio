@@ -14,11 +14,11 @@ import {
   WavesIcon,
 } from '@phosphor-icons/react'
 
-import { AnimatedNumber } from '@/components/ui/AnimatedNumber'
-import { Select } from '@/components/ui/Select'
-import { Slider } from '@/components/ui/Slider'
 import { BUILD_VOLUME_X, BUILD_VOLUME_Y, BUILD_VOLUME_Z, MATERIALS } from '@/data/materials'
 import { calculatePrintCost } from '@/lib/calculate-print'
+import { AnimatedNumber } from '@/shared/ui/AnimatedNumber'
+import { Select } from '@/shared/ui/Select'
+import { Slider } from '@/shared/ui/Slider'
 
 const MATERIAL_ICONS: Record<string, ReactNode> = {
   pla: <LeafIcon weight="duotone" className="size-4" />,

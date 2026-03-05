@@ -7,12 +7,12 @@ import Image from 'next/image'
 
 import { ArrowLeftIcon, ArrowUpRightIcon, StarIcon } from '@phosphor-icons/react'
 
-import { Button } from '@/components/ui/Button'
-import { PortfolioEntry } from '@/data/projects-en'
+import { PortfolioEntry } from '@/features/work/data/projects-en'
 import { useTimeline } from '@/hooks/timeline/useTimeline'
 import { Link } from '@/i18n/navigation'
 import { useRouter } from '@/i18n/navigation'
 import { ANIMATION } from '@/lib/constants/animations'
+import { Button } from '@/shared/ui/Button'
 
 import { ProjectMeta } from './ProjectMeta'
 

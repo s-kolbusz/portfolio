@@ -5,14 +5,25 @@ import path from 'node:path'
 
 const PROJECT_ROOT = process.cwd()
 const SRC_ROOT = path.join(PROJECT_ROOT, 'src')
-const KNOWN_LAYERS = new Set(['app', 'components', 'data', 'hooks', 'i18n', 'lib'])
+const KNOWN_LAYERS = new Set([
+  'app',
+  'components',
+  'data',
+  'features',
+  'hooks',
+  'i18n',
+  'lib',
+  'shared',
+])
 
 const DISALLOWED_IMPORTS = {
   components: new Set(['app']),
+  features: new Set(['app']),
   hooks: new Set(['app', 'components']),
   data: new Set(['app', 'components', 'hooks']),
   i18n: new Set(['app', 'components', 'hooks']),
   lib: new Set(['app']),
+  shared: new Set(['app', 'components', 'features']),
 }
 
 const IMPORT_EXPORT_PATTERN = /(?:import|export)\s+(?:[^'"]+?\s+from\s+)?['"]([^'"]+)['"]/g
@@ -61,26 +72,45 @@ function resolveLayerForFile(relativePath) {
   return layer
 }
 
-function resolveImportedLayer(specifier, importerAbsolutePath) {
+function resolveFeatureScope(relativePath) {
+  const [layer, featureName] = relativePath.split('/')
+  if (layer !== 'features' || !featureName) {
+    return null
+  }
+  return featureName
+}
+
+function resolveImportTarget(specifier, importerAbsolutePath) {
+  let importedRelativePath = null
+
   if (specifier.startsWith('@/')) {
-    const [layer] = specifier.slice(2).split('/')
-    if (KNOWN_LAYERS.has(layer)) {
-      return layer
+    importedRelativePath = specifier.slice(2)
+  } else {
+    if (!specifier.startsWith('./') && !specifier.startsWith('../')) {
+      return null
     }
+
+    const importedAbsolutePath = path.resolve(path.dirname(importerAbsolutePath), specifier)
+    if (!importedAbsolutePath.startsWith(SRC_ROOT)) {
+      return null
+    }
+
+    importedRelativePath = toPosixPath(path.relative(SRC_ROOT, importedAbsolutePath))
+  }
+
+  if (!importedRelativePath) {
     return null
   }
 
-  if (!specifier.startsWith('./') && !specifier.startsWith('../')) {
+  const importedLayer = resolveLayerForFile(importedRelativePath)
+  if (!importedLayer) {
     return null
   }
 
-  const importedAbsolutePath = path.resolve(path.dirname(importerAbsolutePath), specifier)
-  if (!importedAbsolutePath.startsWith(SRC_ROOT)) {
-    return null
+  return {
+    layer: importedLayer,
+    featureScope: resolveFeatureScope(importedRelativePath),
   }
-
-  const importedRelativePath = toPosixPath(path.relative(SRC_ROOT, importedAbsolutePath))
-  return resolveLayerForFile(importedRelativePath)
 }
 
 function checkArchitectureForFile(filePath) {
@@ -91,6 +121,7 @@ function checkArchitectureForFile(filePath) {
 
   const relativePath = toPosixPath(path.relative(SRC_ROOT, filePath))
   const currentLayer = resolveLayerForFile(relativePath)
+  const currentFeatureScope = resolveFeatureScope(relativePath)
   if (!currentLayer) {
     return
   }
@@ -104,18 +135,28 @@ function checkArchitectureForFile(filePath) {
   }
 
   for (const specifier of importedSpecifiers) {
-    const importedLayer = resolveImportedLayer(specifier, filePath)
-    if (!importedLayer) {
+    const importTarget = resolveImportTarget(specifier, filePath)
+    if (!importTarget) {
       continue
     }
 
-    if (!blockedLayers.has(importedLayer)) {
-      continue
+    if (blockedLayers.has(importTarget.layer)) {
+      errors.push(
+        `Import boundary violation in src/${relativePath}: "${specifier}" is not allowed for "${currentLayer}" layer`
+      )
     }
 
-    errors.push(
-      `Import boundary violation in src/${relativePath}: "${specifier}" is not allowed for "${currentLayer}" layer`
-    )
+    if (
+      currentLayer === 'features' &&
+      currentFeatureScope &&
+      importTarget.layer === 'features' &&
+      importTarget.featureScope &&
+      importTarget.featureScope !== currentFeatureScope
+    ) {
+      errors.push(
+        `Cross-feature import violation in src/${relativePath}: "${specifier}" reaches features/${importTarget.featureScope}; use shared contracts instead`
+      )
+    }
   }
 }
 

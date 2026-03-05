@@ -5,8 +5,8 @@ import { useTheme } from 'next-themes'
 
 import { MoonIcon, SunIcon } from '@phosphor-icons/react'
 
-import { Button } from '@/components/ui/Button'
 import { usePathname, useRouter } from '@/i18n/navigation'
+import { Button } from '@/shared/ui/Button'
 
 export function SettingsDock() {
   const { setTheme, resolvedTheme } = useTheme()

@@ -6,9 +6,9 @@ import { useTranslations } from 'next-intl'
 
 import { ArrowDownIcon } from '@phosphor-icons/react'
 
-import { Button } from '@/components/ui/Button'
 import { useHeroAnimation } from '@/hooks/useHeroAnimation'
 import { usePrefersReducedMotion } from '@/hooks/useMedia'
+import { Button } from '@/shared/ui/Button'
 
 const HeroScene = lazy(() => import('@/components/canvas/HeroScene'))
 

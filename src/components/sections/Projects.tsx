@@ -6,13 +6,13 @@ import { useTranslations } from 'next-intl'
 
 import { ArrowRightIcon } from '@phosphor-icons/react'
 
-import { ProjectList } from '@/components/features/ProjectList'
-import { BaseSection } from '@/components/ui/BaseSection'
-import { Button } from '@/components/ui/Button'
-import { EditorialHeader } from '@/components/ui/EditorialHeader'
-import { getFeaturedProjects } from '@/data/get-projects'
+import { ProjectList } from '@/features/work/components/ProjectList'
+import { getFeaturedProjects } from '@/features/work/data/get-projects'
 import { useTimeline } from '@/hooks/timeline/useTimeline'
 import type { Locale } from '@/i18n/routing'
+import { BaseSection } from '@/shared/ui/BaseSection'
+import { Button } from '@/shared/ui/Button'
+import { EditorialHeader } from '@/shared/ui/EditorialHeader'
 
 interface ProjectsProps {
   locale: Locale

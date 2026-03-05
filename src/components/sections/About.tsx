@@ -7,11 +7,11 @@ import Image from 'next/image'
 
 import { ArrowRightIcon } from '@phosphor-icons/react'
 
-import { BaseSection } from '@/components/ui/BaseSection'
-import { SkillTag } from '@/components/ui/SkillTag'
 import { skillCategories } from '@/data/skills'
 import { useTimeline } from '@/hooks/timeline/useTimeline'
 import { ANIMATION } from '@/lib/constants/animations'
+import { BaseSection } from '@/shared/ui/BaseSection'
+import { SkillTag } from '@/shared/ui/SkillTag'
 
 export const About: React.FC = () => {
   const t = useTranslations('about')

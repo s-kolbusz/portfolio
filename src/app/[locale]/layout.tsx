@@ -2,11 +2,11 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getMessages, setRequestLocale } from 'next-intl/server'
 
 import { ThemeProvider } from '@/components/ThemeProvider'
-import { ClientOverlays } from '@/components/ui/ClientOverlays'
-import { HtmlLangSync } from '@/components/ui/HtmlLangSync'
-import { SkipToMain } from '@/components/ui/SkipToMain'
+import { ClientOverlays } from '@/features/navigation/overlays/ClientOverlays'
 import { getLocaleFromParams } from '@/i18n/locale'
 import { routing } from '@/i18n/routing'
+import { HtmlLangSync } from '@/shared/ui/HtmlLangSync'
+import { SkipToMain } from '@/shared/ui/SkipToMain'
 
 type Props = {
   children: React.ReactNode

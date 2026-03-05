@@ -1,7 +1,7 @@
 'use client'
 
-import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
+import { Button } from '@/shared/ui/Button'
 
 interface BookPageDotsProps {
   total: number
