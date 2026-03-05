@@ -1,12 +1,13 @@
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 
 import { ProjectBook } from '@/features/work/components/ProjectBook'
 import { ProjectCardStack } from '@/features/work/components/ProjectCardStack'
 import { getProjects } from '@/features/work/data/get-projects'
 import { getLocaleFromParams } from '@/i18n/locale'
+import { getLocalizedWorkDetailHref, getPageHref } from '@/i18n/route-map'
 import { serializeJsonLd } from '@/lib/json-ld'
-import { buildProjectsPageMetadata } from '@/lib/page-metadata'
+import { buildLocalizedPageMetadata } from '@/lib/page-metadata'
 import { toAbsoluteSiteUrl } from '@/lib/site'
 
 type Props = {
@@ -17,14 +18,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = await getLocaleFromParams(params)
   const t = await getTranslations({ locale, namespace: 'projectsBook' })
 
-  return buildProjectsPageMetadata({
+  return buildLocalizedPageMetadata({
     locale,
     title: t('title'),
     description: t('subtitle'),
+    path: getPageHref('work'),
   })
 }
 
-export default async function ProjectsPage({ params }: Props) {
+export default async function WorkPage({ params }: Props) {
   const locale = await getLocaleFromParams(params)
 
   setRequestLocale(locale)
@@ -32,12 +34,10 @@ export default async function ProjectsPage({ params }: Props) {
 
   return (
     <main id="main-content">
-      {/* Desktop: horizontal book */}
       <div className="hidden lg:block">
         <ProjectBook projects={projects} />
       </div>
 
-      {/* Mobile: vertical card stack */}
       <div className="lg:hidden">
         <ProjectCardStack projects={projects} />
       </div>
@@ -51,7 +51,7 @@ export default async function ProjectsPage({ params }: Props) {
             itemListElement: projects.map((project, index) => ({
               '@type': 'ListItem',
               position: index + 1,
-              url: toAbsoluteSiteUrl(`/${locale}/projects/${project.id}`),
+              url: toAbsoluteSiteUrl(getLocalizedWorkDetailHref(locale, project.id)),
               name: project.title,
             })),
           }),

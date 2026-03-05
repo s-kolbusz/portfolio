@@ -1,4 +1,4 @@
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 
@@ -6,9 +6,10 @@ import { ProjectCaseStudy } from '@/features/work/components/ProjectCaseStudy'
 import { RoleCaseStudy } from '@/features/work/components/RoleCaseStudy'
 import { getProject, getProjects } from '@/features/work/data/get-projects'
 import { requireRoutingLocale } from '@/i18n/locale'
+import { getLocalizedWorkDetailHref } from '@/i18n/route-map'
 import { routing } from '@/i18n/routing'
 import { serializeJsonLd } from '@/lib/json-ld'
-import { buildProjectDetailPageMetadata } from '@/lib/page-metadata'
+import { buildWorkDetailPageMetadata } from '@/lib/page-metadata'
 import { toAbsoluteSiteUrl } from '@/lib/site'
 
 type Props = {
@@ -19,7 +20,7 @@ export const dynamicParams = false
 export const dynamic = 'force-static'
 
 export function generateStaticParams() {
-  const slugs = getProjects('en').map((p) => p.id)
+  const slugs = getProjects('en').map((project) => project.id)
   return routing.locales.flatMap((locale) => slugs.map((slug) => ({ locale, slug })))
 }
 
@@ -31,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const t = await getTranslations({ locale, namespace: 'projectsBook' })
 
-  return buildProjectDetailPageMetadata({
+  return buildWorkDetailPageMetadata({
     locale,
     slug,
     project,
@@ -39,7 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   })
 }
 
-export default async function ProjectDetailPage({ params }: Props) {
+export default async function WorkDetailPage({ params }: Props) {
   const { locale: localeParam, slug } = await params
   const locale = requireRoutingLocale(localeParam)
 
@@ -49,7 +50,7 @@ export default async function ProjectDetailPage({ params }: Props) {
   if (!project) notFound()
 
   const allProjects = getProjects(locale)
-  const currentIdx = allProjects.findIndex((p) => p.id === slug)
+  const currentIdx = allProjects.findIndex((entry) => entry.id === slug)
   const prevProject = currentIdx > 0 ? allProjects[currentIdx - 1] : undefined
   const nextProject = currentIdx < allProjects.length - 1 ? allProjects[currentIdx + 1] : undefined
 
@@ -66,7 +67,7 @@ export default async function ProjectDetailPage({ params }: Props) {
             image: project.heroImage,
             dateCreated: project.year,
             category: project.category,
-            url: toAbsoluteSiteUrl(`/${locale}/projects/${project.id}`),
+            url: toAbsoluteSiteUrl(getLocalizedWorkDetailHref(locale, project.id)),
             author: {
               '@type': 'Person',
               name: 'Sebastian Kolbusz',

@@ -7,7 +7,8 @@ import Image from 'next/image'
 
 import { ArrowUpRightIcon } from '@phosphor-icons/react'
 
-import { PortfolioEntry } from '@/features/work/data/projects-en'
+import type { PortfolioEntry } from '@/features/work/data/projects-en'
+import { getWorkDetailHref } from '@/i18n/route-map'
 import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap'
 import { ANIMATION } from '@/shared/config/animations'
 import { Button } from '@/shared/ui/Button'
@@ -151,7 +152,7 @@ export function ProjectAccordion({ project, isOpen, onAnimationComplete }: Proje
               )}
             </div>
           </div>
-          <Button variant="secondary" size="lg" href={`/projects/${project.id}`}>
+          <Button variant="secondary" size="lg" href={getWorkDetailHref(project.id)}>
             {t('explore')}
           </Button>
         </div>

@@ -12,7 +12,11 @@ import { useTimeline } from '@/shared/hooks/timeline/useTimeline'
 import { BaseSection } from '@/shared/ui/BaseSection'
 import { EditorialHeader } from '@/shared/ui/EditorialHeader'
 
-export function Contact() {
+interface ContactProps {
+  headingLevel?: 'h1' | 'h2'
+}
+
+export function Contact({ headingLevel = 'h2' }: ContactProps) {
   const t = useTranslations('contact')
   const tf = useTranslations('footer')
   const sectionRef = useRef<HTMLElement>(null)
@@ -38,7 +42,12 @@ export function Contact() {
       containerClassName="h-full justify-between gap-24"
     >
       {/* Header */}
-      <EditorialHeader ref={headerRef} title={t('title')} subtitle={t('tagline')} />
+      <EditorialHeader
+        ref={headerRef}
+        title={t('title')}
+        subtitle={t('tagline')}
+        titleAs={headingLevel}
+      />
 
       {/* Big Links */}
       <div ref={linksRef} className="flex flex-col">
@@ -64,7 +73,6 @@ export function Contact() {
         <div className="border-border border-t" />
       </div>
 
-      {/* Footer */}
       <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
         <div className="flex flex-col gap-2">
           <span className="text-muted-foreground font-mono text-xs tracking-widest uppercase">

@@ -8,6 +8,7 @@ import { ArrowRightIcon } from '@phosphor-icons/react'
 
 import { ProjectList } from '@/features/work/components/ProjectList'
 import { getFeaturedProjects } from '@/features/work/data/get-projects'
+import { getPageHref } from '@/i18n/route-map'
 import type { Locale } from '@/i18n/routing'
 import { useTimeline } from '@/shared/hooks/timeline/useTimeline'
 import { BaseSection } from '@/shared/ui/BaseSection'
@@ -51,7 +52,7 @@ export function Projects({ locale }: ProjectsProps) {
       {/* Footer Link */}
       <div ref={footerRef} className="flex justify-center md:justify-end">
         <Button
-          href="/projects"
+          href={getPageHref('work')}
           variant="ghost"
           className="group font-mono text-sm tracking-widest uppercase hover:bg-transparent"
           rightIcon={

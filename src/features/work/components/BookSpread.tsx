@@ -7,8 +7,9 @@ import Image from 'next/image'
 
 import { ArrowRightIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
 
-import { PortfolioEntry } from '@/features/work/data/projects-en'
+import type { PortfolioEntry } from '@/features/work/data/projects-en'
 import { Link } from '@/i18n/navigation'
+import { getWorkDetailHref } from '@/i18n/route-map'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { ANIMATION } from '@/shared/config/animations'
 
@@ -199,7 +200,7 @@ export function BookSpread({ entry, index }: BookSpreadProps) {
         {/* Links */}
         <div className="flex items-center justify-between gap-4 pt-2">
           <Link
-            href={`/projects/${entry.id}`}
+            href={getWorkDetailHref(entry.id)}
             data-spread-link
             className="group text-primary hover:text-primary/80 inline-flex items-center gap-2 text-sm font-medium opacity-0 transition-colors"
           >

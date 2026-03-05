@@ -7,9 +7,9 @@ import Image from 'next/image'
 
 import { ArrowLeftIcon, ArrowUpRightIcon, StarIcon } from '@phosphor-icons/react'
 
-import { PortfolioEntry } from '@/features/work/data/projects-en'
+import type { PortfolioEntry } from '@/features/work/data/projects-en'
 import { Link } from '@/i18n/navigation'
-import { useRouter } from '@/i18n/navigation'
+import { getHomeSectionHref, getWorkDetailHref } from '@/i18n/route-map'
 import { ANIMATION } from '@/shared/config/animations'
 import { useTimeline } from '@/shared/hooks/timeline/useTimeline'
 import { Button } from '@/shared/ui/Button'
@@ -22,7 +22,6 @@ interface ProjectCardStackProps {
 
 export function ProjectCardStack({ projects }: ProjectCardStackProps) {
   const t = useTranslations('projectsBook')
-  const router = useRouter()
   const containerRef = useRef<HTMLDivElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
@@ -49,9 +48,9 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
       {/* Fixed back button */}
       <div className="fixed top-6 left-6 z-50">
         <Button
+          href={getHomeSectionHref('projects')}
           variant="outline-glass"
           size="md"
-          onClick={() => router.push('/#projects')}
           leftIcon={<ArrowLeftIcon weight="bold" className="size-4" />}
         >
           {t('backLabel')}
@@ -75,7 +74,10 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
         {projects.map((entry) => (
           <article key={entry.id} data-stack-item className="group py-6 opacity-0 first:pt-0">
             {/* Title row */}
-            <Link href={`/projects/${entry.id}`} className="flex items-start justify-between gap-3">
+            <Link
+              href={getWorkDetailHref(entry.id)}
+              className="flex items-start justify-between gap-3"
+            >
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <h2 className="font-serif text-2xl font-light sm:text-3xl">{entry.title}</h2>
@@ -120,7 +122,7 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
             {/* Actions — matching accordion style */}
             <div className="mt-3 flex items-center justify-between gap-5">
               <Link
-                href={`/projects/${entry.id}`}
+                href={getWorkDetailHref(entry.id)}
                 className="group/link text-foreground hover:text-primary flex items-center gap-1 font-mono text-xs font-bold tracking-widest uppercase transition-colors"
               >
                 {t('exploreLabel')}

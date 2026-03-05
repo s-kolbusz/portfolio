@@ -19,13 +19,12 @@ async function getJsonLdPayloadByType(page: Page, type: string) {
 }
 
 async function openRoute(page: Page, path: string) {
-  await page.request.get(path, { timeout: 120_000 })
-  await page.goto(path, { timeout: 60_000, waitUntil: 'domcontentloaded' })
+  await page.goto(path, { timeout: 60_000, waitUntil: 'load' })
 }
 
-test('projects index page exposes canonical metadata and ItemList JSON-LD', async ({ page }) => {
+test('work index page exposes canonical metadata and ItemList JSON-LD', async ({ page }) => {
   test.setTimeout(180_000)
-  await openRoute(page, '/en/projects')
+  await openRoute(page, '/en/work')
 
   await expect(page).toHaveTitle('Portfolio | Sebastian Kolbusz')
   await expect(page.locator('meta[name="description"]')).toHaveAttribute(
@@ -34,7 +33,7 @@ test('projects index page exposes canonical metadata and ItemList JSON-LD', asyn
   )
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://www.kolbusz.xyz/en/projects'
+    'https://www.kolbusz.xyz/en/work'
   )
 
   const itemListPayload = await getJsonLdPayloadByType(page, 'ItemList')
@@ -49,7 +48,7 @@ test('projects index page exposes canonical metadata and ItemList JSON-LD', asyn
         '@type': 'ListItem',
         position: 1,
         name: 'Zakofy',
-        url: 'https://www.kolbusz.xyz/en/projects/zakofy',
+        url: 'https://www.kolbusz.xyz/en/work/zakofy',
       }),
     ])
   )
@@ -59,7 +58,7 @@ test('project detail page exposes canonical metadata and CreativeWork JSON-LD', 
   page,
 }) => {
   test.setTimeout(180_000)
-  await openRoute(page, '/en/projects/zakofy')
+  await openRoute(page, '/en/work/zakofy')
 
   await expect(page).toHaveTitle('Zakofy | Sebastian Kolbusz')
   await expect(page.locator('meta[name="description"]')).toHaveAttribute(
@@ -68,7 +67,7 @@ test('project detail page exposes canonical metadata and CreativeWork JSON-LD', 
   )
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://www.kolbusz.xyz/en/projects/zakofy'
+    'https://www.kolbusz.xyz/en/work/zakofy'
   )
 
   const creativeWorkPayload = await getJsonLdPayloadByType(page, 'CreativeWork')
@@ -77,6 +76,6 @@ test('project detail page exposes canonical metadata and CreativeWork JSON-LD', 
     '@context': 'https://schema.org',
     '@type': 'CreativeWork',
     headline: 'Zakofy',
-    url: 'https://www.kolbusz.xyz/en/projects/zakofy',
+    url: 'https://www.kolbusz.xyz/en/work/zakofy',
   })
 })

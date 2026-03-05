@@ -13,9 +13,7 @@ const SmoothScroller = dynamic(
 )
 const DockNav = dynamic(
   () => import('@/features/navigation/components/DockNav').then((mod) => mod.DockNav),
-  {
-    ssr: false,
-  }
+  { ssr: false }
 )
 const SettingsDock = dynamic(
   () => import('@/features/navigation/components/SettingsDock').then((mod) => mod.SettingsDock),
@@ -23,22 +21,24 @@ const SettingsDock = dynamic(
 )
 
 export function ClientOverlays() {
-  const [mounted, setMounted] = useState(false)
+  const [enhancementsReady, setEnhancementsReady] = useState(false)
 
   useEffect(() => {
-    // Delay loading overlays to free up main thread during initial render
-    const timer = setTimeout(() => setMounted(true), 500)
+    // Delay non-essential visual enhancements to keep the main thread free.
+    const timer = setTimeout(() => setEnhancementsReady(true), 500)
     return () => clearTimeout(timer)
   }, [])
 
-  if (!mounted) return null
-
   return (
     <>
-      <CustomCursor />
-      <SmoothScroller />
       <SettingsDock />
       <DockNav />
+      {enhancementsReady ? (
+        <>
+          <CustomCursor />
+          <SmoothScroller />
+        </>
+      ) : null}
     </>
   )
 }

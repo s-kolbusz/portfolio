@@ -13,12 +13,17 @@ import { useTimeline } from '@/shared/hooks/timeline/useTimeline'
 import { BaseSection } from '@/shared/ui/BaseSection'
 import { SkillTag } from '@/shared/ui/SkillTag'
 
-export const About: React.FC = () => {
+interface AboutProps {
+  headingLevel?: 'h1' | 'h2'
+}
+
+export const About: React.FC<AboutProps> = ({ headingLevel = 'h2' }) => {
   const t = useTranslations('about')
   const containerRef = useRef<HTMLElement>(null)
   const imageContainerRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const statsRef = useRef<HTMLDivElement>(null)
+  const HeadingTag = headingLevel
 
   useTimeline(containerRef, { id: 'about' }, (reveal) => {
     reveal(contentRef, { stagger: ANIMATION.stagger.slow })
@@ -43,9 +48,9 @@ export const About: React.FC = () => {
         className="flex flex-col gap-8 lg:sticky lg:top-32 lg:col-span-7 lg:h-fit"
       >
         {/* Main Title - Soft Serif */}
-        <h2 className="font-serif text-5xl leading-[1.1] font-normal md:text-6xl lg:text-7xl">
+        <HeadingTag className="font-serif text-5xl leading-[1.1] font-normal md:text-6xl lg:text-7xl">
           {t('title')}
-        </h2>
+        </HeadingTag>
 
         {/* Lead Paragraph - Larger Serif */}
         <p className="text-muted-foreground font-serif text-2xl leading-relaxed italic">
@@ -97,11 +102,17 @@ export const About: React.FC = () => {
               {t('experience.years')} {t('experience.label')}
             </span>
           </div>
+          <p className="text-muted-foreground font-sans text-sm leading-relaxed">
+            {t('experience.details')}
+          </p>
 
           <div className="stat-line border-border flex items-center justify-between border-b py-3">
             <span className="text-muted-foreground">{t('location_label')}</span>
             <span className="text-foreground font-bold">{t('location.city')}</span>
           </div>
+          <p className="text-muted-foreground font-sans text-sm leading-relaxed">
+            {t('location.details')}
+          </p>
 
           <div className="stat-line flex flex-col gap-4 py-3">
             <span className="text-muted-foreground flex items-center gap-2">
