@@ -27,6 +27,21 @@ export default function CustomCursor() {
   const mouse = useRef({ x: 0, y: 0 })
   const hasMoved = useRef(false)
 
+  useEffect(() => {
+    const root = document.documentElement
+
+    if (!isEnabled) {
+      root.classList.remove('custom-cursor-active')
+      return
+    }
+
+    root.classList.add('custom-cursor-active')
+
+    return () => {
+      root.classList.remove('custom-cursor-active')
+    }
+  }, [isEnabled])
+
   const updateTargetRect = () => {
     if (magneticTargetRef.current && magneticTargetRef.current.isConnected) {
       targetRectRef.current = magneticTargetRef.current.getBoundingClientRect()
@@ -201,7 +216,10 @@ export default function CustomCursor() {
   if (!isEnabled) return null
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-9998 overflow-hidden mix-blend-difference print:hidden">
+    <div
+      data-testid="custom-cursor"
+      className="pointer-events-none fixed inset-0 z-9998 overflow-hidden mix-blend-difference print:hidden"
+    >
       {/* Dot */}
       <div
         ref={cursorRef}

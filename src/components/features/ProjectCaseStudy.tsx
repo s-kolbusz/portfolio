@@ -260,12 +260,13 @@ export function ProjectCaseStudy({ project, prevProject, nextProject }: ProjectC
       <ProjectNav prevProject={prevProject} nextProject={nextProject} />
 
       {/* Lightbox */}
-      <Lightbox
-        images={project.gallery}
-        initialIndex={lightboxIndex}
-        isOpen={lightboxOpen}
-        onClose={() => setLightboxOpen(false)}
-      />
+      {lightboxOpen && (
+        <Lightbox
+          images={project.gallery}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxOpen(false)}
+        />
+      )}
     </article>
   )
 }

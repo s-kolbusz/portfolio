@@ -1,31 +1,34 @@
 import { Metadata } from 'next'
-import { getTranslations } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 
 import { ProjectBook } from '@/components/features/ProjectBook'
 import { ProjectCardStack } from '@/components/features/ProjectCardStack'
 import { getProjects } from '@/data/get-projects'
-import { Locale } from '@/i18n/routing'
+import { getLocaleFromParams } from '@/i18n/locale'
+import { serializeJsonLd } from '@/lib/json-ld'
+import { buildProjectsPageMetadata } from '@/lib/page-metadata'
+import { toAbsoluteSiteUrl } from '@/lib/site'
 
 type Props = {
   params: Promise<{ locale: string }>
 }
 
-import { getMetadataAlternates } from '@/lib/utils'
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale } = await params
+  const locale = await getLocaleFromParams(params)
   const t = await getTranslations({ locale, namespace: 'projectsBook' })
 
-  return {
-    title: `${t('title')} | Sebastian Kolbusz`,
+  return buildProjectsPageMetadata({
+    locale,
+    title: t('title'),
     description: t('subtitle'),
-    alternates: getMetadataAlternates('/projects', locale),
-  }
+  })
 }
 
 export default async function ProjectsPage({ params }: Props) {
-  const { locale } = await params
-  const projects = getProjects(locale as Locale)
+  const locale = await getLocaleFromParams(params)
+
+  setRequestLocale(locale)
+  const projects = getProjects(locale)
 
   return (
     <main id="main-content">
@@ -42,13 +45,13 @@ export default async function ProjectsPage({ params }: Props) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+          __html: serializeJsonLd({
             '@context': 'https://schema.org',
             '@type': 'ItemList',
             itemListElement: projects.map((project, index) => ({
               '@type': 'ListItem',
               position: index + 1,
-              url: `https://kolbusz.xyz/${locale}/projects/${project.id}`,
+              url: toAbsoluteSiteUrl(`/${locale}/projects/${project.id}`),
               name: project.title,
             })),
           }),

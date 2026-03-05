@@ -24,7 +24,7 @@ export const contactLinks: ContactLink[] = [
   {
     id: 'github',
     labelKey: 'github',
-    url: 'https://github.com/skolbusz',
+    url: 'https://github.com/s-kolbusz',
     icon: GithubLogoIcon,
   },
   {

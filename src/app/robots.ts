@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
+      disallow: ['/not-found', '/404', '/500'],
     },
-    sitemap: 'https://kolbusz.xyz/sitemap.xml',
   }
 }

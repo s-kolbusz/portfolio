@@ -2,6 +2,8 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import dynamic from 'next/dynamic'
 
 import { Hero } from '@/components/sections/Hero'
+import { getLocaleFromParams } from '@/i18n/locale'
+import { buildHomePageMetadata } from '@/lib/page-metadata'
 
 const About = dynamic(() => import('@/components/sections/About').then((mod) => mod.About))
 const Projects = dynamic(() => import('@/components/sections/Projects').then((mod) => mod.Projects))
@@ -11,25 +13,19 @@ const PrintCalculator = dynamic(() =>
 )
 const Contact = dynamic(() => import('@/components/sections/Contact').then((mod) => mod.Contact))
 
-import { getMetadataAlternates } from '@/lib/utils'
-
 export async function generateMetadata(props: { params: Promise<{ locale: string }> }) {
-  const params = await props.params
-  const { locale } = params
+  const locale = await getLocaleFromParams(props.params)
   const t = await getTranslations({ locale, namespace: 'Metadata' })
 
-  return {
-    title: {
-      absolute: t('title'),
-    },
+  return buildHomePageMetadata({
+    locale,
+    title: t('title'),
     description: t('description'),
-    alternates: getMetadataAlternates('/', locale),
-  }
+  })
 }
 
 export default async function Home(props: { params: Promise<{ locale: string }> }) {
-  const params = await props.params
-  const { locale } = params
+  const locale = await getLocaleFromParams(props.params)
   setRequestLocale(locale)
 
   return (

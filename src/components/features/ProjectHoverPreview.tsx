@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 
 import Image from 'next/image'
@@ -9,29 +9,17 @@ import { useMedia } from '@/hooks/useMedia'
 import { gsap, useGSAP } from '@/lib/gsap'
 
 interface ProjectHoverPreviewProps {
-  activeImage: string | null
+  image: string | null
+  isActive: boolean
   isVisible: boolean
 }
 
-export function ProjectHoverPreview({ activeImage, isVisible }: ProjectHoverPreviewProps) {
+export function ProjectHoverPreview({ image, isActive, isVisible }: ProjectHoverPreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
 
   // Check for fine pointer (mouse)
   const isEnabled = useMedia('(pointer: fine)')
-
-  // Track images using state and the "adjust state during render" pattern
-  const [lastImage, setLastImage] = useState<string | null>(null)
-  const [prevActiveImage, setPrevActiveImage] = useState<string | null>(null)
-
-  if (activeImage !== prevActiveImage) {
-    setPrevActiveImage(activeImage)
-    if (activeImage) {
-      setLastImage(activeImage)
-    }
-  }
-
-  const imageToRender = activeImage || lastImage
-  const isListening = isEnabled && isVisible && !!activeImage
+  const isListening = isEnabled && isVisible && isActive
 
   // 1. Mouse Follow Logic - Using standard useEffect for strict listener control
   useEffect(() => {
@@ -68,7 +56,7 @@ export function ProjectHoverPreview({ activeImage, isVisible }: ProjectHoverPrev
       const container = containerRef.current
       if (!isEnabled || !container) return
 
-      const shouldShow = !!activeImage && isVisible
+      const shouldShow = isActive && isVisible
 
       if (shouldShow) {
         gsap.to(container, {
@@ -97,7 +85,7 @@ export function ProjectHoverPreview({ activeImage, isVisible }: ProjectHoverPrev
         })
       }
     },
-    { dependencies: [activeImage, isVisible, isEnabled], scope: containerRef }
+    { dependencies: [isActive, isVisible, isEnabled], scope: containerRef }
   )
 
   if (!isEnabled) return null
@@ -107,9 +95,9 @@ export function ProjectHoverPreview({ activeImage, isVisible }: ProjectHoverPrev
       ref={containerRef}
       className="pointer-events-none invisible fixed top-0 left-0 z-9999 h-48 w-72 overflow-hidden rounded-lg opacity-0 shadow-2xl shadow-zinc-950/20 md:h-64 md:w-96 dark:shadow-black/40"
     >
-      {imageToRender && (
+      {image && (
         <Image
-          src={imageToRender}
+          src={image}
           alt="Project preview"
           fill
           className="object-cover"

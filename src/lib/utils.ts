@@ -1,13 +1,13 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
-import { routing } from '@/i18n/routing'
+import { routing, type Locale } from '@/i18n/routing'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function getMetadataAlternates(path: string, currentLocale: string) {
+export function getMetadataAlternates(path: string, currentLocale: Locale) {
   const languages: Record<string, string> = {
     'x-default': `/en${path === '/' ? '' : path}`,
   }
@@ -17,7 +17,7 @@ export function getMetadataAlternates(path: string, currentLocale: string) {
   })
 
   return {
-    canonical: languages[currentLocale] || languages['en'],
+    canonical: languages[currentLocale],
     languages,
   }
 }

@@ -5,10 +5,10 @@ import { useRef } from 'react'
 import { CaretDownIcon } from '@phosphor-icons/react'
 
 import { PortfolioEntry } from '@/data/projects-en'
-import { ANIMATION } from '@/lib/constants/animations'
 import { useScrollStore } from '@/lib/store'
 import { cn } from '@/lib/utils'
 
+import { isItemOutsideViewport } from './project-item/scroll'
 import { ProjectAccordion } from './ProjectAccordion'
 import { ProjectMeta } from './ProjectMeta'
 
@@ -21,44 +21,42 @@ interface ProjectItemProps {
 
 export function ProjectItem({ project, isOpen, onToggle, onHover }: ProjectItemProps) {
   const itemRef = useRef<HTMLDivElement>(null)
+  const shouldScrollAfterOpenRef = useRef(false)
   const lenis = useScrollStore((state) => state.lenis)
+
+  const scrollToItemIfNeeded = () => {
+    if (!itemRef.current) return
+
+    const bounds = itemRef.current.getBoundingClientRect()
+    const isOffScreen = isItemOutsideViewport(bounds, window.innerHeight, 100)
+
+    if (!isOffScreen) return
+
+    if (lenis) {
+      lenis.scrollTo(itemRef.current, {
+        offset: -120,
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      })
+      return
+    }
+
+    itemRef.current.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  const handleAccordionAnimationComplete = () => {
+    if (!shouldScrollAfterOpenRef.current) return
+
+    shouldScrollAfterOpenRef.current = false
+    scrollToItemIfNeeded()
+  }
 
   const handleClick = () => {
     const isOpening = !isOpen
+    shouldScrollAfterOpenRef.current = isOpening
+
     onToggle()
-
-    if (isOpening) {
-      onHover(null) // Clear preview when opening accordion
-
-      // Wait for the accordion animation (opening & closing of others) to finish
-      // before scrolling. This prevents scrolling "too far" because the layout
-      // shifts significantly during the transition.
-      // Animation duration is 0.6s, so we wait just slightly longer.
-      setTimeout(
-        () => {
-          if (itemRef.current) {
-            const rect = itemRef.current.getBoundingClientRect()
-            const isOffScreen = rect.bottom > window.innerHeight || rect.top < 100
-
-            if (isOffScreen) {
-              if (lenis) {
-                lenis.scrollTo(itemRef.current, {
-                  offset: -120,
-                  duration: 1.2,
-                  easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-                })
-              } else {
-                // Fallback
-                itemRef.current.scrollIntoView({ behavior: 'smooth' })
-              }
-            }
-          }
-        },
-        ANIMATION.duration.fast * 1000 + 50
-      )
-    } else {
-      onHover(null)
-    }
+    onHover(null)
   }
 
   // Use heroImage instead of image
@@ -101,7 +99,11 @@ export function ProjectItem({ project, isOpen, onToggle, onHover }: ProjectItemP
         </div>
       </button>
 
-      <ProjectAccordion project={project} isOpen={isOpen} />
+      <ProjectAccordion
+        project={project}
+        isOpen={isOpen}
+        onAnimationComplete={handleAccordionAnimationComplete}
+      />
     </div>
   )
 }

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 
 import { usePathname } from '@/i18n/navigation'
+import { isHomeRoute } from '@/lib/route-predicates'
 
 export function useActiveSection(sectionIds: string[]) {
   const pathname = usePathname()
@@ -11,7 +12,7 @@ export function useActiveSection(sectionIds: string[]) {
 
   useEffect(() => {
     // Only run on the homepage
-    const isHome = pathname === '/' || pathname === '/en' || pathname === '/pl'
+    const isHome = isHomeRoute(pathname)
     if (!isHome) return
 
     // Set initial hash if present
@@ -78,6 +79,6 @@ export function useActiveSection(sectionIds: string[]) {
   }, [pathname, sectionIds])
 
   // Clear active section if not on home
-  const isHome = pathname === '/' || pathname === '/en' || pathname === '/pl'
+  const isHome = isHomeRoute(pathname)
   return isHome ? activeSection : ''
 }

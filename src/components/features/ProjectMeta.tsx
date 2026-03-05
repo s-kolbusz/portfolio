@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 
 interface ProjectMetaProps {
   year: string | number
-  techStack: string[]
+  techStack: readonly string[]
   className?: string
   limit?: number
 }

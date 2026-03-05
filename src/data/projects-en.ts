@@ -1,4 +1,4 @@
-import type { PortfolioEntryBase } from './projects'
+import type { PortfolioEntryBase, PortfolioEntryId } from './projects'
 
 // ---------------------------------------------------------------------------
 // Locale-specific case study content — keyed by PortfolioEntryBase.id
@@ -27,9 +27,11 @@ export interface PortfolioEntryContent {
 }
 
 // Ensure the content type is used alongside base (compile-time safety)
-export type PortfolioEntry = PortfolioEntryBase & PortfolioEntryContent
+export type PortfolioEntry = Omit<PortfolioEntryBase, 'id'> & {
+  id: PortfolioEntryId
+} & PortfolioEntryContent
 
-export const projectsEn: Record<string, PortfolioEntryContent> = {
+export const projectsEn = {
   zakofy: {
     title: 'Zakofy',
     subtitle: 'Premium Tatra Mountain Booking Engine',
@@ -134,5 +136,4 @@ export const projectsEn: Record<string, PortfolioEntryContent> = {
       },
     ],
   },
-}
-
+} satisfies Record<PortfolioEntryId, PortfolioEntryContent>

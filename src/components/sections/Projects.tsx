@@ -12,10 +12,10 @@ import { Button } from '@/components/ui/Button'
 import { EditorialHeader } from '@/components/ui/EditorialHeader'
 import { getFeaturedProjects } from '@/data/get-projects'
 import { useTimeline } from '@/hooks/useTimeline'
-import { Locale } from '@/i18n/routing'
+import type { Locale } from '@/i18n/routing'
 
 interface ProjectsProps {
-  locale: string
+  locale: Locale
 }
 
 export function Projects({ locale }: ProjectsProps) {
@@ -25,7 +25,7 @@ export function Projects({ locale }: ProjectsProps) {
   const contentRef = useRef<HTMLDivElement>(null)
   const footerRef = useRef<HTMLDivElement>(null)
 
-  const projects = getFeaturedProjects(locale as Locale)
+  const projects = getFeaturedProjects(locale)
 
   useTimeline(sectionRef, { id: 'projects' }, (reveal) => {
     reveal(headerRef)

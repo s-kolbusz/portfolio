@@ -22,9 +22,7 @@ export const BaseSection = forwardRef<HTMLElement, BaseSectionProps>(
           className
         )}
       >
-        <div className={cn('container mx-auto flex flex-col', containerClassName)}>
-          {children}
-        </div>
+        <div className={cn('container mx-auto flex flex-col', containerClassName)}>{children}</div>
       </section>
     )
   }

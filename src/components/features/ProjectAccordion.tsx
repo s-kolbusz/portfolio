@@ -4,7 +4,6 @@ import { useRef } from 'react'
 
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
-import Link from 'next/link'
 
 import { ArrowUpRightIcon } from '@phosphor-icons/react'
 
@@ -16,9 +15,10 @@ import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap'
 interface ProjectAccordionProps {
   project: PortfolioEntry
   isOpen: boolean
+  onAnimationComplete?: () => void
 }
 
-export function ProjectAccordion({ project, isOpen }: ProjectAccordionProps) {
+export function ProjectAccordion({ project, isOpen, onAnimationComplete }: ProjectAccordionProps) {
   const t = useTranslations('projects')
   const containerRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
@@ -61,6 +61,7 @@ export function ProjectAccordion({ project, isOpen }: ProjectAccordionProps) {
           containerRef.current.style.pointerEvents = 'auto'
         }
         ScrollTrigger.refresh()
+        onAnimationComplete?.()
       })
     } else {
       // Disable pointer events during close
@@ -76,10 +77,11 @@ export function ProjectAccordion({ project, isOpen }: ProjectAccordionProps) {
           }
           // Refresh ScrollTrigger positions after layout shift
           ScrollTrigger.refresh()
+          onAnimationComplete?.()
         },
       })
     }
-  }, [isOpen])
+  }, [isOpen, onAnimationComplete])
 
   // Use localized content directly from the project object
   const description = project.tagline
@@ -133,7 +135,7 @@ export function ProjectAccordion({ project, isOpen }: ProjectAccordionProps) {
               </div>
 
               {project.liveUrl && (
-                <Link
+                <a
                   href={project.liveUrl}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -145,7 +147,7 @@ export function ProjectAccordion({ project, isOpen }: ProjectAccordionProps) {
                     weight="bold"
                     className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                   />
-                </Link>
+                </a>
               )}
             </div>
           </div>

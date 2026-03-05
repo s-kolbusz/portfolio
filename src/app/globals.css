@@ -136,13 +136,13 @@
   --radius-2xl: calc(var(--radius) + 1rem);
 }
 
-/* Hide scrollbars globally but keep scrolling functionality */
-* {
+/* Opt-in scrollbar suppression for immersive horizontal experiences */
+.hide-scrollbar {
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
 }
 
-*::-webkit-scrollbar {
+.hide-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome, Safari and Opera */
 }
 
@@ -190,18 +190,16 @@ html.lenis body {
   @apply ring-ring ring-offset-background rounded-sm ring-2 ring-offset-8;
 }
 
-/* Hide default cursor on devices with a mouse where custom cursor is active, but only if not reduced motion */
+/* Opt-in cursor suppression when the custom cursor experience is active */
 @media (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  body {
-    cursor: none;
-  }
-
-  a,
-  button,
-  [role='button'],
-  input,
-  select,
-  textarea {
+  .custom-cursor-active,
+  .custom-cursor-active body,
+  .custom-cursor-active a,
+  .custom-cursor-active button,
+  .custom-cursor-active [role='button'],
+  .custom-cursor-active input,
+  .custom-cursor-active select,
+  .custom-cursor-active textarea {
     cursor: none;
   }
 }

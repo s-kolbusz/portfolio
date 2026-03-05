@@ -1,169 +1,40 @@
-import type { Metadata, Viewport } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages, setRequestLocale } from 'next-intl/server'
-import { Fraunces, JetBrains_Mono } from 'next/font/google'
-import localFont from 'next/font/local'
-import { notFound } from 'next/navigation'
 
-import { Analytics } from '@vercel/analytics/next'
-import { SpeedInsights } from '@vercel/speed-insights/next'
-
-import { JsonLd } from '@/components/SEO/JsonLd'
 import { ThemeProvider } from '@/components/theme-provider'
 import { ClientOverlays } from '@/components/ui/ClientOverlays'
+import { HtmlLangSync } from '@/components/ui/HtmlLangSync'
 import { SkipToMain } from '@/components/ui/SkipToMain'
+import { getLocaleFromParams } from '@/i18n/locale'
 import { routing } from '@/i18n/routing'
-
-import '../globals.css'
-
-const satoshi = localFont({
-  src: [
-    {
-      path: '../../fonts/Satoshi-Variable.woff2',
-      style: 'normal',
-      weight: '300 900',
-    },
-    {
-      path: '../../fonts/Satoshi-VariableItalic.woff2',
-      style: 'italic',
-      weight: '300 900',
-    },
-  ],
-  variable: '--font-sans',
-  display: 'swap',
-})
-
-const fraunces = Fraunces({
-  subsets: ['latin'],
-  variable: '--font-serif',
-  display: 'swap',
-})
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  variable: '--font-mono',
-  display: 'swap',
-})
-
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 5,
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#faf9f5' },
-    { media: '(prefers-color-scheme: dark)', color: '#161616' },
-  ],
-}
-
-export const metadata: Metadata = {
-  metadataBase: new URL('https://www.kolbusz.xyz'),
-  title: {
-    default: 'Sebastian Kolbusz | Full-stack Developer',
-    template: '%s | Sebastian Kolbusz',
-  },
-  description:
-    'Portfolio of Sebastian Kolbusz - Full-stack developer and 3D printing enthusiast specializing in cinematic web experiences.',
-  keywords: [
-    'Sebastian Kolbusz',
-    'Full-stack Developer',
-    'Freelance Frontend Engineer',
-    'SaaS Developer',
-    'Portfolio',
-    '3D Printing',
-    'React',
-    'Next.js',
-    'GSAP',
-    'Three.js',
-  ],
-  authors: [{ name: 'Sebastian Kolbusz' }],
-  creator: 'Sebastian Kolbusz',
-  icons: {
-    icon: '/icon.svg',
-    shortcut: '/icon.svg',
-    apple: '/icon.svg',
-  },
-  openGraph: {
-    type: 'website',
-    locale: 'en_US',
-    url: 'https://www.kolbusz.xyz/en',
-    siteName: 'Sebastian Kolbusz Portfolio',
-    title: 'Sebastian Kolbusz | Full-stack Developer',
-    description:
-      'Full-stack developer and 3D printing enthusiast specializing in cinematic web experiences.',
-    images: [
-      {
-        url: '/images/sebastian_kolbusz_caricature.avif',
-        width: 1200,
-        height: 630,
-        alt: 'Sebastian Kolbusz Caricature',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Sebastian Kolbusz | Full-stack Developer',
-    description:
-      'Full-stack developer and 3D printing enthusiast specializing in cinematic web experiences.',
-    images: ['/images/sebastian_kolbusz_caricature.avif'],
-    creator: '@s-kolbusz',
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
-}
 
 type Props = {
   children: React.ReactNode
   params: Promise<{ locale: string }>
 }
 
+export const dynamicParams = false
+export const dynamic = 'force-static'
+
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }))
 }
 
 export default async function LocaleLayout({ children, params }: Props) {
-  const { locale } = await params
+  const locale = await getLocaleFromParams(params)
 
-  // Validate locale
-  if (!routing.locales.includes(locale as 'en' | 'pl')) {
-    notFound()
-  }
-
-  // Enable static rendering
   setRequestLocale(locale)
-
-  // Get messages for the current locale
   const messages = await getMessages()
 
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <body
-        className={`${satoshi.variable} ${fraunces.variable} ${jetbrainsMono.variable} font-sans antialiased`}
-      >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <JsonLd />
-          <NextIntlClientProvider messages={messages}>
-            <SkipToMain />
-            <ClientOverlays />
-            {children}
-          </NextIntlClientProvider>
-        </ThemeProvider>
-        <SpeedInsights />
-        <Analytics />
-      </body>
-    </html>
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+      <NextIntlClientProvider locale={locale} messages={messages}>
+        <HtmlLangSync />
+        <SkipToMain />
+        <div id="page-content-start" tabIndex={-1} className="outline-none" />
+        <ClientOverlays />
+        {children}
+      </NextIntlClientProvider>
+    </ThemeProvider>
   )
 }

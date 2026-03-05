@@ -1,6 +1,7 @@
+import type { PortfolioEntryId } from './projects'
 import type { PortfolioEntryContent } from './projects-en'
 
-export const projectsPl: Record<string, PortfolioEntryContent> = {
+export const projectsPl = {
   zakofy: {
     title: 'Zakofy',
     subtitle: 'System rezerwacyjny klasy Premium',
@@ -105,4 +106,4 @@ export const projectsPl: Record<string, PortfolioEntryContent> = {
       },
     ],
   },
-}
+} satisfies Record<PortfolioEntryId, PortfolioEntryContent>
