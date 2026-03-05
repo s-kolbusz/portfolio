@@ -10,6 +10,8 @@
     "build": "next build",
     "start": "next start",
     "prepare": "git config core.hooksPath .githooks || true",
+    "check:conventions": "node scripts/check-conventions.mjs",
+    "check:architecture": "node scripts/check-architecture.mjs",
     "typecheck": "next typegen && tsc --noEmit",
     "lint": "eslint .",
     "lint:ci": "eslint . --max-warnings=0",

@@ -1,7 +1,7 @@
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages, setRequestLocale } from 'next-intl/server'
 
-import { ThemeProvider } from '@/components/theme-provider'
+import { ThemeProvider } from '@/components/ThemeProvider'
 import { ClientOverlays } from '@/components/ui/ClientOverlays'
 import { HtmlLangSync } from '@/components/ui/HtmlLangSync'
 import { SkipToMain } from '@/components/ui/SkipToMain'

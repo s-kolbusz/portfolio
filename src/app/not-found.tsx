@@ -3,7 +3,7 @@ import { NextIntlClientProvider } from 'next-intl'
 import { Fraunces, JetBrains_Mono } from 'next/font/google'
 import localFont from 'next/font/local'
 
-import { ThemeProvider } from '@/components/theme-provider'
+import { ThemeProvider } from '@/components/ThemeProvider'
 import { ClientOverlays } from '@/components/ui/ClientOverlays'
 import { SkipToMain } from '@/components/ui/SkipToMain'
 import enMessages from '@/i18n/messages/en.json'
