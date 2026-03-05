@@ -50,7 +50,7 @@ export function Contact() {
             rel="noopener noreferrer"
             className="group border-border hover:bg-secondary/30 border-t py-8 transition-colors md:py-12"
           >
-            <div className="flex items-center justify-between">
+            <div className="pointer-events-none flex items-center justify-between">
               <span className="text-foreground font-serif text-3xl font-light transition-transform duration-300 group-hover:translate-x-4 md:text-5xl lg:text-6xl">
                 {t(link.labelKey)}
               </span>
