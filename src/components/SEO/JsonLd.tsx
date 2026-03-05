@@ -9,9 +9,10 @@ export const JsonLd = () => {
     url: SITE_ORIGIN,
     jobTitle: 'Full-stack Developer',
     sameAs: [
-      'https://github.com/skolbusz',
-      'https://linkedin.com/in/sebastian-kolbusz',
-      'https://twitter.com/skolbusz',
+      'https://github.com/s-kolbusz',
+      'https://linkedin.com/in/skolbusz',
+      'https://twitter.com/s_kolbusz',
+      'https://x.com/s_kolbusz',
     ],
     knowsAbout: [
       'Web Development',
