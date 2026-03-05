@@ -47,14 +47,14 @@
 
 **Required Skills:** `react-best-practices`, `systematic-debugging`, `test-driven-development`
 
-- [ ] Split `src/hooks/useTimeline.ts` into smaller modules (types, store, reveal engine, hooks).
-- [ ] Simplify `src/components/ui/DockNav.tsx` by extracting indicator math, route predicates, and event wiring.
-- [ ] Refactor `src/components/canvas/ViscousPuddle.tsx` into shader source module + WebGL setup module + component shell.
-- [ ] Remove setState-during-render pattern from `ProjectHoverPreview` and replace with effect/memo-safe flow.
-- [ ] Replace timeout-coupled accordion scroll sequencing in `ProjectItem` with callback/event-based sync.
-- [ ] Remove lint suppressions in `Lightbox` and `SettingsDock` by fixing hook dependencies/lifecycle design.
-- [ ] Replace `any` usage in `PricingCard` with typed i18n key access.
-- [ ] Delete unused modules/exports (`ContactLink`, `PricingCard`, `useCursorState` exports) or wire them intentionally.
+- [x] Split `src/hooks/useTimeline.ts` into smaller modules (types, store, reveal engine, hooks).
+- [x] Simplify `src/components/ui/DockNav.tsx` by extracting indicator math, route predicates, and event wiring.
+- [x] Refactor `src/components/canvas/ViscousPuddle.tsx` into shader source module + WebGL setup module + component shell.
+- [x] Remove setState-during-render pattern from `ProjectHoverPreview` and replace with effect/memo-safe flow.
+- [x] Replace timeout-coupled accordion scroll sequencing in `ProjectItem` with callback/event-based sync.
+- [x] Remove lint suppressions in `Lightbox` and `SettingsDock` by fixing hook dependencies/lifecycle design.
+- [x] Replace `any` usage in `PricingCard` with typed i18n key access.
+- [x] Delete unused modules/exports (`ContactLink`, `PricingCard`, `useCursorState` exports) or wire them intentionally.
 
 ---
 

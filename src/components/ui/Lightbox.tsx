@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
 
 import Image from 'next/image'
@@ -16,14 +16,14 @@ import { useScrollStore } from '@/lib/store'
 interface LightboxProps {
   images: readonly MediaItem[]
   initialIndex: number
-  isOpen: boolean
   onClose: () => void
 }
 
-export function Lightbox({ images, initialIndex, isOpen, onClose }: LightboxProps) {
-  const [currentIndex, setCurrentIndex] = useState(initialIndex)
+const subscribe = () => () => {}
+
+export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
+  const [currentIndex, setCurrentIndex] = useState(() => initialIndex)
   const [direction, setDirection] = useState(0) // -1 for prev, 1 for next, 0 for initial
-  const [mounted, setMounted] = useState(false)
   const overlayRef = useRef<HTMLDivElement>(null)
   const imageRef = useRef<HTMLDivElement>(null)
 
@@ -32,36 +32,41 @@ export function Lightbox({ images, initialIndex, isOpen, onClose }: LightboxProp
 
   // Access Lenis instance to lock scroll
   const lenis = useScrollStore((state) => state.lenis)
+  const mounted = useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false
+  )
+
+  const showPrev = useCallback(() => {
+    setDirection(-1)
+    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))
+  }, [images.length])
+
+  const showNext = useCallback(() => {
+    setDirection(1)
+    setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))
+  }, [images.length])
 
   useEffect(() => {
-    setMounted(true)
-    if (isOpen) {
-      // Store current focus
-      previousFocus.current = document.activeElement as HTMLElement
+    previousFocus.current = document.activeElement as HTMLElement
+    lenis?.stop()
 
-      setCurrentIndex(initialIndex)
-      setDirection(0)
-      lenis?.stop()
+    const focusTimeoutId = window.setTimeout(() => {
+      overlayRef.current?.focus()
+    }, 50)
 
-      // Move focus to overlay for accessibility
-      // Small timeout to ensure DOM is ready and transition has started
-      setTimeout(() => {
-        overlayRef.current?.focus()
-      }, 50)
-    } else {
+    return () => {
+      window.clearTimeout(focusTimeoutId)
       lenis?.start()
-      // Restore focus
       previousFocus.current?.focus()
     }
-    return () => {
-      lenis?.start() // Ensure we restart scroll on unmount
-    }
-  }, [isOpen, initialIndex, lenis])
+  }, [lenis])
 
   // GSAP Animation for Open
   useGSAP(
     () => {
-      if (!overlayRef.current || !isOpen) return
+      if (!overlayRef.current) return
 
       const tl = gsap.timeline()
 
@@ -81,13 +86,13 @@ export function Lightbox({ images, initialIndex, isOpen, onClose }: LightboxProp
         '-=0.3'
       )
     },
-    { dependencies: [isOpen], revertOnUpdate: true }
+    { revertOnUpdate: true }
   )
 
   // GSAP Animation for Slide Change
   useGSAP(
     () => {
-      if (!isOpen || direction === 0 || !imageRef.current) return
+      if (direction === 0 || !imageRef.current) return
 
       const xOffset = direction * 40
 
@@ -107,23 +112,11 @@ export function Lightbox({ images, initialIndex, isOpen, onClose }: LightboxProp
     { dependencies: [currentIndex] }
   )
 
-  const showPrev = () => {
-    setDirection(-1)
-    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))
-  }
-
-  const showNext = () => {
-    setDirection(1)
-    setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))
-  }
-
   // Focus Trap
-  useFocusTrap(overlayRef, isOpen)
+  useFocusTrap(overlayRef, true)
 
   // Keyboard navigation
   useEffect(() => {
-    if (!isOpen) return
-
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
       if (e.key === 'ArrowLeft') showPrev()
@@ -132,11 +125,9 @@ export function Lightbox({ images, initialIndex, isOpen, onClose }: LightboxProp
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, onClose]) // Intentionally omitting showPrev/showNext to avoid recreation issues.
+  }, [onClose, showPrev, showNext])
 
   if (!mounted) return null
-  if (!isOpen) return null
 
   return createPortal(
     <div

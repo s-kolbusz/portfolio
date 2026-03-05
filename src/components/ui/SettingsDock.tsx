@@ -1,7 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-
 import { useLocale } from 'next-intl'
 import { useTheme } from 'next-themes'
 
@@ -16,16 +14,9 @@ export function SettingsDock() {
   const router = useRouter()
   const pathname = usePathname()
 
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMounted(true)
-  }, [])
-
-  if (!mounted) return null
-
   const toggleTheme = () => {
+    if (!resolvedTheme) return
+
     setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
   }
 
