@@ -1,4 +1,4 @@
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
 import { Fraunces, JetBrains_Mono } from 'next/font/google'
 import localFont from 'next/font/local'
