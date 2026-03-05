@@ -9,7 +9,7 @@ import { ArrowLeftIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
 
 import type { PortfolioEntry } from '@/features/work/data/projects-en'
 import { useRouter } from '@/i18n/navigation'
-import { ANIMATION } from '@/lib/constants/animations'
+import { ANIMATION } from '@/shared/config/animations'
 import { useTimeline } from '@/shared/hooks/timeline/useTimeline'
 import { Button } from '@/shared/ui/Button'
 

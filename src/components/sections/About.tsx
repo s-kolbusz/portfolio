@@ -8,7 +8,7 @@ import Image from 'next/image'
 import { ArrowRightIcon } from '@phosphor-icons/react'
 
 import { skillCategories } from '@/data/skills'
-import { ANIMATION } from '@/lib/constants/animations'
+import { ANIMATION } from '@/shared/config/animations'
 import { useTimeline } from '@/shared/hooks/timeline/useTimeline'
 import { BaseSection } from '@/shared/ui/BaseSection'
 import { SkillTag } from '@/shared/ui/SkillTag'

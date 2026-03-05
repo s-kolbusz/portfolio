@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl'
 import { ArrowUpRightIcon } from '@phosphor-icons/react'
 
 import { contactLinks } from '@/data/contact'
-import { ANIMATION } from '@/lib/constants/animations'
+import { ANIMATION } from '@/shared/config/animations'
 import { useTimeline } from '@/shared/hooks/timeline/useTimeline'
 import { BaseSection } from '@/shared/ui/BaseSection'
 import { EditorialHeader } from '@/shared/ui/EditorialHeader'

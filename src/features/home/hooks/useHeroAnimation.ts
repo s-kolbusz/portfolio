@@ -1,7 +1,7 @@
 import { RefObject } from 'react'
 
-import { ANIMATION } from '@/lib/constants/animations'
 import { gsap, useGSAP } from '@/lib/gsap-core'
+import { ANIMATION } from '@/shared/config/animations'
 
 interface UseHeroAnimationProps {
   containerRef: RefObject<HTMLElement | null>

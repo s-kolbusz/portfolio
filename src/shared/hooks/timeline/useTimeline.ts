@@ -2,9 +2,9 @@
 
 import type { RefObject } from 'react'
 
-import { useSafeAnimation } from '@/lib/constants/animations'
 import { useGSAP } from '@/lib/gsap'
 import { usePrefersReducedMotion } from '@/shared/hooks/useMedia'
+import { useSafeAnimation } from '@/shared/hooks/useSafeAnimation'
 
 import { createReveal, REVEAL } from './reveal-engine'
 import type { RevealFn, RevealOptions, TimelineConfig, TimelineSetup } from './types'

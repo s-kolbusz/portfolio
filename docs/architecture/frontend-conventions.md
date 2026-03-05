@@ -25,6 +25,11 @@ These rules apply to all code in `src/` and are enforced in CI by:
 - `src/shared`: cross-feature modules (`ui`, `hooks`, `lib`, `config`) that are safe to reuse across routes/features.
 - `src/components`, `src/data`, `src/lib`: legacy layers kept temporarily for incremental migration.
 - `src/hooks` is retired; shared hooks must live in `src/shared/hooks` and feature-owned hooks must live in `src/features/*/hooks`.
+
+## Runtime vs Config
+
+- `src/shared/config` and feature/local constants modules must contain static data only.
+- Hook-bearing or environment-dependent behavior belongs in hooks or runtime lib modules, not alongside config exports.
 - `src/i18n`: locale routing and messages.
 
 ## Import Boundaries

@@ -8,8 +8,8 @@ import Image from 'next/image'
 import { StarIcon } from '@phosphor-icons/react'
 
 import { PortfolioEntry } from '@/features/work/data/projects-en'
-import { ANIMATION } from '@/lib/constants/animations'
 import { gsap } from '@/lib/gsap'
+import { ANIMATION } from '@/shared/config/animations'
 import { useTimeline } from '@/shared/hooks/timeline/useTimeline'
 
 interface BookTableOfContentsProps {

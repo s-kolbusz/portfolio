@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl'
 import { ArrowRightIcon } from '@phosphor-icons/react'
 
 import { CalculatorPanel } from '@/components/features/CalculatorPanel'
-import { ANIMATION } from '@/lib/constants/animations'
+import { ANIMATION } from '@/shared/config/animations'
 import { useTimeline } from '@/shared/hooks/timeline/useTimeline'
 import { BaseSection } from '@/shared/ui/BaseSection'
 import { Button } from '@/shared/ui/Button'

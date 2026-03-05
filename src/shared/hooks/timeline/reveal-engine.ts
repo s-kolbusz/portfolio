@@ -1,5 +1,5 @@
-import { ANIMATION } from '@/lib/constants/animations'
 import { gsap } from '@/lib/gsap'
+import { ANIMATION } from '@/shared/config/animations'
 
 import type { AnimationTarget, RevealOptions } from './types'
 
