@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 
-import { useCursorStore, CursorVariant } from '@/features/navigation/lib/cursor-store'
+import type { CursorVariant } from '@/features/navigation/lib/cursor-store'
+import { useCursorStore } from '@/features/navigation/lib/cursor-store'
 
 export function useCursorInteractions() {
   const setVariant = useCursorStore((state) => state.setVariant)

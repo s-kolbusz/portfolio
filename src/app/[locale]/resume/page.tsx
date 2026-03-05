@@ -1,4 +1,4 @@
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 
 import { ArrowLeftIcon } from '@phosphor-icons/react/dist/ssr'
@@ -8,7 +8,8 @@ import { CVPrintButton } from '@/features/resume/components/CVPrintButton'
 import { cvDataEn } from '@/features/resume/data/cv-en'
 import { cvDataPl } from '@/features/resume/data/cv-pl'
 import { getLocaleFromParams } from '@/i18n/locale'
-import { buildCvPageMetadata } from '@/lib/page-metadata'
+import { getPageHref } from '@/i18n/route-map'
+import { buildLocalizedPageMetadata } from '@/lib/page-metadata'
 import { BaseSection } from '@/shared/ui/BaseSection'
 import { Button } from '@/shared/ui/Button'
 
@@ -24,14 +25,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     getTranslations({ locale, namespace: 'Metadata' }),
   ])
 
-  return buildCvPageMetadata({
+  return buildLocalizedPageMetadata({
     locale,
     title: cvTranslations('title'),
     description: metadataTranslations('description'),
+    path: getPageHref('resume'),
   })
 }
 
-export default async function CVPage({ params }: Props) {
+export default async function ResumePage({ params }: Props) {
   const locale = await getLocaleFromParams(params)
   setRequestLocale(locale)
   const t = await getTranslations({ locale, namespace: 'cv' })
@@ -47,7 +49,7 @@ export default async function CVPage({ params }: Props) {
       >
         <div className="flex items-center justify-between">
           <Button
-            href="/"
+            href={getPageHref('home')}
             variant="ghost"
             leftIcon={
               <ArrowLeftIcon

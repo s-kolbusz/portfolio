@@ -1,12 +1,13 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, type MouseEventHandler } from 'react'
 
 import { useTranslations } from 'next-intl'
 
 import { ArrowRightIcon, CheckIcon, StarIcon } from '@phosphor-icons/react'
 
 import { services } from '@/data/services'
+import { getHomeSectionHref } from '@/i18n/route-map'
 import { cn } from '@/lib/utils'
 import { ANIMATION } from '@/shared/config/animations'
 import { useTimeline } from '@/shared/hooks/timeline/useTimeline'
@@ -14,13 +15,19 @@ import { BaseSection } from '@/shared/ui/BaseSection'
 import { Button } from '@/shared/ui/Button'
 import { EditorialHeader } from '@/shared/ui/EditorialHeader'
 
-export function Services() {
+interface ServicesProps {
+  headingLevel?: 'h1' | 'h2'
+}
+
+export function Services({ headingLevel = 'h2' }: ServicesProps) {
   const t = useTranslations('services')
   const sectionRef = useRef<HTMLElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
   const gridRef = useRef<HTMLDivElement>(null)
   const processRef = useRef<HTMLDivElement>(null)
   const processStepsRef = useRef<HTMLDivElement>(null)
+  const featureCount = 5
+  const contactHref = getHomeSectionHref('contact')
 
   useTimeline(sectionRef, { id: 'services' }, (reveal) => {
     reveal(headerRef)
@@ -29,11 +36,12 @@ export function Services() {
     reveal(processStepsRef, { stagger: ANIMATION.stagger.slow })
   })
 
-  const handleServiceClick = () => {
+  const handleContactClick: MouseEventHandler<HTMLAnchorElement> = (event) => {
     const contactSection = document.getElementById('contact')
-    if (contactSection) {
-      contactSection.scrollIntoView({ behavior: 'smooth' })
-    }
+    if (!contactSection) return
+
+    event.preventDefault()
+    contactSection.scrollIntoView({ behavior: 'smooth' })
   }
 
   return (
@@ -44,6 +52,7 @@ export function Services() {
         title={t('title')}
         subtitle={t('intro')}
         tagline={t('limited_availability')}
+        titleAs={headingLevel}
       />
 
       {/* Adjusted Grid: Show all 4 in a row on large screens */}
@@ -52,9 +61,7 @@ export function Services() {
           const isPopular = service.popular
           return (
             <div
-              data-cursor="button"
               key={service.id}
-              onClick={handleServiceClick}
               className={cn(
                 'group bg-card hover:shadow-primary/5 relative flex flex-col justify-between gap-10 border p-8 text-left transition-[color,border-color,box-shadow] duration-500 hover:shadow-2xl md:p-10',
                 isPopular
@@ -97,7 +104,7 @@ export function Services() {
 
                 {/* Features List */}
                 <ul className="border-border flex flex-col gap-3 border-t pt-6">
-                  {Array.from({ length: 5 }).map((_, i) => (
+                  {Array.from({ length: featureCount }).map((_, i) => (
                     <li key={i} className="flex items-start gap-2.5">
                       <CheckIcon
                         className={cn(
@@ -119,6 +126,8 @@ export function Services() {
               {/* CTA Button */}
               <div className="mt-auto pt-4">
                 <Button
+                  href={contactHref}
+                  onClick={handleContactClick}
                   variant={isPopular ? 'primary' : 'outline'}
                   size="sm"
                   className="w-full justify-between"
@@ -134,7 +143,6 @@ export function Services() {
         })}
       </div>
 
-      {/* Process / Workflow Section */}
       <div ref={processRef} className="mb-12 flex flex-col gap-4">
         <div className="border-border border-t pt-12">
           <h3 className="font-serif text-3xl font-light md:text-4xl">{t('process.title')}</h3>

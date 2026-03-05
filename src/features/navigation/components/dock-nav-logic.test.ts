@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { isCvRoute, isHomeRoute, isProjectsRoute } from '@/i18n/routing'
+import { getPageHref } from '@/i18n/route-map'
+import { isHomeRoute, isResumeRoute, isWorkRoute } from '@/i18n/routing'
 
 import {
   NAV_ITEMS,
@@ -16,16 +17,17 @@ describe('dock-nav logic', () => {
     expect(isHomeRoute('/en')).toBe(true)
     expect(isHomeRoute('/en/')).toBe(true)
     expect(isHomeRoute('/pl')).toBe(true)
-    expect(isHomeRoute('/cv')).toBe(false)
+    expect(isHomeRoute(getPageHref('resume'))).toBe(false)
   })
 
-  it('detects cv and projects pages', () => {
-    expect(isCvRoute('/en/cv')).toBe(true)
-    expect(isCvRoute('/en/cv/')).toBe(true)
-    expect(isCvRoute('/projects')).toBe(false)
-    expect(isProjectsRoute('/en/projects')).toBe(true)
-    expect(isProjectsRoute('/en/projects/')).toBe(true)
-    expect(isProjectsRoute('/')).toBe(false)
+  it('detects resume and work pages', () => {
+    expect(isResumeRoute('/en/resume')).toBe(true)
+    expect(isResumeRoute('/en/resume/')).toBe(true)
+    expect(isResumeRoute('/resume')).toBe(false)
+    expect(isWorkRoute('/en/work')).toBe(true)
+    expect(isWorkRoute('/en/work/')).toBe(true)
+    expect(isWorkRoute('/en/work/zakofy')).toBe(true)
+    expect(isWorkRoute('/')).toBe(false)
   })
 
   it('selects hero item by default on home when no active section', () => {
@@ -39,15 +41,15 @@ describe('dock-nav logic', () => {
     expect(index).toBe(servicesIndex)
   })
 
-  it('selects cv item on cv pages', () => {
-    const index = getActiveItemIndex({ pathname: '/pl/cv', activeSection: null })
+  it('selects cv item on resume pages', () => {
+    const index = getActiveItemIndex({ pathname: '/pl/resume', activeSection: null })
     const cvIndex = NAV_ITEMS.findIndex((item) => item.id === 'cv')
     expect(index).toBe(cvIndex)
   })
 
-  it('returns no active item for non-home and non-cv routes', () => {
-    const index = getActiveItemIndex({ pathname: '/en/projects/foo', activeSection: 'hero' })
-    expect(index).toBe(-1)
+  it('does not select homepage items on non-home routes without dedicated dock entries', () => {
+    expect(getActiveItemIndex({ pathname: '/en/work/foo', activeSection: 'hero' })).toBe(-1)
+    expect(getActiveItemIndex({ pathname: '/en/lab', activeSection: null })).toBe(-1)
   })
 
   it('computes desktop indicator offset with page separator accounted for', () => {

@@ -1,8 +1,9 @@
 'use client'
 
-import React from 'react'
+import { useTranslations } from 'next-intl'
 
 import {
+  ArrowLeftIcon,
   ArrowRightIcon,
   CheckIcon,
   CubeIcon,
@@ -13,12 +14,14 @@ import {
 } from '@phosphor-icons/react'
 
 import { ProjectMeta } from '@/features/work/components/ProjectMeta'
+import { getPageHref } from '@/i18n/route-map'
 import { BaseSection } from '@/shared/ui/BaseSection'
 import { Button } from '@/shared/ui/Button'
 import { Select } from '@/shared/ui/Select'
 import { Slider } from '@/shared/ui/Slider'
 
-export default function DesignPage() {
+export function LabPageClient() {
+  const cv = useTranslations('cv')
   const colors = [
     { name: 'Background', variable: 'var(--background)' },
     { name: 'Foreground', variable: 'var(--foreground)' },
@@ -34,6 +37,17 @@ export default function DesignPage() {
 
   return (
     <main id="main-content" className="container mx-auto flex flex-col gap-20 px-6 py-24 lg:px-24">
+      <div className="fixed top-6 left-6 z-50">
+        <Button
+          href={getPageHref('home')}
+          variant="outline-glass"
+          size="md"
+          leftIcon={<ArrowLeftIcon weight="bold" className="size-4" />}
+        >
+          {cv('backHome')}
+        </Button>
+      </div>
+
       <header className="flex flex-col gap-4">
         <h1 className="font-serif text-6xl font-light tracking-tight md:text-8xl">Design System</h1>
         <p className="text-muted-foreground font-mono text-sm tracking-widest uppercase">
@@ -41,7 +55,6 @@ export default function DesignPage() {
         </p>
       </header>
 
-      {/* Typography */}
       <section className="flex flex-col gap-10">
         <h2 className="border-border border-b pb-4 font-mono text-xs font-bold tracking-[0.2em] uppercase opacity-50">
           01. Typography
@@ -72,7 +85,6 @@ export default function DesignPage() {
         </div>
       </section>
 
-      {/* Colors */}
       <section className="flex flex-col gap-10">
         <h2 className="border-border border-b pb-4 font-mono text-xs font-bold tracking-[0.2em] uppercase opacity-50">
           02. Color Palette
@@ -109,7 +121,6 @@ export default function DesignPage() {
         </div>
       </section>
 
-      {/* Buttons */}
       <section className="flex flex-col gap-10">
         <h2 className="border-border border-b pb-4 font-mono text-xs font-bold tracking-[0.2em] uppercase opacity-50">
           03. Buttons
@@ -132,19 +143,16 @@ export default function DesignPage() {
         </div>
       </section>
 
-      {/* Components & Utilities */}
       <section className="flex flex-col gap-10">
         <h2 className="border-border border-b pb-4 font-mono text-xs font-bold tracking-[0.2em] uppercase opacity-50">
           04. Forms & Components
         </h2>
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
-          {/* Sliders */}
           <div className="flex flex-col gap-8">
             <Slider label="Volume" defaultValue={50} valueDisplay="50%" />
             <Slider label="Opacity" defaultValue={80} valueDisplay="0.8" step={0.1} max={1} />
           </div>
 
-          {/* Select & Meta */}
           <div className="flex flex-col gap-8">
             <Select
               label="Choose Material"
@@ -181,7 +189,6 @@ export default function DesignPage() {
         </div>
       </section>
 
-      {/* Section Variants */}
       <section className="flex flex-col gap-10">
         <h2 className="border-border border-b pb-4 font-mono text-xs font-bold tracking-[0.2em] uppercase opacity-50">
           05. Section Variants
@@ -207,7 +214,6 @@ export default function DesignPage() {
         </div>
       </section>
 
-      {/* Dock Preview */}
       <section className="flex flex-col gap-10">
         <h2 className="border-border border-b pb-4 font-mono text-xs font-bold tracking-[0.2em] uppercase opacity-50">
           05. Navigation Mockup

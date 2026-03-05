@@ -9,23 +9,25 @@ import {
   UserIcon,
 } from '@phosphor-icons/react'
 
-import { isCvRoute, isHomeRoute } from '@/i18n/routing'
+import { getHomeSectionHref, getPageHref } from '@/i18n/route-map'
+import { isHomeRoute, matchesLocalizedPageRoute } from '@/i18n/routing'
 
 export interface NavItem {
   href: string
   icon: Icon
   id: 'hero' | 'about' | 'projects' | 'services' | 'calculator' | 'contact' | 'cv'
   isPage?: boolean
+  pageHref?: string
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { href: '/#hero', icon: HouseIcon, id: 'hero' },
-  { href: '/#about', icon: UserIcon, id: 'about' },
-  { href: '/#projects', icon: BriefcaseIcon, id: 'projects' },
-  { href: '/#services', icon: CurrencyDollarIcon, id: 'services' },
-  { href: '/#calculator', icon: CubeIcon, id: 'calculator' },
-  { href: '/#contact', icon: EnvelopeIcon, id: 'contact' },
-  { href: '/cv', icon: FileTextIcon, id: 'cv', isPage: true },
+  { href: getHomeSectionHref('hero'), icon: HouseIcon, id: 'hero' },
+  { href: getHomeSectionHref('about'), icon: UserIcon, id: 'about' },
+  { href: getHomeSectionHref('projects'), icon: BriefcaseIcon, id: 'projects' },
+  { href: getHomeSectionHref('services'), icon: CurrencyDollarIcon, id: 'services' },
+  { href: getHomeSectionHref('calculator'), icon: CubeIcon, id: 'calculator' },
+  { href: getHomeSectionHref('contact'), icon: EnvelopeIcon, id: 'contact' },
+  { href: getPageHref('resume'), icon: FileTextIcon, id: 'cv', isPage: true },
 ]
 
 const DESKTOP_LAYOUT = {
@@ -73,12 +75,12 @@ export function getActiveItemIndex({
   items = NAV_ITEMS,
 }: ActiveItemIndexArgs) {
   const isHome = isHomeRoute(pathname)
-  const isCvPage = isCvRoute(pathname)
 
   return items.findIndex((item) => {
-    if (item.isPage) {
-      if (item.id === 'cv') return isCvPage
-      return pathname === item.href
+    const pageHref = item.pageHref ?? (item.isPage ? item.href : null)
+
+    if (pageHref && matchesLocalizedPageRoute(pathname, pageHref)) {
+      return true
     }
 
     if (!isHome) return false

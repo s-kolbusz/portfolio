@@ -1,4 +1,4 @@
-import { RefObject } from 'react'
+import type { RefObject } from 'react'
 
 import { gsap, useGSAP } from '@/lib/gsap-core'
 import { ANIMATION } from '@/shared/config/animations'

@@ -1,6 +1,8 @@
 import { hasLocale } from 'next-intl'
 import { defineRouting } from 'next-intl/routing'
 
+import { getHrefPathSegment, getLocalizedHref, ROUTE_SEGMENTS } from './route-map'
+
 export const routing = defineRouting({
   locales: ['en', 'pl'],
   defaultLocale: 'en',
@@ -44,19 +46,29 @@ export function isHomeRoute(pathname: string) {
   return normalized === '/' || LOCALE_ROOT_PATHS.has(normalized)
 }
 
-export function isCvRoute(pathname: string) {
-  return hasLocalizedRoutePrefix(pathname, 'cv')
+export function matchesLocalizedPageRoute(pathname: string, href: string) {
+  const segment = getHrefPathSegment(href)
+
+  if (!segment) {
+    return isHomeRoute(pathname)
+  }
+
+  return hasLocalizedRoutePrefix(pathname, segment)
 }
 
-export function isProjectsRoute(pathname: string) {
-  return hasLocalizedRoutePrefix(pathname, 'projects')
+export function isResumeRoute(pathname: string) {
+  return hasLocalizedRoutePrefix(pathname, ROUTE_SEGMENTS.resume)
+}
+
+export function isWorkRoute(pathname: string) {
+  return hasLocalizedRoutePrefix(pathname, ROUTE_SEGMENTS.work)
 }
 
 export function getMetadataAlternates(path: string, currentLocale: Locale) {
   const languages: Record<string, string> = {}
 
   routing.locales.forEach((locale) => {
-    languages[locale] = `/${locale}${path === '/' ? '' : path}`
+    languages[locale] = getLocalizedHref(locale, path)
   })
 
   return {

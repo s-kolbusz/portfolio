@@ -3,6 +3,8 @@ import type { AnchorHTMLAttributes, ReactNode } from 'react'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { getWorkDetailHref } from '@/i18n/route-map'
+
 const routerPush = vi.fn()
 const routerReplace = vi.fn()
 const setTheme = vi.fn()
@@ -80,14 +82,14 @@ describe('navigation integration', () => {
   })
 
   it('switches locale while preserving the current route path', () => {
-    mockPathname = '/projects/zakofy'
+    mockPathname = getWorkDetailHref('zakofy')
     mockLocale = 'en'
 
     render(<SettingsDock />)
 
     fireEvent.click(screen.getByRole('button', { name: 'Switch language' }))
 
-    expect(routerReplace).toHaveBeenCalledWith('/projects/zakofy', { locale: 'pl' })
+    expect(routerReplace).toHaveBeenCalledWith(getWorkDetailHref('zakofy'), { locale: 'pl' })
   })
 
   it('scrolls to in-page sections when a section item is clicked on home route', () => {
@@ -110,13 +112,12 @@ describe('navigation integration', () => {
     expect(routerPush).not.toHaveBeenCalled()
   })
 
-  it('navigates to home hash routes from non-home pages for section items', () => {
-    mockPathname = '/en/cv'
+  it('does not render dock navigation outside the homepage', () => {
+    mockPathname = '/en/resume'
 
     render(<DockNav />)
 
-    fireEvent.click(screen.getAllByRole('button', { name: 'Services' })[0])
-
-    expect(routerPush).toHaveBeenCalledWith('/#services')
+    expect(screen.queryByRole('navigation', { name: 'Main navigation' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Services' })).not.toBeInTheDocument()
   })
 })

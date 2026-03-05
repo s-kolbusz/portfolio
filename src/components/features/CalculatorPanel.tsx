@@ -1,6 +1,7 @@
 'use client'
 
-import { ReactNode, useMemo, useState } from 'react'
+import type { ReactNode } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useTranslations } from 'next-intl'
 

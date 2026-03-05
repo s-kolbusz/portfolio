@@ -8,7 +8,7 @@ import Image from 'next/image'
 import { ArrowLeftIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
 
 import type { PortfolioEntry } from '@/features/work/data/projects-en'
-import { useRouter } from '@/i18n/navigation'
+import { getPageHref } from '@/i18n/route-map'
 import { ANIMATION } from '@/shared/config/animations'
 import { useTimeline } from '@/shared/hooks/timeline/useTimeline'
 import { Button } from '@/shared/ui/Button'
@@ -24,7 +24,6 @@ interface RoleCaseStudyProps {
 export function RoleCaseStudy({ project, prevProject, nextProject }: RoleCaseStudyProps) {
   const t = useTranslations('projectsBook')
   const cs = useTranslations('projectsBook.caseStudy')
-  const router = useRouter()
   const mainRef = useRef<HTMLElement>(null)
   const heroContentRef = useRef<HTMLDivElement>(null)
   const sectionsRef = useRef<HTMLDivElement>(null)
@@ -55,9 +54,9 @@ export function RoleCaseStudy({ project, prevProject, nextProject }: RoleCaseStu
       {/* Fixed back button */}
       <div className="fixed top-6 left-6 z-50">
         <Button
+          href={getPageHref('work')}
           variant="outline-glass"
           size="md"
-          onClick={() => router.push('/projects')}
           leftIcon={<ArrowLeftIcon weight="bold" className="size-4" />}
         >
           {t('backToProjects')}

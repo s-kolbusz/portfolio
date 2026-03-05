@@ -2,12 +2,12 @@ import { describe, expect, it } from 'vitest'
 
 import { getProject } from '@/features/work/data/get-projects'
 import enMessages from '@/i18n/messages/en.json'
+import { getPageHref } from '@/i18n/route-map'
 
 import {
-  buildCvPageMetadata,
   buildHomePageMetadata,
-  buildProjectDetailPageMetadata,
-  buildProjectsPageMetadata,
+  buildLocalizedPageMetadata,
+  buildWorkDetailPageMetadata,
 } from './page-metadata'
 
 describe('page metadata', () => {
@@ -35,20 +35,21 @@ describe('page metadata', () => {
     `)
   })
 
-  it('builds cv metadata without duplicating the global title suffix', () => {
-    const metadata = buildCvPageMetadata({
+  it('builds resume metadata without duplicating the global title suffix', () => {
+    const metadata = buildLocalizedPageMetadata({
       locale: 'en',
       title: enMessages.cv.title,
       description: enMessages.Metadata.description,
+      path: getPageHref('resume'),
     })
 
     expect(metadata).toMatchInlineSnapshot(`
       {
         "alternates": {
-          "canonical": "/en/cv",
+          "canonical": "/en/resume",
           "languages": {
-            "en": "/en/cv",
-            "pl": "/pl/cv",
+            "en": "/en/resume",
+            "pl": "/pl/resume",
           },
         },
         "description": "Senior Frontend Engineer specializing in high-performance SaaS products, Next.js, and immersive web experiences. Based in Zakopane, Poland.",
@@ -57,20 +58,21 @@ describe('page metadata', () => {
     `)
   })
 
-  it('builds projects index metadata without duplicating the global title suffix', () => {
-    const metadata = buildProjectsPageMetadata({
+  it('builds work index metadata without duplicating the global title suffix', () => {
+    const metadata = buildLocalizedPageMetadata({
       locale: 'en',
       title: enMessages.projectsBook.title,
       description: enMessages.projectsBook.subtitle,
+      path: getPageHref('work'),
     })
 
     expect(metadata).toMatchInlineSnapshot(`
       {
         "alternates": {
-          "canonical": "/en/projects",
+          "canonical": "/en/work",
           "languages": {
-            "en": "/en/projects",
-            "pl": "/pl/projects",
+            "en": "/en/work",
+            "pl": "/pl/work",
           },
         },
         "description": "A curated collection of high-performance e-commerce platforms, landing pages, and SaaS engineering.",
@@ -79,13 +81,36 @@ describe('page metadata', () => {
     `)
   })
 
-  it('builds project detail metadata with canonical alternates', () => {
+  it('builds lab metadata with canonical alternates', () => {
+    const metadata = buildLocalizedPageMetadata({
+      locale: 'en',
+      title: 'Lab',
+      description: 'Design system studies, interface experiments, and front-end prototypes.',
+      path: getPageHref('lab'),
+    })
+
+    expect(metadata).toMatchInlineSnapshot(`
+      {
+        "alternates": {
+          "canonical": "/en/lab",
+          "languages": {
+            "en": "/en/lab",
+            "pl": "/pl/lab",
+          },
+        },
+        "description": "Design system studies, interface experiments, and front-end prototypes.",
+        "title": "Lab",
+      }
+    `)
+  })
+
+  it('builds work detail metadata with canonical alternates', () => {
     const project = getProject('zakofy', 'en')
     if (!project) {
       throw new Error('Expected fixture project to exist')
     }
 
-    const metadata = buildProjectDetailPageMetadata({
+    const metadata = buildWorkDetailPageMetadata({
       locale: 'en',
       slug: project.id,
       project,
@@ -95,10 +120,10 @@ describe('page metadata', () => {
     expect(metadata).toMatchInlineSnapshot(`
       {
         "alternates": {
-          "canonical": "/en/projects/zakofy",
+          "canonical": "/en/work/zakofy",
           "languages": {
-            "en": "/en/projects/zakofy",
-            "pl": "/pl/projects/zakofy",
+            "en": "/en/work/zakofy",
+            "pl": "/pl/work/zakofy",
           },
         },
         "description": "Premium Tatra Mountain Booking Engine",

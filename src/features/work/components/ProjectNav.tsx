@@ -6,6 +6,7 @@ import { ArrowLeftIcon, ArrowRightIcon } from '@phosphor-icons/react'
 
 import type { PortfolioEntry } from '@/features/work/data/projects-en'
 import { Link } from '@/i18n/navigation'
+import { getWorkDetailHref } from '@/i18n/route-map'
 
 interface ProjectNavProps {
   prevProject?: PortfolioEntry
@@ -21,7 +22,7 @@ export function ProjectNav({ prevProject, nextProject }: ProjectNavProps) {
       <div className="border-border flex flex-1 border-r">
         {prevProject ? (
           <Link
-            href={`/projects/${prevProject.id}`}
+            href={getWorkDetailHref(prevProject.id)}
             className="group hover:bg-secondary/30 flex w-full items-center gap-4 px-6 py-8 transition-colors sm:px-10 sm:py-12"
           >
             <ArrowLeftIcon
@@ -46,7 +47,7 @@ export function ProjectNav({ prevProject, nextProject }: ProjectNavProps) {
       <div className="flex flex-1">
         {nextProject ? (
           <Link
-            href={`/projects/${nextProject.id}`}
+            href={getWorkDetailHref(nextProject.id)}
             className="group hover:bg-secondary/30 flex w-full items-center justify-end gap-4 px-6 py-8 text-right transition-colors sm:px-10 sm:py-12"
           >
             <div className="min-w-0">

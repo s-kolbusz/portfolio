@@ -1,10 +1,10 @@
-import {
+import type {
   AnchorHTMLAttributes,
   ButtonHTMLAttributes,
   MouseEventHandler,
-  forwardRef,
   ReactNode,
 } from 'react'
+import { forwardRef } from 'react'
 
 import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'

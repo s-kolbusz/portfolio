@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl'
 
 import { useActiveSection } from '@/features/navigation/hooks/useActiveSection'
 import { usePathname, useRouter } from '@/i18n/navigation'
-import { isHomeRoute, isProjectsRoute } from '@/i18n/routing'
+import { isHomeRoute } from '@/i18n/routing'
 import { useGSAP } from '@/lib/gsap'
 
 import { animateIndicator, syncIndicatorPosition, useWindowResize } from './dock-nav-indicator'
@@ -28,7 +28,6 @@ export function DockNav() {
   const router = useRouter()
 
   const isHome = isHomeRoute(pathname)
-  const isProjectsPage = isProjectsRoute(pathname)
 
   const indicatorRef = useRef<HTMLDivElement>(null)
   const mobileIndicatorRef = useRef<HTMLDivElement>(null)
@@ -86,15 +85,10 @@ export function DockNav() {
       return
     }
 
-    if (!isHome) {
-      router.push(item.href)
-      return
-    }
-
     document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' })
   }
 
-  if (isProjectsPage) return null
+  if (!isHome) return null
 
   return (
     <>

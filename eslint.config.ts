@@ -11,6 +11,13 @@ const eslintConfig = defineConfig([
       perfectionist,
     },
     rules: {
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
+        {
+          prefer: 'type-imports',
+          fixStyle: 'separate-type-imports',
+        },
+      ],
       // Import ordering: react → next → external → internal → styles
       'perfectionist/sort-imports': [
         'error',
