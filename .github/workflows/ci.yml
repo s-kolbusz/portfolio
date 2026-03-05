@@ -40,6 +40,9 @@ jobs:
       - name: Architecture boundary checks
         run: pnpm check:architecture
 
+      - name: Code-splitting policy checks
+        run: pnpm check:code-splitting
+
       - name: i18n check
         run: pnpm check:i18n
 
