@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef, useEffect, useState, lazy, Suspense } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useTranslations } from 'next-intl'
 
@@ -8,9 +8,10 @@ import { ArrowDownIcon } from '@phosphor-icons/react'
 
 import { useHeroAnimation } from '@/features/home/hooks/useHeroAnimation'
 import { usePrefersReducedMotion } from '@/shared/hooks/useMedia'
+import { lazyClientOnly } from '@/shared/lib/loadable'
 import { Button } from '@/shared/ui/Button'
 
-const HeroScene = lazy(() => import('@/components/canvas/HeroScene'))
+const HeroScene = lazyClientOnly(() => import('@/components/canvas/HeroScene'))
 
 export function Hero() {
   const t = useTranslations('hero')

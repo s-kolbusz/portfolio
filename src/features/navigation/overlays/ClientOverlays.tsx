@@ -2,22 +2,20 @@
 
 import { useEffect, useState } from 'react'
 
-import dynamic from 'next/dynamic'
+import { dynamicClientOnly, dynamicClientOnlyNamed } from '@/shared/lib/loadable'
 
-const CustomCursor = dynamic(() => import('@/features/navigation/overlays/CustomCursor'), {
-  ssr: false,
-})
-const SmoothScroller = dynamic(
-  () => import('@/shared/ui/SmoothScroller').then((mod) => mod.SmoothScroller),
-  { ssr: false }
+const CustomCursor = dynamicClientOnly(() => import('@/features/navigation/overlays/CustomCursor'))
+const SmoothScroller = dynamicClientOnlyNamed(
+  () => import('@/shared/ui/SmoothScroller'),
+  (module) => module.SmoothScroller
 )
-const DockNav = dynamic(
-  () => import('@/features/navigation/components/DockNav').then((mod) => mod.DockNav),
-  { ssr: false }
+const DockNav = dynamicClientOnlyNamed(
+  () => import('@/features/navigation/components/DockNav'),
+  (module) => module.DockNav
 )
-const SettingsDock = dynamic(
-  () => import('@/features/navigation/components/SettingsDock').then((mod) => mod.SettingsDock),
-  { ssr: false }
+const SettingsDock = dynamicClientOnlyNamed(
+  () => import('@/features/navigation/components/SettingsDock'),
+  (module) => module.SettingsDock
 )
 
 export function ClientOverlays() {
