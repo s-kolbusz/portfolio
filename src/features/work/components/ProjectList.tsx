@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-import type { PortfolioEntry } from '@/features/work/data/projects-en'
+import type { WorkItem } from '@/features/work/data/work-items'
 import { ANIMATION } from '@/shared/config/animations'
 import { useTimeline } from '@/shared/hooks/timeline/useTimeline'
 
@@ -11,7 +11,7 @@ import { ProjectHoverPreview } from './ProjectHoverPreview'
 import { ProjectItem } from './ProjectItem'
 
 interface ProjectListProps {
-  projects: PortfolioEntry[]
+  projects: WorkItem[]
 }
 
 export function ProjectList({ projects }: ProjectListProps) {

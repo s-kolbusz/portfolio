@@ -7,18 +7,19 @@ import Image from 'next/image'
 
 import { StarIcon } from '@phosphor-icons/react'
 
-import type { PortfolioEntry } from '@/features/work/data/projects-en'
+import type { WorkItem } from '@/features/work/data/work-items'
 import { gsap } from '@/lib/gsap'
 import { ANIMATION } from '@/shared/config/animations'
 import { useTimeline } from '@/shared/hooks/timeline/useTimeline'
 
 interface BookTableOfContentsProps {
-  entries: PortfolioEntry[]
+  entries: WorkItem[]
   onNavigate: (index: number) => void
 }
 
 export function BookTableOfContents({ entries, onNavigate }: BookTableOfContentsProps) {
-  const t = useTranslations('projectsBook')
+  const t = useTranslations('work.book')
+  const category = useTranslations('work.categories')
   const [hoveredId, setHoveredId] = useState<string | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const previewRef = useRef<HTMLDivElement>(null)
@@ -98,7 +99,7 @@ export function BookTableOfContents({ entries, onNavigate }: BookTableOfContents
 
                 {/* Category badge */}
                 <span className="border-border/60 text-muted-foreground rounded-full border px-2.5 py-0.5 text-[11px] font-medium">
-                  {t(`categories.${entry.category}`)}
+                  {category(entry.category)}
                 </span>
 
                 {/* Role icon */}

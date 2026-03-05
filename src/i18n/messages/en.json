@@ -1,10 +1,10 @@
 {
-  "Metadata": {
+  "metadata": {
     "title": "Sebastian Kolbusz | Freelance Frontend Engineer & SaaS Developer",
     "description": "Senior Frontend Engineer specializing in high-performance SaaS products, Next.js, and immersive web experiences. Based in Zakopane, Poland."
   },
   "actions": {
-    "skip_to_main": "Skip to main content"
+    "skipToMain": "Skip to main content"
   },
   "nav": {
     "hero": "Home",
@@ -13,19 +13,7 @@
     "services": "Services",
     "calculator": "3D Print",
     "contact": "Contact",
-    "cv": "CV"
-  },
-  "HomePage": {
-    "title": "Sebastian Kolbusz",
-    "subtitle": "Senior Frontend Engineer & SaaS Specialist"
-  },
-  "common": {
-    "home": "Home",
-    "about": "About",
-    "projects": "Projects",
-    "services": "Services",
-    "cv": "CV",
-    "contact": "Contact"
+    "resume": "CV"
   },
   "hero": {
     "name": "Sebastian Kolbusz",
@@ -35,11 +23,11 @@
   },
   "about": {
     "title": "The Craft & Context",
-    "figure_profile": "FIG. 1.0 — PROFILE",
-    "philosophy_label": "My Philosophy",
-    "experience_label": "Experience",
-    "location_label": "Location",
-    "stack_label": "Core Stack",
+    "figureProfile": "FIG. 1.0 — PROFILE",
+    "philosophyLabel": "My Philosophy",
+    "experienceLabel": "Experience",
+    "locationLabel": "Location",
+    "stackLabel": "Core Stack",
     "bio": {
       "title": "Sebastian Kolbusz",
       "description": "Frontend architect with over 6 years of experience engineering scalable SaaS products and high-conversion digital assets."
@@ -56,64 +44,64 @@
     "philosophy": {
       "title": "Engineering Mindset",
       "details": "I champion simplicity, performance, and pragmatic architecture. I build systems where predictable behavior and user trust are built into the code.",
-      "craft_details": "I treat engineering as a craft. It's not just about writing code; it's about creating digital environments that feel natural, responsive, and human."
+      "craftDetails": "I treat engineering as a craft. It's not just about writing code; it's about creating digital environments that feel natural, responsive, and human."
     },
     "skills": {
       "title": "Technical Toolkit"
     }
   },
-  "projects": {
-    "title": "Featured Case Studies",
-    "intro": "I treat every line of code as a business investment. My focus is on creating robust, accessible, and high-performance systems that solve real-world challenges. From rapid MVP prototyping to optimizing enterprise-grade SaaS, I build digital experiences designed to last and perform.",
-    "viewAll": "Explore All Work",
-    "visitSite": "Launch Project",
-    "explore": "Explore Case Study",
-    "highlights_label": "Core Achievements",
-    "stack_label": "Technical Stack",
-    "zakofy": {
-      "description": "Premium booking engine for private Tatra mountain tours. Positioned the client as a market leader through superior SEO and a seamless UX.",
-      "highlights": {
-        "0": "High-impact visual storytelling",
-        "1": "Dynamic booking inquiry system",
-        "2": "Instant-load static generation",
-        "3": "400% growth in organic traffic"
-      }
+  "work": {
+    "section": {
+      "title": "Featured Case Studies",
+      "intro": "I treat every line of code as a business investment. My focus is on creating robust, accessible, and high-performance systems that solve real-world challenges. From rapid MVP prototyping to optimizing enterprise-grade SaaS, I build digital experiences designed to last and perform.",
+      "viewAll": "Explore All Work",
+      "visitSite": "Launch Project",
+      "explore": "Explore Case Study",
+      "highlightsLabel": "Core Achievements",
+      "stackLabel": "Technical Stack"
     },
-    "your-krakow-travel": {
-      "description": "Unified discovery platform for Kraków's premier private tour provider. Centralized fragmented offerings into a high-conversion sales tool.",
-      "highlights": {
-        "0": "Conversion-optimized tour catalog",
-        "1": "60% direct booking share achieved",
-        "2": "Structured data for Google rich results",
-        "3": "Comprehensive trust-signal architecture"
-      }
+    "book": {
+      "title": "Portfolio",
+      "subtitle": "A curated collection of high-performance e-commerce platforms, landing pages, and SaaS engineering.",
+      "tocTitle": "Project Index",
+      "exploreLabel": "Explore Case Study",
+      "visitSiteLabel": "Launch Site",
+      "backLabel": "Back",
+      "backToWork": "Back to Portfolio",
+      "prevProject": "← Previous",
+      "nextProject": "Next →",
+      "roleLabel": "Engineering Role"
     },
-    "wellezza": {
-      "description": "Digital storefront for an elite hair salon. Transformed local presence through seamless third-party booking integration.",
-      "highlights": {
-        "0": "Frictionless online scheduling",
-        "1": "95+ Lighthouse performance score",
-        "2": "Premium visual identity implementation",
-        "3": "Local SEO dominance in Wieliczka"
-      }
+    "caseStudy": {
+      "problemTitle": "The Business Challenge",
+      "approachTitle": "Strategic Approach",
+      "solutionTitle": "Technical Solution",
+      "resultsTitle": "Key Outcomes",
+      "galleryTitle": "Visual Overview",
+      "clientLabel": "Client",
+      "roleLabel": "My Contribution",
+      "techLabel": "Core Technologies",
+      "timelineTitle": "Professional Journey",
+      "nextProjectLabel": "Next Project",
+      "prevProjectLabel": "Previous Project",
+      "viewImageLabel": "View High-Res"
     },
-    "billboard-zakopane": {
-      "description": "B2B platform for regional outdoor advertising leader. Streamlined the sales process with interactive location mapping.",
-      "highlights": {
-        "0": "Interactive billboard location map",
-        "1": "Authority-building company narrative",
-        "2": "Direct B2B lead generation channel",
-        "3": "Scalable service catalog architecture"
-      }
+    "categories": {
+      "eCommerce": "E-Commerce",
+      "saas": "SaaS Products",
+      "landingPage": "Sales Pages",
+      "webApp": "Web Applications",
+      "cms": "Content Systems",
+      "other": "Other"
     }
   },
   "services": {
     "title": "Strategic Services",
     "intro": "Invest in Digital Assets, Not Just Code. I build systems designed to generate revenue, authority, and long-term trust.",
     "cta": "Request a Strategic Consultation",
-    "popular_badge": "High Demand",
-    "limited_availability": "* Accepting new projects for late Q1 2026",
-    "landing-page": {
+    "popularBadge": "High Demand",
+    "limitedAvailability": "* Accepting new projects for late Q1 2026",
+    "landingPage": {
       "label": "Landing Page",
       "title": "High-Conversion Sales Page",
       "price": "€850",
@@ -141,7 +129,7 @@
       },
       "cta": "Establish Your Authority"
     },
-    "web-app": {
+    "webApp": {
       "label": "SaaS / App",
       "title": "Market-Ready MVP",
       "price": "€3,900",
@@ -185,7 +173,10 @@
           "title": "Engineering",
           "desc": "High-fidelity development with agile feedback loops."
         },
-        "3": { "title": "Scale", "desc": "Deployment, SEO launch, and future-proofing." }
+        "3": {
+          "title": "Scale",
+          "desc": "Deployment, SEO launch, and future-proofing."
+        }
       }
     }
   },
@@ -193,7 +184,6 @@
     "title": "Instant Production Quote",
     "description": "Stop guessing. Get a precise, real-time cost estimate for your 3D manufacturing project in seconds.",
     "dimensions": "Part Dimensions",
-    "unit_cm": "Unit: CM",
     "configuration": "Print Settings",
     "material": "Material Choice",
     "infill": "Infill Density (%)",
@@ -201,12 +191,13 @@
     "depth": "Depth (Y)",
     "height": "Height (Z)",
     "output": {
-      "material_cost": "Raw Material Cost",
-      "time_cost": "Production Time",
+      "materialCost": "Raw Material Cost",
+      "timeCost": "Production Time",
       "total": "Estimated Investment"
     },
     "cta": "Request Official Quote",
-    "disclaimer": "* Estimates assume standard geometry. Complex overhangs or support material requirements may affect final pricing."
+    "disclaimer": "* Estimates assume standard geometry. Complex overhangs or support material requirements may affect final pricing.",
+    "unitCm": "Unit: CM"
   },
   "contact": {
     "title": "Let's Build Something Great",
@@ -216,10 +207,10 @@
     "github": "GitHub",
     "twitter": "X (Twitter)",
     "city": "Zakopane, Poland",
-    "location_label": "Operating From",
-    "copyright_label": "Copyright"
+    "locationLabel": "Operating From",
+    "copyrightLabel": "Copyright"
   },
-  "cv": {
+  "resume": {
     "title": "Curriculum Vitae",
     "print": "Print / Save as PDF",
     "summary": "Professional Summary",
@@ -229,40 +220,6 @@
     "languages": "Languages",
     "contact": "Direct Contact",
     "backHome": "Back to Overview"
-  },
-  "projectsBook": {
-    "title": "Portfolio",
-    "subtitle": "A curated collection of high-performance e-commerce platforms, landing pages, and SaaS engineering.",
-    "tocTitle": "Project Index",
-    "exploreLabel": "Explore Case Study",
-    "visitSiteLabel": "Launch Site",
-    "backLabel": "Back",
-    "backToProjects": "Back to Portfolio",
-    "prevProject": "← Previous",
-    "nextProject": "Next →",
-    "roleLabel": "Engineering Role",
-    "categories": {
-      "e-commerce": "E-Commerce",
-      "saas": "SaaS Products",
-      "landing-page": "Sales Pages",
-      "web-app": "Web Applications",
-      "cms": "Content Systems",
-      "other": "Other"
-    },
-    "caseStudy": {
-      "problemTitle": "The Business Challenge",
-      "approachTitle": "Strategic Approach",
-      "solutionTitle": "Technical Solution",
-      "resultsTitle": "Key Outcomes",
-      "galleryTitle": "Visual Overview",
-      "clientLabel": "Client",
-      "roleLabel": "My Contribution",
-      "techLabel": "Core Technologies",
-      "timelineTitle": "Professional Journey",
-      "nextProjectLabel": "Next Project",
-      "prevProjectLabel": "Previous Project",
-      "viewImageLabel": "View High-Res"
-    }
   },
   "footer": {
     "copyright": "© {year} Sebastian Kolbusz. Engineered for performance."

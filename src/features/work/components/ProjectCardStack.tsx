@@ -7,7 +7,7 @@ import Image from 'next/image'
 
 import { ArrowLeftIcon, ArrowUpRightIcon, StarIcon } from '@phosphor-icons/react'
 
-import type { PortfolioEntry } from '@/features/work/data/projects-en'
+import type { WorkItem } from '@/features/work/data/work-items'
 import { Link } from '@/i18n/navigation'
 import { getHomeSectionHref, getWorkDetailHref } from '@/i18n/route-map'
 import { ANIMATION } from '@/shared/config/animations'
@@ -17,11 +17,12 @@ import { Button } from '@/shared/ui/Button'
 import { ProjectMeta } from './ProjectMeta'
 
 interface ProjectCardStackProps {
-  projects: PortfolioEntry[]
+  projects: WorkItem[]
 }
 
 export function ProjectCardStack({ projects }: ProjectCardStackProps) {
-  const t = useTranslations('projectsBook')
+  const t = useTranslations('work.book')
+  const category = useTranslations('work.categories')
   const containerRef = useRef<HTMLDivElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
@@ -96,7 +97,7 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
 
               {/* Category */}
               <span className="border-border/60 text-muted-foreground shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-medium">
-                {t(`categories.${entry.category}`)}
+                {category(entry.category)}
               </span>
             </Link>
 

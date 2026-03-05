@@ -21,7 +21,7 @@ import { Select } from '@/shared/ui/Select'
 import { Slider } from '@/shared/ui/Slider'
 
 export function LabPageClient() {
-  const cv = useTranslations('cv')
+  const resume = useTranslations('resume')
   const colors = [
     { name: 'Background', variable: 'var(--background)' },
     { name: 'Foreground', variable: 'var(--foreground)' },
@@ -44,7 +44,7 @@ export function LabPageClient() {
           size="md"
           leftIcon={<ArrowLeftIcon weight="bold" className="size-4" />}
         >
-          {cv('backHome')}
+          {resume('backHome')}
         </Button>
       </div>
 

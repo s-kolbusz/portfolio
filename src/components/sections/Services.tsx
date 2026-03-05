@@ -19,6 +19,9 @@ interface ServicesProps {
   headingLevel?: 'h1' | 'h2'
 }
 
+const SERVICE_FEATURE_KEYS = ['0', '1', '2', '3', '4'] as const
+const SERVICE_PROCESS_STEP_KEYS = ['0', '1', '2', '3'] as const
+
 export function Services({ headingLevel = 'h2' }: ServicesProps) {
   const t = useTranslations('services')
   const sectionRef = useRef<HTMLElement>(null)
@@ -26,7 +29,6 @@ export function Services({ headingLevel = 'h2' }: ServicesProps) {
   const gridRef = useRef<HTMLDivElement>(null)
   const processRef = useRef<HTMLDivElement>(null)
   const processStepsRef = useRef<HTMLDivElement>(null)
-  const featureCount = 5
   const contactHref = getHomeSectionHref('contact')
 
   useTimeline(sectionRef, { id: 'services' }, (reveal) => {
@@ -51,14 +53,14 @@ export function Services({ headingLevel = 'h2' }: ServicesProps) {
         ref={headerRef}
         title={t('title')}
         subtitle={t('intro')}
-        tagline={t('limited_availability')}
+        tagline={t('limitedAvailability')}
         titleAs={headingLevel}
       />
 
       {/* Adjusted Grid: Show all 4 in a row on large screens */}
       <div ref={gridRef} className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4 xl:gap-4">
         {services.map((service) => {
-          const isPopular = service.popular
+          const isPopular = 'popular' in service && service.popular
           return (
             <div
               key={service.id}
@@ -73,7 +75,7 @@ export function Services({ headingLevel = 'h2' }: ServicesProps) {
               {isPopular && (
                 <div className="bg-primary text-primary-foreground absolute -top-3 left-8 flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold tracking-widest uppercase shadow-md transition-transform group-hover:-translate-y-1">
                   <StarIcon weight="fill" className="size-3" />
-                  {t('popular_badge')}
+                  {t('popularBadge')}
                 </div>
               )}
 
@@ -104,8 +106,8 @@ export function Services({ headingLevel = 'h2' }: ServicesProps) {
 
                 {/* Features List */}
                 <ul className="border-border flex flex-col gap-3 border-t pt-6">
-                  {Array.from({ length: featureCount }).map((_, i) => (
-                    <li key={i} className="flex items-start gap-2.5">
+                  {SERVICE_FEATURE_KEYS.map((featureKey) => (
+                    <li key={featureKey} className="flex items-start gap-2.5">
                       <CheckIcon
                         className={cn(
                           'mt-1 size-3 shrink-0 transition-all',
@@ -116,7 +118,7 @@ export function Services({ headingLevel = 'h2' }: ServicesProps) {
                         weight="bold"
                       />
                       <span className="text-muted-foreground group-hover:text-foreground font-sans text-sm transition-colors">
-                        {t(`${service.id}.features.${i}`)}
+                        {t(`${service.id}.features.${featureKey}`)}
                       </span>
                     </li>
                   ))}
@@ -150,12 +152,14 @@ export function Services({ headingLevel = 'h2' }: ServicesProps) {
         </div>
 
         <div ref={processStepsRef} className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="flex flex-col gap-4">
-              <span className="text-primary/20 font-mono text-4xl font-bold">0{i + 1}</span>
-              <h4 className="font-serif text-xl font-medium">{t(`process.steps.${i}.title`)}</h4>
+          {SERVICE_PROCESS_STEP_KEYS.map((stepKey, index) => (
+            <div key={stepKey} className="flex flex-col gap-4">
+              <span className="text-primary/20 font-mono text-4xl font-bold">0{index + 1}</span>
+              <h4 className="font-serif text-xl font-medium">
+                {t(`process.steps.${stepKey}.title`)}
+              </h4>
               <p className="text-muted-foreground font-sans text-sm leading-relaxed">
-                {t(`process.steps.${i}.desc`)}
+                {t(`process.steps.${stepKey}.desc`)}
               </p>
             </div>
           ))}

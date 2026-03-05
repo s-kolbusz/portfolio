@@ -7,14 +7,14 @@ import Image from 'next/image'
 
 import { ArrowLeftIcon, ArrowRightIcon, XIcon } from '@phosphor-icons/react'
 
-import type { MediaItem } from '@/features/work/data/projects'
+import type { WorkItemMedia } from '@/features/work/data/work-items'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { useFocusTrap } from '@/shared/hooks/useFocusTrap'
 import { useScrollStore } from '@/shared/lib/scroll-store'
 import { Button } from '@/shared/ui/Button'
 
 interface LightboxProps {
-  images: readonly MediaItem[]
+  images: readonly WorkItemMedia[]
   initialIndex: number
   onClose: () => void
 }

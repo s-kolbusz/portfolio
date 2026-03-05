@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getProject } from '@/features/work/data/get-projects'
+import { getWorkItem } from '@/features/work/data/get-work-items'
 import enMessages from '@/i18n/messages/en.json'
 import { getPageHref } from '@/i18n/route-map'
 
@@ -14,8 +14,8 @@ describe('page metadata', () => {
   it('builds home metadata', () => {
     const metadata = buildHomePageMetadata({
       locale: 'en',
-      title: enMessages.Metadata.title,
-      description: enMessages.Metadata.description,
+      title: enMessages.metadata.title,
+      description: enMessages.metadata.description,
     })
 
     expect(metadata).toMatchInlineSnapshot(`
@@ -38,8 +38,8 @@ describe('page metadata', () => {
   it('builds resume metadata without duplicating the global title suffix', () => {
     const metadata = buildLocalizedPageMetadata({
       locale: 'en',
-      title: enMessages.cv.title,
-      description: enMessages.Metadata.description,
+      title: enMessages.resume.title,
+      description: enMessages.metadata.description,
       path: getPageHref('resume'),
     })
 
@@ -61,8 +61,8 @@ describe('page metadata', () => {
   it('builds work index metadata without duplicating the global title suffix', () => {
     const metadata = buildLocalizedPageMetadata({
       locale: 'en',
-      title: enMessages.projectsBook.title,
-      description: enMessages.projectsBook.subtitle,
+      title: enMessages.work.book.title,
+      description: enMessages.work.book.subtitle,
       path: getPageHref('work'),
     })
 
@@ -105,7 +105,7 @@ describe('page metadata', () => {
   })
 
   it('builds work detail metadata with canonical alternates', () => {
-    const project = getProject('zakofy', 'en')
+    const project = getWorkItem('zakofy', 'en')
     if (!project) {
       throw new Error('Expected fixture project to exist')
     }
@@ -114,7 +114,7 @@ describe('page metadata', () => {
       locale: 'en',
       slug: project.id,
       project,
-      categoryLabel: enMessages.projectsBook.categories[project.category],
+      categoryLabel: enMessages.work.categories[project.category],
     })
 
     expect(metadata).toMatchInlineSnapshot(`

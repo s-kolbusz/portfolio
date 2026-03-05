@@ -1,7 +1,6 @@
-import type { PortfolioEntryId } from './projects'
-import type { PortfolioEntryContent } from './projects-en'
+import type { WorkItemContent, WorkItemId } from './work-items'
 
-export const projectsPl = {
+export const workItemsPl = {
   zakofy: {
     title: 'Zakofy',
     subtitle: 'System rezerwacyjny klasy Premium',
@@ -106,4 +105,4 @@ export const projectsPl = {
       },
     ],
   },
-} satisfies Record<PortfolioEntryId, PortfolioEntryContent>
+} satisfies Record<WorkItemId, WorkItemContent>

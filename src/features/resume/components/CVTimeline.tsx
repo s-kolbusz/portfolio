@@ -4,7 +4,7 @@ import React, { useRef, useEffect } from 'react'
 
 import { useTranslations } from 'next-intl'
 
-import type { CVEducation, CVExperience } from '@/features/resume/data/cv'
+import type { ResumeEducation, ResumeExperience } from '@/features/resume/data/resume'
 import { gsap, ScrollTrigger } from '@/lib/gsap'
 
 import { CVEntry } from './CVEntry'
@@ -12,12 +12,12 @@ import { CVEntry } from './CVEntry'
 gsap.registerPlugin(ScrollTrigger)
 
 interface CVTimelineProps {
-  experience: CVExperience[]
-  education: CVEducation[]
+  experience: ResumeExperience[]
+  education: ResumeEducation[]
 }
 
 export const CVTimeline: React.FC<CVTimelineProps> = ({ experience, education }) => {
-  const t = useTranslations('cv')
+  const t = useTranslations('resume')
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {

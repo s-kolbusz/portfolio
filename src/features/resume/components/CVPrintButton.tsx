@@ -9,7 +9,7 @@ import { PrinterIcon } from '@phosphor-icons/react'
 import { Button } from '@/shared/ui/Button'
 
 export const CVPrintButton = () => {
-  const t = useTranslations('cv')
+  const t = useTranslations('resume')
 
   return (
     <Button

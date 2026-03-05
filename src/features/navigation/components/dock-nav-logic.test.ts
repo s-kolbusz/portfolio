@@ -41,10 +41,10 @@ describe('dock-nav logic', () => {
     expect(index).toBe(servicesIndex)
   })
 
-  it('selects cv item on resume pages', () => {
+  it('selects resume item on resume pages', () => {
     const index = getActiveItemIndex({ pathname: '/pl/resume', activeSection: null })
-    const cvIndex = NAV_ITEMS.findIndex((item) => item.id === 'cv')
-    expect(index).toBe(cvIndex)
+    const resumeIndex = NAV_ITEMS.findIndex((item) => item.id === 'resume')
+    expect(index).toBe(resumeIndex)
   })
 
   it('does not select homepage items on non-home routes without dedicated dock entries', () => {
@@ -53,13 +53,13 @@ describe('dock-nav logic', () => {
   })
 
   it('computes desktop indicator offset with page separator accounted for', () => {
-    const cvIndex = NAV_ITEMS.findIndex((item) => item.id === 'cv')
-    expect(getDesktopIndicatorOffset(cvIndex)).toBe(409)
+    const resumeIndex = NAV_ITEMS.findIndex((item) => item.id === 'resume')
+    expect(getDesktopIndicatorOffset(resumeIndex)).toBe(409)
   })
 
   it('computes mobile indicator offset with page separator accounted for', () => {
-    const cvIndex = NAV_ITEMS.findIndex((item) => item.id === 'cv')
-    expect(getMobileIndicatorOffset(cvIndex)).toBe(325)
+    const resumeIndex = NAV_ITEMS.findIndex((item) => item.id === 'resume')
+    expect(getMobileIndicatorOffset(resumeIndex)).toBe(325)
   })
 
   it('computes hover scale based on index distance', () => {

@@ -1,10 +1,10 @@
 {
-  "Metadata": {
+  "metadata": {
     "title": "Sebastian Kolbusz | Senior Frontend Engineer & Specjalista SaaS",
     "description": "Senior Frontend Engineer specjalizujący się w wydajnych produktach SaaS, Next.js i immersyjnych doświadczeniach webowych. Zakopane, Polska."
   },
   "actions": {
-    "skip_to_main": "Przejdź do treści"
+    "skipToMain": "Przejdź do treści"
   },
   "nav": {
     "hero": "Główna",
@@ -13,19 +13,7 @@
     "services": "Usługi",
     "calculator": "Druk 3D",
     "contact": "Kontakt",
-    "cv": "CV"
-  },
-  "HomePage": {
-    "title": "Sebastian Kolbusz",
-    "subtitle": "Senior Frontend Engineer | Specjalista SaaS"
-  },
-  "common": {
-    "home": "Główna",
-    "about": "O mnie",
-    "projects": "Realizacje",
-    "services": "Usługi",
-    "cv": "CV",
-    "contact": "Kontakt"
+    "resume": "CV"
   },
   "hero": {
     "name": "Sebastian Kolbusz",
@@ -35,11 +23,11 @@
   },
   "about": {
     "title": "Doświadczenie i Warsztat",
-    "figure_profile": "RYS. 1.0 — PROFIL",
-    "philosophy_label": "Moje Podejście",
-    "experience_label": "Doświadczenie",
-    "location_label": "Lokalizacja",
-    "stack_label": "Główny Stack",
+    "figureProfile": "RYS. 1.0 — PROFIL",
+    "philosophyLabel": "Moje Podejście",
+    "experienceLabel": "Doświadczenie",
+    "locationLabel": "Lokalizacja",
+    "stackLabel": "Główny Stack",
     "bio": {
       "title": "Sebastian Kolbusz",
       "description": "Architekt frontend z ponad 6-letnim doświadczeniem w budowaniu skalowalnych systemów SaaS oraz wydajnych rozwiązań webowych."
@@ -56,64 +44,64 @@
     "philosophy": {
       "title": "Inżynierski mindset",
       "details": "Cenię prostotę, wydajność i pragmatyzm. Projektuję systemy, których fundamentem jest niezawodność i zaufanie użytkownika.",
-      "craft_details": "Traktuję inżynierię oprogramowania jak rzemiosło. Nie chodzi tylko o pisanie kodu, ale o tworzenie cyfrowych przestrzeni, które są intuicyjne, responsywne i po prostu ludzkie."
+      "craftDetails": "Traktuję inżynierię oprogramowania jak rzemiosło. Nie chodzi tylko o pisanie kodu, ale o tworzenie cyfrowych przestrzeni, które są intuicyjne, responsywne i po prostu ludzkie."
     },
     "skills": {
       "title": "Technologie"
     }
   },
-  "projects": {
-    "title": "Wybrane Case Studies",
-    "intro": "Kod traktuję jako inwestycję biznesową. Skupiam się na tworzeniu solidnych, dostępnych i wydajnych systemów, które rozwiązują realne problemy. Od szybkich prototypów MVP po optymalizację rozbudowanych systemów SaaS – buduję rozwiązania stworzone, by zarabiać i trwać.",
-    "viewAll": "Zobacz wszystkie projekty",
-    "visitSite": "Uruchom projekt",
-    "explore": "Poznaj Case Study",
-    "highlights_label": "Kluczowe osiągnięcia",
-    "stack_label": "Stos technologiczny",
-    "zakofy": {
-      "description": "System rezerwacyjny premium dla prywatnych wycieczek tatrzańskich. Pozycjonuje klienta jako lidera rynku dzięki zaawansowanemu SEO i intuicyjnemu UX.",
-      "highlights": {
-        "0": "Angażujący storytelling wizualny",
-        "1": "Dynamiczny system zapytań",
-        "2": "Błyskawiczne ładowanie (Static Gen)",
-        "3": "400% wzrostu ruchu organicznego"
-      }
+  "work": {
+    "section": {
+      "title": "Wybrane Case Studies",
+      "intro": "Kod traktuję jako inwestycję biznesową. Skupiam się na tworzeniu solidnych, dostępnych i wydajnych systemów, które rozwiązują realne problemy. Od szybkich prototypów MVP po optymalizację rozbudowanych systemów SaaS – buduję rozwiązania stworzone, by zarabiać i trwać.",
+      "viewAll": "Zobacz wszystkie projekty",
+      "visitSite": "Uruchom projekt",
+      "explore": "Poznaj Case Study",
+      "highlightsLabel": "Kluczowe osiągnięcia",
+      "stackLabel": "Stos technologiczny"
     },
-    "your-krakow-travel": {
-      "description": "Zunifikowana platforma dla czołowego dostawcy wycieczek w Krakowie. Skonsolidowanie rozproszonej oferty w skuteczne narzędzie sprzedaży.",
-      "highlights": {
-        "0": "Katalog zoptymalizowany pod konwersję",
-        "1": "60% udziału rezerwacji bezpośrednich",
-        "2": "Dane strukturalne (Google Rich Results)",
-        "3": "Architektura budująca zaufanie"
-      }
+    "book": {
+      "title": "Portfolio",
+      "subtitle": "Wyselekcjonowana kolekcja wydajnych platform e-commerce, stron sprzedażowych i rozwiązań SaaS.",
+      "tocTitle": "Indeks Projektów",
+      "exploreLabel": "Poznaj Case Study",
+      "visitSiteLabel": "Uruchom Stronę",
+      "backLabel": "Wróć",
+      "backToWork": "Wróć do Portfolio",
+      "prevProject": "← Poprzedni",
+      "nextProject": "Następny →",
+      "roleLabel": "Rola inżynierska"
     },
-    "wellezza": {
-      "description": "Cyfrowa wizytówka elitarnego salonu fryzjerskiego. Transformacja lokalnej obecności poprzez płynną integrację z systemem rezerwacji.",
-      "highlights": {
-        "0": "Bezproblemowe zapisy online 24/7",
-        "1": "Wynik wydajności Lighthouse 95+",
-        "2": "Wdrożenie identyfikacji klasy premium",
-        "3": "Dominacja w lokalnym SEO (Wieliczka)"
-      }
+    "caseStudy": {
+      "problemTitle": "Wyzwanie Biznesowe",
+      "approachTitle": "Podejście Strategiczne",
+      "solutionTitle": "Rozwiązanie Techniczne",
+      "resultsTitle": "Kluczowe Wyniki",
+      "galleryTitle": "Przegląd Wizualny",
+      "clientLabel": "Klient",
+      "roleLabel": "Mój wkład",
+      "techLabel": "Główne technologie",
+      "timelineTitle": "Ścieżka Zawodowa",
+      "nextProjectLabel": "Następny projekt",
+      "prevProjectLabel": "Poprzedni projekt",
+      "viewImageLabel": "Zobacz w wysokiej rozdzielczości"
     },
-    "billboard-zakopane": {
-      "description": "Platforma B2B dla lidera reklamy outdoorowej. Usprawnienie procesu sprzedaży dzięki interaktywnej mapie lokalizacji.",
-      "highlights": {
-        "0": "Interaktywna mapa billboardów",
-        "1": "Narracja budująca autorytet marki",
-        "2": "Bezpośredni kanał generowania leadów",
-        "3": "Skalowalna architektura usług"
-      }
+    "categories": {
+      "eCommerce": "E-Commerce",
+      "saas": "Produkty SaaS",
+      "landingPage": "Strony Sprzedażowe",
+      "webApp": "Aplikacje Webowe",
+      "cms": "Systemy Treści",
+      "other": "Inne"
     }
   },
   "services": {
     "title": "Usługi strategiczne",
     "intro": "Inwestuj w rozwiązania, które budują wartość Twojej firmy, a nie tylko w kod. Projektuję systemy, które generują przychód i zaufanie.",
     "cta": "Umów konsultację strategiczną",
-    "popular_badge": "Popularny wybór",
-    "limited_availability": "* Przyjmuję projekty na koniec Q1 2026",
-    "landing-page": {
+    "popularBadge": "Popularny wybór",
+    "limitedAvailability": "* Przyjmuję projekty na koniec Q1 2026",
+    "landingPage": {
       "label": "Landing Page",
       "title": "Skuteczna Strona Sprzedażowa",
       "price": "3500 zł",
@@ -141,7 +129,7 @@
       },
       "cta": "Zbuduj Swój Autorytet"
     },
-    "web-app": {
+    "webApp": {
       "label": "SaaS / Aplikacja",
       "title": "MVP Gotowe na Rynek",
       "price": "18 000 zł",
@@ -185,7 +173,10 @@
           "title": "Implementacja",
           "desc": "Rozwój wysokiej jakości z szybką pętlą feedbacku."
         },
-        "3": { "title": "Skalowanie", "desc": "Wdrożenie, start SEO i przyszłościowe wsparcie." }
+        "3": {
+          "title": "Skalowanie",
+          "desc": "Wdrożenie, start SEO i przyszłościowe wsparcie."
+        }
       }
     }
   },
@@ -193,7 +184,6 @@
     "title": "Szybka Wycena Produkcji",
     "description": "Otrzymaj precyzyjny, rzeczywisty kosztorys Twojego projektu 3D w kilka sekund.",
     "dimensions": "Wymiary części",
-    "unit_cm": "Jednostka: CM",
     "configuration": "Ustawienia druku",
     "material": "Wybór materiału",
     "infill": "Gęstość wypełnienia (%)",
@@ -201,12 +191,13 @@
     "depth": "Głębokość (Y)",
     "height": "Wysokość (Z)",
     "output": {
-      "material_cost": "Koszt surowca",
-      "time_cost": "Czas produkcji",
+      "materialCost": "Koszt surowca",
+      "timeCost": "Czas produkcji",
       "total": "Szacowana inwestycja"
     },
     "cta": "Zamów Oficjalną Wycenę",
-    "disclaimer": "* Szacunki zakładają standardową geometrię. Złożone nawisy lub konieczność stosowania podpór mogą wpłynąć na cenę."
+    "disclaimer": "* Szacunki zakładają standardową geometrię. Złożone nawisy lub konieczność stosowania podpór mogą wpłynąć na cenę.",
+    "unitCm": "Jednostka: CM"
   },
   "contact": {
     "title": "Zbudujmy coś wielkiego",
@@ -216,10 +207,10 @@
     "github": "GitHub",
     "twitter": "X (Twitter)",
     "city": "Zakopane, Polska",
-    "location_label": "Pracuję z",
-    "copyright_label": "Prawa autorskie"
+    "locationLabel": "Pracuję z",
+    "copyrightLabel": "Prawa autorskie"
   },
-  "cv": {
+  "resume": {
     "title": "Życiorys Zawodowy",
     "print": "Drukuj / Zapisz jako PDF",
     "summary": "Podsumowanie zawodowe",
@@ -229,40 +220,6 @@
     "languages": "Języki",
     "contact": "Kontakt bezpośredni",
     "backHome": "Wróć do przeglądu"
-  },
-  "projectsBook": {
-    "title": "Portfolio",
-    "subtitle": "Wyselekcjonowana kolekcja wydajnych platform e-commerce, stron sprzedażowych i rozwiązań SaaS.",
-    "tocTitle": "Indeks Projektów",
-    "exploreLabel": "Poznaj Case Study",
-    "visitSiteLabel": "Uruchom Stronę",
-    "backLabel": "Wróć",
-    "backToProjects": "Wróć do Portfolio",
-    "prevProject": "← Poprzedni",
-    "nextProject": "Następny →",
-    "roleLabel": "Rola inżynierska",
-    "categories": {
-      "e-commerce": "E-Commerce",
-      "saas": "Produkty SaaS",
-      "landing-page": "Strony Sprzedażowe",
-      "web-app": "Aplikacje Webowe",
-      "cms": "Systemy Treści",
-      "other": "Inne"
-    },
-    "caseStudy": {
-      "problemTitle": "Wyzwanie Biznesowe",
-      "approachTitle": "Podejście Strategiczne",
-      "solutionTitle": "Rozwiązanie Techniczne",
-      "resultsTitle": "Kluczowe Wyniki",
-      "galleryTitle": "Przegląd Wizualny",
-      "clientLabel": "Klient",
-      "roleLabel": "Mój wkład",
-      "techLabel": "Główne technologie",
-      "timelineTitle": "Ścieżka Zawodowa",
-      "nextProjectLabel": "Następny projekt",
-      "prevProjectLabel": "Poprzedni projekt",
-      "viewImageLabel": "Zobacz w wysokiej rozdzielczości"
-    }
   },
   "footer": {
     "copyright": "© {year} Sebastian Kolbusz. Engineered for performance."

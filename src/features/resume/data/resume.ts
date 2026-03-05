@@ -1,4 +1,4 @@
-export interface CVExperience {
+export interface ResumeExperience {
   company: string
   title: string
   location: string
@@ -7,7 +7,7 @@ export interface CVExperience {
   highlights: string[]
 }
 
-export interface CVEducation {
+export interface ResumeEducation {
   school: string
   degree: string
   location: string
@@ -15,7 +15,7 @@ export interface CVEducation {
   highlights: string[]
 }
 
-export interface CVData {
+export interface ResumeData {
   name: string
   title: string
   contact: {
@@ -26,8 +26,8 @@ export interface CVData {
     github?: string
   }
   summary: string
-  experience: CVExperience[]
-  education: CVEducation[]
+  experience: ResumeExperience[]
+  education: ResumeEducation[]
   skills: {
     category: string
     items: string[]

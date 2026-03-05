@@ -1,45 +1,63 @@
 // ---------------------------------------------------------------------------
-// Portfolio Entry — Locale-independent shared base
+// Work Item — Locale-independent shared base
 // ---------------------------------------------------------------------------
 
-export type EntryType = 'project' | 'role'
+export type WorkItemType = 'project' | 'role'
 
-export type Category = 'e-commerce' | 'saas' | 'landing-page' | 'web-app' | 'cms' | 'other'
+export type WorkCategory = 'eCommerce' | 'saas' | 'landingPage' | 'webApp' | 'cms' | 'other'
 
-export interface MediaItem {
+export interface WorkItemMedia {
   url: string
   alt: string
   type: 'image' | 'video'
 }
 
-export interface RolePhase {
+export interface WorkPhase {
   period: string
 }
 
-export interface PortfolioEntryBase {
+export interface WorkItemBase {
   id: string
-  type: EntryType
+  type: WorkItemType
   year: string
-  category: Category
+  category: WorkCategory
   techStack: readonly string[]
   heroImage: string
-  gallery: readonly MediaItem[]
+  gallery: readonly WorkItemMedia[]
   featured: boolean
   order: number
   liveUrl?: string
-  timeline?: readonly RolePhase[]
+  timeline?: readonly WorkPhase[]
+}
+
+export interface WorkItemContent {
+  title: string
+  subtitle: string
+  tagline: string
+  pullQuotes: string[]
+  client?: string
+  role?: string
+  problem?: string
+  approach?: string
+  solution?: string
+  results?: string
+  phases?: {
+    title: string
+    description: string
+    highlights: string[]
+  }[]
 }
 
 // ---------------------------------------------------------------------------
 // Entries — order determines book page sequence
 // ---------------------------------------------------------------------------
 
-export const portfolioEntries = [
+export const workItems = [
   {
     id: 'zakofy',
     type: 'project',
     year: '2026',
-    category: 'e-commerce',
+    category: 'eCommerce',
     techStack: ['Next.js', 'Payload CMS', 'Tailwind CSS', 'TypeScript', 'MongoDB'],
     heroImage: '/images/projects/zakofy.avif',
     gallery: [
@@ -67,7 +85,7 @@ export const portfolioEntries = [
     id: 'your-krakow-travel',
     type: 'project',
     year: '2025',
-    category: 'e-commerce',
+    category: 'eCommerce',
     techStack: ['Next.js', 'Payload CMS', 'Tailwind CSS', 'TypeScript', 'MongoDB'],
     heroImage: '/images/projects/yourkrakowtravel.avif',
     gallery: [
@@ -90,7 +108,7 @@ export const portfolioEntries = [
     id: 'wellezza',
     type: 'project',
     year: '2024',
-    category: 'landing-page',
+    category: 'landingPage',
     techStack: ['Next.js', 'Tailwind CSS', 'TypeScript', 'GSAP'],
     heroImage: '/images/projects/wellezza.avif',
     gallery: [
@@ -113,7 +131,7 @@ export const portfolioEntries = [
     id: 'billboard-zakopane',
     type: 'project',
     year: '2023',
-    category: 'landing-page',
+    category: 'landingPage',
     techStack: ['Next.js', 'Tailwind CSS', 'TypeScript'],
     heroImage: '/images/projects/billboard.avif',
     gallery: [
@@ -145,6 +163,10 @@ export const portfolioEntries = [
     liveUrl: 'https://ready2order.com',
     timeline: [{ period: '2019–2020' }, { period: '2020–2022' }, { period: '2022–2025' }],
   },
-] as const satisfies readonly PortfolioEntryBase[]
+] as const satisfies readonly WorkItemBase[]
 
-export type PortfolioEntryId = (typeof portfolioEntries)[number]['id']
+export type WorkItemId = (typeof workItems)[number]['id']
+
+export type WorkItem = Omit<WorkItemBase, 'id'> & {
+  id: WorkItemId
+} & WorkItemContent
