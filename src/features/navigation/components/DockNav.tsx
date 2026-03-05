@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 
 import { useActiveSection } from '@/features/navigation/hooks/useActiveSection'
 import { usePathname, useRouter } from '@/i18n/navigation'
+import { isHomeRoute, isProjectsRoute } from '@/i18n/routing'
 import { useGSAP } from '@/lib/gsap'
 
 import { animateIndicator, syncIndicatorPosition, useWindowResize } from './dock-nav-indicator'
@@ -15,8 +16,6 @@ import {
   getDesktopIndicatorOffset,
   getHoverScale,
   getMobileIndicatorOffset,
-  isHomeRoute,
-  isProjectsRoute,
 } from './dock-nav-logic'
 import { DockItem } from './DockItem'
 

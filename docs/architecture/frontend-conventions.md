@@ -30,6 +30,7 @@ These rules apply to all code in `src/` and are enforced in CI by:
 
 - `src/shared/config` and feature/local constants modules must contain static data only.
 - Hook-bearing or environment-dependent behavior belongs in hooks or runtime lib modules, not alongside config exports.
+- Locale routing config, route predicates, and locale-aware path helpers must be centralized in `src/i18n/routing.ts`.
 - `src/i18n`: locale routing and messages.
 
 ## Import Boundaries

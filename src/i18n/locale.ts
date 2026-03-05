@@ -1,19 +1,6 @@
-import { hasLocale } from 'next-intl'
 import { notFound } from 'next/navigation'
 
-import { routing, type Locale } from './routing'
-
-export function isRoutingLocale(locale: string): locale is Locale {
-  return hasLocale(routing.locales, locale)
-}
-
-export function getLocaleOrDefault(locale?: string | null): Locale {
-  if (locale && isRoutingLocale(locale)) {
-    return locale
-  }
-
-  return routing.defaultLocale
-}
+import { isRoutingLocale, type Locale } from './routing'
 
 export function requireRoutingLocale(locale: string): Locale {
   if (!isRoutingLocale(locale)) {

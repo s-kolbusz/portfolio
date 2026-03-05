@@ -1,9 +1,7 @@
 import type { Metadata } from 'next'
 
 import type { PortfolioEntry } from '@/features/work/data/projects-en'
-import type { Locale } from '@/i18n/routing'
-
-import { getMetadataAlternates } from './utils'
+import { getMetadataAlternates, type Locale } from '@/i18n/routing'
 
 type LocalizedMetadataInput = {
   locale: Locale
