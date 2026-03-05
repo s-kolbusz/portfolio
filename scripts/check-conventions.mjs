@@ -55,6 +55,14 @@ function stripKnownTestSuffix(baseName) {
   return baseName
 }
 
+function stripDeclarationSuffix(baseName) {
+  if (baseName.endsWith('.d')) {
+    return baseName.slice(0, -'.d'.length)
+  }
+
+  return baseName
+}
+
 function hasExportedHook(filePath) {
   const content = readFileSync(filePath, 'utf8')
   return EXPORTED_HOOK_PATTERN.test(content)
@@ -154,14 +162,14 @@ function walkDirectory(currentPath) {
     }
 
     if (extension === '.ts' && isComponentUtilityModule(relativePath)) {
-      const normalizedName = stripKnownTestSuffix(baseName)
+      const normalizedName = stripDeclarationSuffix(stripKnownTestSuffix(baseName))
       if (!KEBAB_CASE_PATTERN.test(normalizedName)) {
         errors.push(`Component utility TypeScript modules must use kebab-case: src/${relativePath}`)
       }
     }
 
     if (extension === '.ts' && isDataOrLibModule(relativePath)) {
-      const normalizedName = stripKnownTestSuffix(baseName)
+      const normalizedName = stripDeclarationSuffix(stripKnownTestSuffix(baseName))
       if (!KEBAB_CASE_PATTERN.test(normalizedName)) {
         errors.push(`Data/lib/config TypeScript modules must use kebab-case: src/${relativePath}`)
       }
@@ -172,7 +180,7 @@ function walkDirectory(currentPath) {
       !isTestFileBaseName(baseName) &&
       isZustandStoreModule(absolutePath)
     ) {
-      const normalizedName = stripKnownTestSuffix(baseName)
+      const normalizedName = stripDeclarationSuffix(stripKnownTestSuffix(baseName))
 
       if (!normalizedName.endsWith('-store')) {
         errors.push(`Zustand store modules must use *-store.ts naming: src/${relativePath}`)
