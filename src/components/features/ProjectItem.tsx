@@ -8,7 +8,7 @@ import { PortfolioEntry } from '@/data/projects-en'
 import { useScrollStore } from '@/lib/store'
 import { cn } from '@/lib/utils'
 
-import { isItemOutsideViewport } from './project-item/scroll'
+import { isItemOutsideViewport } from './project-item-scroll'
 import { ProjectAccordion } from './ProjectAccordion'
 import { ProjectMeta } from './ProjectMeta'
 

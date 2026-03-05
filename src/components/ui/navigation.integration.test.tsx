@@ -61,7 +61,7 @@ vi.mock('@/lib/gsap', () => ({
   useGSAP: () => undefined,
 }))
 
-vi.mock('./dock-nav/indicator', () => ({
+vi.mock('./dock-nav-indicator', () => ({
   animateIndicator: vi.fn(),
   syncIndicatorPosition: vi.fn(),
   useWindowResize: vi.fn(),

@@ -8,7 +8,7 @@ import { useActiveSection } from '@/hooks/useActiveSection'
 import { usePathname, useRouter } from '@/i18n/navigation'
 import { useGSAP } from '@/lib/gsap'
 
-import { animateIndicator, syncIndicatorPosition, useWindowResize } from './dock-nav/indicator'
+import { animateIndicator, syncIndicatorPosition, useWindowResize } from './dock-nav-indicator'
 import {
   NAV_ITEMS,
   getActiveItemIndex,
@@ -17,7 +17,7 @@ import {
   getMobileIndicatorOffset,
   isHomeRoute,
   isProjectsRoute,
-} from './dock-nav/logic'
+} from './dock-nav-logic'
 import { DockItem } from './DockItem'
 
 export function DockNav() {

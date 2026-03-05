@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getImageToRender } from './state'
+import { getImageToRender } from './project-hover-preview-state'
 
 describe('project-hover-preview state', () => {
   it('uses active image when available', () => {

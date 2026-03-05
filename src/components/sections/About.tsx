@@ -10,7 +10,7 @@ import { ArrowRightIcon } from '@phosphor-icons/react'
 import { BaseSection } from '@/components/ui/BaseSection'
 import { SkillTag } from '@/components/ui/SkillTag'
 import { skillCategories } from '@/data/skills'
-import { useTimeline } from '@/hooks/useTimeline'
+import { useTimeline } from '@/hooks/timeline/useTimeline'
 import { ANIMATION } from '@/lib/constants/animations'
 
 export const About: React.FC = () => {
