@@ -6,13 +6,13 @@ import { useTranslations } from 'next-intl'
 
 import { ArrowRightIcon, CheckIcon, StarIcon } from '@phosphor-icons/react'
 
-import { BaseSection } from '@/components/ui/BaseSection'
-import { Button } from '@/components/ui/Button'
-import { EditorialHeader } from '@/components/ui/EditorialHeader'
 import { services } from '@/data/services'
 import { useTimeline } from '@/hooks/timeline/useTimeline'
 import { ANIMATION } from '@/lib/constants/animations'
 import { cn } from '@/lib/utils'
+import { BaseSection } from '@/shared/ui/BaseSection'
+import { Button } from '@/shared/ui/Button'
+import { EditorialHeader } from '@/shared/ui/EditorialHeader'
 
 export function Services() {
   const t = useTranslations('services')

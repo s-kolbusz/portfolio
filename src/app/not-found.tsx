@@ -4,11 +4,11 @@ import { Fraunces, JetBrains_Mono } from 'next/font/google'
 import localFont from 'next/font/local'
 
 import { ThemeProvider } from '@/components/ThemeProvider'
-import { ClientOverlays } from '@/components/ui/ClientOverlays'
-import { SkipToMain } from '@/components/ui/SkipToMain'
+import { ClientOverlays } from '@/features/navigation/overlays/ClientOverlays'
 import enMessages from '@/i18n/messages/en.json'
 import { Link } from '@/i18n/navigation'
 import { routing } from '@/i18n/routing'
+import { SkipToMain } from '@/shared/ui/SkipToMain'
 
 import './globals.css'
 

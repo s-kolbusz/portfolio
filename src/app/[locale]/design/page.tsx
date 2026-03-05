@@ -12,11 +12,11 @@ import {
   SunIcon,
 } from '@phosphor-icons/react'
 
-import { BaseSection } from '@/components/ui/BaseSection'
-import { Button } from '@/components/ui/Button'
-import { Select } from '@/components/ui/Select'
-import { Slider } from '@/components/ui/Slider'
 import { ProjectMeta } from '@/features/work/components/ProjectMeta'
+import { BaseSection } from '@/shared/ui/BaseSection'
+import { Button } from '@/shared/ui/Button'
+import { Select } from '@/shared/ui/Select'
+import { Slider } from '@/shared/ui/Slider'
 
 export default function DesignPage() {
   const colors = [

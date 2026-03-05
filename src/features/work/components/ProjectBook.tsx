@@ -12,9 +12,9 @@ import { useTranslations } from 'next-intl'
 
 import { ArrowLeftIcon } from '@phosphor-icons/react'
 
-import { Button } from '@/components/ui/Button'
 import { PortfolioEntry } from '@/features/work/data/projects-en'
 import { useRouter } from '@/i18n/navigation'
+import { Button } from '@/shared/ui/Button'
 
 import { BookEdgeNav } from './BookEdgeNav'
 import { BookPageDots } from './BookPageDots'

@@ -7,11 +7,11 @@ import { useTranslations } from 'next-intl'
 import { ArrowRightIcon } from '@phosphor-icons/react'
 
 import { CalculatorPanel } from '@/components/features/CalculatorPanel'
-import { BaseSection } from '@/components/ui/BaseSection'
-import { Button } from '@/components/ui/Button'
-import { EditorialHeader } from '@/components/ui/EditorialHeader'
 import { useTimeline } from '@/hooks/timeline/useTimeline'
 import { ANIMATION } from '@/lib/constants/animations'
+import { BaseSection } from '@/shared/ui/BaseSection'
+import { Button } from '@/shared/ui/Button'
+import { EditorialHeader } from '@/shared/ui/EditorialHeader'
 
 export const PrintCalculator = () => {
   const t = useTranslations('calculator')

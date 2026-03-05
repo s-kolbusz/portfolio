@@ -3,14 +3,14 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 
 import { ArrowLeftIcon } from '@phosphor-icons/react/dist/ssr'
 
-import { BaseSection } from '@/components/ui/BaseSection'
-import { Button } from '@/components/ui/Button'
 import { CVLayout } from '@/features/resume/components/CVLayout'
 import { CVPrintButton } from '@/features/resume/components/CVPrintButton'
 import { cvDataEn } from '@/features/resume/data/cv-en'
 import { cvDataPl } from '@/features/resume/data/cv-pl'
 import { getLocaleFromParams } from '@/i18n/locale'
 import { buildCvPageMetadata } from '@/lib/page-metadata'
+import { BaseSection } from '@/shared/ui/BaseSection'
+import { Button } from '@/shared/ui/Button'
 
 type Props = {
   params: Promise<{ locale: string }>
