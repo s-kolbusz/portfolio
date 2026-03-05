@@ -25,7 +25,6 @@ describe('page metadata', () => {
           "languages": {
             "en": "/en",
             "pl": "/pl",
-            "x-default": "/en",
           },
         },
         "description": "Senior Frontend Engineer specializing in high-performance SaaS products, Next.js, and immersive web experiences. Based in Zakopane, Poland.",
@@ -50,7 +49,6 @@ describe('page metadata', () => {
           "languages": {
             "en": "/en/cv",
             "pl": "/pl/cv",
-            "x-default": "/en/cv",
           },
         },
         "description": "Senior Frontend Engineer specializing in high-performance SaaS products, Next.js, and immersive web experiences. Based in Zakopane, Poland.",
@@ -73,7 +71,6 @@ describe('page metadata', () => {
           "languages": {
             "en": "/en/projects",
             "pl": "/pl/projects",
-            "x-default": "/en/projects",
           },
         },
         "description": "A curated collection of high-performance e-commerce platforms, landing pages, and SaaS engineering.",
@@ -102,7 +99,6 @@ describe('page metadata', () => {
           "languages": {
             "en": "/en/projects/zakofy",
             "pl": "/pl/projects/zakofy",
-            "x-default": "/en/projects/zakofy",
           },
         },
         "description": "Premium Tatra Mountain Booking Engine",
