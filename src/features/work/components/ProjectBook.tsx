@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl'
 
 import { ArrowLeftIcon } from '@phosphor-icons/react'
 
-import type { PortfolioEntry } from '@/features/work/data/projects-en'
+import type { WorkItem } from '@/features/work/data/work-items'
 import { useRouter } from '@/i18n/navigation'
 import { getHomeSectionHref } from '@/i18n/route-map'
 import { Button } from '@/shared/ui/Button'
@@ -35,11 +35,11 @@ const EDITABLE_SELECTOR = [
 ].join(', ')
 
 interface ProjectBookProps {
-  projects: PortfolioEntry[]
+  projects: WorkItem[]
 }
 
 export function ProjectBook({ projects }: ProjectBookProps) {
-  const t = useTranslations('projectsBook')
+  const t = useTranslations('work.book')
   const router = useRouter()
   const backButtonRef = useRef<HTMLButtonElement>(null)
   const regionRef = useRef<HTMLDivElement>(null)
@@ -325,7 +325,7 @@ export function ProjectBook({ projects }: ProjectBookProps) {
           onClick={handleBack}
           leftIcon={<ArrowLeftIcon weight="bold" className="size-4" />}
         >
-          {isOnToC ? t('backLabel') : t('backToProjects')}
+          {isOnToC ? t('backLabel') : t('backToWork')}
         </Button>
       </div>
 

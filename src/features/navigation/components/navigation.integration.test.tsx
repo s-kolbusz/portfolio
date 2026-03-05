@@ -20,7 +20,7 @@ const navLabels = {
   services: 'Services',
   calculator: '3D Print',
   contact: 'Contact',
-  cv: 'CV',
+  resume: 'CV',
 } as const
 
 vi.mock('next-intl', () => ({

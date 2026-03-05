@@ -15,7 +15,7 @@ const Contact = dynamic(() => import('@/components/sections/Contact').then((mod)
 
 export async function generateMetadata(props: { params: Promise<{ locale: string }> }) {
   const locale = await getLocaleFromParams(props.params)
-  const t = await getTranslations({ locale, namespace: 'Metadata' })
+  const t = await getTranslations({ locale, namespace: 'metadata' })
 
   return buildHomePageMetadata({
     locale,

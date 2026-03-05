@@ -4,17 +4,17 @@ import { useTranslations } from 'next-intl'
 
 import { ArrowLeftIcon, ArrowRightIcon } from '@phosphor-icons/react'
 
-import type { PortfolioEntry } from '@/features/work/data/projects-en'
+import type { WorkItem } from '@/features/work/data/work-items'
 import { Link } from '@/i18n/navigation'
 import { getWorkDetailHref } from '@/i18n/route-map'
 
 interface ProjectNavProps {
-  prevProject?: PortfolioEntry
-  nextProject?: PortfolioEntry
+  prevProject?: WorkItem
+  nextProject?: WorkItem
 }
 
 export function ProjectNav({ prevProject, nextProject }: ProjectNavProps) {
-  const t = useTranslations('projectsBook.caseStudy')
+  const t = useTranslations('work.caseStudy')
 
   return (
     <nav className="border-border flex items-stretch border-t" aria-label="Project navigation">

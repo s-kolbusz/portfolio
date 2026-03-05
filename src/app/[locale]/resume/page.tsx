@@ -5,8 +5,8 @@ import { ArrowLeftIcon } from '@phosphor-icons/react/dist/ssr'
 
 import { CVLayout } from '@/features/resume/components/CVLayout'
 import { CVPrintButton } from '@/features/resume/components/CVPrintButton'
-import { cvDataEn } from '@/features/resume/data/cv-en'
-import { cvDataPl } from '@/features/resume/data/cv-pl'
+import { resumeDataEn } from '@/features/resume/data/resume-en'
+import { resumeDataPl } from '@/features/resume/data/resume-pl'
 import { getLocaleFromParams } from '@/i18n/locale'
 import { getPageHref } from '@/i18n/route-map'
 import { buildLocalizedPageMetadata } from '@/lib/page-metadata'
@@ -20,14 +20,14 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = await getLocaleFromParams(params)
 
-  const [cvTranslations, metadataTranslations] = await Promise.all([
-    getTranslations({ locale, namespace: 'cv' }),
-    getTranslations({ locale, namespace: 'Metadata' }),
+  const [resumeTranslations, metadataTranslations] = await Promise.all([
+    getTranslations({ locale, namespace: 'resume' }),
+    getTranslations({ locale, namespace: 'metadata' }),
   ])
 
   return buildLocalizedPageMetadata({
     locale,
-    title: cvTranslations('title'),
+    title: resumeTranslations('title'),
     description: metadataTranslations('description'),
     path: getPageHref('resume'),
   })
@@ -36,14 +36,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ResumePage({ params }: Props) {
   const locale = await getLocaleFromParams(params)
   setRequestLocale(locale)
-  const t = await getTranslations({ locale, namespace: 'cv' })
+  const t = await getTranslations({ locale, namespace: 'resume' })
 
-  const cvData = locale === 'pl' ? cvDataPl : cvDataEn
+  const resumeData = locale === 'pl' ? resumeDataPl : resumeDataEn
 
   return (
     <main id="main-content" className="bg-neutral-100/50 dark:bg-neutral-900/50 print:bg-white">
       <BaseSection
-        id="cv-header-nav"
+        id="resume-header-nav"
         className="min-h-0 py-8 md:py-20 print:hidden"
         containerClassName="max-w-[210mm] lg:px-6 print:hidden"
       >
@@ -68,7 +68,7 @@ export default async function ResumePage({ params }: Props) {
       </BaseSection>
 
       <div className="flex flex-col justify-center gap-8 pt-4 pb-18 print:p-0">
-        <CVLayout data={cvData} />
+        <CVLayout data={resumeData} />
 
         <div className="flex items-center justify-center lg:hidden">
           <CVPrintButton />

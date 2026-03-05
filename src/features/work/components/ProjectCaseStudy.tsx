@@ -7,7 +7,7 @@ import Image from 'next/image'
 
 import { ArrowLeftIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
 
-import type { PortfolioEntry } from '@/features/work/data/projects-en'
+import type { WorkItem } from '@/features/work/data/work-items'
 import { getPageHref } from '@/i18n/route-map'
 import { ANIMATION } from '@/shared/config/animations'
 import { useTimeline } from '@/shared/hooks/timeline/useTimeline'
@@ -17,14 +17,15 @@ import { Lightbox } from './Lightbox'
 import { ProjectNav } from './ProjectNav'
 
 interface ProjectCaseStudyProps {
-  project: PortfolioEntry
-  prevProject?: PortfolioEntry
-  nextProject?: PortfolioEntry
+  project: WorkItem
+  prevProject?: WorkItem
+  nextProject?: WorkItem
 }
 
 export function ProjectCaseStudy({ project, prevProject, nextProject }: ProjectCaseStudyProps) {
-  const t = useTranslations('projectsBook')
-  const cs = useTranslations('projectsBook.caseStudy')
+  const t = useTranslations('work.book')
+  const cs = useTranslations('work.caseStudy')
+  const category = useTranslations('work.categories')
   const mainRef = useRef<HTMLElement>(null)
   const heroContentRef = useRef<HTMLDivElement>(null)
   const metaRef = useRef<HTMLElement>(null)
@@ -116,7 +117,7 @@ export function ProjectCaseStudy({ project, prevProject, nextProject }: ProjectC
         >
           {/* Category + year */}
           <div className="mb-3 flex items-center gap-3 font-mono text-xs tracking-widest text-white/60 uppercase">
-            <span>{t(`categories.${project.category}`)}</span>
+            <span>{category(project.category)}</span>
             <span className="opacity-40">·</span>
             <span>{project.year}</span>
           </div>

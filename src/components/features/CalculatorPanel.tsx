@@ -88,7 +88,7 @@ export const CalculatorPanel = () => {
             <h3 className="text-primary font-mono text-sm tracking-widest uppercase">
               {t('dimensions')}
             </h3>
-            <span className="text-muted-foreground font-mono text-xs">{t('unit_cm')}</span>
+            <span className="text-muted-foreground font-mono text-xs">{t('unitCm')}</span>
           </div>
 
           <Slider
@@ -184,7 +184,7 @@ export const CalculatorPanel = () => {
         <div className="relative z-10 flex flex-col gap-8">
           <div className="space-y-2">
             <span className="font-mono text-xs tracking-widest uppercase opacity-60">
-              {t('output.material_cost')}
+              {t('output.materialCost')}
             </span>
             <div className="font-mono text-4xl font-light tracking-tight tabular-nums">
               <AnimatedNumber value={result.materialCost} formatter={formatCurrency} />
@@ -193,7 +193,7 @@ export const CalculatorPanel = () => {
 
           <div className="space-y-2">
             <span className="font-mono text-xs tracking-widest uppercase opacity-60">
-              {t('output.time_cost')}
+              {t('output.timeCost')}
             </span>
             <div className="font-mono text-4xl font-light tracking-tight tabular-nums">
               <AnimatedNumber value={result.timeEstimate} formatter={formatTime} />

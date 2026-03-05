@@ -4,7 +4,7 @@ import React, { useRef } from 'react'
 
 import { useTranslations } from 'next-intl'
 
-import type { CVData } from '@/features/resume/data/cv'
+import type { ResumeData } from '@/features/resume/data/resume'
 import { ANIMATION } from '@/shared/config/animations'
 import { useTimeline } from '@/shared/hooks/timeline/useTimeline'
 import { SkillTag } from '@/shared/ui/SkillTag'
@@ -13,11 +13,11 @@ import { CVHeader } from './CVHeader'
 import { CVTimeline } from './CVTimeline'
 
 interface CVLayoutProps {
-  data: CVData
+  data: ResumeData
 }
 
 export const CVLayout: React.FC<CVLayoutProps> = ({ data }) => {
-  const t = useTranslations('cv')
+  const t = useTranslations('resume')
   const containerRef = useRef<HTMLDivElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
   const mainColRef = useRef<HTMLDivElement>(null)

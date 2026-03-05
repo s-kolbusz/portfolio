@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 
 import { ProjectCaseStudy } from '@/features/work/components/ProjectCaseStudy'
 import { RoleCaseStudy } from '@/features/work/components/RoleCaseStudy'
-import { getProject, getProjects } from '@/features/work/data/get-projects'
+import { getWorkItem, getWorkItems } from '@/features/work/data/get-work-items'
 import { requireRoutingLocale } from '@/i18n/locale'
 import { getLocalizedWorkDetailHref } from '@/i18n/route-map'
 import { routing } from '@/i18n/routing'
@@ -20,23 +20,23 @@ export const dynamicParams = false
 export const dynamic = 'force-static'
 
 export function generateStaticParams() {
-  const slugs = getProjects('en').map((project) => project.id)
+  const slugs = getWorkItems('en').map((project) => project.id)
   return routing.locales.flatMap((locale) => slugs.map((slug) => ({ locale, slug })))
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale: localeParam, slug } = await params
   const locale = requireRoutingLocale(localeParam)
-  const project = getProject(slug, locale)
+  const project = getWorkItem(slug, locale)
   if (!project) return {}
 
-  const t = await getTranslations({ locale, namespace: 'projectsBook' })
+  const category = await getTranslations({ locale, namespace: 'work.categories' })
 
   return buildWorkDetailPageMetadata({
     locale,
     slug,
     project,
-    categoryLabel: t(`categories.${project.category}`),
+    categoryLabel: category(project.category),
   })
 }
 
@@ -46,10 +46,10 @@ export default async function WorkDetailPage({ params }: Props) {
 
   setRequestLocale(locale)
 
-  const project = getProject(slug, locale)
+  const project = getWorkItem(slug, locale)
   if (!project) notFound()
 
-  const allProjects = getProjects(locale)
+  const allProjects = getWorkItems(locale)
   const currentIdx = allProjects.findIndex((entry) => entry.id === slug)
   const prevProject = currentIdx > 0 ? allProjects[currentIdx - 1] : undefined
   const nextProject = currentIdx < allProjects.length - 1 ? allProjects[currentIdx + 1] : undefined

@@ -7,7 +7,7 @@ import Image from 'next/image'
 
 import { ArrowLeftIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
 
-import type { PortfolioEntry } from '@/features/work/data/projects-en'
+import type { WorkItem } from '@/features/work/data/work-items'
 import { getPageHref } from '@/i18n/route-map'
 import { ANIMATION } from '@/shared/config/animations'
 import { useTimeline } from '@/shared/hooks/timeline/useTimeline'
@@ -16,14 +16,15 @@ import { Button } from '@/shared/ui/Button'
 import { ProjectNav } from './ProjectNav'
 
 interface RoleCaseStudyProps {
-  project: PortfolioEntry
-  prevProject?: PortfolioEntry
-  nextProject?: PortfolioEntry
+  project: WorkItem
+  prevProject?: WorkItem
+  nextProject?: WorkItem
 }
 
 export function RoleCaseStudy({ project, prevProject, nextProject }: RoleCaseStudyProps) {
-  const t = useTranslations('projectsBook')
-  const cs = useTranslations('projectsBook.caseStudy')
+  const t = useTranslations('work.book')
+  const cs = useTranslations('work.caseStudy')
+  const category = useTranslations('work.categories')
   const mainRef = useRef<HTMLElement>(null)
   const heroContentRef = useRef<HTMLDivElement>(null)
   const sectionsRef = useRef<HTMLDivElement>(null)
@@ -59,7 +60,7 @@ export function RoleCaseStudy({ project, prevProject, nextProject }: RoleCaseStu
           size="md"
           leftIcon={<ArrowLeftIcon weight="bold" className="size-4" />}
         >
-          {t('backToProjects')}
+          {t('backToWork')}
         </Button>
       </div>
 
@@ -81,7 +82,7 @@ export function RoleCaseStudy({ project, prevProject, nextProject }: RoleCaseStu
           className="relative z-10 w-full px-6 pb-10 opacity-0 sm:px-12 lg:px-20 lg:pb-16"
         >
           <div className="mb-3 flex items-center gap-3 font-mono text-xs tracking-widest text-white/60 uppercase">
-            <span>{t(`categories.${project.category}`)}</span>
+            <span>{category(project.category)}</span>
             <span className="opacity-40">·</span>
             <span>{project.year}</span>
             <span className="opacity-40">·</span>
@@ -135,7 +136,7 @@ export function RoleCaseStudy({ project, prevProject, nextProject }: RoleCaseStu
             </div>
             <div>
               <span className="text-muted-foreground block font-mono text-[11px] tracking-widest uppercase">
-                {t(`categories.${project.category}`)}
+                {category(project.category)}
               </span>
               <span className="mt-1 block text-sm">{project.tagline}</span>
             </div>

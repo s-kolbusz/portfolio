@@ -3,12 +3,14 @@ import { EnvelopeIcon, GithubLogoIcon, LinkedinLogoIcon, XLogoIcon } from '@phos
 
 export interface ContactLink {
   id: string
-  labelKey: string
+  labelKey: ContactLabelKey
   url: string
   icon: Icon
 }
 
-export const contactLinks: ContactLink[] = [
+export type ContactLabelKey = 'email' | 'linkedin' | 'github' | 'twitter'
+
+export const contactLinks = [
   {
     id: 'email',
     labelKey: 'email',
@@ -33,4 +35,4 @@ export const contactLinks: ContactLink[] = [
     url: 'https://x.com/s_kolbusz',
     icon: XLogoIcon,
   },
-]
+] as const satisfies readonly ContactLink[]

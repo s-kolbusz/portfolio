@@ -1,20 +1,22 @@
 export interface Service {
-  id: string
+  id: ServiceId
   popular?: boolean
 }
 
-export const services: Service[] = [
+export type ServiceId = 'landingPage' | 'website' | 'webApp' | 'hourly'
+
+export const services = [
   {
-    id: 'landing-page',
+    id: 'landingPage',
   },
   {
     id: 'website',
     popular: true,
   },
   {
-    id: 'web-app',
+    id: 'webApp',
   },
   {
     id: 'hourly',
   },
-]
+] as const satisfies readonly Service[]

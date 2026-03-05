@@ -60,12 +60,12 @@ export const About: React.FC<AboutProps> = ({ headingLevel = 'h2' }) => {
         {/* Body Text - Clean Sans */}
         <div className="text-muted-foreground flex flex-col gap-6 font-sans text-lg leading-relaxed">
           <p>{t('philosophy.details')}</p>
-          <p>{t('philosophy.craft_details')}</p>
+          <p>{t('philosophy.craftDetails')}</p>
         </div>
 
         {/* Signature / Philosophy Marker */}
         <div className="border-primary mt-8 border-l-2 pl-6">
-          <p className="text-primary mb-2 font-mono text-sm">{t('philosophy_label')}</p>
+          <p className="text-primary mb-2 font-mono text-sm">{t('philosophyLabel')}</p>
           <p className="text-foreground font-serif text-xl italic">{t('philosophy.details')}</p>
         </div>
       </div>
@@ -89,7 +89,7 @@ export const About: React.FC<AboutProps> = ({ headingLevel = 'h2' }) => {
 
           {/* Decorative Caption */}
           <div className="border-border text-muted-foreground mt-4 flex justify-between border-b py-2 font-mono text-xs">
-            <span>{t('figure_profile')}</span>
+            <span>{t('figureProfile')}</span>
             <span>{t('location.city')}</span>
           </div>
         </div>
@@ -97,7 +97,7 @@ export const About: React.FC<AboutProps> = ({ headingLevel = 'h2' }) => {
         {/* "System Specs" - Tech/Minimalist Stats */}
         <div ref={statsRef} className="flex flex-col gap-6 font-mono text-sm">
           <div className="stat-line border-border flex items-center justify-between border-b py-3">
-            <span className="text-muted-foreground">{t('experience_label')}</span>
+            <span className="text-muted-foreground">{t('experienceLabel')}</span>
             <span className="text-foreground font-bold">
               {t('experience.years')} {t('experience.label')}
             </span>
@@ -107,7 +107,7 @@ export const About: React.FC<AboutProps> = ({ headingLevel = 'h2' }) => {
           </p>
 
           <div className="stat-line border-border flex items-center justify-between border-b py-3">
-            <span className="text-muted-foreground">{t('location_label')}</span>
+            <span className="text-muted-foreground">{t('locationLabel')}</span>
             <span className="text-foreground font-bold">{t('location.city')}</span>
           </div>
           <p className="text-muted-foreground font-sans text-sm leading-relaxed">
@@ -117,7 +117,7 @@ export const About: React.FC<AboutProps> = ({ headingLevel = 'h2' }) => {
           <div className="stat-line flex flex-col gap-4 py-3">
             <span className="text-muted-foreground flex items-center gap-2">
               <ArrowRightIcon className="text-primary" />
-              {t('stack_label')}
+              {t('stackLabel')}
             </span>
             <div className="text-foreground/80 flex flex-wrap gap-x-4 gap-y-3">
               {skillCategories[0].skills.map((skill) => (

@@ -1,37 +1,10 @@
-import type { PortfolioEntryBase, PortfolioEntryId } from './projects'
+import type { WorkItemContent, WorkItemId } from './work-items'
 
 // ---------------------------------------------------------------------------
-// Locale-specific case study content — keyed by PortfolioEntryBase.id
+// Locale-specific case study content — keyed by WorkItemBase.id
 // ---------------------------------------------------------------------------
 
-export interface PortfolioEntryContent {
-  title: string
-  subtitle: string
-  tagline: string
-  pullQuotes: string[]
-
-  // Project-specific (type: "project")
-  client?: string
-  role?: string
-  problem?: string
-  approach?: string
-  solution?: string
-  results?: string
-
-  // Role-specific (type: "role")
-  phases?: {
-    title: string
-    description: string
-    highlights: string[]
-  }[]
-}
-
-// Ensure the content type is used alongside base (compile-time safety)
-export type PortfolioEntry = Omit<PortfolioEntryBase, 'id'> & {
-  id: PortfolioEntryId
-} & PortfolioEntryContent
-
-export const projectsEn = {
+export const workItemsEn = {
   zakofy: {
     title: 'Zakofy',
     subtitle: 'Premium Tatra Mountain Booking Engine',
@@ -136,4 +109,4 @@ export const projectsEn = {
       },
     ],
   },
-} satisfies Record<PortfolioEntryId, PortfolioEntryContent>
+} satisfies Record<WorkItemId, WorkItemContent>

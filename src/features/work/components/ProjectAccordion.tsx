@@ -7,20 +7,20 @@ import Image from 'next/image'
 
 import { ArrowUpRightIcon } from '@phosphor-icons/react'
 
-import type { PortfolioEntry } from '@/features/work/data/projects-en'
+import type { WorkItem } from '@/features/work/data/work-items'
 import { getWorkDetailHref } from '@/i18n/route-map'
 import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap'
 import { ANIMATION } from '@/shared/config/animations'
 import { Button } from '@/shared/ui/Button'
 
 interface ProjectAccordionProps {
-  project: PortfolioEntry
+  project: WorkItem
   isOpen: boolean
   onAnimationComplete?: () => void
 }
 
 export function ProjectAccordion({ project, isOpen, onAnimationComplete }: ProjectAccordionProps) {
-  const t = useTranslations('projects')
+  const t = useTranslations('work.section')
   const containerRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
 
@@ -108,7 +108,7 @@ export function ProjectAccordion({ project, isOpen, onAnimationComplete }: Proje
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
             <div className="flex flex-col gap-4">
               <span className="text-primary font-mono text-xs tracking-widest uppercase">
-                {t('highlights_label')}
+                {t('highlightsLabel')}
               </span>
               <ul className="flex flex-col gap-3">
                 {highlights.map((highlight, index) => (
@@ -126,7 +126,7 @@ export function ProjectAccordion({ project, isOpen, onAnimationComplete }: Proje
             <div className="flex flex-col gap-6">
               <div className="flex flex-col gap-2">
                 <span className="text-primary font-mono text-xs tracking-widest uppercase">
-                  {t('stack_label')}
+                  {t('stackLabel')}
                 </span>
                 <div className="text-muted-foreground flex flex-wrap gap-x-4 gap-y-1 font-mono text-xs sm:text-sm">
                   {project.techStack.map((tech) => (

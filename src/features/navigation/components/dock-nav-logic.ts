@@ -15,7 +15,7 @@ import { isHomeRoute, matchesLocalizedPageRoute } from '@/i18n/routing'
 export interface NavItem {
   href: string
   icon: Icon
-  id: 'hero' | 'about' | 'projects' | 'services' | 'calculator' | 'contact' | 'cv'
+  id: 'hero' | 'about' | 'projects' | 'services' | 'calculator' | 'contact' | 'resume'
   isPage?: boolean
   pageHref?: string
 }
@@ -27,7 +27,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: getHomeSectionHref('services'), icon: CurrencyDollarIcon, id: 'services' },
   { href: getHomeSectionHref('calculator'), icon: CubeIcon, id: 'calculator' },
   { href: getHomeSectionHref('contact'), icon: EnvelopeIcon, id: 'contact' },
-  { href: getPageHref('resume'), icon: FileTextIcon, id: 'cv', isPage: true },
+  { href: getPageHref('resume'), icon: FileTextIcon, id: 'resume', isPage: true },
 ]
 
 const DESKTOP_LAYOUT = {

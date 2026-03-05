@@ -1,6 +1,6 @@
-import type { CVData } from './cv'
+import type { ResumeData } from './resume'
 
-export const cvDataEn: CVData = {
+export const resumeDataEn: ResumeData = {
   name: 'Sebastian Kolbusz',
   title: 'Senior Frontend Engineer',
   contact: {

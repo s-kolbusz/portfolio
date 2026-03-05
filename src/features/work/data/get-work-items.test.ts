@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { getFeaturedProjects, getProject, getProjects } from './get-projects'
-import type { PortfolioEntryContent } from './projects-en'
-import { projectsEn } from './projects-en'
+import { getFeaturedWorkItems, getWorkItem, getWorkItems } from './get-work-items'
+import type { WorkItemContent } from './work-items'
+import { workItemsEn } from './work-items-en'
 
-describe('get-projects', () => {
+describe('get-work-items', () => {
   it('returns entries sorted by order for a locale', () => {
-    const projects = getProjects('en')
+    const projects = getWorkItems('en')
 
     expect(projects).toHaveLength(5)
     expect(projects.map((project) => project.id)).toEqual([
@@ -19,43 +19,43 @@ describe('get-projects', () => {
   })
 
   it('returns locale-specific content', () => {
-    const project = getProject('billboard-zakopane', 'pl')
+    const project = getWorkItem('billboard-zakopane', 'pl')
 
     expect(project?.title).toBe('Billboard Zakopane')
     expect(project?.subtitle).toBe('Platforma B2B Reklamy Zewnętrznej')
   })
 
   it('returns a single entry by slug', () => {
-    const project = getProject('zakofy', 'en')
+    const project = getWorkItem('zakofy', 'en')
 
     expect(project?.id).toBe('zakofy')
     expect(project?.title).toBe('Zakofy')
   })
 
   it('returns undefined for unknown slugs', () => {
-    expect(getProject('missing-project', 'en')).toBeUndefined()
+    expect(getWorkItem('missing-project', 'en')).toBeUndefined()
   })
 
   it('returns only featured entries', () => {
-    const featuredProjects = getFeaturedProjects('en')
+    const featuredProjects = getFeaturedWorkItems('en')
 
     expect(featuredProjects.length).toBeGreaterThan(0)
     expect(featuredProjects.every((project) => project.featured)).toBe(true)
   })
 
-  it('throws when localized content is missing for a portfolio entry', () => {
-    const mutableProjectsEn = projectsEn as Record<string, PortfolioEntryContent>
+  it('throws when localized content is missing for a work item', () => {
+    const mutableWorkItemsEn = workItemsEn as Record<string, WorkItemContent>
     const removedId = 'zakofy'
-    const originalContent = mutableProjectsEn[removedId]
+    const originalContent = mutableWorkItemsEn[removedId]
 
-    delete mutableProjectsEn[removedId]
+    delete mutableWorkItemsEn[removedId]
 
     try {
-      expect(() => getProjects('en')).toThrowError(
-        `Missing localized portfolio content for entry "${removedId}" in locale "en".`
+      expect(() => getWorkItems('en')).toThrowError(
+        `Missing localized work item content for "${removedId}" in locale "en".`
       )
     } finally {
-      mutableProjectsEn[removedId] = originalContent
+      mutableWorkItemsEn[removedId] = originalContent
     }
   })
 })

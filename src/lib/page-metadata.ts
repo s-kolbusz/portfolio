@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import type { PortfolioEntry } from '@/features/work/data/projects-en'
+import type { WorkItem } from '@/features/work/data/work-items'
 import { getPageHref, getWorkDetailHref } from '@/i18n/route-map'
 import { getMetadataAlternates, type Locale } from '@/i18n/routing'
 
@@ -41,7 +41,7 @@ export function buildHomePageMetadata({
 type WorkDetailMetadataInput = {
   locale: Locale
   slug: string
-  project: PortfolioEntry
+  project: WorkItem
   categoryLabel: string
 }
 

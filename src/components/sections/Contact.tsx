@@ -76,14 +76,14 @@ export function Contact({ headingLevel = 'h2' }: ContactProps) {
       <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
         <div className="flex flex-col gap-2">
           <span className="text-muted-foreground font-mono text-xs tracking-widest uppercase">
-            {t('location_label')}
+            {t('locationLabel')}
           </span>
           <span className="font-sans text-lg">{t('city')}</span>
         </div>
 
         <div className="flex flex-col gap-2 md:text-right">
           <span className="text-muted-foreground font-mono text-xs tracking-widest uppercase">
-            {t('copyright_label')}
+            {t('copyrightLabel')}
           </span>
           <span className="text-muted-foreground font-sans text-sm">
             {tf('copyright', { year: currentYear })}

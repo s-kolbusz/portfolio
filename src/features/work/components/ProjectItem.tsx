@@ -4,7 +4,7 @@ import { useRef } from 'react'
 
 import { CaretDownIcon } from '@phosphor-icons/react'
 
-import type { PortfolioEntry } from '@/features/work/data/projects-en'
+import type { WorkItem } from '@/features/work/data/work-items'
 import { cn } from '@/lib/utils'
 import { useScrollStore } from '@/shared/lib/scroll-store'
 
@@ -13,7 +13,7 @@ import { ProjectAccordion } from './ProjectAccordion'
 import { ProjectMeta } from './ProjectMeta'
 
 interface ProjectItemProps {
-  project: PortfolioEntry
+  project: WorkItem
   isOpen: boolean
   onToggle: () => void
   onHover: (image: string | null) => void

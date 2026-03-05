@@ -7,19 +7,20 @@ import Image from 'next/image'
 
 import { ArrowRightIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
 
-import type { PortfolioEntry } from '@/features/work/data/projects-en'
+import type { WorkItem } from '@/features/work/data/work-items'
 import { Link } from '@/i18n/navigation'
 import { getWorkDetailHref } from '@/i18n/route-map'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { ANIMATION } from '@/shared/config/animations'
 
 interface BookSpreadProps {
-  entry: PortfolioEntry
+  entry: WorkItem
   index: number
 }
 
 export function BookSpread({ entry, index }: BookSpreadProps) {
-  const t = useTranslations('projectsBook')
+  const t = useTranslations('work.book')
+  const category = useTranslations('work.categories')
   const panelRef = useRef<HTMLDivElement>(null)
 
   useGSAP(
@@ -245,7 +246,7 @@ export function BookSpread({ entry, index }: BookSpreadProps) {
           {/* Category badge */}
           <div className="absolute top-8 right-8">
             <span className="bg-background/80 text-foreground rounded-full px-3 py-1 text-xs font-medium backdrop-blur-sm">
-              {t(`categories.${entry.category}`)}
+              {category(entry.category)}
             </span>
           </div>
 
