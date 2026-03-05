@@ -6,7 +6,7 @@ Maintain synchronized `planning-with-files` artifacts and a fully mapped, priori
 
 ## Current Phase
 
-Phase 6
+Phase 7
 
 ## Phases
 
@@ -52,6 +52,14 @@ Phase 6
 - [x] Expand Linear hierarchy for all remaining epics/stories/tasks from `docs/PLAN.md`
 - [x] Update planning files with full `WEB-*` mapping ranges
 - [x] Apply PM prioritization in Linear and sync priority tiers in planning artifacts
+- **Status:** complete
+
+### Phase 7: E0-S2 Baseline Snapshot Capture (`WEB-50`, duplicate parent: `WEB-3`)
+
+- [x] Run baseline quality commands and capture raw output artifacts: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`
+- [x] Generate and store route map snapshot and file topology snapshot
+- [x] Convert baseline failures into follow-up Linear issues and link evidence
+- [x] Update planning artifacts and synchronize Linear state in the same session
 - **Status:** complete
 
 ## Program Epic Status
@@ -107,9 +115,10 @@ Phase 6
 
 ## Errors Encountered
 
-| Error | Attempt | Resolution |
-| ----- | ------- | ---------- |
-|       | 1       |            |
+| Error                                                            | Attempt | Resolution                                                         |
+| ---------------------------------------------------------------- | ------- | ------------------------------------------------------------------ |
+| `pnpm typecheck` failed in baseline capture (TS2307 + TS1261)    | 1       | Captured in artifact log and opened `WEB-83` + `WEB-82` follow-ups |
+| `pnpm build` failed in baseline capture (TS1261 casing conflict) | 1       | Captured in artifact log and opened `WEB-82` follow-up             |
 
 ## Notes
 

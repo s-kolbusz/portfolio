@@ -1,0 +1,33 @@
+$ pnpm build
+START=2026-03-05T15:19:59Z
+
+> portfolio@0.1.0 build /Users/sklbsz/Projects/portfolio/website
+> next build
+
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+- Experiments (use with caution):
+  · optimizePackageImports
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 5.2s
+  Running TypeScript ...
+Failed to compile.
+
+./src/app/layout.tsx:8:24
+Type error: Already included file name '/Users/sklbsz/Projects/portfolio/website/src/components/SEO/JsonLd.tsx' differs from file name '/Users/sklbsz/Projects/portfolio/website/src/components/seo/JsonLd.tsx' only in casing.
+  The file is in the program because:
+    Imported via '@/components/SEO/JsonLd' from file '/Users/sklbsz/Projects/portfolio/website/src/app/layout.tsx'
+    Root file specified for compilation
+
+[0m [90m  6 |[39m [36mimport[39m { [33mSpeedInsights[39m } [36mfrom[39m [32m'@vercel/speed-insights/next'[39m
+ [90m  7 |[39m
+[31m[1m>[22m[39m[90m  8 |[39m [36mimport[39m { [33mJsonLd[39m } [36mfrom[39m [32m'@/components/SEO/JsonLd'[39m
+ [90m    |[39m                        [31m[1m^[22m[39m
+ [90m  9 |[39m [36mimport[39m { routing } [36mfrom[39m [32m'@/i18n/routing'[39m
+ [90m 10 |[39m [36mimport[39m { [33mSITE_ORIGIN[39m } [36mfrom[39m [32m'@/lib/site'[39m
+ [90m 11 |[39m[0m
+Next.js build worker exited with code: 1 and signal: null
+ ELIFECYCLE  Command failed with exit code 1.
+END=2026-03-05T15:20:09Z
+__EXIT_CODE__=1

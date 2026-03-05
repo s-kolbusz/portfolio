@@ -1,0 +1,17 @@
+$ pnpm typecheck
+START=2026-03-05T15:19:38Z
+
+> portfolio@0.1.0 typecheck /Users/sklbsz/Projects/portfolio/website
+> tsc --noEmit
+
+.next/types/validator.ts(42,39): error TS2307: Cannot find module '../../src/app/[locale]/lab/page.js' or its corresponding type declarations.
+.next/types/validator.ts(60,39): error TS2307: Cannot find module '../../src/app/[locale]/resume/page.js' or its corresponding type declarations.
+.next/types/validator.ts(69,39): error TS2307: Cannot find module '../../src/app/[locale]/work/[slug]/page.js' or its corresponding type declarations.
+.next/types/validator.ts(78,39): error TS2307: Cannot find module '../../src/app/[locale]/work/page.js' or its corresponding type declarations.
+src/app/layout.tsx(8,24): error TS1261: Already included file name '/Users/sklbsz/Projects/portfolio/website/src/components/SEO/JsonLd.tsx' differs from file name '/Users/sklbsz/Projects/portfolio/website/src/components/seo/JsonLd.tsx' only in casing.
+  The file is in the program because:
+    Imported via '@/components/SEO/JsonLd' from file '/Users/sklbsz/Projects/portfolio/website/src/app/layout.tsx'
+    Matched by include pattern '**/*.tsx' in '/Users/sklbsz/Projects/portfolio/website/tsconfig.json'
+ ELIFECYCLE  Command failed with exit code 2.
+END=2026-03-05T15:19:41Z
+__EXIT_CODE__=2
