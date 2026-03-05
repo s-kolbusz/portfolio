@@ -9,6 +9,10 @@ const SRC_ROOT = path.join(PROJECT_ROOT, 'src')
 const KEBAB_CASE_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const PASCAL_CASE_PATTERN = /^[A-Z][A-Za-z0-9]*$/
 const ROOT_HOOK_PATTERN = /^use[A-Z][A-Za-z0-9]*$/
+const NEXT_DYNAMIC_SEGMENT_PATTERN = /^\[[^/\]]+\]$/
+const NEXT_OPTIONAL_DYNAMIC_SEGMENT_PATTERN = /^\[\[[^/\]]+\]\]$/
+const NEXT_ROUTE_GROUP_PATTERN = /^\([^/]+\)$/
+const NEXT_SLOT_PATTERN = /^@[a-z0-9]+(?:-[a-z0-9]+)*$/
 
 const errors = []
 
@@ -16,14 +20,21 @@ function toPosixPath(filePath) {
   return filePath.split(path.sep).join('/')
 }
 
+function isLowercase(value) {
+  return value === value.toLowerCase()
+}
+
 function isAllowedDirectoryName(name) {
-  return (
-    KEBAB_CASE_PATTERN.test(name) ||
-    /^\[[^/\]]+\]$/.test(name) ||
-    /^\[\[[^/\]]+\]\]$/.test(name) ||
-    /^\([^/]+\)$/.test(name) ||
-    /^@[a-z0-9]+(?:-[a-z0-9]+)*$/.test(name)
-  )
+  if (KEBAB_CASE_PATTERN.test(name) || NEXT_SLOT_PATTERN.test(name)) {
+    return true
+  }
+
+  const isNextRouteSegment =
+    NEXT_DYNAMIC_SEGMENT_PATTERN.test(name) ||
+    NEXT_OPTIONAL_DYNAMIC_SEGMENT_PATTERN.test(name) ||
+    NEXT_ROUTE_GROUP_PATTERN.test(name)
+
+  return isNextRouteSegment && isLowercase(name)
 }
 
 function isTestFileBaseName(baseName) {
@@ -52,7 +63,7 @@ function walkDirectory(currentPath) {
     if (entry.isDirectory()) {
       if (!isAllowedDirectoryName(entry.name)) {
         errors.push(
-          `Directory names must be lowercase-kebab (or Next route segments): src/${relativePath}`
+          `Directory names must be lowercase-kebab (or lowercase Next route segments): src/${relativePath}`
         )
       }
       walkDirectory(absolutePath)
