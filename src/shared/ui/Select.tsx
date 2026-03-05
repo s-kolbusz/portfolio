@@ -1,6 +1,7 @@
 'use client'
 
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
+import { useId } from 'react'
 
 import { Select as SelectPrimitive } from '@base-ui/react/select'
 import { CaretDownIcon, CheckIcon } from '@phosphor-icons/react'
@@ -24,6 +25,9 @@ interface SelectProps {
 
 export const Select = ({ id, label, onChange, options, className }: SelectProps) => {
   const lenis = useScrollStore((state) => state.lenis)
+  const generatedId = useId()
+  const fieldId = id ?? `select-${generatedId.replace(/:/g, '')}`
+  const labelId = `${fieldId}-label`
 
   const handleOpenChange = (open: boolean) => {
     if (lenis) {
@@ -37,17 +41,18 @@ export const Select = ({ id, label, onChange, options, className }: SelectProps)
 
   return (
     <div className={cn('flex flex-col gap-3', className)}>
-      <label htmlFor={id} className="text-muted-foreground text-sm font-medium">
+      <label id={labelId} htmlFor={fieldId} className="text-muted-foreground text-sm font-medium">
         {label}
       </label>
       <SelectPrimitive.Root
-        id={id}
-        name={id}
+        name={fieldId}
         defaultValue={options.keys().next().value}
         onOpenChange={handleOpenChange}
         onValueChange={onChange}
       >
         <SelectPrimitive.Trigger
+          id={fieldId}
+          aria-labelledby={labelId}
           className={cn(
             'border-input bg-background text-foreground group box-border flex w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-3 text-sm font-medium transition-all duration-200',
             'hover:border-primary/50',

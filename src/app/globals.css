@@ -146,6 +146,11 @@
   display: none; /* Chrome, Safari and Opera */
 }
 
+html,
+body {
+  scrollbar-gutter: stable;
+}
+
 html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
