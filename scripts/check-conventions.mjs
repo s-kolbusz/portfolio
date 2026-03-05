@@ -10,6 +10,7 @@ const KEBAB_CASE_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const PASCAL_CASE_PATTERN = /^[A-Z][A-Za-z0-9]*$/
 const HOOK_FILE_PATTERN = /^use[A-Z][A-Za-z0-9]*$/
 const EXPORTED_HOOK_PATTERN = /\bexport\s+(?:async\s+)?(?:function|const)\s+use[A-Z][A-Za-z0-9]*/
+const ZUSTAND_IMPORT_PATTERN = /\bfrom ['"]zustand['"]/
 const NEXT_DYNAMIC_SEGMENT_PATTERN = /^\[[^/\]]+\]$/
 const NEXT_OPTIONAL_DYNAMIC_SEGMENT_PATTERN = /^\[\[[^/\]]+\]\]$/
 const NEXT_ROUTE_GROUP_PATTERN = /^\([^/]+\)$/
@@ -59,6 +60,11 @@ function hasExportedHook(filePath) {
   return EXPORTED_HOOK_PATTERN.test(content)
 }
 
+function isZustandStoreModule(filePath) {
+  const content = readFileSync(filePath, 'utf8')
+  return ZUSTAND_IMPORT_PATTERN.test(content)
+}
+
 function isComponentModule(relativePath) {
   return (
     relativePath.startsWith('components/') ||
@@ -89,6 +95,10 @@ function isDataOrLibModule(relativePath) {
     /^features\/[^/]+\/data\//.test(relativePath) ||
     /^features\/[^/]+\/lib\//.test(relativePath)
   )
+}
+
+function isAllowedZustandStorePath(relativePath) {
+  return relativePath.startsWith('shared/lib/') || /^features\/[^/]+\/lib\//.test(relativePath)
 }
 
 function walkDirectory(currentPath) {
@@ -154,6 +164,24 @@ function walkDirectory(currentPath) {
       const normalizedName = stripKnownTestSuffix(baseName)
       if (!KEBAB_CASE_PATTERN.test(normalizedName)) {
         errors.push(`Data/lib/config TypeScript modules must use kebab-case: src/${relativePath}`)
+      }
+    }
+
+    if (
+      extension === '.ts' &&
+      !isTestFileBaseName(baseName) &&
+      isZustandStoreModule(absolutePath)
+    ) {
+      const normalizedName = stripKnownTestSuffix(baseName)
+
+      if (!normalizedName.endsWith('-store')) {
+        errors.push(`Zustand store modules must use *-store.ts naming: src/${relativePath}`)
+      }
+
+      if (!isAllowedZustandStorePath(relativePath)) {
+        errors.push(
+          `Zustand store modules must live in src/shared/lib or src/features/*/lib: src/${relativePath}`
+        )
       }
     }
   }

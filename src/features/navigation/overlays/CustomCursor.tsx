@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react'
 
 import { useCursorInteractions } from '@/features/navigation/hooks/useCursorInteractions'
-import { useCursorStore } from '@/lib/cursor-store'
+import { useCursorStore } from '@/features/navigation/lib/cursor-store'
 import { useGSAP } from '@/lib/gsap'
 import { gsap } from '@/lib/gsap'
 import { useMedia, usePrefersReducedMotion } from '@/shared/hooks/useMedia'

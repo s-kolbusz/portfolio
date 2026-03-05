@@ -5,8 +5,8 @@ import { useRef } from 'react'
 import { CaretDownIcon } from '@phosphor-icons/react'
 
 import { PortfolioEntry } from '@/features/work/data/projects-en'
-import { useScrollStore } from '@/lib/store'
 import { cn } from '@/lib/utils'
+import { useScrollStore } from '@/shared/lib/scroll-store'
 
 import { isItemOutsideViewport } from './project-item-scroll'
 import { ProjectAccordion } from './ProjectAccordion'
