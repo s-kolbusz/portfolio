@@ -4,7 +4,7 @@ import React, { useRef, useEffect } from 'react'
 
 import { useTranslations } from 'next-intl'
 
-import type { CVEducation, CVExperience } from '@/data/cv'
+import type { CVEducation, CVExperience } from '@/features/resume/data/cv'
 import { gsap, ScrollTrigger } from '@/lib/gsap'
 
 import { CVEntry } from './CVEntry'
