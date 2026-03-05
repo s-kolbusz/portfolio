@@ -108,6 +108,16 @@
   - `docs/refactor-round-2/findings.md` (updated)
   - `docs/refactor-round-2/progress.md` (updated)
 
+### Phase 8: Post-Project Architecture Flattening Validation (`WEB-84`)
+
+- **Status:** pending
+- Actions taken:
+  - Added an end-of-program validation phase to assess whether `src/shared/*` should remain or be flattened to layer-first directories.
+  - Created Linear epic `WEB-84` and mapped it as a post-Epic-9 decision gate.
+- Files created/modified:
+  - `docs/refactor-round-2/task_plan.md` (updated)
+  - `docs/refactor-round-2/progress.md` (updated)
+
 ## Round 2 PR Checklist
 
 ### Skill Gates (must be logged in PR and `docs/refactor-round-2/progress.md`)
@@ -147,6 +157,7 @@
 | Content + i18n          | WEB-16 | WEB-40..WEB-43 | WEB-72..WEB-75       | High          |
 | UI + accessibility      | WEB-17 | WEB-44..WEB-46 | WEB-76..WEB-78       | Medium        |
 | Final hardening         | WEB-18 | WEB-47..WEB-49 | WEB-79..WEB-81       | High          |
+| Flattening validation   | WEB-84 | TBD            | TBD                  | Medium        |
 
 ## Test Results
 
@@ -154,7 +165,7 @@
 | -------------------------------------------- | ---------------------------------------------- | ---------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------ | ------ |
 | Planning workspace exists                    | `fd -H -t f . docs/refactor-round-2`           | Three planning files listed                    | `task_plan.md`, `findings.md`, `progress.md` found                                                       | Passed                                           |
 | Synchronization prerequisite present in plan | `rg -n "Linear state                           | plan-to-Linear" docs/refactor-round-2/PLAN.md` | New prerequisite lines found                                                                             | Matches found in `docs/refactor-round-2/PLAN.md` | Passed |
-| Linear hierarchy completeness                | Linear MCP issue list for project              | Epics/stories/tasks all present for PLAN scope | Epics `WEB-1`, `WEB-10..18`; stories `WEB-2..4`, `WEB-19..49`; tasks `WEB-5..9`, `WEB-50..83`            | Passed                                           |
+| Linear hierarchy completeness                | Linear MCP issue list for project              | Epics/stories/tasks all present for PLAN scope | Epics `WEB-1`, `WEB-10..18`, `WEB-84`; stories `WEB-2..4`, `WEB-19..49`; tasks `WEB-5..9`, `WEB-50..83`  | Passed                                           |
 | PM priority application                      | Linear issue updates by identifier             | Priority tiers set across active backlog       | High/Medium priority applied to active round-2 items                                                     | Passed                                           |
 | Baseline lint snapshot                       | `pnpm lint`                                    | Exit code `0` with raw output captured         | Exit `0`; evidence in `artifacts/baseline-2026-03-05-web-50/lint.log`                                    | Passed                                           |
 | Baseline typecheck snapshot                  | `pnpm typecheck`                               | Baseline output captured and failure tracked   | Exit `2`; evidence in `artifacts/baseline-2026-03-05-web-50/typecheck.log`; follow-up `WEB-82`, `WEB-83` | Failed (tracked)                                 |
@@ -174,13 +185,13 @@
 
 ## 5-Question Reboot Check
 
-| Question             | Answer                                                                                                           |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Where am I?          | Phase 7 complete (baseline snapshots captured and evidence logged for `WEB-50`)                                  |
-| Where am I going?    | Resolve follow-ups `WEB-82` and `WEB-83`, then continue Epic 1 high-priority convention chain                    |
-| What's the goal?     | Keep Round 2 plan files and Linear state synchronized while executing stories with artifact-grade evidence       |
-| What have I learned? | Baseline quality state has two tracked blockers (`typecheck`, `build`) plus current route/file topology evidence |
-| What have I done?    | Captured baseline command/route/topology artifacts and converted failures into follow-up Linear tasks            |
+| Question             | Answer                                                                                                             |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Where am I?          | Phase 8 queued (post-project flattening validation epic `WEB-84` added to plan and Linear)                         |
+| Where am I going?    | Execute core epics through final hardening, then run flattening validation gate before architecture simplification |
+| What's the goal?     | Keep Round 2 plan files and Linear state synchronized while executing stories with artifact-grade evidence         |
+| What have I learned? | Baseline quality state has two tracked blockers (`typecheck`, `build`) plus current route/file topology evidence   |
+| What have I done?    | Captured baseline command/route/topology artifacts and converted failures into follow-up Linear tasks              |
 
 ---
 

@@ -6,7 +6,7 @@ Maintain synchronized `planning-with-files` artifacts and a fully mapped, priori
 
 ## Current Phase
 
-Phase 7
+Phase 8
 
 ## Phases
 
@@ -62,6 +62,13 @@ Phase 7
 - [x] Update planning artifacts and synchronize Linear state in the same session
 - **Status:** complete
 
+### Phase 8: Post-Project Architecture Flattening Validation (`WEB-84`)
+
+- [ ] Define flattening validation criteria (complexity, coupling, velocity, boundary-rule signal).
+- [ ] Evaluate final architecture after Epic 9 and score keep-vs-flatten options.
+- [ ] Record decision and follow-on plan (retain `shared` or execute flattening migration slice).
+- **Status:** pending
+
 ## Program Epic Status
 
 | Epic                                                 | Identifier | Linear Status | Priority |
@@ -76,6 +83,7 @@ Phase 7
 | Epic 7: Content Model + i18n Normalization           | WEB-16     | todo          | High     |
 | Epic 8: UI Consistency + Accessibility Hardening     | WEB-17     | todo          | Medium   |
 | Epic 9: Final Hardening and Public-Ready Exit        | WEB-18     | todo          | High     |
+| Epic 10: Post-Project Flattening Validation          | WEB-84     | backlog       | Medium   |
 
 ## Key Questions
 
@@ -112,6 +120,7 @@ Phase 7
 | Epic 7: Content + i18n          | WEB-16  | WEB-40..WEB-43 | WEB-72..WEB-75                                                                       |
 | Epic 8: UI + Accessibility      | WEB-17  | WEB-44..WEB-46 | WEB-76..WEB-78                                                                       |
 | Epic 9: Final Exit              | WEB-18  | WEB-47..WEB-49 | WEB-79..WEB-81                                                                       |
+| Epic 10: Flattening Validation  | WEB-84  | TBD            | TBD                                                                                  |
 
 ## Errors Encountered
 
