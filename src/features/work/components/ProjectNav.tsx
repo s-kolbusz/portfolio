@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl'
 
 import { ArrowLeftIcon, ArrowRightIcon } from '@phosphor-icons/react'
 
-import type { PortfolioEntry } from '@/data/projects-en'
+import type { PortfolioEntry } from '@/features/work/data/projects-en'
 import { Link } from '@/i18n/navigation'
 
 interface ProjectNavProps {

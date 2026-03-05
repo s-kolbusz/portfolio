@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getProject } from '@/data/get-projects'
+import { getProject } from '@/features/work/data/get-projects'
 import enMessages from '@/i18n/messages/en.json'
 
 import {

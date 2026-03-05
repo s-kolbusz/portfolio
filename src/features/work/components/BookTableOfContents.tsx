@@ -7,7 +7,7 @@ import Image from 'next/image'
 
 import { StarIcon } from '@phosphor-icons/react'
 
-import { PortfolioEntry } from '@/data/projects-en'
+import { PortfolioEntry } from '@/features/work/data/projects-en'
 import { useTimeline } from '@/hooks/timeline/useTimeline'
 import { ANIMATION } from '@/lib/constants/animations'
 import { gsap } from '@/lib/gsap'

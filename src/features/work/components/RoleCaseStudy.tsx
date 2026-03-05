@@ -8,7 +8,7 @@ import Image from 'next/image'
 import { ArrowLeftIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
 
 import { Button } from '@/components/ui/Button'
-import type { PortfolioEntry } from '@/data/projects-en'
+import type { PortfolioEntry } from '@/features/work/data/projects-en'
 import { useTimeline } from '@/hooks/timeline/useTimeline'
 import { useRouter } from '@/i18n/navigation'
 import { ANIMATION } from '@/lib/constants/animations'
