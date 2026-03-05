@@ -5,7 +5,7 @@ import localFont from 'next/font/local'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 
-import { JsonLd } from '@/components/SEO/JsonLd'
+import { JsonLd } from '@/components/seo/JsonLd'
 import { routing } from '@/i18n/routing'
 import { SITE_ORIGIN } from '@/lib/site'
 
