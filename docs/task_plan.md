@@ -88,16 +88,16 @@
 
 **Required Skills:** `writing-clearly-and-concisely`, `verification-before-completion`
 
-- [ ] Replace template README with a recruiter-ready project narrative.
-- [ ] Add `Project Overview` section with business context and engineering goals.
-- [ ] Add `Tech Stack` section with rationale for each core choice.
-- [ ] Add `Architectural Decisions` section explaining important tradeoffs and why.
-- [ ] Add `Setup and Run Instructions` (prereqs, install, dev, build, production run).
-- [ ] Add `Testing Guidelines` (unit/integration/e2e commands, expectations, CI policy).
-- [ ] Add `Code Quality Standards` (lint, format, typecheck, accessibility expectations).
-- [ ] Add `Performance and Accessibility Notes` for animation-heavy features.
-- [ ] Add `Deployment` and `Environment Variables` sections if applicable.
-- [ ] Add `Known Limitations / Future Improvements` section with intentional scope notes.
+- [x] Replace template README with a recruiter-ready project narrative.
+- [x] Add `Project Overview` section with business context and engineering goals.
+- [x] Add `Tech Stack` section with rationale for each core choice.
+- [x] Add `Architectural Decisions` section explaining important tradeoffs and why.
+- [x] Add `Setup and Run Instructions` (prereqs, install, dev, build, production run).
+- [x] Add `Testing Guidelines` (unit/integration/e2e commands, expectations, CI policy).
+- [x] Add `Code Quality Standards` (lint, format, typecheck, accessibility expectations).
+- [x] Add `Performance and Accessibility Notes` for animation-heavy features.
+- [x] Add `Deployment` and `Environment Variables` sections if applicable.
+- [x] Add `Known Limitations / Future Improvements` section with intentional scope notes.
 
 ---
 

@@ -2,38 +2,37 @@
 
 ## Current Phase
 
-- Phase: `Phase 6 - Testing Coverage Expansion and Regression Defense`
+- Phase: `Phase 7 - Project Documentation (README.md)`
 - Status: `Completed`
 - Active Branch: `codex/refactoring`
 
-## Completed Items (Phase 6)
+## Completed Items (Phase 7)
 
-- [x] Added integration tests for locale switching, route preservation, and section navigation behavior in [`src/components/ui/navigation.integration.test.tsx`].
-- [x] Added component-level calculator interaction and deterministic formatting tests in [`src/components/features/CalculatorPanel.test.tsx`].
-- [x] Added e2e regression flow for project list -> detail navigation with prev/next verification in [`e2e/project-navigation.spec.ts`].
-- [x] Added e2e metadata + JSON-LD assertions in [`e2e/metadata-jsonld.spec.ts`].
-- [x] Added coverage thresholds in [`vitest.config.ts`] and enforced them in CI via [`package.json`] + [`.github/workflows/ci.yml`].
-- [x] Added a pre-release verification checklist in [`docs/pre-release-checklist.md`] and linked it from [`README.md`].
-- [x] Marked Phase 6 tasks complete in [`docs/task_plan.md`].
+- [x] Replaced template `README.md` with a recruiter-ready project narrative.
+- [x] Added `Project Overview` with business context and engineering goals.
+- [x] Added `Tech Stack` with rationale for core technologies.
+- [x] Added `Architectural Decisions` documenting key tradeoffs.
+- [x] Added complete setup and run instructions (install, dev, build, production).
+- [x] Added testing guidelines with commands, coverage expectations, and CI policy.
+- [x] Added code quality standards (lint, format, typecheck, accessibility expectations).
+- [x] Added performance and accessibility notes for animation-heavy behavior.
+- [x] Added deployment and environment variable sections.
+- [x] Added known limitations and future improvement scope.
+- [x] Marked Phase 7 tasks complete in [`docs/task_plan.md`].
 
-## Verification Snapshot (Phase 6)
+## Verification Snapshot (Phase 7)
 
-- `pnpm lint`: pass
-- `pnpm typecheck`: pass
 - `pnpm format:check`: pass
+- `pnpm lint:ci`: pass
+- `pnpm typecheck`: pass
 - `pnpm test:coverage`: pass (40 tests / 12 files, thresholds met)
-- `PLAYWRIGHT_BASE_URL=http://localhost:3000 pnpm test:e2e e2e/project-navigation.spec.ts e2e/metadata-jsonld.spec.ts --workers=1`: pass (3 tests)
 - `pnpm build`: pass
 
 ## Previous Phase
 
-- Completed: `Phase 5 - Accessibility and UX Hardening`.
+- Completed: `Phase 6 - Testing Coverage Expansion and Regression Defense`.
 
 ## Errors Encountered (Log)
 
-- `2026-03-05`: `pnpm vitest run --coverage` initially failed due missing `@vitest/coverage-v8`.
-- `2026-03-05`: Resolved by adding `@vitest/coverage-v8` as a dev dependency.
-- `2026-03-05`: `pnpm build` failed after an invalid `vitest.config.ts` coverage option (`all`) was introduced.
-- `2026-03-05`: Resolved by removing the unsupported option and keeping compatible coverage thresholds.
-- `2026-03-05`: New Playwright specs intermittently timed out on `next dev` startup route compilation for `/en/projects`.
-- `2026-03-05`: Resolved for verification by running e2e against `next start` with `PLAYWRIGHT_BASE_URL`, while keeping test assertions unchanged.
+- `2026-03-05`: `pnpm format:check` initially failed due markdown formatting differences in `README.md`.
+- `2026-03-05`: Resolved by running `pnpm prettier --write README.md` and re-running verification.

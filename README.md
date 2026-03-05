@@ -1,56 +1,181 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sebastian Kolbusz Portfolio Website
 
-## Getting Started
+A bilingual portfolio platform built with Next.js 16 to showcase case studies, services, and technical depth for freelance and product engineering work.
 
-First, run the development server:
+## Project Overview
+
+### Business Context
+
+This project is the public-facing portfolio and lead funnel for a senior frontend engineer. It has two jobs:
+
+- communicate business value to non-technical clients
+- demonstrate production-grade frontend architecture to technical reviewers and recruiters
+
+### Engineering Goals
+
+- Deliver fast, static-first pages with strong SEO and structured data.
+- Support full `en` and `pl` localization with route-preserving navigation.
+- Keep animation-heavy UI performant without breaking accessibility.
+- Enforce quality with automated lint, type, test, and build gates.
+
+## Tech Stack
+
+| Layer        | Choice                                      | Why this choice                                                              |
+| ------------ | ------------------------------------------- | ---------------------------------------------------------------------------- |
+| Framework    | Next.js 16 (App Router)                     | Static generation, strong metadata APIs, mature deployment story.            |
+| UI           | React 19 + TypeScript                       | Predictable component model with strict typing for maintainability.          |
+| Styling      | Tailwind CSS v4                             | Fast iteration with consistent design tokens and low CSS drift.              |
+| Localization | `next-intl`                                 | Locale-aware routing, messages, and server/client integration in App Router. |
+| Motion       | GSAP + Lenis + custom WebGL                 | Cinematic interactions with explicit performance control points.             |
+| State        | Zustand                                     | Minimal shared client state for scroll and interaction orchestration.        |
+| Testing      | Vitest + Testing Library + Playwright + Axe | Unit/integration/e2e + accessibility checks in one pipeline.                 |
+| Tooling      | ESLint, Prettier, pnpm, GitHub Actions      | Consistent local/CI quality gates and reproducible builds.                   |
+
+## Architectural Decisions
+
+1. Locale as a first-class route segment (`/[locale]/...`)
+   Keeps URLs explicit and crawlable, enables static generation per locale, and preserves path when switching language.
+
+2. Split domain content into base data + locale overlays
+   Portfolio entry structure lives in one place, localized copy in locale-specific files. This reduces drift and catches missing translations early.
+
+3. Progressive enhancement for expensive client overlays
+   Custom cursor, smooth scrolling, dock UI, and WebGL scene mount after initial render and are disabled or reduced for motion-sensitive users.
+
+4. Centralized metadata and JSON-LD helpers
+   Shared metadata builders and schema serializers keep canonical URLs and structured data consistent across pages.
+
+5. Layered quality strategy
+   Unit/integration tests cover logic and component behavior, while Playwright validates high-risk user flows and accessibility semantics.
+
+## Setup and Run Instructions
+
+### Prerequisites
+
+- Node.js `22.16.1` (matches `package.json` Volta config)
+- pnpm `10.x`
+
+### Install
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Quality Commands (Phase 1)
-
-- `pnpm lint` - Run ESLint checks.
-- `pnpm lint:ci` - Run ESLint with `--max-warnings=0` (same gate as CI).
-- `pnpm typecheck` - Run TypeScript type checking.
-- `pnpm test` - Run unit/integration tests with Vitest.
-- `pnpm test:watch` - Run Vitest in watch mode.
-- `pnpm test:e2e` - Run Playwright e2e tests.
-- `pnpm format` - Apply Prettier formatting.
-- `pnpm format:check` - Validate formatting.
-- `pnpm build` - Build the production app.
-
-Install Playwright browsers once before local e2e runs:
-
-```bash
+pnpm install
 pnpm exec playwright install
 ```
 
-Pre-release sign-off checklist: [`docs/pre-release-checklist.md`](docs/pre-release-checklist.md)
+### Run in Development
 
-## Learn More
+```bash
+pnpm dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Open [http://localhost:3000/en](http://localhost:3000/en).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Build and Run Production
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+pnpm build
+pnpm start
+```
 
-## Deploy on Vercel
+## Testing Guidelines
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Unit and Integration
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+pnpm test
+```
+
+Runs Vitest for `src/**/*.test.{ts,tsx}`.
+
+### Coverage Gate
+
+```bash
+pnpm test:coverage
+```
+
+Coverage thresholds:
+
+- lines: `80%`
+- statements: `80%`
+- functions: `75%`
+- branches: `70%`
+
+### End-to-End and Accessibility
+
+```bash
+pnpm test:e2e
+```
+
+By default, Playwright starts `pnpm dev`. To run against an existing server (for example `next start`), set:
+
+```bash
+PLAYWRIGHT_BASE_URL=http://localhost:3000 pnpm test:e2e
+```
+
+### CI Policy
+
+CI runs on every push and pull request and requires all of the following to pass:
+
+- `pnpm lint:ci` (zero warnings)
+- `pnpm typecheck`
+- `pnpm test:coverage`
+- `pnpm format:check`
+- `pnpm build`
+
+## Code Quality Standards
+
+- Lint: `pnpm lint:ci` must pass with zero warnings.
+- Type safety: `pnpm typecheck` must pass.
+- Formatting: `pnpm format:check` must pass.
+- Accessibility: no serious or critical Axe violations on core routes; skip-link and keyboard paths must remain functional.
+- Every change should preserve canonical metadata and JSON-LD correctness on localized routes.
+
+## Performance and Accessibility Notes
+
+- Heavy client overlays are lazy-loaded and delayed to reduce hydration pressure.
+- WebGL hero background is mounted only after a delay and skipped when `prefers-reduced-motion` is enabled.
+- Reduced-motion users do not receive custom cursor/WebGL effects.
+- Scroll and animation orchestration is isolated in dedicated hooks/modules to avoid render-time side effects.
+- Keyboard navigation is tested for critical interactive flows (project book navigation and lightbox focus handling).
+
+## Deployment
+
+### Canonical Host
+
+Canonical metadata is configured around: `https://www.kolbusz.xyz`.
+
+### Recommended
+
+Deploy on Vercel for the simplest Next.js App Router path.
+
+### Alternative
+
+Any Node host that supports Next.js production runtime:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm build
+pnpm start
+```
+
+## Environment Variables
+
+No runtime environment variables are required to run the application locally.
+
+Optional variables:
+
+- `PLAYWRIGHT_BASE_URL`: tells Playwright to reuse an existing app server instead of starting `pnpm dev`.
+
+## Known Limitations / Future Improvements
+
+- E2E suite currently targets Chromium only; add cross-browser coverage (WebKit and Firefox).
+- Locales are currently limited to English and Polish.
+- Portfolio content is file-based; a CMS-backed workflow could improve content operations.
+- WebGL fallback can be expanded with a static visual for older/locked-down devices.
+- Performance budgets are validated manually; automated Lighthouse CI would tighten regressions.
+
+## Additional Project Docs
+
+- Pre-release checklist: [docs/pre-release-checklist.md](docs/pre-release-checklist.md)
+- Refactoring task plan: [docs/task_plan.md](docs/task_plan.md)
+- Progress log: [docs/progress.md](docs/progress.md)
