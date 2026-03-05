@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { PortfolioEntry } from '@/features/work/data/projects-en'
-import { useTimeline } from '@/hooks/timeline/useTimeline'
 import { ANIMATION } from '@/lib/constants/animations'
+import { useTimeline } from '@/shared/hooks/timeline/useTimeline'
 
 import { getImageToRender } from './project-hover-preview-state'
 import { ProjectHoverPreview } from './ProjectHoverPreview'

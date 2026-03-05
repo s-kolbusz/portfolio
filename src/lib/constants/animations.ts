@@ -1,4 +1,4 @@
-import { usePrefersReducedMotion } from '@/hooks/useMedia'
+import { usePrefersReducedMotion } from '@/shared/hooks/useMedia'
 
 export const ANIMATION = {
   duration: {

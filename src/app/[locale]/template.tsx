@@ -2,9 +2,9 @@
 
 import { useRef } from 'react'
 
-import { usePrefersReducedMotion } from '@/hooks/useMedia'
 import { ANIMATION } from '@/lib/constants/animations'
 import { gsap, useGSAP } from '@/lib/gsap-core'
+import { usePrefersReducedMotion } from '@/shared/hooks/useMedia'
 
 export default function Template({ children }: { children: React.ReactNode }) {
   const containerRef = useRef<HTMLDivElement>(null)

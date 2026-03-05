@@ -50,7 +50,7 @@ vi.mock('@/i18n/navigation', () => ({
   }),
 }))
 
-vi.mock('@/hooks/useActiveSection', () => ({
+vi.mock('@/features/navigation/hooks/useActiveSection', () => ({
   useActiveSection: () => mockActiveSection,
 }))
 

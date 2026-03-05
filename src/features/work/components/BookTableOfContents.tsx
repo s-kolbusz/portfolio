@@ -8,9 +8,9 @@ import Image from 'next/image'
 import { StarIcon } from '@phosphor-icons/react'
 
 import { PortfolioEntry } from '@/features/work/data/projects-en'
-import { useTimeline } from '@/hooks/timeline/useTimeline'
 import { ANIMATION } from '@/lib/constants/animations'
 import { gsap } from '@/lib/gsap'
+import { useTimeline } from '@/shared/hooks/timeline/useTimeline'
 
 interface BookTableOfContentsProps {
   entries: PortfolioEntry[]

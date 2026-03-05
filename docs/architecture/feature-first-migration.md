@@ -22,4 +22,5 @@
 - Feature modules are route-facing domain slices.
 - Shared modules are cross-domain primitives/utilities.
 - No cross-feature imports; promote shared contracts when reuse is required.
-- Legacy `src/components`, `src/data`, `src/hooks`, and `src/lib` remain only as temporary migration sources.
+- Legacy `src/components`, `src/data`, and `src/lib` remain only as temporary migration sources.
+- Hook ownership is finalized in Epic 4: shared hooks live in `src/shared/hooks`, feature hooks live in `src/features/*/hooks`.

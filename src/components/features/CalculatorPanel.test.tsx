@@ -22,7 +22,7 @@ vi.mock('next-intl', () => ({
   },
 }))
 
-vi.mock('@/hooks/useMedia', () => ({
+vi.mock('@/shared/hooks/useMedia', () => ({
   usePrefersReducedMotion: () => true,
 }))
 

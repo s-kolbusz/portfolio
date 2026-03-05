@@ -68,11 +68,7 @@ function isComponentModule(relativePath) {
 }
 
 function isHookModule(relativePath) {
-  return (
-    relativePath.startsWith('hooks/') ||
-    relativePath.startsWith('shared/hooks/') ||
-    /^features\/[^/]+\/hooks\//.test(relativePath)
-  )
+  return relativePath.startsWith('shared/hooks/') || /^features\/[^/]+\/hooks\//.test(relativePath)
 }
 
 function isComponentUtilityModule(relativePath) {
@@ -103,6 +99,12 @@ function walkDirectory(currentPath) {
     const relativePath = toPosixPath(path.relative(SRC_ROOT, absolutePath))
 
     if (entry.isDirectory()) {
+      if (relativePath === 'hooks') {
+        errors.push(
+          'Top-level src/hooks is retired; place shared hooks in src/shared/hooks and feature hooks in src/features/*/hooks'
+        )
+      }
+
       if (!isAllowedDirectoryName(entry.name)) {
         errors.push(
           `Directory names must be lowercase-kebab (or lowercase Next route segments): src/${relativePath}`

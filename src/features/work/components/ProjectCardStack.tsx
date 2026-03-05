@@ -8,10 +8,10 @@ import Image from 'next/image'
 import { ArrowLeftIcon, ArrowUpRightIcon, StarIcon } from '@phosphor-icons/react'
 
 import { PortfolioEntry } from '@/features/work/data/projects-en'
-import { useTimeline } from '@/hooks/timeline/useTimeline'
 import { Link } from '@/i18n/navigation'
 import { useRouter } from '@/i18n/navigation'
 import { ANIMATION } from '@/lib/constants/animations'
+import { useTimeline } from '@/shared/hooks/timeline/useTimeline'
 import { Button } from '@/shared/ui/Button'
 
 import { ProjectMeta } from './ProjectMeta'

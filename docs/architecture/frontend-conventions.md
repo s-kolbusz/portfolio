@@ -14,7 +14,7 @@ These rules apply to all code in `src/` and are enforced in CI by:
 - Directory names must be `lowercase-kebab`.
 - Next.js special route segments are allowed: `[segment]`, `[[segment]]`, `(group)`, `@slot`.
 - React component files in `src/components/**` must use `PascalCase.tsx`.
-- Hook modules in `src/hooks/**` that export `useX` hooks must use `useX.ts` or `useX.tsx`.
+- Hook modules in `src/shared/hooks/**` and `src/features/*/hooks/**` that export `useX` hooks must use `useX.ts` or `useX.tsx`.
 - Utility modules in `src/components/**` that use `.ts` must use `kebab-case.ts`.
 - TypeScript module files in `src/data`, `src/i18n`, and `src/lib` must use `kebab-case.ts`.
 
@@ -23,7 +23,8 @@ These rules apply to all code in `src/` and are enforced in CI by:
 - `src/app`: routing, layouts, and page entrypoints.
 - `src/features`: feature-owned modules (for example `work`, `resume`, `navigation`), each with local `components`, `data`, `hooks`, and `lib`.
 - `src/shared`: cross-feature modules (`ui`, `hooks`, `lib`, `config`) that are safe to reuse across routes/features.
-- `src/components`, `src/hooks`, `src/data`, `src/lib`: legacy layers kept temporarily for incremental migration.
+- `src/components`, `src/data`, `src/lib`: legacy layers kept temporarily for incremental migration.
+- `src/hooks` is retired; shared hooks must live in `src/shared/hooks` and feature-owned hooks must live in `src/features/*/hooks`.
 - `src/i18n`: locale routing and messages.
 
 ## Import Boundaries
@@ -41,7 +42,7 @@ The following import boundaries are hard rules:
 
 ## Incremental Migration Rule
 
-- During migration, feature/shared code may temporarily consume legacy `src/hooks`, `src/lib`, and `src/data` modules where equivalents are not yet moved.
+- During migration, feature/shared code may temporarily consume legacy `src/lib` and `src/data` modules where equivalents are not yet moved.
 - New shared primitives should be authored in `src/shared/ui` instead of `src/components/ui`.
 - Migration steps are tracked in `docs/architecture/feature-first-migration.md`.
 
