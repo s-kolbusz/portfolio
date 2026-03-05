@@ -119,6 +119,7 @@ CI runs on every push and pull request and requires all of the following to pass
 - `pnpm lint:ci` (zero warnings)
 - `pnpm typecheck`
 - `pnpm check:code-splitting`
+- `pnpm check:bundle-budgets`
 - `pnpm test:coverage`
 - `pnpm format:check`
 - `pnpm build`
@@ -128,6 +129,7 @@ CI runs on every push and pull request and requires all of the following to pass
 - Lint: `pnpm lint:ci` must pass with zero warnings.
 - Type safety: `pnpm typecheck` must pass.
 - Code splitting: `pnpm check:code-splitting` must pass and any manual split point must be documented.
+- Bundle size: `pnpm check:bundle-budgets` must pass after production build output is generated.
 - Formatting: `pnpm format:check` must pass.
 - Accessibility: no serious or critical Axe violations on core routes; skip-link and keyboard paths must remain functional.
 - Every change should preserve canonical metadata and JSON-LD correctness on localized routes.

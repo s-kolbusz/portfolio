@@ -12,6 +12,7 @@
     "prepare": "git config core.hooksPath .githooks || true",
     "check:conventions": "node scripts/check-conventions.mjs",
     "check:architecture": "node scripts/check-architecture.mjs",
+    "check:bundle-budgets": "node scripts/check-bundle-budgets.mjs",
     "check:code-splitting": "node scripts/check-code-splitting.mjs",
     "check:i18n": "node scripts/check-i18n.mjs",
     "typecheck": "next typegen && tsc --noEmit",

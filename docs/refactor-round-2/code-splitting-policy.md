@@ -31,10 +31,11 @@
 - Do not use manual splitting as a default response to any client component.
 - Do not add bundle-budget thresholds here; that lands in `WEB-35`.
 
-## Follow-Up For WEB-35
+## Bundle Budgets
 
-- Add measurable bundle budgets now that split points are centralized and stable.
-- Emit actionable CI output that shows which route or asset exceeded the threshold.
+- Route budgets are defined in `scripts/bundle-budgets.json`.
+- `pnpm check:bundle-budgets` reads the built client-reference manifests and reports per-route client JS totals.
+- CI now runs the bundle budget gate immediately after `pnpm build`.
 
 ## Enforcement
 

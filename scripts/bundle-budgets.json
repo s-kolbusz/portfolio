@@ -1,0 +1,37 @@
+[
+  {
+    "label": "home",
+    "route": "/[locale]",
+    "manifestPath": ".next/server/app/[locale]/page_client-reference-manifest.js",
+    "entryKey": "[project]/src/app/[locale]/page",
+    "budgetBytes": 600000
+  },
+  {
+    "label": "lab",
+    "route": "/[locale]/lab",
+    "manifestPath": ".next/server/app/[locale]/lab/page_client-reference-manifest.js",
+    "entryKey": "[project]/src/app/[locale]/lab/page",
+    "budgetBytes": 360000
+  },
+  {
+    "label": "resume",
+    "route": "/[locale]/resume",
+    "manifestPath": ".next/server/app/[locale]/resume/page_client-reference-manifest.js",
+    "entryKey": "[project]/src/app/[locale]/resume/page",
+    "budgetBytes": 310000
+  },
+  {
+    "label": "work-index",
+    "route": "/[locale]/work",
+    "manifestPath": ".next/server/app/[locale]/work/page_client-reference-manifest.js",
+    "entryKey": "[project]/src/app/[locale]/work/page",
+    "budgetBytes": 335000
+  },
+  {
+    "label": "work-detail",
+    "route": "/[locale]/work/[slug]",
+    "manifestPath": ".next/server/app/[locale]/work/[slug]/page_client-reference-manifest.js",
+    "entryKey": "[project]/src/app/[locale]/work/[slug]/page",
+    "budgetBytes": 325000
+  }
+]
