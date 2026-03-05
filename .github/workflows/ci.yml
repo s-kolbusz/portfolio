@@ -34,8 +34,8 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
-      - name: Unit and integration tests
-        run: pnpm test
+      - name: Unit and integration tests (coverage gate)
+        run: pnpm test:coverage
 
       - name: Format check
         run: pnpm format:check

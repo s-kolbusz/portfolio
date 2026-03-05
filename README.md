@@ -38,6 +38,8 @@ Install Playwright browsers once before local e2e runs:
 pnpm exec playwright install
 ```
 
+Pre-release sign-off checklist: [`docs/pre-release-checklist.md`](docs/pre-release-checklist.md)
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

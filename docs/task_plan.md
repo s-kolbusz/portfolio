@@ -75,12 +75,12 @@
 
 **Required Skills:** `test-driven-development`, `systematic-debugging`, `verification-before-completion`
 
-- [ ] Add integration tests for locale switching, routing preservation, and section navigation behavior.
-- [ ] Add e2e tests for project list -> detail navigation (including prev/next links).
-- [ ] Add e2e tests for JSON-LD presence and key metadata outputs.
-- [ ] Add tests around print calculator interactions and deterministic output formatting.
-- [ ] Add test coverage thresholds and enforce them in CI.
-- [ ] Add a pre-release verification checklist in repo docs.
+- [x] Add integration tests for locale switching, routing preservation, and section navigation behavior.
+- [x] Add e2e tests for project list -> detail navigation (including prev/next links).
+- [x] Add e2e tests for JSON-LD presence and key metadata outputs.
+- [x] Add tests around print calculator interactions and deterministic output formatting.
+- [x] Add test coverage thresholds and enforce them in CI.
+- [x] Add a pre-release verification checklist in repo docs.
 
 ---
 
