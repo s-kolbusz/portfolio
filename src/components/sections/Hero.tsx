@@ -16,7 +16,6 @@ export function Hero() {
   const t = useTranslations('hero')
   const containerRef = useRef<HTMLElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
-  // const roleRef = useRef<HTMLDivElement>(null)
   const ctaRef = useRef<HTMLDivElement>(null)
   const ctaIconRef = useRef<SVGSVGElement>(null)
   const caretRef = useRef<HTMLSpanElement>(null)
@@ -35,7 +34,6 @@ export function Hero() {
   useHeroAnimation({
     containerRef,
     caretRef,
-    // roleRef,
     ctaRef,
     ctaIconRef,
     prefersReducedMotion,
@@ -61,9 +59,6 @@ export function Hero() {
     const element = document.getElementById('about')
     element?.scrollIntoView({ behavior: 'smooth' })
   }
-
-  // Delay the loading of the heavy 3D scene to free up main thread during hydration
-  // (State and effect initialized at top of component)
 
   return (
     <section
@@ -99,7 +94,6 @@ export function Hero() {
         </div>
 
         {/* Role & Tagline */}
-        {/* <div ref={roleRef} className="flex max-w-3xl flex-col gap-4"> */}
         <div className="flex max-w-3xl flex-col gap-4">
           <h2 className="font-mono text-xl font-medium md:text-3xl">{t('role')}</h2>
           <p className="text-muted-foreground font-serif text-xl italic md:text-3xl">

@@ -5,7 +5,7 @@ import { useRef } from 'react'
 import { CaretDownIcon } from '@phosphor-icons/react'
 
 import { PortfolioEntry } from '@/data/projects-en'
-import { useScrollStore } from '@/lib/store'
+import { useScrollStore } from '@/lib/stores'
 import { cn } from '@/lib/utils'
 
 import { ProjectAccordion } from './project-accordion'

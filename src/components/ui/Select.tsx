@@ -5,7 +5,7 @@ import { ReactNode } from 'react'
 import { Select as SelectPrimitive } from '@base-ui/react/select'
 import { CaretDownIcon, CheckIcon } from '@phosphor-icons/react'
 
-import { useScrollStore } from '@/lib/store'
+import { useScrollStore } from '@/lib/stores'
 import { cn } from '@/lib/utils'
 
 interface Option {

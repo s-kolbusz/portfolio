@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { MediaItem } from '@/data/projects'
 import { useFocusTrap } from '@/hooks/use-focus-trap'
 import { gsap, useGSAP } from '@/lib/gsap'
-import { useScrollStore } from '@/lib/store'
+import { useScrollStore } from '@/lib/stores'
 
 interface LightboxProps {
   images: readonly MediaItem[]

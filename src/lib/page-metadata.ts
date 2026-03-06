@@ -1,9 +1,22 @@
 import type { Metadata } from 'next'
 
 import type { PortfolioEntry } from '@/data/projects-en'
-import type { Locale } from '@/i18n/routing'
+import { routing, type Locale } from '@/i18n/routing'
 
-import { getMetadataAlternates } from './utils'
+export function getMetadataAlternates(path: string, currentLocale: Locale) {
+  const languages: Record<string, string> = {
+    'x-default': `/en${path === '/' ? '' : path}`,
+  }
+
+  routing.locales.forEach((locale) => {
+    languages[locale] = `/${locale}${path === '/' ? '' : path}`
+  })
+
+  return {
+    canonical: languages[currentLocale],
+    languages,
+  }
+}
 
 type LocalizedMetadataInput = {
   locale: Locale

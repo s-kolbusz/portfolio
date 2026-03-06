@@ -1,12 +1,11 @@
 import { RefObject } from 'react'
 
 import { ANIMATION } from '@/lib/constants/animations'
-import { gsap, useGSAP } from '@/lib/gsap-core'
+import { gsap, useGSAP } from '@/lib/gsap'
 
 interface UseHeroAnimationProps {
   containerRef: RefObject<HTMLElement | null>
   caretRef: RefObject<HTMLSpanElement | null>
-  // roleRef: RefObject<HTMLDivElement | null>
   ctaRef: RefObject<HTMLDivElement | null>
   ctaIconRef: RefObject<SVGSVGElement | null>
   prefersReducedMotion: boolean
@@ -15,7 +14,6 @@ interface UseHeroAnimationProps {
 export function useHeroAnimation({
   containerRef,
   caretRef,
-  // roleRef,
   ctaRef,
   ctaIconRef,
   prefersReducedMotion,

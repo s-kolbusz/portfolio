@@ -6,7 +6,7 @@ import Lenis from 'lenis'
 
 import { usePrefersReducedMotion } from '@/hooks/use-media'
 import { gsap, ScrollTrigger } from '@/lib/gsap'
-import { useScrollStore } from '@/lib/store'
+import { useScrollStore } from '@/lib/stores'
 
 export function SmoothScroller() {
   const setLenis = useScrollStore((state) => state.setLenis)

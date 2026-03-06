@@ -3,7 +3,7 @@
 import { useRef } from 'react'
 
 import { usePrefersReducedMotion } from '@/hooks/use-media'
-import { useSafeAnimation } from '@/lib/constants/animations'
+import { useSafeAnimation } from '@/hooks/use-safe-animation'
 import { gsap, useGSAP } from '@/lib/gsap'
 
 interface AnimatedNumberProps {
