@@ -44,12 +44,12 @@ export function Hero() {
     return name.split(' ').map((word, wordIndex) => (
       <span key={wordIndex} className="inline-block whitespace-nowrap">
         {word.split('').map((char, charIndex) => (
-          <span key={charIndex} className="char inline-block">
+          <span key={charIndex} className="char opacity-0 inline-block">
             {char}
           </span>
         ))}
         {wordIndex < name.split(' ').length - 1 && (
-          <span className="char inline-block whitespace-pre"> </span>
+          <span className="char opacity-0 inline-block whitespace-pre"> </span>
         )}
       </span>
     ))
@@ -66,6 +66,11 @@ export function Hero() {
       ref={containerRef}
       className="bg-background text-foreground relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden px-6 pt-20"
     >
+      <noscript>
+        <style>{`
+          .char, .hero-cta { opacity: 1 !important; }
+        `}</style>
+      </noscript>
       {/* 3D Background */}
       <div className="absolute inset-0 z-0 select-none">
         {showScene && (
@@ -102,7 +107,7 @@ export function Hero() {
         </div>
 
         {/* CTA */}
-        <div ref={ctaRef}>
+        <div ref={ctaRef} className="hero-cta opacity-0">
           <Button
             onClick={handleCtaClick}
             size="lg"

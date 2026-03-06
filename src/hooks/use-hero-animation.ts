@@ -45,7 +45,6 @@ export function useHeroAnimation({
       const charRects = chars.map((char) => char.getBoundingClientRect())
 
       // WRITE phase: Now we can safely mutate the DOM without triggering a reflow
-      gsap.set(chars, { opacity: 0 })
       gsap.set(caretRef.current, { opacity: 1 })
 
       chars.forEach((char, i) => {
