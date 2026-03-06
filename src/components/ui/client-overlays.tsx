@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react'
 
 import dynamic from 'next/dynamic'
 
-const CustomCursor = dynamic(() => import('@/components/ui/custom-cursor'), { ssr: false })
+const CustomCursor = dynamic(() => import('@/components/ui/custom-cursor').then((mod) => mod.CustomCursor), {
+  ssr: false,
+})
 const SmoothScroller = dynamic(
   () => import('@/components/ui/smooth-scroller').then((mod) => mod.SmoothScroller),
   { ssr: false }

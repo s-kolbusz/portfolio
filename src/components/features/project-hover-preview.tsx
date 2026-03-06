@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { createPortal } from 'react-dom'
 
 import Image from 'next/image'
@@ -21,34 +21,34 @@ export function ProjectHoverPreview({ image, isActive, isVisible }: ProjectHover
   const isEnabled = useMedia('(pointer: fine)')
   const isListening = isEnabled && isVisible && isActive
 
-  // 1. Mouse Follow Logic - Using standard useEffect for strict listener control
-  useEffect(() => {
-    const container = containerRef.current
-    if (!isListening || !container) return
+  // 1. Mouse Follow Logic - Using useGSAP for automatic cleanup and scoping
+  useGSAP(
+    () => {
+      const container = containerRef.current
+      if (!isListening || !container) return
 
-    // Spring physics for smooth follow
-    const xTo = gsap.quickTo(container, 'x', { duration: 0.6, ease: 'power3.out' })
-    const yTo = gsap.quickTo(container, 'y', { duration: 0.6, ease: 'power3.out' })
+      // Spring physics for smooth follow
+      const xTo = gsap.quickTo(container, 'x', { duration: 0.6, ease: 'power3.out' })
+      const yTo = gsap.quickTo(container, 'y', { duration: 0.6, ease: 'power3.out' })
 
-    // Initialize position to center of screen (approximate dimensions to avoid reading layout)
-    const centerX = window.innerWidth / 2 - 150
-    const centerY = window.innerHeight / 2 - 100
-    gsap.set(container, { x: centerX, y: centerY })
+      // Initialize position to center of screen (approximate dimensions to avoid reading layout)
+      const centerX = window.innerWidth / 2 - 150
+      const centerY = window.innerHeight / 2 - 100
+      gsap.set(container, { x: centerX, y: centerY })
 
-    const onMove = (e: MouseEvent) => {
-      xTo(e.clientX + 20)
-      yTo(e.clientY + 20)
-    }
+      const onMove = (e: MouseEvent) => {
+        xTo(e.clientX + 20)
+        yTo(e.clientY + 20)
+      }
 
-    window.addEventListener('mousemove', onMove)
+      window.addEventListener('mousemove', onMove)
 
-    return () => {
-      window.removeEventListener('mousemove', onMove)
-      // We do NOT kill tweens here to avoid "y not eligible for reset" warning
-      // if the visibility animation tries to run after this.
-      // quickTo instances will be garbage collected.
-    }
-  }, [isListening])
+      return () => {
+        window.removeEventListener('mousemove', onMove)
+      }
+    },
+    { dependencies: [isListening], scope: containerRef }
+  )
 
   // 2. Visibility & Transition Logic
   useGSAP(

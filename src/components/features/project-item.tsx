@@ -71,7 +71,7 @@ export function ProjectItem({ project, isOpen, onToggle, onHover }: ProjectItemP
     >
       <button
         onClick={handleClick}
-        className="flex w-full items-center justify-between py-8 text-left outline-none md:py-10"
+        className="flex w-full items-center justify-between py-8 text-left outline-none *:pointer-events-none md:py-10"
         aria-expanded={isOpen}
         aria-controls={`project-content-${project.id}`}
         id={`project-trigger-${project.id}`}

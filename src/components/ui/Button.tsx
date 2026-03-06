@@ -2,8 +2,8 @@ import {
   AnchorHTMLAttributes,
   ButtonHTMLAttributes,
   MouseEventHandler,
-  forwardRef,
   ReactNode,
+  Ref,
 } from 'react'
 
 import { Link } from '@/i18n/navigation'
@@ -21,11 +21,13 @@ interface ButtonVisualProps {
 type ButtonAsButtonProps = ButtonVisualProps &
   Omit<ButtonHTMLAttributes<HTMLButtonElement>, keyof ButtonVisualProps | 'href'> & {
     href?: undefined
+    ref?: Ref<HTMLButtonElement>
   }
 
 type ButtonAsLinkProps = ButtonVisualProps &
   Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof ButtonVisualProps | 'href'> & {
     href: string
+    ref?: Ref<HTMLAnchorElement>
   }
 
 type ButtonProps = ButtonAsButtonProps | ButtonAsLinkProps
@@ -36,7 +38,7 @@ function isExternalHref(href: string) {
   return href.startsWith('//') || EXTERNAL_LINK_PROTOCOL.test(href)
 }
 
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
+export function Button(props: ButtonProps) {
   const {
     className,
     variant = 'primary',
@@ -85,7 +87,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) =>
   )
 
   if ('href' in rest && typeof rest.href === 'string') {
-    const { href, onClick, target, rel, tabIndex, ...anchorProps } = rest
+    const { href, onClick, target, rel, tabIndex, ref, ...anchorProps } = rest
     const handleClick: MouseEventHandler<HTMLAnchorElement> | undefined =
       isDisabled || onClick
         ? (event) => {
@@ -111,24 +113,30 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) =>
       const resolvedRel = target === '_blank' ? (rel ?? 'noopener noreferrer') : rel
 
       return (
-        <a href={href} target={target} rel={resolvedRel} {...commonLinkProps}>
+        <a
+          href={href}
+          target={target}
+          rel={resolvedRel}
+          ref={ref as Ref<HTMLAnchorElement>}
+          {...commonLinkProps}
+        >
           {content}
         </a>
       )
     }
 
     return (
-      <Link href={href} {...commonLinkProps}>
+      <Link href={href} ref={ref as Ref<HTMLAnchorElement>} {...commonLinkProps}>
         {content}
       </Link>
     )
   }
 
-  const { type = 'button', ...buttonProps } = rest
+  const { type = 'button', ref, ...buttonProps } = rest
 
   return (
     <button
-      ref={ref}
+      ref={ref as Ref<HTMLButtonElement>}
       type={type}
       className={combinedClassName}
       disabled={isDisabled}
@@ -138,6 +146,4 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) =>
       {content}
     </button>
   )
-})
-
-Button.displayName = 'Button'
+}

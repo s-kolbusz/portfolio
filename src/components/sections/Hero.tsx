@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 import { useHeroAnimation } from '@/hooks/use-hero-animation'
 import { usePrefersReducedMotion } from '@/hooks/use-media'
 
-const HeroScene = lazy(() => import('@/components/canvas/hero-scene'))
+const HeroScene = lazy(() => import('@/components/canvas/hero-scene').then((mod) => ({ default: mod.HeroScene })))
 
 export function Hero() {
   const t = useTranslations('hero')

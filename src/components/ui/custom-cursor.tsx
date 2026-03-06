@@ -7,7 +7,7 @@ import { useMedia, usePrefersReducedMotion } from '@/hooks/use-media'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { useCursorStore } from '@/lib/stores'
 
-export default function CustomCursor() {
+export function CustomCursor() {
   const prefersReducedMotion = usePrefersReducedMotion()
   const isEnabled = useMedia('(pointer: fine)') && !prefersReducedMotion
 
@@ -57,7 +57,7 @@ export default function CustomCursor() {
   }, [])
 
   // Subscribe to store changes manually to handle visual updates
-  useEffect(() => {
+  useGSAP(() => {
     // Initialize mouse position if window is available
     if (typeof window !== 'undefined') {
       mouse.current.x = window.innerWidth / 2

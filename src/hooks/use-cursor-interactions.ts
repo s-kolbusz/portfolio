@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useRef } from 'react'
 
 import { useCursorStore, type CursorVariant } from '@/lib/stores'

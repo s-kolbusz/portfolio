@@ -6,7 +6,7 @@ import { usePrefersReducedMotion } from '@/hooks/use-media'
 
 import { ViscousPuddle } from './viscous-puddle'
 
-export default function HeroScene() {
+export function HeroScene() {
   const [mounted, setMounted] = useState(false)
   const prefersReducedMotion = usePrefersReducedMotion()
 

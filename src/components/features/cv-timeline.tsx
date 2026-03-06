@@ -1,11 +1,11 @@
 'use client'
 
-import React, { useRef, useEffect } from 'react'
+import React, { useRef } from 'react'
 
 import { useTranslations } from 'next-intl'
 
 import type { CVEducation, CVExperience } from '@/data/cv'
-import { gsap, ScrollTrigger } from '@/lib/gsap'
+import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap'
 
 import { CVEntry } from './cv-entry'
 
@@ -20,10 +20,8 @@ export const CVTimeline: React.FC<CVTimelineProps> = ({ experience, education })
   const t = useTranslations('cv')
   const containerRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    if (!containerRef.current) return
-
-    const ctx = gsap.context(() => {
+  useGSAP(
+    () => {
       const entries = gsap.utils.toArray<HTMLElement>('.cv-entry')
       entries.forEach((entry) => {
         gsap.fromTo(
@@ -42,10 +40,9 @@ export const CVTimeline: React.FC<CVTimelineProps> = ({ experience, education })
           }
         )
       })
-    }, containerRef)
-
-    return () => ctx.revert()
-  }, [])
+    },
+    { scope: containerRef }
+  )
 
   return (
     <div ref={containerRef} className="relative flex flex-col gap-6 md:gap-5 print:gap-5">
