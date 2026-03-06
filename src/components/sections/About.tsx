@@ -122,5 +122,3 @@ export const About: React.FC = () => {
     </BaseSection>
   )
 }
-
-export default About

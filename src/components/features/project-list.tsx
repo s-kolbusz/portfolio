@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-import { PortfolioEntry } from '@/data/projects-en'
+import { type PortfolioEntry } from '@/data/projects-en'
 import { useTimeline } from '@/hooks/use-timeline'
 import { ANIMATION } from '@/lib/constants/animations'
 

@@ -36,6 +36,13 @@ export function Services() {
     }
   }
 
+  const handleServiceKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      handleServiceClick()
+    }
+  }
+
   return (
     <BaseSection id="services" ref={sectionRef} containerClassName="gap-12 md:gap-18">
       {/* Header */}
@@ -54,7 +61,10 @@ export function Services() {
             <div
               data-cursor="button"
               key={service.id}
+              role="button"
+              tabIndex={0}
               onClick={handleServiceClick}
+              onKeyDown={handleServiceKeyDown}
               className={cn(
                 'group bg-card hover:shadow-primary/5 relative flex flex-col justify-between gap-10 border p-8 text-left transition-[color,border-color,box-shadow] duration-500 hover:shadow-2xl md:p-10',
                 isPopular

@@ -10,7 +10,9 @@ import { Button } from '@/components/ui/button'
 import { useHeroAnimation } from '@/hooks/use-hero-animation'
 import { usePrefersReducedMotion } from '@/hooks/use-media'
 
-const HeroScene = lazy(() => import('@/components/canvas/hero-scene').then((mod) => ({ default: mod.HeroScene })))
+const HeroScene = lazy(() =>
+  import('@/components/canvas/hero-scene').then((mod) => ({ default: mod.HeroScene }))
+)
 
 export function Hero() {
   const t = useTranslations('hero')
@@ -44,12 +46,12 @@ export function Hero() {
     return name.split(' ').map((word, wordIndex) => (
       <span key={wordIndex} className="inline-block whitespace-nowrap">
         {word.split('').map((char, charIndex) => (
-          <span key={charIndex} className="char opacity-0 inline-block">
+          <span key={charIndex} className="char inline-block opacity-0">
             {char}
           </span>
         ))}
         {wordIndex < name.split(' ').length - 1 && (
-          <span className="char opacity-0 inline-block whitespace-pre"> </span>
+          <span className="char inline-block whitespace-pre opacity-0"> </span>
         )}
       </span>
     ))

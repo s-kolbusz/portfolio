@@ -1,4 +1,4 @@
-import { Metadata } from 'next'
+import { type Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 
 import { ProjectBook } from '@/components/features/project-book'

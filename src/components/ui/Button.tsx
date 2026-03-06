@@ -1,9 +1,9 @@
 import {
-  AnchorHTMLAttributes,
-  ButtonHTMLAttributes,
-  MouseEventHandler,
-  ReactNode,
-  Ref,
+  type AnchorHTMLAttributes,
+  type ButtonHTMLAttributes,
+  type MouseEventHandler,
+  type ReactNode,
+  type Ref,
 } from 'react'
 
 import { Link } from '@/i18n/navigation'

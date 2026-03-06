@@ -8,7 +8,7 @@ import Image from 'next/image'
 import { ArrowLeftIcon, ArrowRightIcon, XIcon } from '@phosphor-icons/react'
 
 import { Button } from '@/components/ui/button'
-import { MediaItem } from '@/data/projects'
+import { type MediaItem } from '@/data/projects'
 import { useFocusTrap } from '@/hooks/use-focus-trap'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { useScrollStore } from '@/lib/stores'
@@ -134,6 +134,7 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
   if (!mounted) return null
 
   return createPortal(
+    /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
     <div
       ref={overlayRef}
       role="dialog"
@@ -143,6 +144,9 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 outline-none sm:p-8"
       onClick={(e) => {
         if (e.target === overlayRef.current) onClose()
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') onClose()
       }}
     >
       {/* Top Bar */}
@@ -191,6 +195,7 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
       {/* Image Container */}
       <div
         ref={imageRef}
+        role="presentation"
         className="relative h-full w-full max-w-7xl select-none"
         onClick={(e) => e.stopPropagation()}
       >

@@ -1,6 +1,6 @@
 'use client'
 
-import { RefObject } from 'react'
+import { type RefObject } from 'react'
 
 import { ANIMATION } from '@/lib/constants/animations'
 import { gsap, useGSAP } from '@/lib/gsap'

@@ -1,4 +1,4 @@
-import { Metadata } from 'next'
+import { type Metadata } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
 import { Fraunces, JetBrains_Mono } from 'next/font/google'
 import localFont from 'next/font/local'
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <html suppressHydrationWarning>
+    <html lang={routing.defaultLocale} suppressHydrationWarning>
       <body
         className={`${satoshi.variable} ${fraunces.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >

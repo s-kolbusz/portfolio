@@ -1,4 +1,4 @@
-import Lenis from 'lenis'
+import type Lenis from 'lenis'
 import { create } from 'zustand'
 
 interface ScrollStore {

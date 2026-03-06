@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode } from 'react'
+import { type ReactNode } from 'react'
 
 import { Select as SelectPrimitive } from '@base-ui/react/select'
 import { CaretDownIcon, CheckIcon } from '@phosphor-icons/react'

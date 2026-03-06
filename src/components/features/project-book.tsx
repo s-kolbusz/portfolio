@@ -1,7 +1,7 @@
 'use client'
 
 import {
-  KeyboardEvent as ReactKeyboardEvent,
+  type KeyboardEvent as ReactKeyboardEvent,
   useCallback,
   useEffect,
   useRef,
@@ -13,7 +13,7 @@ import { useTranslations } from 'next-intl'
 import { ArrowLeftIcon } from '@phosphor-icons/react'
 
 import { Button } from '@/components/ui/button'
-import { PortfolioEntry } from '@/data/projects-en'
+import { type PortfolioEntry } from '@/data/projects-en'
 import { useRouter } from '@/i18n/navigation'
 
 import { BookEdgeNav } from './book-edge-nav'
@@ -94,6 +94,7 @@ export function ProjectBook({ projects }: ProjectBookProps) {
     }
   }
 
+  /* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */
   return (
     <div
       role="region"
