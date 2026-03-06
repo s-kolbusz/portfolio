@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef } from 'react'
 
 import { useTheme } from 'next-themes'
 
-import { usePrefersReducedMotion } from '@/hooks/useMedia'
+import { usePrefersReducedMotion } from '@/hooks/use-media'
 
 import { disposePuddleWebGL, hexToRgb, lerp, setupPuddleWebGL } from './viscous-puddle/webgl'
 

@@ -1,10 +1,10 @@
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages, setRequestLocale } from 'next-intl/server'
 
+import { HtmlLangSync } from '@/components/seo/html-lang-sync'
 import { ThemeProvider } from '@/components/theme-provider'
-import { ClientOverlays } from '@/components/ui/ClientOverlays'
-import { HtmlLangSync } from '@/components/ui/HtmlLangSync'
-import { SkipToMain } from '@/components/ui/SkipToMain'
+import { ClientOverlays } from '@/components/ui/client-overlays'
+import { SkipToMain } from '@/components/ui/skip-to-main'
 import { getLocaleFromParams } from '@/i18n/locale'
 import { routing } from '@/i18n/routing'
 
@@ -24,7 +24,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   const locale = await getLocaleFromParams(params)
 
   setRequestLocale(locale)
-  const messages = await getMessages()
+  const messages = await getMessages({ locale })
 
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>

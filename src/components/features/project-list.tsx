@@ -3,12 +3,12 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { PortfolioEntry } from '@/data/projects-en'
-import { useTimeline } from '@/hooks/useTimeline'
+import { useTimeline } from '@/hooks/use-timeline'
 import { ANIMATION } from '@/lib/constants/animations'
 
+import { ProjectHoverPreview } from './project-hover-preview'
 import { getImageToRender } from './project-hover-preview/state'
-import { ProjectHoverPreview } from './ProjectHoverPreview'
-import { ProjectItem } from './ProjectItem'
+import { ProjectItem } from './project-item'
 
 interface ProjectListProps {
   projects: PortfolioEntry[]

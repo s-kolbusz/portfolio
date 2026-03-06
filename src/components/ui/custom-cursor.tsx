@@ -2,8 +2,8 @@
 
 import { useEffect, useRef } from 'react'
 
-import { useCursorInteractions } from '@/hooks/useCursorInteractions'
-import { useMedia, usePrefersReducedMotion } from '@/hooks/useMedia'
+import { useCursorInteractions } from '@/hooks/use-cursor-interactions'
+import { useMedia, usePrefersReducedMotion } from '@/hooks/use-media'
 import { useCursorStore } from '@/lib/cursor-store'
 import { useGSAP } from '@/lib/gsap'
 import { gsap } from '@/lib/gsap'

@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 
 import Lenis from 'lenis'
 
-import { usePrefersReducedMotion } from '@/hooks/useMedia'
+import { usePrefersReducedMotion } from '@/hooks/use-media'
 import { gsap, ScrollTrigger } from '@/lib/gsap'
 import { useScrollStore } from '@/lib/store'
 

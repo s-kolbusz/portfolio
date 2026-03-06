@@ -2,7 +2,7 @@
 
 import { useRef } from 'react'
 
-import { usePrefersReducedMotion } from '@/hooks/useMedia'
+import { usePrefersReducedMotion } from '@/hooks/use-media'
 import { useSafeAnimation } from '@/lib/constants/animations'
 import { gsap, useGSAP } from '@/lib/gsap'
 

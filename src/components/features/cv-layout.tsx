@@ -4,13 +4,13 @@ import React, { useRef } from 'react'
 
 import { useTranslations } from 'next-intl'
 
-import { SkillTag } from '@/components/ui/SkillTag'
+import { SkillTag } from '@/components/ui/skill-tag'
 import type { CVData } from '@/data/cv'
-import { useTimeline } from '@/hooks/useTimeline'
+import { useTimeline } from '@/hooks/use-timeline'
 import { ANIMATION } from '@/lib/constants/animations'
 
-import { CVHeader } from './CVHeader'
-import { CVTimeline } from './CVTimeline'
+import { CVHeader } from './cv-header'
+import { CVTimeline } from './cv-timeline'
 
 interface CVLayoutProps {
   data: CVData

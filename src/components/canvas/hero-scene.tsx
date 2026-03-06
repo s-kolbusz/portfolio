@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react'
 
-import { usePrefersReducedMotion } from '@/hooks/useMedia'
+import { usePrefersReducedMotion } from '@/hooks/use-media'
 
-import { ViscousPuddle } from './ViscousPuddle'
+import { ViscousPuddle } from './viscous-puddle'
 
 export default function HeroScene() {
   const [mounted, setMounted] = useState(false)

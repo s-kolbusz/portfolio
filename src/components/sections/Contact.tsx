@@ -6,10 +6,10 @@ import { useTranslations } from 'next-intl'
 
 import { ArrowUpRightIcon } from '@phosphor-icons/react'
 
-import { BaseSection } from '@/components/ui/BaseSection'
-import { EditorialHeader } from '@/components/ui/EditorialHeader'
+import { BaseSection } from '@/components/ui/base-section'
+import { EditorialHeader } from '@/components/ui/editorial-header'
 import { contactLinks } from '@/data/contact'
-import { useTimeline } from '@/hooks/useTimeline'
+import { useTimeline } from '@/hooks/use-timeline'
 import { ANIMATION } from '@/lib/constants/animations'
 
 export function Contact() {

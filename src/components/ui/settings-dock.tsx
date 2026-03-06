@@ -5,7 +5,7 @@ import { useTheme } from 'next-themes'
 
 import { MoonIcon, SunIcon } from '@phosphor-icons/react'
 
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { usePathname, useRouter } from '@/i18n/navigation'
 
 export function SettingsDock() {

@@ -15,7 +15,7 @@ vi.mock('@/i18n/navigation', () => ({
   ),
 }))
 
-import { Button } from './Button'
+import { Button } from './button'
 
 describe('Button link semantics', () => {
   it('uses locale-aware link rendering for internal href values', () => {

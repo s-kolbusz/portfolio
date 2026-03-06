@@ -7,9 +7,9 @@ import Image from 'next/image'
 
 import { ArrowLeftIcon, ArrowRightIcon, XIcon } from '@phosphor-icons/react'
 
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { MediaItem } from '@/data/projects'
-import { useFocusTrap } from '@/hooks/useFocusTrap'
+import { useFocusTrap } from '@/hooks/use-focus-trap'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { useScrollStore } from '@/lib/store'
 

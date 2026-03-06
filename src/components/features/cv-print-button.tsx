@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl'
 
 import { PrinterIcon } from '@phosphor-icons/react'
 
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 
 export const CVPrintButton = () => {
   const t = useTranslations('cv')

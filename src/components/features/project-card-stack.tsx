@@ -7,14 +7,14 @@ import Image from 'next/image'
 
 import { ArrowLeftIcon, ArrowUpRightIcon, StarIcon } from '@phosphor-icons/react'
 
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { PortfolioEntry } from '@/data/projects-en'
-import { useTimeline } from '@/hooks/useTimeline'
+import { useTimeline } from '@/hooks/use-timeline'
 import { Link } from '@/i18n/navigation'
 import { useRouter } from '@/i18n/navigation'
 import { ANIMATION } from '@/lib/constants/animations'
 
-import { ProjectMeta } from './ProjectMeta'
+import { ProjectMeta } from './project-meta'
 
 interface ProjectCardStackProps {
   projects: PortfolioEntry[]

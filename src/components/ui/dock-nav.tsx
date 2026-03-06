@@ -4,10 +4,11 @@ import { useCallback, useMemo, useRef, useState } from 'react'
 
 import { useTranslations } from 'next-intl'
 
-import { useActiveSection } from '@/hooks/useActiveSection'
+import { useActiveSection } from '@/hooks/use-active-section'
 import { usePathname, useRouter } from '@/i18n/navigation'
 import { useGSAP } from '@/lib/gsap'
 
+import { DockItem } from './dock-item'
 import { animateIndicator, syncIndicatorPosition, useWindowResize } from './dock-nav/indicator'
 import {
   NAV_ITEMS,
@@ -18,7 +19,6 @@ import {
   isHomeRoute,
   isProjectsRoute,
 } from './dock-nav/logic'
-import { DockItem } from './DockItem'
 
 export function DockNav() {
   const t = useTranslations('nav')

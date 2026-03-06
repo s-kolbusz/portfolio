@@ -6,11 +6,11 @@ import { useTranslations } from 'next-intl'
 
 import { ArrowRightIcon, CheckIcon, StarIcon } from '@phosphor-icons/react'
 
-import { BaseSection } from '@/components/ui/BaseSection'
-import { Button } from '@/components/ui/Button'
-import { EditorialHeader } from '@/components/ui/EditorialHeader'
+import { BaseSection } from '@/components/ui/base-section'
+import { Button } from '@/components/ui/button'
+import { EditorialHeader } from '@/components/ui/editorial-header'
 import { services } from '@/data/services'
-import { useTimeline } from '@/hooks/useTimeline'
+import { useTimeline } from '@/hooks/use-timeline'
 import { ANIMATION } from '@/lib/constants/animations'
 import { cn } from '@/lib/utils'
 

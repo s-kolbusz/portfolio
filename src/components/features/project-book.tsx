@@ -12,14 +12,14 @@ import { useTranslations } from 'next-intl'
 
 import { ArrowLeftIcon } from '@phosphor-icons/react'
 
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { PortfolioEntry } from '@/data/projects-en'
 import { useRouter } from '@/i18n/navigation'
 
-import { BookEdgeNav } from './BookEdgeNav'
-import { BookPageDots } from './BookPageDots'
-import { BookSpread } from './BookSpread'
-import { BookTableOfContents } from './BookTableOfContents'
+import { BookEdgeNav } from './book-edge-nav'
+import { BookPageDots } from './book-page-dots'
+import { BookSpread } from './book-spread'
+import { BookTableOfContents } from './book-table-of-contents'
 
 interface ProjectBookProps {
   projects: PortfolioEntry[]

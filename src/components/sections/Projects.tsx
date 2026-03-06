@@ -6,12 +6,12 @@ import { useTranslations } from 'next-intl'
 
 import { ArrowRightIcon } from '@phosphor-icons/react'
 
-import { ProjectList } from '@/components/features/ProjectList'
-import { BaseSection } from '@/components/ui/BaseSection'
-import { Button } from '@/components/ui/Button'
-import { EditorialHeader } from '@/components/ui/EditorialHeader'
+import { ProjectList } from '@/components/features/project-list'
+import { BaseSection } from '@/components/ui/base-section'
+import { Button } from '@/components/ui/button'
+import { EditorialHeader } from '@/components/ui/editorial-header'
 import { getFeaturedProjects } from '@/data/get-projects'
-import { useTimeline } from '@/hooks/useTimeline'
+import { useTimeline } from '@/hooks/use-timeline'
 import type { Locale } from '@/i18n/routing'
 
 interface ProjectsProps {

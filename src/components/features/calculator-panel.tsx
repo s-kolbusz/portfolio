@@ -14,9 +14,9 @@ import {
   WavesIcon,
 } from '@phosphor-icons/react'
 
-import { AnimatedNumber } from '@/components/ui/AnimatedNumber'
-import { Select } from '@/components/ui/Select'
-import { Slider } from '@/components/ui/Slider'
+import { AnimatedNumber } from '@/components/ui/animated-number'
+import { Select } from '@/components/ui/select'
+import { Slider } from '@/components/ui/slider'
 import { BUILD_VOLUME_X, BUILD_VOLUME_Y, BUILD_VOLUME_Z, MATERIALS } from '@/data/materials'
 import { calculatePrintCost } from '@/lib/calculate-print'
 

@@ -4,16 +4,16 @@ import { useEffect, useState } from 'react'
 
 import dynamic from 'next/dynamic'
 
-const CustomCursor = dynamic(() => import('@/components/ui/CustomCursor'), { ssr: false })
+const CustomCursor = dynamic(() => import('@/components/ui/custom-cursor'), { ssr: false })
 const SmoothScroller = dynamic(
-  () => import('@/components/ui/SmoothScroller').then((mod) => mod.SmoothScroller),
+  () => import('@/components/ui/smooth-scroller').then((mod) => mod.SmoothScroller),
   { ssr: false }
 )
-const DockNav = dynamic(() => import('@/components/ui/DockNav').then((mod) => mod.DockNav), {
+const DockNav = dynamic(() => import('@/components/ui/dock-nav').then((mod) => mod.DockNav), {
   ssr: false,
 })
 const SettingsDock = dynamic(
-  () => import('@/components/ui/SettingsDock').then((mod) => mod.SettingsDock),
+  () => import('@/components/ui/settings-dock').then((mod) => mod.SettingsDock),
   { ssr: false }
 )
 

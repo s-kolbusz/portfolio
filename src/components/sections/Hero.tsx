@@ -6,11 +6,11 @@ import { useTranslations } from 'next-intl'
 
 import { ArrowDownIcon } from '@phosphor-icons/react'
 
-import { Button } from '@/components/ui/Button'
-import { useHeroAnimation } from '@/hooks/useHeroAnimation'
-import { usePrefersReducedMotion } from '@/hooks/useMedia'
+import { Button } from '@/components/ui/button'
+import { useHeroAnimation } from '@/hooks/use-hero-animation'
+import { usePrefersReducedMotion } from '@/hooks/use-media'
 
-const HeroScene = lazy(() => import('@/components/canvas/HeroScene'))
+const HeroScene = lazy(() => import('@/components/canvas/hero-scene'))
 
 export function Hero() {
   const t = useTranslations('hero')

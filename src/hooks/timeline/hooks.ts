@@ -2,7 +2,7 @@
 
 import type { RefObject } from 'react'
 
-import { usePrefersReducedMotion } from '@/hooks/useMedia'
+import { usePrefersReducedMotion } from '@/hooks/use-media'
 import { useSafeAnimation } from '@/lib/constants/animations'
 import { useGSAP } from '@/lib/gsap'
 

@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl'
 import type { CVEducation, CVExperience } from '@/data/cv'
 import { gsap, ScrollTrigger } from '@/lib/gsap'
 
-import { CVEntry } from './CVEntry'
+import { CVEntry } from './cv-entry'
 
 gsap.registerPlugin(ScrollTrigger)
 

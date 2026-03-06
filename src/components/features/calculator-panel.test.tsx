@@ -22,7 +22,7 @@ vi.mock('next-intl', () => ({
   },
 }))
 
-vi.mock('@/hooks/useMedia', () => ({
+vi.mock('@/hooks/use-media', () => ({
   usePrefersReducedMotion: () => true,
 }))
 
@@ -38,7 +38,7 @@ vi.mock('@/lib/gsap', () => ({
 import { MATERIALS } from '@/data/materials'
 import { calculatePrintCost } from '@/lib/calculate-print'
 
-import { CalculatorPanel } from './CalculatorPanel'
+import { CalculatorPanel } from './calculator-panel'
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat('en-IE', { style: 'currency', currency: 'EUR' }).format(value)
