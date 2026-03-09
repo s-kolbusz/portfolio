@@ -29,20 +29,6 @@ export function Services() {
     reveal(processStepsRef, { stagger: ANIMATION.stagger.slow })
   })
 
-  const handleServiceClick = () => {
-    const contactSection = document.getElementById('contact')
-    if (contactSection) {
-      contactSection.scrollIntoView({ behavior: 'smooth' })
-    }
-  }
-
-  const handleServiceKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault()
-      handleServiceClick()
-    }
-  }
-
   return (
     <BaseSection id="services" ref={sectionRef} containerClassName="gap-12 md:gap-18">
       {/* Header */}
@@ -59,12 +45,7 @@ export function Services() {
           const isPopular = service.popular
           return (
             <div
-              data-cursor="button"
               key={service.id}
-              role="button"
-              tabIndex={0}
-              onClick={handleServiceClick}
-              onKeyDown={handleServiceKeyDown}
               className={cn(
                 'group bg-card hover:shadow-primary/5 relative flex flex-col justify-between gap-10 border p-8 text-left transition-[color,border-color,box-shadow] duration-500 hover:shadow-2xl md:p-10',
                 isPopular
@@ -129,6 +110,7 @@ export function Services() {
               {/* CTA Button */}
               <div className="mt-auto pt-4">
                 <Button
+                  href="#contact"
                   variant={isPopular ? 'primary' : 'outline'}
                   size="sm"
                   className="w-full justify-between"

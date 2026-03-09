@@ -140,13 +140,21 @@ export default function DesignPage() {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
           {/* Sliders */}
           <div className="flex flex-col gap-8">
-            <Slider label="Volume" defaultValue={50} valueDisplay="50%" />
-            <Slider label="Opacity" defaultValue={80} valueDisplay="0.8" step={0.1} max={1} />
+            <Slider id="volume-slider" label="Volume" defaultValue={50} valueDisplay="50%" />
+            <Slider
+              id="opacity-slider"
+              label="Opacity"
+              defaultValue={80}
+              valueDisplay="0.8"
+              step={0.1}
+              max={1}
+            />
           </div>
 
           {/* Select & Meta */}
           <div className="flex flex-col gap-8">
             <Select
+              id="material-select"
               label="Choose Material"
               onChange={() => {}}
               options={
@@ -214,15 +222,25 @@ export default function DesignPage() {
         </h2>
         <div className="relative h-40 w-full rounded-2xl bg-neutral-100 dark:bg-neutral-900">
           <div className="glass absolute bottom-6 left-1/2 flex -translate-x-1/2 items-center gap-2 p-2">
-            <div className="glass-button flex h-10 w-10 items-center justify-center rounded-md">
+            <button
+              aria-label="Home"
+              className="glass-button flex h-10 w-10 items-center justify-center rounded-md"
+            >
               <HouseIcon size={20} weight="duotone" />
-            </div>
-            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-emerald-500/10 text-emerald-600">
+            </button>
+            <div
+              role="img"
+              aria-label="Status"
+              className="flex h-10 w-10 items-center justify-center rounded-md bg-emerald-500/10 text-emerald-600"
+            >
               <CheckIcon size={20} weight="bold" />
             </div>
-            <div className="glass-button flex h-10 w-10 items-center justify-center rounded-md">
+            <button
+              aria-label="Toggle theme"
+              className="glass-button flex h-10 w-10 items-center justify-center rounded-md"
+            >
               <MoonIcon size={20} weight="duotone" />
-            </div>
+            </button>
           </div>
         </div>
       </section>
