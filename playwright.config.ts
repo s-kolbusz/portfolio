@@ -13,6 +13,7 @@ export default defineConfig({
     baseURL,
     trace: 'on-first-retry',
   },
+  snapshotPathTemplate: '{testDir}/{testFileDir}/{testFileName}-snapshots/{arg}-{projectName}{ext}',
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {

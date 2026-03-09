@@ -18,17 +18,25 @@ test('project list navigation reaches details and preserves prev/next project se
   await zakofyLink.click()
 
   await expect(page).toHaveURL(/\/en\/projects\/zakofy$/)
+  // Wait for the new page's heading to ensure transition completed
+  await expect(page.getByRole('heading', { name: /zakofy/i, level: 1 })).toBeVisible()
   await expect(page.getByRole('navigation', { name: 'Project navigation' })).toBeVisible()
 
   const nextProjectLink = page.getByRole('link', { name: /next project/i })
+  await expect(nextProjectLink).toBeVisible()
   await expect(nextProjectLink).toHaveAttribute('href', /\/en\/projects\/your-krakow-travel$/)
   await nextProjectLink.click()
 
   await expect(page).toHaveURL(/\/en\/projects\/your-krakow-travel$/)
+  // Wait for the new page's heading to ensure transition completed
+  await expect(page.getByRole('heading', { name: /your krakow travel/i, level: 1 })).toBeVisible()
 
   const previousProjectLink = page.getByRole('link', { name: /previous project/i })
+  await expect(previousProjectLink).toBeVisible()
   await expect(previousProjectLink).toHaveAttribute('href', /\/en\/projects\/zakofy$/)
   await previousProjectLink.click()
 
   await expect(page).toHaveURL(/\/en\/projects\/zakofy$/)
+  // Wait for the new page's heading to ensure transition completed
+  await expect(page.getByRole('heading', { name: /zakofy/i, level: 1 })).toBeVisible()
 })
