@@ -2,8 +2,8 @@
 
 import type { RefObject } from 'react'
 
-import { usePrefersReducedMotion } from '@/hooks/useMedia'
-import { useSafeAnimation } from '@/lib/constants/animations'
+import { usePrefersReducedMotion } from '@/hooks/use-media'
+import { useSafeAnimation } from '@/hooks/use-safe-animation'
 import { useGSAP } from '@/lib/gsap'
 
 import { createReveal, REVEAL } from './reveal-engine'

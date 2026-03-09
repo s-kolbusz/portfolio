@@ -1,14 +1,13 @@
-import { Metadata } from 'next'
+import { type Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 
-import { ProjectCaseStudy } from '@/components/features/ProjectCaseStudy'
-import { RoleCaseStudy } from '@/components/features/RoleCaseStudy'
+import { ProjectCaseStudy, RoleCaseStudy } from '@/components/features/project/project-book'
 import { getProject, getProjects } from '@/data/get-projects'
 import { requireRoutingLocale } from '@/i18n/locale'
 import { routing } from '@/i18n/routing'
-import { serializeJsonLd } from '@/lib/json-ld'
 import { buildProjectDetailPageMetadata } from '@/lib/page-metadata'
+import { serializeJsonLd } from '@/lib/serialize-json-ld'
 import { toAbsoluteSiteUrl } from '@/lib/site'
 
 type Props = {

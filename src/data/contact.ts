@@ -1,5 +1,10 @@
 import type { Icon } from '@phosphor-icons/react'
-import { EnvelopeIcon, GithubLogoIcon, LinkedinLogoIcon, XLogoIcon } from '@phosphor-icons/react'
+import {
+  EnvelopeIcon,
+  GithubLogoIcon,
+  LinkedinLogoIcon,
+  XLogoIcon,
+} from '@phosphor-icons/react/dist/ssr'
 
 export interface ContactLink {
   id: string

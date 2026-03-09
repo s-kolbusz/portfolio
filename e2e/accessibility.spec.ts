@@ -1,7 +1,8 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 
-const CORE_ROUTES = ['/en', '/en/cv', '/en/projects', '/en/projects/zakofy'] as const
+const CORE_ROUTES = ['/en', '/en/cv', '/en/projects', '/en/projects/zakofy', '/en/design'] as const
+
 const ROUTES_WITH_SKIP_LINK = [
   '/en',
   '/en/cv',
@@ -100,4 +101,35 @@ test('reduced-motion users do not get custom cursor or WebGL hero scene', async 
 
   await expect(page.getByTestId('custom-cursor')).toHaveCount(0)
   await expect(page.locator('canvas[aria-hidden="true"]')).toHaveCount(0)
+})
+
+test('target sizes meet WCAG 2.2 minimum requirements', async ({ page }) => {
+  await page.goto('/en')
+  await page.waitForTimeout(1000)
+
+  const dockButtons = page.locator('.dock-nav button')
+  const count = await dockButtons.count()
+
+  for (let i = 0; i < count; i++) {
+    const box = await dockButtons.nth(i).boundingBox()
+    if (box) {
+      // WCAG 2.2 AA target size is 24x24 CSS pixels
+      expect(box.width).toBeGreaterThanOrEqual(24)
+      expect(box.height).toBeGreaterThanOrEqual(24)
+    }
+  }
+})
+
+test('theme toggle changes class on html element', async ({ page }) => {
+  await page.goto('/en')
+
+  const themeToggle = page.getByLabel(/toggle theme/i)
+  await expect(themeToggle).toBeVisible()
+
+  const html = page.locator('html')
+  const initialTheme = await html.getAttribute('class')
+
+  await themeToggle.click()
+  const toggledTheme = await html.getAttribute('class')
+  expect(toggledTheme).not.toEqual(initialTheme)
 })

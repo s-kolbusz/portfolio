@@ -13,10 +13,11 @@ export default defineConfig({
     baseURL,
     trace: 'on-first-retry',
   },
+  snapshotPathTemplate: '{testDir}/{testFileDir}/{testFileName}-snapshots/{arg}-{projectName}{ext}',
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {
-        command: 'pnpm dev',
+        command: 'pnpm start',
         url: baseURL,
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,

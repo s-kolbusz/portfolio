@@ -2,13 +2,16 @@ name: CI
 
 on:
   push:
+    branches:
+      - 'main'
+      - 'release/**'
   pull_request:
 
 jobs:
   quality:
     name: Quality Gates
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     steps:
       - name: Checkout repository
@@ -22,13 +25,16 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          node-version: 24.14.0
           cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Lint (no warnings allowed)
+      - name: Dependency audit
+        run: pnpm audit --audit-level=high
+
+      - name: Lint
         run: pnpm lint:ci
 
       - name: Typecheck
@@ -42,3 +48,17 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      - name: Install Playwright Browsers
+        run: pnpm exec playwright install --with-deps
+
+      - name: Run E2E tests
+        run: pnpm test:e2e
+
+      - name: Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          configPath: ./lighthouserc.json
+          budgetPath: ./lighthouse-budget.json
+          uploadArtifacts: true
+          temporaryPublicStorage: true

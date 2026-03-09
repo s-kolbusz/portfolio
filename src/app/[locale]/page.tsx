@@ -1,17 +1,13 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server'
-import dynamic from 'next/dynamic'
 
-import { Hero } from '@/components/sections/Hero'
+import { About } from '@/components/sections/about'
+import { Contact } from '@/components/sections/contact'
+import { Hero } from '@/components/sections/hero'
+import { PrintCalculator } from '@/components/sections/print-calculator'
+import { Projects } from '@/components/sections/projects'
+import { Services } from '@/components/sections/services'
 import { getLocaleFromParams } from '@/i18n/locale'
 import { buildHomePageMetadata } from '@/lib/page-metadata'
-
-const About = dynamic(() => import('@/components/sections/About').then((mod) => mod.About))
-const Projects = dynamic(() => import('@/components/sections/Projects').then((mod) => mod.Projects))
-const Services = dynamic(() => import('@/components/sections/Services').then((mod) => mod.Services))
-const PrintCalculator = dynamic(() =>
-  import('@/components/sections/PrintCalculator').then((mod) => mod.PrintCalculator)
-)
-const Contact = dynamic(() => import('@/components/sections/Contact').then((mod) => mod.Contact))
 
 export async function generateMetadata(props: { params: Promise<{ locale: string }> }) {
   const locale = await getLocaleFromParams(props.params)

@@ -1,11 +1,11 @@
-import { Metadata } from 'next'
+import { type Metadata } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
 import { Fraunces, JetBrains_Mono } from 'next/font/google'
 import localFont from 'next/font/local'
 
 import { ThemeProvider } from '@/components/theme-provider'
-import { ClientOverlays } from '@/components/ui/ClientOverlays'
-import { SkipToMain } from '@/components/ui/SkipToMain'
+import { ClientOverlays } from '@/components/ui/client-overlays'
+import { SkipToMain } from '@/components/ui/skip-to-main'
 import enMessages from '@/i18n/messages/en.json'
 import { Link } from '@/i18n/navigation'
 import { routing } from '@/i18n/routing'
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <html suppressHydrationWarning>
+    <html lang={routing.defaultLocale} suppressHydrationWarning>
       <body
         className={`${satoshi.variable} ${fraunces.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >

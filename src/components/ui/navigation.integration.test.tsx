@@ -50,7 +50,7 @@ vi.mock('@/i18n/navigation', () => ({
   }),
 }))
 
-vi.mock('@/hooks/useActiveSection', () => ({
+vi.mock('@/hooks/use-active-section', () => ({
   useActiveSection: () => mockActiveSection,
 }))
 
@@ -67,8 +67,8 @@ vi.mock('./dock-nav/indicator', () => ({
   useWindowResize: vi.fn(),
 }))
 
-import { DockNav } from './DockNav'
-import { SettingsDock } from './SettingsDock'
+import { DockNav } from './dock-nav'
+import { SettingsDock } from './settings-dock'
 
 describe('navigation integration', () => {
   beforeEach(() => {

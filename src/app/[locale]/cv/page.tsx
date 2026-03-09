@@ -1,12 +1,11 @@
-import { Metadata } from 'next'
+import { type Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 
 import { ArrowLeftIcon } from '@phosphor-icons/react/dist/ssr'
 
-import { CVLayout } from '@/components/features/CVLayout'
-import { CVPrintButton } from '@/components/features/CVPrintButton'
-import { BaseSection } from '@/components/ui/BaseSection'
-import { Button } from '@/components/ui/Button'
+import { CVLayout, CVPrintButton } from '@/components/features/cv'
+import { BaseSection } from '@/components/ui/base-section'
+import { Button } from '@/components/ui/button'
 import { cvDataEn } from '@/data/cv-en'
 import { cvDataPl } from '@/data/cv-pl'
 import { getLocaleFromParams } from '@/i18n/locale'
