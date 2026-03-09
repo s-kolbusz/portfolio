@@ -8,7 +8,7 @@ test.describe('visual regression', () => {
 
   test('homepage matches baseline', async ({ page }) => {
     await page.goto('/en')
-    
+
     // Force visibility of elements and HIDE dynamic canvas
     await page.addStyleTag({
       content: `
@@ -42,9 +42,9 @@ test.describe('visual regression', () => {
 
     // Scroll to the bottom to trigger any lazy loading or scroll-based logic
     await page.evaluate(async () => {
-      window.scrollTo(0, document.body.scrollHeight);
-      await new Promise(r => setTimeout(r, 500));
-      window.scrollTo(0, 0);
+      window.scrollTo(0, document.body.scrollHeight)
+      await new Promise((r) => setTimeout(r, 500))
+      window.scrollTo(0, 0)
     })
 
     // Wait for everything to settle
@@ -66,7 +66,7 @@ test.describe('visual regression', () => {
     await page.goto('/en/cv')
     await page.waitForLoadState('networkidle')
     await page.waitForTimeout(1000)
-    
+
     await page.addStyleTag({
       content: `
         #page-transition-container { opacity: 1 !important; visibility: visible !important; }
@@ -85,7 +85,8 @@ test.describe('visual regression', () => {
     await page.waitForTimeout(2000)
 
     await page.addStyleTag({
-      content: '#page-transition-container { opacity: 1 !important; visibility: visible !important; }',
+      content:
+        '#page-transition-container { opacity: 1 !important; visibility: visible !important; }',
     })
 
     await expect(page).toHaveScreenshot('project-book-en.png', {
