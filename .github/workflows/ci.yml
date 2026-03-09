@@ -49,9 +49,6 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Analysis
-        run: pnpm exec next experimental-analyze --output ./analyze-report
-
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
 
