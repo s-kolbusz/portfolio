@@ -1,7 +1,5 @@
 'use client'
 
-import React from 'react'
-
 import {
   ArrowRightIcon,
   CheckIcon,
@@ -12,7 +10,7 @@ import {
   SunIcon,
 } from '@phosphor-icons/react'
 
-import { ProjectMeta } from '@/components/features/project-meta'
+import { ProjectMeta } from '@/components/features/project'
 import { BaseSection } from '@/components/ui/base-section'
 import { Button } from '@/components/ui/button'
 import { Select } from '@/components/ui/select'

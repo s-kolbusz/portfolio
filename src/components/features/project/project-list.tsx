@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { type PortfolioEntry } from '@/data/projects-en'
-import { useTimeline } from '@/hooks/use-timeline'
+import { useTimeline } from '@/hooks/timeline'
 import { ANIMATION } from '@/lib/constants/animations'
 
 import { ProjectHoverPreview } from './project-hover-preview'

@@ -7,7 +7,7 @@ import {
 } from 'react'
 
 import { Link } from '@/i18n/navigation'
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/cn'
 
 interface ButtonVisualProps {
   variant?: 'primary' | 'secondary' | 'outline' | 'outline-glass' | 'ghost' | 'glass'

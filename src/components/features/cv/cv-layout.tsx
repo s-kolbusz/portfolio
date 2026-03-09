@@ -1,12 +1,12 @@
 'use client'
 
-import React, { useRef } from 'react'
+import { useRef } from 'react'
 
 import { useTranslations } from 'next-intl'
 
 import { SkillTag } from '@/components/ui/skill-tag'
 import type { CVData } from '@/data/cv'
-import { useTimeline } from '@/hooks/use-timeline'
+import { useTimeline } from '@/hooks/timeline'
 import { ANIMATION } from '@/lib/constants/animations'
 
 import { CVHeader } from './cv-header'

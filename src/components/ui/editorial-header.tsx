@@ -1,8 +1,6 @@
-'use client'
+import { forwardRef } from 'react'
 
-import React, { forwardRef } from 'react'
-
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/cn'
 
 interface EditorialHeaderProps {
   title: string

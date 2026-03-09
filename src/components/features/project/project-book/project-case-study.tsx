@@ -9,11 +9,11 @@ import { ArrowLeftIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
 
 import { Button } from '@/components/ui/button'
 import type { PortfolioEntry } from '@/data/projects-en'
-import { useTimeline } from '@/hooks/use-timeline'
+import { useTimeline } from '@/hooks/timeline'
 import { useRouter } from '@/i18n/navigation'
 import { ANIMATION } from '@/lib/constants/animations'
 
-import { Lightbox } from '../ui/lightbox'
+import { Lightbox } from '../../../ui/lightbox'
 import { ProjectNav } from './project-nav'
 
 interface ProjectCaseStudyProps {

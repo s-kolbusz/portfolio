@@ -9,12 +9,12 @@ import { ArrowLeftIcon, ArrowUpRightIcon, StarIcon } from '@phosphor-icons/react
 
 import { Button } from '@/components/ui/button'
 import { type PortfolioEntry } from '@/data/projects-en'
-import { useTimeline } from '@/hooks/use-timeline'
+import { useTimeline } from '@/hooks/timeline'
 import { Link } from '@/i18n/navigation'
 import { useRouter } from '@/i18n/navigation'
 import { ANIMATION } from '@/lib/constants/animations'
 
-import { ProjectMeta } from './project-meta'
+import { ProjectMeta } from '../project-meta'
 
 interface ProjectCardStackProps {
   projects: PortfolioEntry[]

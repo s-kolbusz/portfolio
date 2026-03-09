@@ -1,7 +1,5 @@
 'use client'
 
-import React from 'react'
-
 import { useTranslations } from 'next-intl'
 
 import { PrinterIcon } from '@phosphor-icons/react'

@@ -1,12 +1,12 @@
 import { type Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 
-import { ProjectBook } from '@/components/features/project-book'
-import { ProjectCardStack } from '@/components/features/project-card-stack'
+import { ProjectBook } from '@/components/features/project/project-book'
+import { ProjectCardStack } from '@/components/features/project/project-book'
 import { getProjects } from '@/data/get-projects'
 import { getLocaleFromParams } from '@/i18n/locale'
-import { serializeJsonLd } from '@/lib/json-ld'
 import { buildProjectsPageMetadata } from '@/lib/page-metadata'
+import { serializeJsonLd } from '@/lib/serialize-json-ld'
 import { toAbsoluteSiteUrl } from '@/lib/site'
 
 type Props = {

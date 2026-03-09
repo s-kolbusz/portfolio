@@ -5,8 +5,8 @@ import { type ReactNode } from 'react'
 import { Select as SelectPrimitive } from '@base-ui/react/select'
 import { CaretDownIcon, CheckIcon } from '@phosphor-icons/react'
 
+import { cn } from '@/lib/cn'
 import { useScrollStore } from '@/lib/stores'
-import { cn } from '@/lib/utils'
 
 interface Option {
   label: string

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef } from 'react'
+import { useRef } from 'react'
 
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
@@ -10,7 +10,7 @@ import { ArrowRightIcon } from '@phosphor-icons/react'
 import { BaseSection } from '@/components/ui/base-section'
 import { SkillTag } from '@/components/ui/skill-tag'
 import { skillCategories } from '@/data/skills'
-import { useTimeline } from '@/hooks/use-timeline'
+import { useTimeline } from '@/hooks/timeline'
 import { ANIMATION } from '@/lib/constants/animations'
 
 export const About: React.FC = () => {

@@ -5,8 +5,8 @@ import { useRef, useState } from 'react'
 import type { Icon } from '@phosphor-icons/react'
 
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/cn'
 import { gsap, useGSAP } from '@/lib/gsap'
-import { cn } from '@/lib/utils'
 
 import { DockTooltip } from './dock-tooltip'
 

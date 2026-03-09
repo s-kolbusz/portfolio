@@ -1,4 +1,4 @@
-import { serializeJsonLd } from '@/lib/json-ld'
+import { serializeJsonLd } from '@/lib/serialize-json-ld'
 import { SITE_AUTHOR, SITE_NAME, SITE_ORIGIN } from '@/lib/site'
 
 export const JsonLd = () => {

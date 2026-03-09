@@ -10,9 +10,9 @@ import { BaseSection } from '@/components/ui/base-section'
 import { Button } from '@/components/ui/button'
 import { EditorialHeader } from '@/components/ui/editorial-header'
 import { services } from '@/data/services'
-import { useTimeline } from '@/hooks/use-timeline'
+import { useTimeline } from '@/hooks/timeline'
+import { cn } from '@/lib/cn'
 import { ANIMATION } from '@/lib/constants/animations'
-import { cn } from '@/lib/utils'
 
 export function Services() {
   const t = useTranslations('services')

@@ -6,11 +6,11 @@ import { useTranslations } from 'next-intl'
 
 import { ArrowRightIcon } from '@phosphor-icons/react'
 
-import { CalculatorPanel } from '@/components/features/calculator-panel'
+import { CalculatorPanel } from '@/components/features/calculator'
 import { BaseSection } from '@/components/ui/base-section'
 import { Button } from '@/components/ui/button'
 import { EditorialHeader } from '@/components/ui/editorial-header'
-import { useTimeline } from '@/hooks/use-timeline'
+import { useTimeline } from '@/hooks/timeline'
 import { ANIMATION } from '@/lib/constants/animations'
 
 export const PrintCalculator = () => {

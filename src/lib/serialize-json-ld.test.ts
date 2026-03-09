@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { serializeJsonLd } from './json-ld'
+import { serializeJsonLd } from './serialize-json-ld'
 
 describe('serializeJsonLd', () => {
   it('escapes < characters to prevent script injection breaks', () => {

@@ -1,6 +1,6 @@
 import { forwardRef, type InputHTMLAttributes, type ReactNode } from 'react'
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/cn'
 
 interface SliderProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string

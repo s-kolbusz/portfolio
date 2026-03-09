@@ -1,5 +1,3 @@
-import React from 'react'
-
 interface CVEntryProps {
   title: string
   subtitle: string

@@ -9,7 +9,7 @@ import { ArrowUpRightIcon } from '@phosphor-icons/react'
 import { BaseSection } from '@/components/ui/base-section'
 import { EditorialHeader } from '@/components/ui/editorial-header'
 import { contactLinks } from '@/data/contact'
-import { useTimeline } from '@/hooks/use-timeline'
+import { useTimeline } from '@/hooks/timeline'
 import { ANIMATION } from '@/lib/constants/animations'
 
 export function Contact() {
