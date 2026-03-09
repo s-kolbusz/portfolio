@@ -4,7 +4,7 @@ import {
   MapPinIcon,
   LinkedinLogoIcon,
   GithubLogoIcon,
-} from '@phosphor-icons/react'
+} from '@phosphor-icons/react/dist/ssr'
 
 interface CVHeaderProps {
   name: string
