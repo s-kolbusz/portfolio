@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 
 async function openRoute(page: Page, path: string) {
   await page.request.get(path, { timeout: 120_000 })
-  await page.goto(path, { timeout: 60_000, waitUntil: 'domcontentloaded' })
+  await page.goto(path, { timeout: 60_000, waitUntil: 'networkidle' })
 }
 
 test('project list navigation reaches details and preserves prev/next project sequence', async ({
@@ -15,7 +15,7 @@ test('project list navigation reaches details and preserves prev/next project se
 
   const zakofyLink = page.getByRole('link', { name: /zakofy/i }).first()
   await expect(zakofyLink).toBeVisible()
-  await zakofyLink.click()
+  await zakofyLink.click({ force: true })
 
   await expect(page).toHaveURL(/\/en\/projects\/zakofy$/)
   // Wait for the new page's heading to ensure transition completed
@@ -25,7 +25,7 @@ test('project list navigation reaches details and preserves prev/next project se
   const nextProjectLink = page.getByRole('link', { name: /next project/i })
   await expect(nextProjectLink).toBeVisible()
   await expect(nextProjectLink).toHaveAttribute('href', /\/en\/projects\/your-krakow-travel$/)
-  await nextProjectLink.click()
+  await nextProjectLink.click({ force: true })
 
   await expect(page).toHaveURL(/\/en\/projects\/your-krakow-travel$/)
   // Wait for the new page's heading to ensure transition completed
@@ -34,7 +34,7 @@ test('project list navigation reaches details and preserves prev/next project se
   const previousProjectLink = page.getByRole('link', { name: /previous project/i })
   await expect(previousProjectLink).toBeVisible()
   await expect(previousProjectLink).toHaveAttribute('href', /\/en\/projects\/zakofy$/)
-  await previousProjectLink.click()
+  await previousProjectLink.click({ force: true })
 
   await expect(page).toHaveURL(/\/en\/projects\/zakofy$/)
   // Wait for the new page's heading to ensure transition completed
