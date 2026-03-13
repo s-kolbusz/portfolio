@@ -13,7 +13,7 @@ import { useTranslations } from 'next-intl'
 import { ArrowLeftIcon } from '@phosphor-icons/react'
 
 import { Button } from '@/components/ui/button'
-import { type PortfolioEntry } from '@/data/projects-en'
+import type { PortfolioEntry } from '@/data/projects'
 import { useRouter } from '@/i18n/navigation'
 
 import { BookEdgeNav } from './book-edge-nav'

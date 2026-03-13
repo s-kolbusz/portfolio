@@ -7,7 +7,7 @@ import Image from 'next/image'
 
 import { StarIcon } from '@phosphor-icons/react'
 
-import { type PortfolioEntry } from '@/data/projects-en'
+import type { PortfolioEntry } from '@/data/projects'
 import { useTimeline } from '@/hooks/timeline'
 import { ANIMATION } from '@/lib/constants/animations'
 import { gsap } from '@/lib/gsap'
@@ -63,9 +63,9 @@ export function BookTableOfContents({ entries, onNavigate }: BookTableOfContents
       {/* Left — entry list */}
       <div className="flex w-1/2 flex-col justify-center px-12 xl:px-16 2xl:px-20">
         <div ref={titleRef}>
-          <h1 className="mb-10 font-serif text-5xl font-light tracking-tight xl:text-6xl">
+          <h2 className="mb-10 font-serif text-5xl font-light tracking-tight xl:text-6xl">
             {t('title')}
-          </h1>
+          </h2>
 
           <p className="text-muted-foreground mb-8 max-w-md text-base leading-relaxed">
             {t('subtitle')}

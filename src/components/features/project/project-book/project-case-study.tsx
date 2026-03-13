@@ -8,7 +8,7 @@ import Image from 'next/image'
 import { ArrowLeftIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
 
 import { Button } from '@/components/ui/button'
-import type { PortfolioEntry } from '@/data/projects-en'
+import type { PortfolioEntry } from '@/data/projects'
 import { useTimeline } from '@/hooks/timeline'
 import { useRouter } from '@/i18n/navigation'
 import { ANIMATION } from '@/lib/constants/animations'
@@ -122,9 +122,9 @@ export function ProjectCaseStudy({ project, prevProject, nextProject }: ProjectC
             <span>{project.year}</span>
           </div>
 
-          <h1 className="font-serif text-4xl font-light tracking-tight text-white sm:text-5xl lg:text-7xl">
+          <h2 className="font-serif text-4xl font-light tracking-tight text-white sm:text-5xl lg:text-7xl">
             {project.title}
-          </h1>
+          </h2>
 
           <p className="mt-3 max-w-xl text-lg leading-relaxed text-white/70 sm:text-xl">
             {project.subtitle}

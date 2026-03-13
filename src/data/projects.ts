@@ -31,6 +31,37 @@ export interface PortfolioEntryBase {
 }
 
 // ---------------------------------------------------------------------------
+// Locale-specific case study content — keyed by PortfolioEntryBase.id
+// ---------------------------------------------------------------------------
+
+export interface PortfolioEntryContent {
+  title: string
+  subtitle: string
+  tagline: string
+  pullQuotes: string[]
+
+  // Project-specific (type: "project")
+  client?: string
+  role?: string
+  problem?: string
+  approach?: string
+  solution?: string
+  results?: string
+
+  // Role-specific (type: "role")
+  phases?: {
+    title: string
+    description: string
+    highlights: string[]
+  }[]
+}
+
+// Ensure the content type is used alongside base (compile-time safety)
+export type PortfolioEntry = Omit<PortfolioEntryBase, 'id'> & {
+  id: PortfolioEntryId
+} & PortfolioEntryContent
+
+// ---------------------------------------------------------------------------
 // Entries — order determines book page sequence
 // ---------------------------------------------------------------------------
 

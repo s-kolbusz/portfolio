@@ -1,4 +1,6 @@
-import { type MetadataRoute } from 'next'
+import type { MetadataRoute } from 'next'
+
+import { toAbsoluteSiteUrl } from '@/lib/site'
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -7,5 +9,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/not-found', '/404', '/500'],
     },
+    sitemap: toAbsoluteSiteUrl('/sitemap.xml'),
   }
 }

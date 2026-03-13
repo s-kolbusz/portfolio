@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { getFeaturedProjects, getProject, getProjects } from './get-projects'
-import type { PortfolioEntryContent } from './projects-en'
+import type { PortfolioEntryContent } from './projects'
 import { projectsEn } from './projects-en'
 
 describe('get-projects', () => {

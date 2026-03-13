@@ -7,7 +7,7 @@ import Image from 'next/image'
 
 import { ArrowRightIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
 
-import { type PortfolioEntry } from '@/data/projects-en'
+import type { PortfolioEntry } from '@/data/projects'
 import { Link } from '@/i18n/navigation'
 import { ANIMATION } from '@/lib/constants/animations'
 import { gsap, useGSAP } from '@/lib/gsap'

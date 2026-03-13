@@ -1,4 +1,4 @@
-import { type Material } from '@/data/materials'
+import type { Material } from '@/data/materials'
 
 interface CalculationInput {
   width: number // cm

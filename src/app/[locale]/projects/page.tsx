@@ -1,4 +1,4 @@
-import { type Metadata } from 'next'
+import type { Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 
 import { ProjectBook } from '@/components/features/project/project-book'
@@ -26,12 +26,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProjectsPage({ params }: Props) {
   const locale = await getLocaleFromParams(params)
+  const t = await getTranslations({ locale, namespace: 'projectsBook' })
 
   setRequestLocale(locale)
   const projects = getProjects(locale)
 
   return (
     <main id="main-content">
+      <h1 className="sr-only">{t('title')}</h1>
+
       {/* Desktop: horizontal book */}
       <div className="hidden lg:block">
         <ProjectBook projects={projects} />

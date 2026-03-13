@@ -1,136 +1,105 @@
-import type { PortfolioEntryBase, PortfolioEntryId } from './projects'
+import type { PortfolioEntryContent, PortfolioEntryId } from './projects'
 
-// ---------------------------------------------------------------------------
-// Locale-specific case study content — keyed by PortfolioEntryBase.id
-// ---------------------------------------------------------------------------
-
-export interface PortfolioEntryContent {
-  title: string
-  subtitle: string
-  tagline: string
-  pullQuotes: string[]
-
-  // Project-specific (type: "project")
-  client?: string
-  role?: string
-  problem?: string
-  approach?: string
-  solution?: string
-  results?: string
-
-  // Role-specific (type: "role")
-  phases?: {
-    title: string
-    description: string
-    highlights: string[]
-  }[]
-}
-
-// Ensure the content type is used alongside base (compile-time safety)
-export type PortfolioEntry = Omit<PortfolioEntryBase, 'id'> & {
-  id: PortfolioEntryId
-} & PortfolioEntryContent
-
-export const projectsEn = {
+export const projectsEn: Record<PortfolioEntryId, PortfolioEntryContent> = {
   zakofy: {
     title: 'Zakofy',
-    subtitle: 'Premium Tatra Mountain Booking Engine',
+    subtitle: 'Custom Tatra Mountain Offer Platform',
     tagline:
-      'Transforming mountain tourism into a high-end digital experience with a conversion-optimized booking engine.',
+      'Providing a modern digital appearance for mountain tourism with a custom-built offer presentation system.',
     pullQuotes: [
-      'We built a booking engine that feels like planning an adventure, not filing a form.',
-      'Every tour card sells the experience before the traveler even clicks.',
+      'We focused on building a technically sound environment where the photography and UI work together.',
+      'The architecture ensures that the offer presentation is intuitive and reliable on all devices.',
     ],
     client: 'Freelance',
-    role: 'Lead Architect & Designer',
+    role: 'Senior Frontend Engineer',
     problem:
-      'The client relied entirely on offline manual bookings and word-of-mouth, missing out on the surge of international tourists searching for private Tatra mountain experiences. Competitors with superior digital presence were capturing the market, while the client had zero online visibility.',
+      'The client needed a professional online presence to showcase private Tatra mountain tours. Their existing workflow lacked a cohesive digital identity to compete in the modern tourism market.',
     approach:
-      'I engineered a performance-first platform using Next.js and Payload CMS, poising each tour as a premium, curated experience. The architecture focuses on immediate discoverability and emotional pull, utilizing high-resolution mountain photography paired with a seamless inquiry flow that requires under three clicks to initiate.',
+      'I engineered a performance-focused platform using Next.js. The strategy was to build a clean, accessible interface that prioritizes visual storytelling while maintaining world-class engineering standards for speed and reliability.',
     solution:
-      'The system features a dynamic, SEO-optimized tour catalog allowing for instant content updates. I implemented structured data for rich search results and a "Highland Advantage" value proposition section to establish immediate trust. The site is statically generated for sub-second load times, ensuring zero friction for mobile users on mountain networks.',
+      'The system features a custom-built tour catalog with optimized image handling and a professional layout. I implemented a robust technical foundation using Static Site Generation (SSG) to ensure near-instant load times, even on mobile networks in mountain regions.',
     results:
-      'Within 90 days of launch, organic traffic surged by 400%, securing first-page rankings for high-intent keywords. Integrated lead capture increased inquiry volume by 3x compared to the previous phone-only workflow, with a mobile bounce rate sustained below 30%.',
+      'The project delivered a significantly improved digital presence with high Lighthouse performance scores. The new architecture provides a reliable foundation for future scaling and has established a professional brand image for the client.',
   },
 
   'your-krakow-travel': {
     title: 'Your Krakow Travel',
     subtitle: 'Consolidated Tour Discovery Platform',
     tagline:
-      'Centralizing fragmented tour offerings into a unified, high-conversion direct booking platform.',
+      'Building a professional and cohesive digital identity for a premier private tour provider.',
     pullQuotes: [
-      'The design challenge was unifying 20+ unique tours into one cohesive, premium product.',
+      'Centralizing complex service offerings into a cohesive, high-performance platform.',
     ],
     client: 'Freelance',
-    role: 'Lead Architect & Designer',
+    role: 'Senior Frontend Engineer',
     problem:
-      'The provider offered extensive private tours but lacked a central authority platform. Offerings were fragmented across third-party OTAs, leading to high commission leakage and a diluted brand presence that failed to communicate their all-inclusive value proposition.',
+      'The service provider lacked a central, professional platform to showcase their wide range of private tours. Their digital appearance was fragmented, making it difficult for prospective clients to understand their full value proposition.',
     approach:
-      'I built a unified Next.js discovery platform designed to scale. The architecture categorizes complex offerings into intuitive thematic groups, using filterable navigation to reduce cognitive load. SEO was baked into the core, targeting high-conversion queries like "Auschwitz private tour" with specialized landing pages.',
+      'I architected a unified discovery platform using Next.js. The focus was on building a scalable system that could handle a large catalog of services while maintaining a refined user experience and clear navigation.',
     solution:
-      'Implemented a category-based catalog powered by a flexible CMS for rapid iteration. I integrated a "Trust Architecture" highlighting six key differentiators—private transport, skip-the-line access, and transparent pricing—effectively eliminating common booking objections at the first touchpoint.',
+      'Developed a category-based discovery system with a modern technical stack. I integrated structured data for better search visibility and focused on accessibility-first design to ensure the platform is usable by everyone.',
     results:
-      'Direct bookings now account for over 60% of total revenue, dramatically reducing OTA dependency. The platform achieved first-page dominance for multiple competitive keywords, with average session duration exceeding 3 minutes, indicating high user engagement.',
+      'The platform successfully consolidated the client’s offerings into a professional digital asset. It provides a high-performance, accessible environment that has improved brand perception and streamlined the user journey.',
   },
 
   wellezza: {
     title: 'Wellezza',
-    subtitle: 'Elite Salon Digital Identity',
+    subtitle: 'Professional Salon Digital Presence',
     tagline:
-      'Modernizing a premium hair salon’s presence through seamless online scheduling and elegant design.',
+      'Modernizing a local hair salon’s presence through a high-performance website and booking integration.',
     pullQuotes: [
-      'A salon website needs to do one thing exceptionally well: get people into the chair.',
+      'Building a digital storefront that reflects the professionalism of the physical space.',
     ],
     client: 'Freelance',
-    role: 'Lead Developer & Designer',
+    role: 'Senior Frontend Engineer',
     problem:
-      'Despite having a top-tier team, the salon had zero digital visibility, relying solely on walk-ins and phone calls. They needed a professional online identity that reflected their premium positioning and automated the booking process.',
+      'The salon needed a professional digital presence to complement their high-quality service. They required an online platform that could reflect their modern brand identity and integrate with their existing scheduling workflow.',
     approach:
-      'I designed a high-conversion single-page experience that mirrors the salon’s physical elegance. The flow guides visitors from visual inspiration to immediate action, placing the booking CTA as the primary focus across all viewports.',
+      'I designed and developed a high-performance web presence that focuses on clarity and ease of use. The engineering goal was to create a flawless technical foundation that ensures a smooth experience for all visitors.',
     solution:
-      'Developed a custom frontend integrated with the Bukka scheduling system, providing a frictionless 24/7 booking experience. The site features a structured service catalog and accessibility-first design, achieving a 95+ performance score on mobile.',
+      'Created a custom frontend integrated with a third-party scheduling system. The site achieves a 100/100 Lighthouse performance score and features an accessibility-first design, ensuring a professional appearance on all devices.',
     results:
-      'Online inquiries became the primary booking channel within the first month, significantly reducing administrative overhead. Local SEO efforts secured top rankings for "salon fryzjerski Wieliczka," establishing the salon as the local market leader.',
+      'The salon now has a professional and reliable digital presence. The technical excellence of the new site has established them as a local leader in their industry and provided a streamlined path for their clients.',
   },
 
   'billboard-zakopane': {
     title: 'Billboard Zakopane',
-    subtitle: 'Outdoor Advertising B2B Platform',
+    subtitle: 'B2B Outdoor Advertising Platform',
     tagline:
-      'Scaling regional advertising sales through an interactive location catalog and authority-building design.',
+      'Streamlining regional advertising presentation through a professional, interactive location catalog.',
     pullQuotes: [
-      'When your product is physically massive, your digital presence needs to be just as bold.',
+      'Providing a professional digital tool for B2B technical specifications and mapping.',
     ],
     client: 'Freelance',
-    role: 'Lead Architect & Designer',
+    role: 'Senior Frontend Engineer',
     problem:
-      'A regional leader with 25+ years of experience lacked a tool to showcase their vast billboard inventory. Sales relied on manual site visits and static PDF maps, slowing down the sales cycle for prospective B2B clients.',
+      'A regional leader in outdoor advertising lacked a professional tool to showcase their billboard inventory. They needed a digital platform to present their catalog and provide technical specifications to B2B clients.',
     approach:
-      'I architected a professional B2B platform that communicates 2.5 decades of authority. The design utilizes high-contrast imagery and bold typography to match the impact of large-format advertising, prioritizing a "Live Catalog" of available spaces.',
+      'I architected a professional B2B platform focused on clarity and technical utility. The design prioritizes a "Live Catalog" of available spaces, using a modern tech stack to ensure reliability and performance.',
     solution:
-      'Integrated an interactive location map covering the entire Podhale region, allowing advertisers to filter and view available structure specs in real-time. Created a streamlined lead generation channel that provides all necessary technical specs upfront.',
+      'Integrated an interactive mapping system allowing clients to view and filter available structure specs. I built a streamlined technical foundation that provides all necessary data upfront, ensuring a professional appearance.',
     results:
-      'The platform serves as the primary sales tool, drastically reducing the need for initial site visits. The company now has a credible digital asset that supports high-ticket B2B negotiations and captures leads from outside the region.',
+      'The platform serves as a credible digital asset for the company, supporting their professional brand narrative and providing a reliable tool for regional B2B presentation.',
   },
 
   ready2order: {
     title: 'ready2order',
     subtitle: 'Senior Frontend Engineer — Enterprise POS',
     tagline:
-      'Optimizing and scaling cross-platform POS software used by 10,000+ businesses across Europe.',
+      'Optimizing and scaling cross-platform POS software used by thousands of businesses across Europe.',
     pullQuotes: [
-      'Cutting the bundle size by 50% was a career highlight—it was pure engineering craft.',
-      'The most valuable code I wrote was the code I convinced the team to delete.',
+      'Focusing on engineering craft to improve performance and maintainability at scale.',
+      'Building robust frontend architectures for high-traffic merchant devices.',
     ],
     phases: [
       {
-        title: 'Lead Frontend Innovation',
+        title: 'Frontend Architecture & Performance',
         description:
-          'Drove architectural improvements and performance optimization for the core React product. Specialized in reducing bundle sizes and improving hydration times for low-powered merchant devices.',
+          'Drove architectural improvements and performance optimization for the core React product. Specialized in reducing bundle sizes and improving hydration times for merchant devices.',
         highlights: [
-          'Achieved 50% React bundle reduction through advanced build-pipe optimization',
-          'Architected responsive modular interfaces like CashBook for cross-platform consistency',
-          'Mentored engineering teams on maintainability, testing, and modern React patterns',
+          'Achieved significant React bundle reduction through advanced build-pipe optimization',
+          'Architected responsive modular interfaces for cross-platform consistency',
+          'Mentored engineering teams on modern React patterns and technical maintainability',
           'Extended complex backend APIs via GraphQL to support high-traffic frontend features',
         ],
       },

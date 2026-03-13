@@ -8,7 +8,7 @@ import Image from 'next/image'
 import { ArrowLeftIcon, ArrowUpRightIcon, StarIcon } from '@phosphor-icons/react'
 
 import { Button } from '@/components/ui/button'
-import { type PortfolioEntry } from '@/data/projects-en'
+import type { PortfolioEntry } from '@/data/projects'
 import { useTimeline } from '@/hooks/timeline'
 import { Link } from '@/i18n/navigation'
 import { useRouter } from '@/i18n/navigation'
@@ -61,9 +61,9 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
       {/* Header */}
       <div ref={headerRef}>
         <div data-stack-header className="mb-10 opacity-0">
-          <h1 className="font-serif text-3xl font-light tracking-tight sm:text-4xl">
+          <h2 className="font-serif text-3xl font-light tracking-tight sm:text-4xl">
             {t('title')}
-          </h1>
+          </h2>
           <p className="text-muted-foreground mt-2 max-w-sm text-sm leading-relaxed">
             {t('subtitle')}
           </p>

@@ -1,8 +1,7 @@
 import type { Locale } from '@/i18n/routing'
 
 import { portfolioEntries } from './projects'
-import type { PortfolioEntryId } from './projects'
-import type { PortfolioEntryContent, PortfolioEntry } from './projects-en'
+import type { PortfolioEntryContent, PortfolioEntry, PortfolioEntryId } from './projects'
 import { projectsEn } from './projects-en'
 import { projectsPl } from './projects-pl'
 

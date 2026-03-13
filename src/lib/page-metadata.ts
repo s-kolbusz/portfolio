@@ -1,15 +1,15 @@
 import type { Metadata } from 'next'
 
-import type { PortfolioEntry } from '@/data/projects-en'
+import type { PortfolioEntry } from '@/data/projects'
 import { routing, type Locale } from '@/i18n/routing'
+import { toAbsoluteSiteUrl } from '@/lib/site'
 
 export function getMetadataAlternates(path: string, currentLocale: Locale) {
-  const languages: Record<string, string> = {
-    'x-default': `/en${path === '/' ? '' : path}`,
-  }
+  const languages: Record<string, string> = {}
 
   routing.locales.forEach((locale) => {
-    languages[locale] = `/${locale}${path === '/' ? '' : path}`
+    // Ensure we generate absolute URLs for each locale
+    languages[locale] = toAbsoluteSiteUrl(`/${locale}${path === '/' ? '' : path}`)
   })
 
   return {

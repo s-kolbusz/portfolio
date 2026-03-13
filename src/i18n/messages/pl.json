@@ -1,15 +1,15 @@
 {
   "Metadata": {
-    "title": "Sebastian Kolbusz | Senior Frontend Engineer & Specjalista SaaS",
-    "description": "Senior Frontend Engineer specjalizujący się w wydajnych produktach SaaS, Next.js i immersyjnych doświadczeniach webowych. Zakopane, Polska."
+    "title": "Sebastian Kolbusz | Senior Frontend Engineer & Web Architect",
+    "description": "Senior Frontend Engineer z Zakopanego, specjalizujący się w wysokowydajnych aplikacjach Next.js i kinowych doświadczeniach webowych dla globalnych SaaS oraz lokalnych firm."
   },
   "actions": {
     "skip_to_main": "Przejdź do treści"
   },
   "nav": {
-    "hero": "Główna",
+    "hero": "Start",
     "about": "O mnie",
-    "projects": "Realizacje",
+    "projects": "Projekty",
     "services": "Usługi",
     "calculator": "Druk 3D",
     "contact": "Kontakt",
@@ -17,250 +17,250 @@
   },
   "HomePage": {
     "title": "Sebastian Kolbusz",
-    "subtitle": "Senior Frontend Engineer | Specjalista SaaS"
+    "subtitle": "Senior Frontend Engineer & Web Architect"
   },
   "common": {
-    "home": "Główna",
+    "home": "Start",
     "about": "O mnie",
-    "projects": "Realizacje",
+    "projects": "Projekty",
     "services": "Usługi",
     "cv": "CV",
     "contact": "Kontakt"
   },
   "hero": {
     "name": "Sebastian Kolbusz",
-    "role": "Architekt Frontend",
-    "tagline": "Projektuję wydajne produkty webowe, które realnie wspierają Twój biznes.",
-    "cta": "Poznaj mój warsztat"
+    "role": "Frontend Architect",
+    "tagline": "Buduję wysokowydajne aplikacje internetowe z naciskiem na kinowy ruch i doskonałość techniczną.",
+    "cta": "Zobacz moje projekty"
   },
   "about": {
-    "title": "Doświadczenie i Warsztat",
+    "title": "Rzemiosło i Kontext",
     "figure_profile": "RYS. 1.0 — PROFIL",
-    "philosophy_label": "Moje Podejście",
+    "philosophy_label": "Moja Filozofia",
     "experience_label": "Doświadczenie",
     "location_label": "Lokalizacja",
-    "stack_label": "Główny Stack",
+    "stack_label": "Stack Technologiczny",
     "bio": {
       "title": "Sebastian Kolbusz",
-      "description": "Architekt frontend z ponad 6-letnim doświadczeniem w budowaniu skalowalnych systemów SaaS oraz wydajnych rozwiązań webowych."
+      "description": "Senior Frontend Engineer z ponad 6-letnim doświadczeniem w budowaniu skalowalnych produktów SaaS i wysokiej klasy wizerunku cyfrowego."
     },
     "experience": {
       "years": "6+",
-      "label": "Lat doświadczenia",
-      "details": "Specjalizacja w ekosystemie React, optymalizacji wydajności oraz Developer Experience (DX)."
+      "label": "Lat Doświadczenia",
+      "details": "Specjalizacja w ekosystemie React, optymalizacji wydajności i precyzyjnej implementacji UI/UX."
     },
     "location": {
       "city": "Zakopane, Polska",
-      "details": "Praca z samego serca polskich Tatr."
+      "details": "Rozwiązuję globalne wyzwania inżynieryjne z serca Tatr."
     },
     "philosophy": {
-      "title": "Inżynierski mindset",
-      "details": "Cenię prostotę, wydajność i pragmatyzm. Projektuję systemy, których fundamentem jest niezawodność i zaufanie użytkownika.",
-      "craft_details": "Traktuję inżynierię oprogramowania jak rzemiosło. Nie chodzi tylko o pisanie kodu, ale o tworzenie cyfrowych przestrzeni, które są intuicyjne, responsywne i po prostu ludzkie."
+      "title": "Mentalność Inżynierska",
+      "details": "Stawiam na prostotę, wydajność i dostępną architekturę. Buduję systemy, w których niezawodność techniczna i czysty kod są fundamentem zaufania do marki.",
+      "craft_details": "Traktuję inżynierię jako rzemiosło. Chodzi o tworzenie środowisk cyfrowych, które są solidne technicznie, responsywne i dopracowane wizualnie."
     },
     "skills": {
-      "title": "Technologie"
+      "title": "Zestaw Narzędzi"
     }
   },
   "projects": {
-    "title": "Wybrane Case Studies",
-    "intro": "Kod traktuję jako inwestycję biznesową. Skupiam się na tworzeniu solidnych, dostępnych i wydajnych systemów, które rozwiązują realne problemy. Od szybkich prototypów MVP po optymalizację rozbudowanych systemów SaaS – buduję rozwiązania stworzone, by zarabiać i trwać.",
-    "viewAll": "Zobacz wszystkie projekty",
-    "visitSite": "Uruchom projekt",
-    "explore": "Poznaj Case Study",
-    "highlights_label": "Kluczowe osiągnięcia",
-    "stack_label": "Stos technologiczny",
+    "title": "Wybrane Prace Inżynierskie",
+    "intro": "Skupiam się na tworzeniu solidnych, dostępnych i wydajnych systemów. Od szybkiego prototypowania po projektowanie architektury SaaS klasy enterprise — buduję doświadczenia cyfrowe z myślą o długoterminowej konserwacji i jakości technicznej.",
+    "viewAll": "Wszystkie Projekty",
+    "visitSite": "Uruchom Projekt",
+    "explore": "Zobacz Case Study",
+    "highlights_label": "Kluczowe Wyniki Techniczne",
+    "stack_label": "Stack Technologiczny",
     "zakofy": {
-      "description": "System rezerwacyjny premium dla prywatnych wycieczek tatrzańskich. Pozycjonuje klienta jako lidera rynku dzięki zaawansowanemu SEO i intuicyjnemu UX.",
+      "description": "Dedykowana platforma prezentacji oferty dla wycieczek tatrzańskich. Podniosłem standard wizerunku cyfrowego klienta poprzez dopracowane UI i wydajną architekturę.",
       "highlights": {
-        "0": "Angażujący storytelling wizualny",
-        "1": "Dynamiczny system zapytań",
-        "2": "Błyskawiczne ładowanie (Static Gen)",
-        "3": "400% wzrostu ruchu organicznego"
+        "0": "Kinowy storytelling wizualny",
+        "1": "Uproszczony proces zapytań",
+        "2": "Optymalizacja statyczna (SSG)",
+        "3": "Znaczący wzrost wyników Lighthouse"
       }
     },
     "your-krakow-travel": {
-      "description": "Zunifikowana platforma dla czołowego dostawcy wycieczek w Krakowie. Skonsolidowanie rozproszonej oferty w skuteczne narzędzie sprzedaży.",
+      "description": "Zunifikowana platforma prezentacji oferty dla wiodącego dostawcy wycieczek. Skonsolidowałem rozproszoną ofertę w spójną i wydajną tożsamość cyfrową.",
       "highlights": {
-        "0": "Katalog zoptymalizowany pod konwersję",
-        "1": "60% udziału rezerwacji bezpośrednich",
-        "2": "Dane strukturalne (Google Rich Results)",
-        "3": "Architektura budująca zaufanie"
+        "0": "Dopracowana architektura katalogu",
+        "1": "Uproszczona nawigacja i UX",
+        "2": "Dane strukturalne dla SEO",
+        "3": "Dostępny i responsywny układ"
       }
     },
     "wellezza": {
-      "description": "Cyfrowa wizytówka elitarnego salonu fryzjerskiego. Transformacja lokalnej obecności poprzez płynną integrację z systemem rezerwacji.",
+      "description": "Wizerunek cyfrowy dla lokalnego salonu fryzjerskiego. Zintegrowałem zewnętrzne systemy rezerwacji z wydajnym, dedykowanym sklepem.",
       "highlights": {
-        "0": "Bezproblemowe zapisy online 24/7",
-        "1": "Wynik wydajności Lighthouse 95+",
-        "2": "Wdrożenie identyfikacji klasy premium",
-        "3": "Dominacja w lokalnym SEO (Wieliczka)"
+        "0": "Bezproblemowa integracja rezerwacji",
+        "1": "Wydajność Lighthouse 100/100",
+        "2": "Wdrożenie dedykowanego brandingu",
+        "3": "Optymalizacja pod lokalne SEO"
       }
     },
     "billboard-zakopane": {
-      "description": "Platforma B2B dla lidera reklamy outdoorowej. Usprawnienie procesu sprzedaży dzięki interaktywnej mapie lokalizacji.",
+      "description": "Profesjonalna platforma dla regionalnego lidera reklamy. Uprościłem ścieżkę klienta dzięki interaktywnej mapie lokalizacji.",
       "highlights": {
-        "0": "Interaktywna mapa billboardów",
-        "1": "Narracja budująca autorytet marki",
-        "2": "Bezpośredni kanał generowania leadów",
+        "0": "Interaktywna integracja map",
+        "1": "Profesjonalna narracja marki",
+        "2": "Uproszczony fundament techniczny",
         "3": "Skalowalna architektura usług"
       }
     }
   },
   "services": {
-    "title": "Usługi strategiczne",
-    "intro": "Inwestuj w rozwiązania, które budują wartość Twojej firmy, a nie tylko w kod. Projektuję systemy, które generują przychód i zaufanie.",
-    "cta": "Umów konsultację strategiczną",
-    "popular_badge": "Popularny wybór",
+    "title": "Usługi Inżynierskie",
+    "intro": "Skupiam się na doskonałości technicznej i profesjonalnym wizerunku cyfrowym. Buduję strony i aplikacje zaprojektowane z myślą o wydajności i niezawodności.",
+    "cta": "Skontaktuj się",
+    "popular_badge": "Główna Usługa",
     "limited_availability": "* Przyjmuję projekty na koniec Q1 2026",
     "landing-page": {
       "label": "Landing Page",
-      "title": "Skuteczna Strona Sprzedażowa",
+      "title": "Wydajna Strona Sprzedażowa",
       "price": "3500 zł",
-      "unit": "inwestycja stała",
+      "unit": "stała inwestycja",
       "features": {
-        "0": "Treści oparte na psychologii sprzedaży",
-        "1": "Błyskawiczne działanie na mobile",
-        "2": "Architektura gotowa pod testy A/B",
+        "0": "Profesjonalny i dopracowany design",
+        "1": "Błyskawiczna wydajność mobilna",
+        "2": "W pełni responsywna architektura",
         "3": "Struktura zoptymalizowana pod SEO",
-        "4": "Automatyczny system pozyskiwania leadów"
+        "4": "Czysty, łatwy w utrzymaniu kod"
       },
-      "cta": "Zacznij Konwertować Ruch"
+      "cta": "Zbuduj moją stronę"
     },
     "website": {
-      "label": "Strona Firmowa",
-      "title": "Platforma Autorytetu Marki",
+      "label": "Strona Biznesowa",
+      "title": "Profesjonalna Platforma Web",
       "price": "8000 zł",
       "unit": "inwestycja bazowa",
       "features": {
-        "0": "Wielostronicowy design pod konwersję",
-        "1": "Przyjazny CMS (pełna autonomia)",
-        "2": "Narracja wizualna",
-        "3": "Integracja dowodu społecznego",
-        "4": "Ciągła optymalizacja wydajności"
+        "0": "Wielostronicowy wizerunek web",
+        "1": "Dedykowany CMS do zarządzania",
+        "2": "Zaawansowane animacje GSAP",
+        "3": "Dostępny i semantyczny układ",
+        "4": "Zoptymalizowany fundament techniczny"
       },
-      "cta": "Zbuduj Swój Autorytet"
+      "cta": "Podnieś swój wizerunek"
     },
     "web-app": {
       "label": "SaaS / Aplikacja",
-      "title": "MVP Gotowe na Rynek",
+      "title": "Dedykowana Inżynieria SaaS",
       "price": "18 000 zł",
       "unit": "pakiet startowy",
       "features": {
-        "0": "Szybki cykl rozwoju (4-6 tygodni)",
-        "1": "Bezpieczeństwo klasy enterprise",
-        "2": "Skalowalna architektura chmurowa",
-        "3": "Złożone integracje z API",
-        "4": "Warsztat Discovery i UX"
+        "0": "Pełny cykl rozwoju Full-stack",
+        "1": "Bezpieczne systemy autoryzacji",
+        "2": "Skalowalna architektura bazy danych",
+        "3": "Integracje z zewnętrznymi API",
+        "4": "Dopracowany projekt UX"
       },
-      "cta": "Uruchom Swój Startup"
+      "cta": "Zbuduj moją aplikację"
     },
     "hourly": {
       "label": "Konsultacje",
-      "title": "Ekspert Techniczny na żądanie",
+      "title": "Wsparcie Techniczne",
       "price": "250 zł",
       "unit": "za godzinę",
       "features": {
-        "0": "Rozwiązywanie krytycznych problemów",
-        "1": "Audyty bezpieczeństwa i architektury",
-        "2": "Szlifowanie UI/UX i animacje",
-        "3": "Mentoring i code review",
-        "4": "Priorytetowe wsparcie techniczne"
+        "0": "Optymalizacja wydajności i poprawki",
+        "1": "Audyty dostępności i techniczne",
+        "2": "Złożone UI i animacje GSAP",
+        "3": "Mentoring i przeglądy kodu",
+        "4": "Wsparcie inżynieryjne i utrzymanie"
       },
-      "cta": "Rozwiąż Mój Problem"
+      "cta": "Uzyskaj wsparcie"
     },
     "process": {
-      "title": "Proces Współpracy",
-      "intro": "Przejrzysty, nastawiony na wyniki proces zaprojektowany dla szybkości i klarowności.",
+      "title": "Proces Pracy",
+      "intro": "Przejrzysty proces inżynieryjny skupiony na jakości technicznej.",
       "steps": {
         "0": {
-          "title": "Research",
-          "desc": "Analiza celów biznesowych i potrzeb odbiorców."
+          "title": "Odkrycie",
+          "desc": "Zrozumienie Twoich celów technicznych."
         },
         "1": {
-          "title": "Strategia",
-          "desc": "Definiowanie architektury i narracji projektu."
+          "title": "Architektura",
+          "desc": "Definiowanie stacku i przepływu systemu."
         },
         "2": {
-          "title": "Implementacja",
-          "desc": "Rozwój wysokiej jakości z szybką pętlą feedbacku."
+          "title": "Inżynieria",
+          "desc": "Wysokiej jakości rozwój i testy."
         },
-        "3": { "title": "Skalowanie", "desc": "Wdrożenie, start SEO i przyszłościowe wsparcie." }
+        "3": { "title": "Dostarczenie", "desc": "Strojenie wydajności, wdrożenie i start." }
       }
     }
   },
   "calculator": {
-    "title": "Szybka Wycena Produkcji",
-    "description": "Otrzymaj precyzyjny, rzeczywisty kosztorys Twojego projektu 3D w kilka sekund.",
-    "dimensions": "Wymiary części",
+    "title": "Wycena Produkcji 3D",
+    "description": "Uzyskaj precyzyjną wycenę kosztów projektu druku 3D w oparciu o materiał i objętość.",
+    "dimensions": "Wymiary Części",
     "unit_cm": "Jednostka: CM",
-    "configuration": "Ustawienia druku",
-    "material": "Wybór materiału",
-    "infill": "Gęstość wypełnienia (%)",
+    "configuration": "Ustawienia Druku",
+    "material": "Wybór Materiału",
+    "infill": "Gęstość Wypełnienia (%)",
     "width": "Szerokość (X)",
     "depth": "Głębokość (Y)",
     "height": "Wysokość (Z)",
     "output": {
-      "material_cost": "Koszt surowca",
-      "time_cost": "Czas produkcji",
-      "total": "Szacowana inwestycja"
+      "material_cost": "Koszt Materiału",
+      "time_cost": "Czas Produkcji",
+      "total": "Szacowana Inwestycja"
     },
-    "cta": "Zamów Oficjalną Wycenę",
-    "disclaimer": "* Szacunki zakładają standardową geometrię. Złożone nawisy lub konieczność stosowania podpór mogą wpłynąć na cenę."
+    "cta": "Poproś o finalną wycenę",
+    "disclaimer": "* Szacunki oparte na standardowych ustawieniach. Złożona geometria może wpłynąć na czas i koszt."
   },
   "contact": {
-    "title": "Zbudujmy coś wielkiego",
-    "tagline": "Aktualnie przyjmuję nowe zlecenia. Napisz do mnie, aby porozmawiać o tym, jak zamienić Twoją wizję w dochodowy produkt cyfrowy.",
+    "title": "Budujmy Razem",
+    "tagline": "Obecnie przyjmuję nowe projekty. Skontaktuj się, aby porozmawiać o Twoim wizerunku cyfrowym.",
     "email": "Email",
     "linkedin": "LinkedIn",
     "github": "GitHub",
     "twitter": "X (Twitter)",
     "city": "Zakopane, Polska",
-    "location_label": "Pracuję z",
-    "copyright_label": "Prawa autorskie"
+    "location_label": "Działam z",
+    "copyright_label": "Copyright"
   },
   "cv": {
-    "title": "Życiorys Zawodowy",
-    "print": "Drukuj / Zapisz jako PDF",
-    "summary": "Podsumowanie zawodowe",
-    "experience": "Doświadczenie inżynierskie",
+    "title": "Curriculum Vitae",
+    "print": "Drukuj / Zapisz PDF",
+    "summary": "Podsumowanie Zawodowe",
+    "experience": "Doświadczenie Inżynieryjne",
     "education": "Wykształcenie",
-    "skills": "Ekspertyza techniczna",
+    "skills": "Ekspertyza Techniczna",
     "languages": "Języki",
-    "contact": "Kontakt bezpośredni",
-    "backHome": "Wróć do przeglądu"
+    "contact": "Kontakt Bezpośredni",
+    "backHome": "Powrót do strony"
   },
   "projectsBook": {
-    "title": "Portfolio",
-    "subtitle": "Wyselekcjonowana kolekcja wydajnych platform e-commerce, stron sprzedażowych i rozwiązań SaaS.",
+    "title": "Wybrane Prace",
+    "subtitle": "Kolekcja wysokowydajnych aplikacji webowych i profesjonalnego wizerunku cyfrowego.",
     "tocTitle": "Indeks Projektów",
-    "exploreLabel": "Poznaj Case Study",
+    "exploreLabel": "Zobacz Case Study",
     "visitSiteLabel": "Uruchom Stronę",
-    "backLabel": "Wróć",
-    "backToProjects": "Wróć do Portfolio",
+    "backLabel": "Powrót",
+    "backToProjects": "Powrót do Portfolio",
     "prevProject": "← Poprzedni",
     "nextProject": "Następny →",
-    "roleLabel": "Rola inżynierska",
+    "roleLabel": "Rola Inżynieryjna",
     "categories": {
-      "e-commerce": "E-Commerce",
+      "e-commerce": "Prezentacja Oferty",
       "saas": "Produkty SaaS",
-      "landing-page": "Strony Sprzedażowe",
-      "web-app": "Aplikacje Webowe",
+      "landing-page": "Strony Wydajnościowe",
+      "web-app": "Aplikacje Web",
       "cms": "Systemy Treści",
       "other": "Inne"
     },
     "caseStudy": {
-      "problemTitle": "Wyzwanie Biznesowe",
-      "approachTitle": "Podejście Strategiczne",
-      "solutionTitle": "Rozwiązanie Techniczne",
-      "resultsTitle": "Kluczowe Wyniki",
+      "problemTitle": "Wyzwanie",
+      "approachTitle": "Podejście Techniczne",
+      "solutionTitle": "Rozwiązanie",
+      "resultsTitle": "Wyniki Inżynieryjne",
       "galleryTitle": "Przegląd Wizualny",
       "clientLabel": "Klient",
-      "roleLabel": "Mój wkład",
-      "techLabel": "Główne technologie",
+      "roleLabel": "Mój Wkład",
+      "techLabel": "Kluczowe Technologie",
       "timelineTitle": "Ścieżka Zawodowa",
-      "nextProjectLabel": "Następny projekt",
-      "prevProjectLabel": "Poprzedni projekt",
+      "nextProjectLabel": "Następny Projekt",
+      "prevProjectLabel": "Poprzedni Projekt",
       "viewImageLabel": "Zobacz w wysokiej rozdzielczości"
     }
   },
@@ -270,7 +270,7 @@
   "notFound": {
     "title": "404",
     "subtitle": "Strona nie znaleziona",
-    "description": "Strona, której szukasz, mogła zostać usunięta, zmieniła nazwę lub jest tymczasowo niedostępna.",
-    "returnHome": "Wróć na stronę główną"
+    "description": "Strona, której szukasz, mogła zostać usunięta lub jest tymczasowo niedostępna.",
+    "returnHome": "Powrót do strony głównej"
   }
 }

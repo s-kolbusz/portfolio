@@ -1,7 +1,7 @@
 {
   "Metadata": {
-    "title": "Sebastian Kolbusz | Freelance Frontend Engineer & SaaS Developer",
-    "description": "Senior Frontend Engineer specializing in high-performance SaaS products, Next.js, and immersive web experiences. Based in Zakopane, Poland."
+    "title": "Sebastian Kolbusz | Senior Frontend Engineer & Web Architect",
+    "description": "Senior Frontend Engineer in Zakopane specializing in high-performance Next.js apps and cinematic web experiences that elevate the digital presence of global SaaS and local businesses."
   },
   "actions": {
     "skip_to_main": "Skip to main content"
@@ -17,7 +17,7 @@
   },
   "HomePage": {
     "title": "Sebastian Kolbusz",
-    "subtitle": "Senior Frontend Engineer & SaaS Specialist"
+    "subtitle": "Senior Frontend Engineer & Web Architect"
   },
   "common": {
     "home": "Home",
@@ -30,8 +30,8 @@
   "hero": {
     "name": "Sebastian Kolbusz",
     "role": "Frontend Architect",
-    "tagline": "Engineering high-performance web products that scale with your business.",
-    "cta": "Explore My Craft"
+    "tagline": "Engineering high-performance web applications with a focus on cinematic motion and technical excellence.",
+    "cta": "Explore My Work"
   },
   "about": {
     "title": "The Craft & Context",
@@ -42,156 +42,156 @@
     "stack_label": "Core Stack",
     "bio": {
       "title": "Sebastian Kolbusz",
-      "description": "Frontend architect with over 6 years of experience engineering scalable SaaS products and high-conversion digital assets."
+      "description": "Senior Frontend Engineer with over 6 years of experience building scalable SaaS products and high-end digital appearances."
     },
     "experience": {
       "years": "6+",
       "label": "Years of Experience",
-      "details": "Specializing in React ecosystem, build performance, and developer experience."
+      "details": "Specializing in the React ecosystem, performance optimization, and refined UI/UX implementation."
     },
     "location": {
       "city": "Zakopane, Poland",
-      "details": "Operating from the heart of the Tatra Mountains."
+      "details": "Solving global engineering challenges from the heart of the Tatra Mountains."
     },
     "philosophy": {
       "title": "Engineering Mindset",
-      "details": "I champion simplicity, performance, and pragmatic architecture. I build systems where predictable behavior and user trust are built into the code.",
-      "craft_details": "I treat engineering as a craft. It's not just about writing code; it's about creating digital environments that feel natural, responsive, and human."
+      "details": "I focus on simplicity, performance, and accessible architecture. I build systems where technical reliability and clean code are the foundation of brand trust.",
+      "craft_details": "I treat engineering as a craft. It's about creating digital environments that are technically sound, highly responsive, and visually polished."
     },
     "skills": {
       "title": "Technical Toolkit"
     }
   },
   "projects": {
-    "title": "Featured Case Studies",
-    "intro": "I treat every line of code as a business investment. My focus is on creating robust, accessible, and high-performance systems that solve real-world challenges. From rapid MVP prototyping to optimizing enterprise-grade SaaS, I build digital experiences designed to last and perform.",
+    "title": "Selected Engineering Work",
+    "intro": "I focus on creating robust, accessible, and high-performance systems. From rapid prototyping to architecting enterprise-grade SaaS, I build digital experiences designed for long-term maintainability and technical excellence.",
     "viewAll": "Explore All Work",
     "visitSite": "Launch Project",
     "explore": "Explore Case Study",
-    "highlights_label": "Core Achievements",
+    "highlights_label": "Key Technical Outcomes",
     "stack_label": "Technical Stack",
     "zakofy": {
-      "description": "Premium booking engine for private Tatra mountain tours. Positioned the client as a market leader through superior SEO and a seamless UX.",
+      "description": "Custom offer presentation platform for Tatra mountain tours. Elevated the client's digital presence through a refined UI and high-performance architecture.",
       "highlights": {
-        "0": "High-impact visual storytelling",
-        "1": "Dynamic booking inquiry system",
-        "2": "Instant-load static generation",
-        "3": "400% growth in organic traffic"
+        "0": "Cinematic visual storytelling",
+        "1": "Streamlined inquiry flow",
+        "2": "Optimized static site generation",
+        "3": "Significant increase in lighthouse scores"
       }
     },
     "your-krakow-travel": {
-      "description": "Unified discovery platform for Kraków's premier private tour provider. Centralized fragmented offerings into a high-conversion sales tool.",
+      "description": "Unified offer presentation platform for a premier private tour provider. Centralized fragmented offerings into a cohesive and performant digital identity.",
       "highlights": {
-        "0": "Conversion-optimized tour catalog",
-        "1": "60% direct booking share achieved",
-        "2": "Structured data for Google rich results",
-        "3": "Comprehensive trust-signal architecture"
+        "0": "Refined tour catalog architecture",
+        "1": "Streamlined navigation and UX",
+        "2": "Structured data for search visibility",
+        "3": "Accessible and responsive layout"
       }
     },
     "wellezza": {
-      "description": "Digital storefront for an elite hair salon. Transformed local presence through seamless third-party booking integration.",
+      "description": "Digital appearance for a local hair salon. Integrated third-party booking systems into a high-performance, custom-built storefront.",
       "highlights": {
-        "0": "Frictionless online scheduling",
-        "1": "95+ Lighthouse performance score",
-        "2": "Premium visual identity implementation",
-        "3": "Local SEO dominance in Wieliczka"
+        "0": "Seamless booking integration",
+        "1": "100/100 Lighthouse performance",
+        "2": "Custom branding implementation",
+        "3": "Optimized for local search visibility"
       }
     },
     "billboard-zakopane": {
-      "description": "B2B platform for regional outdoor advertising leader. Streamlined the sales process with interactive location mapping.",
+      "description": "Professional platform for a regional advertising leader. Streamlined the client journey with interactive location mapping and a modern technical base.",
       "highlights": {
-        "0": "Interactive billboard location map",
-        "1": "Authority-building company narrative",
-        "2": "Direct B2B lead generation channel",
-        "3": "Scalable service catalog architecture"
+        "0": "Interactive mapping integration",
+        "1": "Professional brand narrative",
+        "2": "Streamlined technical foundation",
+        "3": "Scalable service architecture"
       }
     }
   },
   "services": {
-    "title": "Strategic Services",
-    "intro": "Invest in Digital Assets, Not Just Code. I build systems designed to generate revenue, authority, and long-term trust.",
-    "cta": "Request a Strategic Consultation",
-    "popular_badge": "High Demand",
+    "title": "Engineering Services",
+    "intro": "Focusing on technical excellence and professional digital appearances. I build websites and applications designed for performance, reliability, and brand trust.",
+    "cta": "Get in Touch",
+    "popular_badge": "Core Service",
     "limited_availability": "* Accepting new projects for late Q1 2026",
     "landing-page": {
       "label": "Landing Page",
-      "title": "High-Conversion Sales Page",
+      "title": "High-Performance Page",
       "price": "€850",
       "unit": "fixed investment",
       "features": {
-        "0": "Psychology-driven sales copy",
+        "0": "Professional and polished design",
         "1": "Lightning-fast mobile performance",
-        "2": "A/B test-ready architecture",
+        "2": "Fully responsive architecture",
         "3": "SEO-optimized structure",
-        "4": "Automated lead capture system"
+        "4": "Clean, maintainable code"
       },
-      "cta": "Start Converting Traffic"
+      "cta": "Build My Page"
     },
     "website": {
       "label": "Business Site",
-      "title": "Brand Authority Platform",
+      "title": "Professional Web Platform",
       "price": "€1,800",
       "unit": "base investment",
       "features": {
-        "0": "Conversion-focused multi-page design",
-        "1": "User-friendly CMS for autonomy",
-        "2": "Advanced GSAP visual storytelling",
-        "3": "Social proof & trust integration",
-        "4": "Ongoing performance optimization"
+        "0": "High-end multi-page web presence",
+        "1": "Custom CMS for easy management",
+        "2": "Advanced GSAP motion design",
+        "3": "Accessible and semantic layout",
+        "4": "Optimized technical foundation"
       },
-      "cta": "Establish Your Authority"
+      "cta": "Elevate My Presence"
     },
     "web-app": {
       "label": "SaaS / App",
-      "title": "Market-Ready MVP",
+      "title": "Custom SaaS Engineering",
       "price": "€3,900",
       "unit": "launch package",
       "features": {
-        "0": "Rapid 4-6 week development cycle",
-        "1": "Enterprise-grade authentication",
-        "2": "Scalable cloud database design",
-        "3": "Complex third-party integrations",
-        "4": "Product discovery & UX workshop"
+        "0": "Full-stack development cycle",
+        "1": "Secure authentication systems",
+        "2": "Scalable database architecture",
+        "3": "Third-party API integrations",
+        "4": "Refined user experience design"
       },
-      "cta": "Launch Your Startup"
+      "cta": "Build My App"
     },
     "hourly": {
       "label": "Consulting",
-      "title": "On-Demand Technical Expert",
+      "title": "Technical Engineering Support",
       "price": "€60",
       "unit": "per hour",
       "features": {
-        "0": "Critical performance bottleneck fixes",
-        "1": "Security & architectural audits",
-        "2": "UI/UX polish & complex animations",
-        "3": "Developer mentoring & code reviews",
-        "4": "Priority technical support"
+        "0": "Performance optimization & fixes",
+        "1": "Accessibility & technical audits",
+        "2": "Complex UI & GSAP animations",
+        "3": "Technical mentoring & code reviews",
+        "4": "Engineering support and maintenance"
       },
-      "cta": "Solve My Challenge"
+      "cta": "Contact for Support"
     },
     "process": {
       "title": "The Workflow",
-      "intro": "A transparent, results-driven process designed for clarity and speed.",
+      "intro": "A transparent engineering process focused on clarity and technical quality.",
       "steps": {
         "0": {
           "title": "Discovery",
-          "desc": "Auditing your business goals and audience psychology."
+          "desc": "Understanding your technical goals and requirements."
         },
         "1": {
-          "title": "Strategy",
-          "desc": "Defining the technical architecture and narrative flow."
+          "title": "Architecture",
+          "desc": "Defining the tech stack and system flow."
         },
         "2": {
           "title": "Engineering",
-          "desc": "High-fidelity development with agile feedback loops."
+          "desc": "High-fidelity development and testing."
         },
-        "3": { "title": "Scale", "desc": "Deployment, SEO launch, and future-proofing." }
+        "3": { "title": "Delivery", "desc": "Performance tuning, deployment, and launch." }
       }
     }
   },
   "calculator": {
-    "title": "Instant Production Quote",
-    "description": "Stop guessing. Get a precise, real-time cost estimate for your 3D manufacturing project in seconds.",
+    "title": "3D Manufacturing Estimate",
+    "description": "Get a precise, real-time cost estimate for your 3D printing project based on material and volume.",
     "dimensions": "Part Dimensions",
     "unit_cm": "Unit: CM",
     "configuration": "Print Settings",
@@ -205,12 +205,12 @@
       "time_cost": "Production Time",
       "total": "Estimated Investment"
     },
-    "cta": "Request Official Quote",
-    "disclaimer": "* Estimates assume standard geometry. Complex overhangs or support material requirements may affect final pricing."
+    "cta": "Request Final Quote",
+    "disclaimer": "* Estimates based on standard settings. Complex geometries may affect final production time and cost."
   },
   "contact": {
-    "title": "Let's Build Something Great",
-    "tagline": "I'm currently accepting new projects. Reach out to discuss how we can turn your vision into a high-performance digital asset.",
+    "title": "Let's Build Together",
+    "tagline": "I'm currently accepting new projects. Reach out to discuss how we can build your next high-performance digital presence.",
     "email": "Email",
     "linkedin": "LinkedIn",
     "github": "GitHub",
@@ -231,8 +231,8 @@
     "backHome": "Back to Overview"
   },
   "projectsBook": {
-    "title": "Portfolio",
-    "subtitle": "A curated collection of high-performance e-commerce platforms, landing pages, and SaaS engineering.",
+    "title": "Selected Work",
+    "subtitle": "A collection of high-performance web applications and professional digital appearances.",
     "tocTitle": "Project Index",
     "exploreLabel": "Explore Case Study",
     "visitSiteLabel": "Launch Site",
@@ -242,18 +242,18 @@
     "nextProject": "Next →",
     "roleLabel": "Engineering Role",
     "categories": {
-      "e-commerce": "E-Commerce",
+      "e-commerce": "Offer Presentation",
       "saas": "SaaS Products",
-      "landing-page": "Sales Pages",
+      "landing-page": "Performance Pages",
       "web-app": "Web Applications",
       "cms": "Content Systems",
       "other": "Other"
     },
     "caseStudy": {
-      "problemTitle": "The Business Challenge",
-      "approachTitle": "Strategic Approach",
-      "solutionTitle": "Technical Solution",
-      "resultsTitle": "Key Outcomes",
+      "problemTitle": "The Challenge",
+      "approachTitle": "Technical Approach",
+      "solutionTitle": "The Solution",
+      "resultsTitle": "Engineering Outcomes",
       "galleryTitle": "Visual Overview",
       "clientLabel": "Client",
       "roleLabel": "My Contribution",

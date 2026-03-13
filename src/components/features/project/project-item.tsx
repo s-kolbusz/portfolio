@@ -4,7 +4,7 @@ import { useRef } from 'react'
 
 import { CaretDownIcon } from '@phosphor-icons/react'
 
-import { type PortfolioEntry } from '@/data/projects-en'
+import type { PortfolioEntry } from '@/data/projects'
 import { cn } from '@/lib/cn'
 import { useScrollStore } from '@/lib/stores'
 
