@@ -1,181 +1,120 @@
 # Sebastian Kolbusz Portfolio Website
 
-A bilingual portfolio platform built with Next.js 16 to showcase case studies, services, and technical depth for freelance and product engineering work.
+A bilingual, high-performance portfolio platform built with Next.js 16 to showcase case studies, services, and technical depth for freelance and product engineering work.
 
 ## Project Overview
 
 ### Business Context
 
-This project is the public-facing portfolio and lead funnel for a senior frontend engineer. It has two jobs:
+This project is the public-facing portfolio and lead funnel for a senior frontend engineer. It serves two primary functions:
 
-- communicate business value to non-technical clients
-- demonstrate production-grade frontend architecture to technical reviewers and recruiters
+- **Business Value:** Communicates expertise and results to non-technical clients.
+- **Technical Excellence:** Demonstrates production-grade frontend architecture to technical reviewers and recruiters.
 
 ### Engineering Goals
 
-- Deliver fast, static-first pages with strong SEO and structured data.
-- Support full `en` and `pl` localization with route-preserving navigation.
-- Keep animation-heavy UI performant without breaking accessibility.
-- Enforce quality with automated lint, type, test, and build gates.
+- **Performance:** Deliver lightning-fast, static-first pages with a focus on Core Web Vitals.
+- **SEO & Visibility:** Strong metadata APIs and structured JSON-LD data (ItemList, CreativeWork) for all routes.
+- **Localization:** Full `en` and `pl` support using `next-intl` with route-preserving navigation.
+- **Accessibility (a11y):** WCAG 2.2 AA compliant by default, with functional keyboard paths and skip-links.
+- **Aesthetics:** Cinematic, animation-heavy UI (GSAP + WebGL) that remains performant and respects `prefers-reduced-motion`.
 
 ## Tech Stack
 
-| Layer        | Choice                                      | Why this choice                                                              |
-| ------------ | ------------------------------------------- | ---------------------------------------------------------------------------- |
-| Framework    | Next.js 16 (App Router)                     | Static generation, strong metadata APIs, mature deployment story.            |
-| UI           | React 19 + TypeScript                       | Predictable component model with strict typing for maintainability.          |
-| Styling      | Tailwind CSS v4                             | Fast iteration with consistent design tokens and low CSS drift.              |
-| Localization | `next-intl`                                 | Locale-aware routing, messages, and server/client integration in App Router. |
-| Motion       | GSAP + Lenis + custom WebGL                 | Cinematic interactions with explicit performance control points.             |
-| State        | Zustand                                     | Minimal shared client state for scroll and interaction orchestration.        |
-| Testing      | Vitest + Testing Library + Playwright + Axe | Unit/integration/e2e + accessibility checks in one pipeline.                 |
-| Tooling      | ESLint, Prettier, pnpm, GitHub Actions      | Consistent local/CI quality gates and reproducible builds.                   |
+| Layer            | Choice                                      | Why this choice                                                        |
+| ---------------- | ------------------------------------------- | ---------------------------------------------------------------------- |
+| **Framework**    | Next.js 16 (App Router)                     | Static Site Generation (SSG), Turbopack, and mature metadata handling. |
+| **UI Library**   | React 19 + TypeScript                       | Latest React features (Compiler, Actions) with strict typing.          |
+| **Styling**      | Tailwind CSS v4                             | CSS-first configuration, high performance, and modern design tokens.   |
+| **Localization** | `next-intl`                                 | Type-safe messages and locale-aware routing in the App Router.         |
+| **Motion**       | GSAP + Lenis + custom WebGL                 | Fine-grained control over smooth scrolling and complex animations.     |
+| **State**        | Zustand                                     | Lightweight state for scroll and interaction orchestration.            |
+| **Testing**      | Vitest + Testing Library + Playwright + Axe | Comprehensive unit, integration, and E2E testing with a11y checks.     |
+| **Tooling**      | ESLint, Prettier, pnpm, Volta               | Enforced code standards and reproducible environments.                 |
 
 ## Architectural Decisions
 
-1. Locale as a first-class route segment (`/[locale]/...`)
-   Keeps URLs explicit and crawlable, enables static generation per locale, and preserves path when switching language.
+1.  **Locale as a Primary Route Segment (`/[locale]/...`)**
+    Ensures explicit, crawlable URLs and enables static generation per locale while preserving the path during language switches.
 
-2. Split domain content into base data + locale overlays
-   Portfolio entry structure lives in one place, localized copy in locale-specific files. This reduces drift and catches missing translations early.
+2.  **Domain Content & Locale Overlays**
+    Project data is centralized in `src/data/`, with localized copy stored in `src/i18n/messages/`. This reduces content drift and ensures consistency.
 
-3. Progressive enhancement for expensive client overlays
-   Custom cursor, smooth scrolling, dock UI, and WebGL scene mount after initial render and are disabled or reduced for motion-sensitive users.
+3.  **Progressive Enhancement & Motion Control**
+    Heavy client-side features (WebGL, custom cursors, smooth scrolling) are lazy-loaded and delayed. They are automatically disabled for users with `prefers-reduced-motion`.
 
-4. Centralized metadata and JSON-LD helpers
-   Shared metadata builders and schema serializers keep canonical URLs and structured data consistent across pages.
+4.  **Semantic SEO Foundation**
+    Shared metadata builders and schema serializers maintain canonical URLs and structured data integrity across all localized routes.
 
-5. Layered quality strategy
-   Unit/integration tests cover logic and component behavior, while Playwright validates high-risk user flows and accessibility semantics.
+5.  **Multi-Layered Quality Gate**
+    A combination of Vitest (logic/components) and Playwright (E2E/a11y) ensures that every change meets the project's strict quality standards.
 
 ## Setup and Run Instructions
 
 ### Prerequisites
 
-- Node.js `22.16.1` (matches `package.json` Volta config)
-- pnpm `10.x`
+- **Node.js:** `24.14.0` (managed via [Volta](https://volta.sh/))
+- **Package Manager:** `pnpm`
 
-### Install
+### Installation
 
 ```bash
 pnpm install
 pnpm exec playwright install
 ```
 
-### Run in Development
+### Development
 
 ```bash
 pnpm dev
 ```
 
-Open [http://localhost:3000/en](http://localhost:3000/en).
+The application will be available at [http://localhost:3000/en](http://localhost:3000/en).
 
-### Build and Run Production
+### Production Build
 
 ```bash
 pnpm build
 pnpm start
 ```
 
-## Testing Guidelines
+## Testing
 
-### Unit and Integration
+### Unit and Integration (Vitest)
 
 ```bash
 pnpm test
 ```
 
-Runs Vitest for `src/**/*.test.{ts,tsx}`.
-
-### Coverage Gate
+### Coverage Reports
 
 ```bash
 pnpm test:coverage
 ```
 
-Coverage thresholds:
+Current thresholds: Lines: `85%`, Statements: `85%`, Functions: `85%`, Branches: `80%`.
 
-- lines: `80%`
-- statements: `80%`
-- functions: `75%`
-- branches: `70%`
-
-### End-to-End and Accessibility
+### End-to-End and Accessibility (Playwright)
 
 ```bash
 pnpm test:e2e
 ```
 
-By default, Playwright starts `pnpm dev`. To run against an existing server (for example `next start`), set:
+To run against a specific URL:
 
 ```bash
-PLAYWRIGHT_BASE_URL=http://localhost:3000 pnpm test:e2e
+PLAYWRIGHT_BASE_URL=https://your-preview-url.com pnpm test:e2e
 ```
-
-### CI Policy
-
-CI runs on every push and pull request and requires all of the following to pass:
-
-- `pnpm lint:ci` (zero warnings)
-- `pnpm typecheck`
-- `pnpm test:coverage`
-- `pnpm format:check`
-- `pnpm build`
-
-## Code Quality Standards
-
-- Lint: `pnpm lint:ci` must pass with zero warnings.
-- Type safety: `pnpm typecheck` must pass.
-- Formatting: `pnpm format:check` must pass.
-- Accessibility: no serious or critical Axe violations on core routes; skip-link and keyboard paths must remain functional.
-- Every change should preserve canonical metadata and JSON-LD correctness on localized routes.
-
-## Performance and Accessibility Notes
-
-- Heavy client overlays are lazy-loaded and delayed to reduce hydration pressure.
-- WebGL hero background is mounted only after a delay and skipped when `prefers-reduced-motion` is enabled.
-- Reduced-motion users do not receive custom cursor/WebGL effects.
-- Scroll and animation orchestration is isolated in dedicated hooks/modules to avoid render-time side effects.
-- Keyboard navigation is tested for critical interactive flows (project book navigation and lightbox focus handling).
 
 ## Deployment
 
-### Canonical Host
+The project is optimized for **Vercel**, utilizing Next.js App Router features for optimal performance and deployment simplicity.
 
-Canonical metadata is configured around: `https://www.kolbusz.xyz`.
+**Note on Build Manifests:** You may see "playwright" references in `.next` build manifests. These are strictly informational paths related to the `pnpm` content-addressable store and do **not** indicate that Playwright code is bundled into the client-side production assets.
 
-### Recommended
+## Known Limitations & Roadmap
 
-Deploy on Vercel for the simplest Next.js App Router path.
-
-### Alternative
-
-Any Node host that supports Next.js production runtime:
-
-```bash
-pnpm install --frozen-lockfile
-pnpm build
-pnpm start
-```
-
-## Environment Variables
-
-No runtime environment variables are required to run the application locally.
-
-Optional variables:
-
-- `PLAYWRIGHT_BASE_URL`: tells Playwright to reuse an existing app server instead of starting `pnpm dev`.
-
-## Known Limitations / Future Improvements
-
-- E2E suite currently targets Chromium only; add cross-browser coverage (WebKit and Firefox).
-- Locales are currently limited to English and Polish.
-- Portfolio content is file-based; a CMS-backed workflow could improve content operations.
-- WebGL fallback can be expanded with a static visual for older/locked-down devices.
-- Performance budgets are validated manually; automated Lighthouse CI would tighten regressions.
-
-## Additional Project Docs
-
-- Pre-release checklist: [docs/pre-release-checklist.md](docs/pre-release-checklist.md)
-- Refactoring task plan: [docs/task_plan.md](docs/task_plan.md)
-- Progress log: [docs/progress.md](docs/progress.md)
+- **Browser Coverage:** Currently optimized for Chromium; WebKit and Firefox coverage is planned.
+- **CMS Integration:** Transitioning from file-based content to a headless CMS for easier updates.
+- **WebGL Fallbacks:** Enhancing static fallbacks for older devices or restricted environments.
+- **Automated Performance Monitoring:** Integrating Lighthouse CI for automated performance regression testing.
