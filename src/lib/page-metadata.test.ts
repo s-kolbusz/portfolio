@@ -21,16 +21,15 @@ describe('page metadata', () => {
     expect(metadata).toMatchInlineSnapshot(`
       {
         "alternates": {
-          "canonical": "/en",
+          "canonical": "https://www.kolbusz.xyz/en",
           "languages": {
-            "en": "/en",
-            "pl": "/pl",
-            "x-default": "/en",
+            "en": "https://www.kolbusz.xyz/en",
+            "pl": "https://www.kolbusz.xyz/pl",
           },
         },
-        "description": "Senior Frontend Engineer specializing in high-performance SaaS products, Next.js, and immersive web experiences. Based in Zakopane, Poland.",
+        "description": "Senior Frontend Developer in Zakopane specializing in high-performance Next.js apps and refined digital experiences for global SaaS and local businesses.",
         "title": {
-          "absolute": "Sebastian Kolbusz | Freelance Frontend Engineer & SaaS Developer",
+          "absolute": "Sebastian Kolbusz | Senior Frontend Specialist & Web Architect",
         },
       }
     `)
@@ -46,14 +45,13 @@ describe('page metadata', () => {
     expect(metadata).toMatchInlineSnapshot(`
       {
         "alternates": {
-          "canonical": "/en/cv",
+          "canonical": "https://www.kolbusz.xyz/en/cv",
           "languages": {
-            "en": "/en/cv",
-            "pl": "/pl/cv",
-            "x-default": "/en/cv",
+            "en": "https://www.kolbusz.xyz/en/cv",
+            "pl": "https://www.kolbusz.xyz/pl/cv",
           },
         },
-        "description": "Senior Frontend Engineer specializing in high-performance SaaS products, Next.js, and immersive web experiences. Based in Zakopane, Poland.",
+        "description": "Senior Frontend Developer in Zakopane specializing in high-performance Next.js apps and refined digital experiences for global SaaS and local businesses.",
         "title": "Curriculum Vitae",
       }
     `)
@@ -69,15 +67,14 @@ describe('page metadata', () => {
     expect(metadata).toMatchInlineSnapshot(`
       {
         "alternates": {
-          "canonical": "/en/projects",
+          "canonical": "https://www.kolbusz.xyz/en/projects",
           "languages": {
-            "en": "/en/projects",
-            "pl": "/pl/projects",
-            "x-default": "/en/projects",
+            "en": "https://www.kolbusz.xyz/en/projects",
+            "pl": "https://www.kolbusz.xyz/pl/projects",
           },
         },
-        "description": "A curated collection of high-performance e-commerce platforms, landing pages, and SaaS engineering.",
-        "title": "Portfolio",
+        "description": "A collection of high-performance web applications and professional digital appearances.",
+        "title": "Selected Work",
       }
     `)
   })
@@ -98,23 +95,22 @@ describe('page metadata', () => {
     expect(metadata).toMatchInlineSnapshot(`
       {
         "alternates": {
-          "canonical": "/en/projects/zakofy",
+          "canonical": "https://www.kolbusz.xyz/en/projects/zakofy",
           "languages": {
-            "en": "/en/projects/zakofy",
-            "pl": "/pl/projects/zakofy",
-            "x-default": "/en/projects/zakofy",
+            "en": "https://www.kolbusz.xyz/en/projects/zakofy",
+            "pl": "https://www.kolbusz.xyz/pl/projects/zakofy",
           },
         },
-        "description": "Premium Tatra Mountain Booking Engine",
+        "description": "Custom Tatra Mountain Offer Platform",
         "openGraph": {
-          "description": "Transforming mountain tourism into a high-end digital experience with a conversion-optimized booking engine.",
+          "description": "Providing a modern digital appearance for mountain tourism with a custom-built offer presentation system.",
           "images": [
             "/images/projects/zakofy.avif",
           ],
           "title": "Zakofy",
         },
         "other": {
-          "article:section": "E-Commerce",
+          "article:section": "Offer Presentation",
         },
         "title": "Zakofy",
       }

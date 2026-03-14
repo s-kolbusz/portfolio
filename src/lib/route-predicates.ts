@@ -17,15 +17,10 @@ export function isCvRoute(pathname: string) {
 }
 
 /**
- * Specifically matches the projects list/book page.
- * Excludes individual case studies.
+ * Matches projects list or individual case studies.
  */
 export function isProjectsRoute(pathname: string) {
-  const normalized = normalizePathname(pathname)
-  // Match /projects, /en/projects, /pl/projects exactly
-  return (
-    normalized === '/projects' || normalized === '/en/projects' || normalized === '/pl/projects'
-  )
+  return normalizePathname(pathname).includes('/projects')
 }
 
 /**

@@ -34,7 +34,7 @@ describe('Select', () => {
     const option2 = await screen.findByRole('option', { name: 'Option 2' })
     await user.click(option2)
 
-    expect(onChange).toHaveBeenCalledWith('opt2', expect.any(Object))
+    expect(onChange).toHaveBeenCalledWith('opt2')
   })
 
   it('associates the label with the trigger via id', () => {
