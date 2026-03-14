@@ -27,10 +27,10 @@ test('projects index page exposes canonical metadata and ItemList JSON-LD', asyn
   test.setTimeout(180_000)
   await openRoute(page, '/en/projects')
 
-  await expect(page).toHaveTitle('Portfolio | Sebastian Kolbusz')
+  await expect(page).toHaveTitle('Selected Work | Sebastian Kolbusz')
   await expect(page.locator('meta[name="description"]')).toHaveAttribute(
     'content',
-    'A curated collection of high-performance e-commerce platforms, landing pages, and SaaS engineering.'
+    'A collection of high-performance web applications and professional digital appearances.'
   )
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
@@ -64,7 +64,7 @@ test('project detail page exposes canonical metadata and CreativeWork JSON-LD', 
   await expect(page).toHaveTitle('Zakofy | Sebastian Kolbusz')
   await expect(page.locator('meta[name="description"]')).toHaveAttribute(
     'content',
-    'Premium Tatra Mountain Booking Engine'
+    'Custom Tatra Mountain Offer Platform'
   )
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
