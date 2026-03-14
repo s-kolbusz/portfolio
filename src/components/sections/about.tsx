@@ -7,6 +7,7 @@ import Image from 'next/image'
 
 import { ArrowRightIcon } from '@phosphor-icons/react'
 
+import { SEOText } from '@/components/seo/seo-text'
 import { BaseSection } from '@/components/ui/base-section'
 import { SkillTag } from '@/components/ui/skill-tag'
 import { skillCategories } from '@/data/skills'
@@ -63,6 +64,17 @@ export const About: React.FC = () => {
           <p className="text-primary mb-2 font-mono text-sm">{t('philosophy_label')}</p>
           <p className="text-foreground font-serif text-xl italic">{t('philosophy.details')}</p>
         </div>
+
+        {/* SEO Depth: Progressive Disclosure */}
+        <SEOText
+          title={t('seo.strategy_title')}
+          buttonLabel={t('seo.read_more')}
+          className="mt-12 border-t-0 py-0"
+        >
+          <p>{t('seo.strategy_p1')}</p>
+          <p className="mt-4">{t('seo.strategy_p2')}</p>
+          <p className="mt-4">{t('seo.strategy_p3')}</p>
+        </SEOText>
       </div>
 
       {/* Right Column: Visuals & Specs (Tech Twist) */}

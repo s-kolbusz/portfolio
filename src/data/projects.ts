@@ -16,6 +16,13 @@ export interface RolePhase {
   period: string
 }
 
+export interface ProjectMetric {
+  label: string
+  value: string | number
+  unit?: string
+  description?: string
+}
+
 export interface PortfolioEntryBase {
   id: string
   type: EntryType
@@ -28,6 +35,7 @@ export interface PortfolioEntryBase {
   order: number
   liveUrl?: string
   timeline?: readonly RolePhase[]
+  metrics?: readonly ProjectMetric[]
 }
 
 // ---------------------------------------------------------------------------
@@ -93,6 +101,10 @@ export const portfolioEntries = [
     featured: true,
     order: 1,
     liveUrl: 'https://zakofy.com',
+    metrics: [
+      { label: 'Lighthouse', value: 100, description: 'Performance Score' },
+      { label: 'LCP', value: 0.8, unit: 's', description: 'Largest Contentful Paint' },
+    ],
   },
   {
     id: 'your-krakow-travel',
@@ -116,6 +128,10 @@ export const portfolioEntries = [
     featured: true,
     order: 2,
     liveUrl: 'https://yourkrakowtravel.com',
+    metrics: [
+      { label: 'Lighthouse', value: 100, description: 'Performance Score' },
+      { label: 'FID', value: 15, unit: 'ms', description: 'First Input Delay' },
+    ],
   },
   {
     id: 'wellezza',
@@ -139,6 +155,10 @@ export const portfolioEntries = [
     featured: true,
     order: 3,
     liveUrl: 'https://wellezza.pl',
+    metrics: [
+      { label: 'Lighthouse', value: 100, description: 'Performance Score' },
+      { label: 'A11y', value: 100, description: 'Accessibility Score' },
+    ],
   },
   {
     id: 'billboard-zakopane',
@@ -162,6 +182,10 @@ export const portfolioEntries = [
     featured: true,
     order: 4,
     liveUrl: 'https://billboardzakopane.pl',
+    metrics: [
+      { label: 'Lighthouse', value: 100, description: 'Performance Score' },
+      { label: 'CLS', value: 0, description: 'Cumulative Layout Shift' },
+    ],
   },
   {
     id: 'ready2order',
@@ -175,6 +199,10 @@ export const portfolioEntries = [
     order: 5,
     liveUrl: 'https://ready2order.com',
     timeline: [{ period: '2019–2020' }, { period: '2020–2022' }, { period: '2022–2025' }],
+    metrics: [
+      { label: 'Bundle', value: -50, unit: '%', description: 'Size Reduction' },
+      { label: 'Scale', value: '10k+', description: 'Active Merchants' },
+    ],
   },
 ] as const satisfies readonly PortfolioEntryBase[]
 

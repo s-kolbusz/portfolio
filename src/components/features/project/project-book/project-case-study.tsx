@@ -5,14 +5,13 @@ import { useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 
-import { ArrowLeftIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
+import { ArrowSquareOutIcon } from '@phosphor-icons/react'
 
-import { Button } from '@/components/ui/button'
 import type { PortfolioEntry } from '@/data/projects'
 import { useTimeline } from '@/hooks/timeline'
-import { useRouter } from '@/i18n/navigation'
 import { ANIMATION } from '@/lib/constants/animations'
 
+import { MetricBadge } from '../../../seo/metric-badge'
 import { Lightbox } from '../../../ui/lightbox'
 import { ProjectNav } from './project-nav'
 
@@ -25,7 +24,6 @@ interface ProjectCaseStudyProps {
 export function ProjectCaseStudy({ project, prevProject, nextProject }: ProjectCaseStudyProps) {
   const t = useTranslations('projectsBook')
   const cs = useTranslations('projectsBook.caseStudy')
-  const router = useRouter()
   const mainRef = useRef<HTMLElement>(null)
   const heroContentRef = useRef<HTMLDivElement>(null)
   const metaRef = useRef<HTMLElement>(null)
@@ -85,18 +83,6 @@ export function ProjectCaseStudy({ project, prevProject, nextProject }: ProjectC
 
   return (
     <article ref={mainRef} className="min-h-screen">
-      {/* Fixed back button */}
-      <div className="fixed top-6 left-6 z-50">
-        <Button
-          variant="outline-glass"
-          size="md"
-          onClick={() => router.back()}
-          leftIcon={<ArrowLeftIcon weight="bold" className="size-4" />}
-        >
-          {t('backLabel')}
-        </Button>
-      </div>
-
       {/* ---- Hero ---- */}
       <header className="relative flex h-[70vh] items-end overflow-hidden sm:h-[80vh]">
         <Image
@@ -209,6 +195,20 @@ export function ProjectCaseStudy({ project, prevProject, nextProject }: ProjectC
             <p className="text-foreground/80 mt-4 text-base leading-relaxed sm:text-lg">
               {section.content}
             </p>
+
+            {section.key === 'resultsTitle' && project.metrics && (
+              <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3">
+                {project.metrics.map((metric) => (
+                  <MetricBadge
+                    key={metric.label}
+                    label={metric.label}
+                    value={metric.value}
+                    unit={metric.unit}
+                    description={metric.description}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </section>
       ))}

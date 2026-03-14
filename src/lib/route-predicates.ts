@@ -16,6 +16,21 @@ export function isCvRoute(pathname: string) {
   return normalizePathname(pathname).includes('/cv')
 }
 
+/**
+ * Specifically matches the projects list/book page.
+ * Excludes individual case studies.
+ */
 export function isProjectsRoute(pathname: string) {
-  return normalizePathname(pathname).includes('/projects')
+  const normalized = normalizePathname(pathname)
+  // Match /projects, /en/projects, /pl/projects exactly
+  return (
+    normalized === '/projects' || normalized === '/en/projects' || normalized === '/pl/projects'
+  )
+}
+
+/**
+ * Matches individual case study detail pages.
+ */
+export function isProjectDetailRoute(pathname: string) {
+  return /^\/(en|pl)?\/?projects\/[^/]+$/.test(pathname)
 }

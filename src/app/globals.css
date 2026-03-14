@@ -197,9 +197,10 @@ html.lenis body {
   .custom-cursor-active a,
   .custom-cursor-active button,
   .custom-cursor-active [role='button'],
+  .custom-cursor-active [data-cursor],
   .custom-cursor-active input,
   .custom-cursor-active select,
   .custom-cursor-active textarea {
-    cursor: none;
+    cursor: none !important;
   }
 }

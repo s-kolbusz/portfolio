@@ -2,11 +2,10 @@
 
 import type { ReactNode } from 'react'
 
-import { Select as SelectPrimitive } from '@base-ui/react/select'
 import { CaretDownIcon, CheckIcon } from '@phosphor-icons/react'
+import * as SelectPrimitive from '@radix-ui/react-select'
 
 import { cn } from '@/lib/cn'
-import { useScrollStore } from '@/lib/stores'
 
 interface Option {
   label: string
@@ -20,89 +19,66 @@ interface SelectProps {
   options: Map<string, Option>
   onChange: (val: string | null) => void
   className?: string
+  defaultValue?: string
 }
 
-export const Select = ({ id, label, onChange, options, className }: SelectProps) => {
-  const lenis = useScrollStore((state) => state.lenis)
-
-  const handleOpenChange = (open: boolean) => {
-    if (lenis) {
-      if (open) {
-        lenis.stop()
-      } else {
-        lenis.start()
-      }
-    }
-  }
+/**
+ * Select component using Radix UI.
+ * - data-cursor="button" handles custom cursor integration.
+ * - Clean and minimal implementation without excessive state.
+ */
+export const Select = ({ id, label, onChange, options, className, defaultValue }: SelectProps) => {
+  const optionsList = Array.from(options.values())
+  const fallbackDefault = optionsList[0]?.value
 
   return (
     <div className={cn('flex flex-col gap-3', className)}>
       <label htmlFor={id} className="text-muted-foreground text-sm font-medium">
         {label}
       </label>
-      <SelectPrimitive.Root
-        id={id}
-        name={id}
-        defaultValue={options.keys().next().value}
-        onOpenChange={handleOpenChange}
-        onValueChange={onChange}
-      >
+      <SelectPrimitive.Root defaultValue={defaultValue || fallbackDefault} onValueChange={onChange}>
         <SelectPrimitive.Trigger
+          id={id}
           className={cn(
             'border-input bg-background text-foreground group box-border flex w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-3 text-sm font-medium transition-all duration-200',
             'hover:border-primary/50',
             'focus-visible:ring-primary focus-visible:ring-offset-background focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
-            'data-popup-open:border-primary data-popup-open:ring-primary data-popup-open:ring-offset-background data-popup-open:ring-2 data-popup-open:ring-offset-2'
+            'data-[state=open]:border-primary data-[state=open]:ring-primary data-[state=open]:ring-offset-background data-[state=open]:ring-2 data-[state=open]:ring-offset-2'
           )}
         >
-          <SelectPrimitive.Value className="flex items-center gap-2 truncate">
-            {(v) => {
-              const opt = options.get(v)
-              return (
-                <>
-                  {opt?.icon && <span className="text-primary">{opt.icon}</span>}
-                  <span className="truncate">{opt?.label}</span>
-                </>
-              )
-            }}
-          </SelectPrimitive.Value>
+          <SelectPrimitive.Value />
           <SelectPrimitive.Icon className="flex items-center justify-center">
             <CaretDownIcon
               weight="bold"
-              className="text-muted-foreground size-4 transition-transform duration-200 group-data-popup-open:rotate-180"
+              className="text-muted-foreground size-4 transition-transform duration-200 group-data-[state=open]:rotate-180"
             />
           </SelectPrimitive.Icon>
         </SelectPrimitive.Trigger>
 
         <SelectPrimitive.Portal>
-          <SelectPrimitive.Positioner
-            align="center"
-            alignItemWithTrigger={false}
+          <SelectPrimitive.Content
+            position="popper"
             sideOffset={8}
-            className="z-50 w-(--anchor-width)"
+            className={cn(
+              'glass border-border z-50 box-border rounded-2xl border shadow-xl transition-all',
+              'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
+              'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
+              'min-w-(--radix-select-trigger-width)'
+            )}
           >
-            <SelectPrimitive.Popup
-              data-lenis-prevent
-              className={cn(
-                'glass border-border box-border overflow-y-auto rounded-2xl border p-4 shadow-xl transition-all duration-300 ease-out',
-                'focus-visible:ring-accent focus-visible:ring-offset-background focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
-                'data-ending-style:scale-90 data-ending-style:opacity-0 data-starting-style:scale-90 data-starting-style:opacity-0',
-                'max-h-(--available-height) min-w-(--anchor-width) origin-(--transform-origin)'
-              )}
-            >
-              {Array.from(options.values()).map((option) => (
+            <SelectPrimitive.Viewport className="p-4">
+              {optionsList.map((option) => (
                 <SelectPrimitive.Item
-                  data-cursor="button"
                   key={option.value}
                   value={option.value}
+                  data-cursor="button"
                   className={cn(
-                    'box-border flex w-full items-center justify-between rounded-xl px-4 py-2.5 text-left text-sm transition-colors outline-none',
-                    'focus-visible:ring-primary focus-visible:ring-2 focus-visible:ring-offset-0 focus-visible:outline-none',
-                    'data-selected:bg-primary data-selected:text-primary-foreground data-selected:font-bold',
-                    'data-highlighted:not-data-selected:bg-muted/50 data-highlighted:not-data-selected:text-foreground'
+                    'box-border flex w-full cursor-none items-center justify-between rounded-xl px-4 py-2.5 text-left text-sm transition-colors outline-none select-none',
+                    'focus:bg-muted/50 focus:text-foreground',
+                    'data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground data-[state=selected]:font-bold'
                   )}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="pointer-events-none flex items-center gap-3">
                     {option.icon && (
                       <span className={cn('flex size-5 items-center justify-center')}>
                         {option.icon}
@@ -115,8 +91,8 @@ export const Select = ({ id, label, onChange, options, className }: SelectProps)
                   </SelectPrimitive.ItemIndicator>
                 </SelectPrimitive.Item>
               ))}
-            </SelectPrimitive.Popup>
-          </SelectPrimitive.Positioner>
+            </SelectPrimitive.Viewport>
+          </SelectPrimitive.Content>
         </SelectPrimitive.Portal>
       </SelectPrimitive.Root>
     </div>

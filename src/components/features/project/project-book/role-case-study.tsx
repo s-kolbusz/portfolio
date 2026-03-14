@@ -5,12 +5,10 @@ import { useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 
-import { ArrowLeftIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
+import { ArrowSquareOutIcon } from '@phosphor-icons/react'
 
-import { Button } from '@/components/ui/button'
 import type { PortfolioEntry } from '@/data/projects'
 import { useTimeline } from '@/hooks/timeline'
-import { useRouter } from '@/i18n/navigation'
 import { ANIMATION } from '@/lib/constants/animations'
 
 import { ProjectNav } from './project-nav'
@@ -24,7 +22,6 @@ interface RoleCaseStudyProps {
 export function RoleCaseStudy({ project, prevProject, nextProject }: RoleCaseStudyProps) {
   const t = useTranslations('projectsBook')
   const cs = useTranslations('projectsBook.caseStudy')
-  const router = useRouter()
   const mainRef = useRef<HTMLElement>(null)
   const heroContentRef = useRef<HTMLDivElement>(null)
   const sectionsRef = useRef<HTMLDivElement>(null)
@@ -52,18 +49,6 @@ export function RoleCaseStudy({ project, prevProject, nextProject }: RoleCaseStu
 
   return (
     <article ref={mainRef} className="min-h-screen">
-      {/* Fixed back button */}
-      <div className="fixed top-6 left-6 z-50">
-        <Button
-          variant="outline-glass"
-          size="md"
-          onClick={() => router.push('/projects')}
-          leftIcon={<ArrowLeftIcon weight="bold" className="size-4" />}
-        >
-          {t('backToProjects')}
-        </Button>
-      </div>
-
       {/* ---- Hero ---- */}
       <header className="relative flex h-[70vh] items-end overflow-hidden sm:h-[80vh]">
         <Image

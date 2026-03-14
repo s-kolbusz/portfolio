@@ -1,7 +1,7 @@
 {
   "Metadata": {
-    "title": "Sebastian Kolbusz | Senior Frontend Engineer & Web Architect",
-    "description": "Senior Frontend Engineer z Zakopanego, specjalizujący się w wysokowydajnych aplikacjach Next.js i kinowych doświadczeniach webowych dla globalnych SaaS oraz lokalnych firm."
+    "title": "Sebastian Kolbusz | Senior Frontend Specialist & Web Architect",
+    "description": "Senior Frontend Developer z Zakopanego, specjalizujący się w wysokowydajnych aplikacjach Next.js i dopracowanych doświadczeniach cyfrowych dla globalnych SaaS oraz lokalnych firm."
   },
   "actions": {
     "skip_to_main": "Przejdź do treści"
@@ -17,7 +17,7 @@
   },
   "HomePage": {
     "title": "Sebastian Kolbusz",
-    "subtitle": "Senior Frontend Engineer & Web Architect"
+    "subtitle": "Senior Frontend Specialist & Web Architect"
   },
   "common": {
     "home": "Start",
@@ -29,12 +29,12 @@
   },
   "hero": {
     "name": "Sebastian Kolbusz",
-    "role": "Frontend Architect",
-    "tagline": "Buduję wysokowydajne aplikacje internetowe z naciskiem na kinowy ruch i doskonałość techniczną.",
+    "role": "Web Architect",
+    "tagline": "Buduję wysokowydajne produkty cyfrowe z naciskiem na dopracowanie wizualne i doskonałość techniczną.",
     "cta": "Zobacz moje projekty"
   },
   "about": {
-    "title": "Rzemiosło i Kontext",
+    "title": "Doświadczenie i Kontekst",
     "figure_profile": "RYS. 1.0 — PROFIL",
     "philosophy_label": "Moja Filozofia",
     "experience_label": "Doświadczenie",
@@ -42,7 +42,7 @@
     "stack_label": "Stack Technologiczny",
     "bio": {
       "title": "Sebastian Kolbusz",
-      "description": "Senior Frontend Engineer z ponad 6-letnim doświadczeniem w budowaniu skalowalnych produktów SaaS i wysokiej klasy wizerunku cyfrowego."
+      "description": "Senior Frontend Specialist z ponad 6-letnim doświadczeniem w budowaniu skalowalnych produktów SaaS i profesjonalnego wizerunku cyfrowego."
     },
     "experience": {
       "years": "6+",
@@ -51,20 +51,27 @@
     },
     "location": {
       "city": "Zakopane, Polska",
-      "details": "Rozwiązuję globalne wyzwania inżynieryjne z serca Tatr."
+      "details": "Rozwiązuję wyzwania techniczne z serca polskich Tatr."
     },
     "philosophy": {
-      "title": "Mentalność Inżynierska",
-      "details": "Stawiam na prostotę, wydajność i dostępną architekturę. Buduję systemy, w których niezawodność techniczna i czysty kod są fundamentem zaufania do marki.",
-      "craft_details": "Traktuję inżynierię jako rzemiosło. Chodzi o tworzenie środowisk cyfrowych, które są solidne technicznie, responsywne i dopracowane wizualnie."
+      "title": "Mentalność Techniczna",
+      "details": "Stawiam na prostotę, wydajność i dostępną architekturę. Buduję systemy, w których niezawodność i czysty kod są fundamentem zaufania do marki.",
+      "craft_details": "Traktuję tworzenie stron jako rzemiosło. Chodzi o budowanie środowisk cyfrowych, które są solidne, responsywne i dopracowane wizualnie."
     },
     "skills": {
       "title": "Zestaw Narzędzi"
+    },
+    "seo": {
+      "strategy_title": "Strategia Rozwoju",
+      "read_more": "Poznaj szczegóły techniczne",
+      "strategy_p1": "Moje podejście do architektury webowej opiera się na przekonaniu, że profesjonalny wizerunek cyfrowy buduje się na bezbłędnym fundamencie technicznym. Priorytetyzując wydajność, dostępność i płynność interakcji, pomagam markom budować natychmiastowy autorytet.",
+      "strategy_p2": "Działając z Zakopanego, łączę światowe standardy z osobistym podejściem potrzebnym do sukcesu lokalnych firm. Niezależnie od tego, czy projektuję złożony dashboard React dla startupu SaaS, czy buduję dopracowaną obecność dla lokalnej usługi, skupiam się na dostarczaniu wyników, które przetrwają próbę czasu.",
+      "strategy_p3": "Każdy projekt traktuję jako długoterminową inwestycję w cyfrową przyszłość Twojej marki. Wykorzystując nowoczesne technologie, takie jak Next.js i Tailwind CSS, zapewniam, że Twoja strona jest nie tylko estetyczna, ale także zoptymalizowana pod kątem widoczności i niezawodności."
     }
   },
   "projects": {
-    "title": "Wybrane Prace Inżynierskie",
-    "intro": "Skupiam się na tworzeniu solidnych, dostępnych i wydajnych systemów. Od szybkiego prototypowania po projektowanie architektury SaaS klasy enterprise — buduję doświadczenia cyfrowe z myślą o długoterminowej konserwacji i jakości technicznej.",
+    "title": "Moje Realizacje",
+    "intro": "Skupiam się na tworzeniu solidnych, dostępnych i wydajnych systemów. Od szybkiego prototypowania po projektowanie architektury SaaS klasy enterprise — buduję doświadczenia cyfrowe z myślą o długoterminowej jakości.",
     "viewAll": "Wszystkie Projekty",
     "visitSite": "Uruchom Projekt",
     "explore": "Zobacz Case Study",
@@ -73,7 +80,7 @@
     "zakofy": {
       "description": "Dedykowana platforma prezentacji oferty dla wycieczek tatrzańskich. Podniosłem standard wizerunku cyfrowego klienta poprzez dopracowane UI i wydajną architekturę.",
       "highlights": {
-        "0": "Kinowy storytelling wizualny",
+        "0": "Angażujący storytelling wizualny",
         "1": "Uproszczony proces zapytań",
         "2": "Optymalizacja statyczna (SSG)",
         "3": "Znaczący wzrost wyników Lighthouse"
@@ -89,7 +96,7 @@
       }
     },
     "wellezza": {
-      "description": "Wizerunek cyfrowy dla lokalnego salonu fryzjerskiego. Zintegrowałem zewnętrzne systemy rezerwacji z wydajnym, dedykowanym sklepem.",
+      "description": "Wizerunek cyfrowy dla lokalnego salonu fryzjerskiego. Zintegrowałem zewnętrzne systemy rezerwacji z wydajną, dedykowaną stroną.",
       "highlights": {
         "0": "Bezproblemowa integracja rezerwacji",
         "1": "Wydajność Lighthouse 100/100",
@@ -108,7 +115,7 @@
     }
   },
   "services": {
-    "title": "Usługi Inżynierskie",
+    "title": "Usługi",
     "intro": "Skupiam się na doskonałości technicznej i profesjonalnym wizerunku cyfrowym. Buduję strony i aplikacje zaprojektowane z myślą o wydajności i niezawodności.",
     "cta": "Skontaktuj się",
     "popular_badge": "Główna Usługa",
@@ -135,7 +142,7 @@
       "features": {
         "0": "Wielostronicowy wizerunek web",
         "1": "Dedykowany CMS do zarządzania",
-        "2": "Zaawansowane animacje GSAP",
+        "2": "Zaawansowane projekty interakcji",
         "3": "Dostępny i semantyczny układ",
         "4": "Zoptymalizowany fundament techniczny"
       },
@@ -143,11 +150,11 @@
     },
     "web-app": {
       "label": "SaaS / Aplikacja",
-      "title": "Dedykowana Inżynieria SaaS",
+      "title": "Dedykowany Rozwój SaaS",
       "price": "18 000 zł",
       "unit": "pakiet startowy",
       "features": {
-        "0": "Pełny cykl rozwoju Full-stack",
+        "0": "Pełny cykl budowy Full-stack",
         "1": "Bezpieczne systemy autoryzacji",
         "2": "Skalowalna architektura bazy danych",
         "3": "Integracje z zewnętrznymi API",
@@ -163,15 +170,15 @@
       "features": {
         "0": "Optymalizacja wydajności i poprawki",
         "1": "Audyty dostępności i techniczne",
-        "2": "Złożone UI i animacje GSAP",
+        "2": "Złożone UI i dopracowane interakcje",
         "3": "Mentoring i przeglądy kodu",
-        "4": "Wsparcie inżynieryjne i utrzymanie"
+        "4": "Wsparcie i utrzymanie"
       },
       "cta": "Uzyskaj wsparcie"
     },
     "process": {
       "title": "Proces Pracy",
-      "intro": "Przejrzysty proces inżynieryjny skupiony na jakości technicznej.",
+      "intro": "Przejrzysty proces skupiony na jakości technicznej i klarowności.",
       "steps": {
         "0": {
           "title": "Odkrycie",
@@ -182,10 +189,10 @@
           "desc": "Definiowanie stacku i przepływu systemu."
         },
         "2": {
-          "title": "Inżynieria",
-          "desc": "Wysokiej jakości rozwój i testy."
+          "title": "Rozwój",
+          "desc": "Wysokiej jakości budowa i testy."
         },
-        "3": { "title": "Dostarczenie", "desc": "Strojenie wydajności, wdrożenie i start." }
+        "3": { "title": "Dostarczenie", "desc": "Strojenie wydajności i start." }
       }
     }
   },
@@ -223,7 +230,7 @@
     "title": "Curriculum Vitae",
     "print": "Drukuj / Zapisz PDF",
     "summary": "Podsumowanie Zawodowe",
-    "experience": "Doświadczenie Inżynieryjne",
+    "experience": "Doświadczenie Zawodowe",
     "education": "Wykształcenie",
     "skills": "Ekspertyza Techniczna",
     "languages": "Języki",
@@ -240,7 +247,7 @@
     "backToProjects": "Powrót do Portfolio",
     "prevProject": "← Poprzedni",
     "nextProject": "Następny →",
-    "roleLabel": "Rola Inżynieryjna",
+    "roleLabel": "Rola Zawodowa",
     "categories": {
       "e-commerce": "Prezentacja Oferty",
       "saas": "Produkty SaaS",
@@ -251,9 +258,9 @@
     },
     "caseStudy": {
       "problemTitle": "Wyzwanie",
-      "approachTitle": "Podejście Techniczne",
+      "approachTitle": "Podejście do Projektu",
       "solutionTitle": "Rozwiązanie",
-      "resultsTitle": "Wyniki Inżynieryjne",
+      "resultsTitle": "Wyniki Techniczne",
       "galleryTitle": "Przegląd Wizualny",
       "clientLabel": "Klient",
       "roleLabel": "Mój Wkład",
