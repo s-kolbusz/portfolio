@@ -1,7 +1,14 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 
-const CORE_ROUTES = ['/en', '/en/cv', '/en/projects', '/en/projects/zakofy', '/en/design'] as const
+const CORE_ROUTES = [
+  '/en',
+  '/en/cv',
+  '/en/projects',
+  '/en/projects/zakofy',
+  '/en/design',
+  '/en/services',
+] as const
 
 const ROUTES_WITH_SKIP_LINK = [
   '/en',
@@ -9,6 +16,7 @@ const ROUTES_WITH_SKIP_LINK = [
   '/en/projects',
   '/en/design',
   '/en/projects/zakofy',
+  '/en/services',
   '/en/does-not-exist',
 ] as const
 

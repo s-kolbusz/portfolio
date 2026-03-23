@@ -1,4 +1,7 @@
 {
+  "terms": {
+    "back": "Back"
+  },
   "Metadata": {
     "title": "Sebastian Kolbusz | Senior Frontend Specialist & Web Architect",
     "description": "Senior Frontend Developer in Zakopane specializing in high-performance Next.js apps and refined digital experiences for global SaaS and local businesses."
@@ -120,11 +123,14 @@
     "cta": "Get in Touch",
     "popular_badge": "Core Service",
     "limited_availability": "* Accepting new projects for late Q1 2026",
+    "view_details_cta": "View Full Offer & FAQ",
     "landing-page": {
       "label": "Landing Page",
-      "title": "High-Performance Page",
+      "title": "High-Performance Sales Page",
       "price": "€850",
       "unit": "fixed investment",
+      "description": "A focused, lightning-fast single-page website built with one clear goal: getting your visitors to take action. Whether you're launching a new product, gathering leads, or testing a business idea, this is the perfect starting point. I engineer every element to load instantly, rank naturally on Google, and guide users smoothly toward your offer without any confusing detours.",
+      "ideal_for": "Marketing campaigns, new product launches, and focused lead generation.",
       "features": {
         "0": "Professional and polished design",
         "1": "Lightning-fast mobile performance",
@@ -139,6 +145,8 @@
       "title": "Professional Web Platform",
       "price": "€1,800",
       "unit": "base investment",
+      "description": "A comprehensive digital platform that acts as your hardest-working sales rep, working 24/7. I build tailored, multi-page websites that do more than just look good—they establish authority and educate your clients. From a compelling homepage that tells your story to an easy-to-use CMS that lets you manage your own content, this package gives you a robust, SEO-dominant structure built to perform.",
+      "ideal_for": "Growing local businesses, agencies, and established consulting firms.",
       "features": {
         "0": "High-end multi-page web presence",
         "1": "Custom CMS for easy management",
@@ -153,6 +161,8 @@
       "title": "Custom SaaS Development",
       "price": "€3,900",
       "unit": "launch package",
+      "description": "Turn your complex business logic into an intuitive, scalable web application. Using modern frameworks like Next.js and robust cloud databases, I architect full-stack solutions tailored exactly to how you operate. Whether you need a secure internal dashboard, a seamless customer portal, or a complete Software-as-a-Service (SaaS) product, I deliver high-performance applications designed to grow right alongside your user base.",
+      "ideal_for": "Tech startups, specialized internal tools, and data-heavy customer portals.",
       "features": {
         "0": "Full-stack development cycle",
         "1": "Secure authentication systems",
@@ -164,9 +174,11 @@
     },
     "hourly": {
       "label": "Consulting",
-      "title": "Technical Support",
+      "title": "Technical Support & Audits",
       "price": "€60",
       "unit": "per hour",
+      "description": "Expert technical guidance to rescue, refactor, or level up your existing digital products. If your current website feels sluggish, is invisible on Google, fails accessibility checks, or simply needs a professional code review, I can step in. I help teams optimize their frontend architecture, smooth out clunky UI interactions, and establish solid engineering practices that actually work.",
+      "ideal_for": "Projects needing urgent performance fixes, accessibility audits, or technical mentoring.",
       "features": {
         "0": "Performance optimization & fixes",
         "1": "Accessibility & technical audits",
@@ -193,6 +205,31 @@
           "desc": "High-fidelity build and testing."
         },
         "3": { "title": "Delivery", "desc": "Performance tuning and launch." }
+      }
+    }
+  },
+  "services_page": {
+    "ideal_for_label": "Perfect For",
+    "meta_title": "Web Development Services | Professional Websites & Apps",
+    "meta_description": "Professional web development, high-performance landing pages, and custom business applications. Focused on speed, technical SEO, and Core Web Vitals.",
+    "h1": "Professional Web Development Services",
+    "h2_niche": "Modern Websites and Apps for Your Business",
+    "h2_offer": "Explore My Core Services",
+    "h2_trust": "Why Work With Me?",
+    "trust_content": "I build technical solutions focusing on performance, accessibility, and high conversion rates. As a senior engineer with experience in global projects, I deliver top-tier code quality, whether I'm building a complex application for a tech startup or a responsive platform for a local business. Every project is built on a modern technology stack (Next.js, React), ensuring lightning-fast load times, excellent Core Web Vitals scores, and a natural advantage in SEO.",
+    "h2_faq": "Frequently Asked Questions",
+    "faq": {
+      "0": {
+        "question": "How much does a website cost?",
+        "answer": "Pricing depends on complexity. Landing pages start at €850, and full web applications from €3,900. I always provide a clear, upfront estimate before we begin."
+      },
+      "1": {
+        "question": "How long does it take to build a website?",
+        "answer": "A standard landing page takes 1-2 weeks, while a custom multi-page business site might take 3-5 weeks depending on revisions and content readiness."
+      },
+      "2": {
+        "question": "Do you provide hosting and maintenance?",
+        "answer": "Yes. I can set up optimized hosting (e.g., Vercel) and offer an hourly consulting rate for ongoing maintenance and support."
       }
     }
   },

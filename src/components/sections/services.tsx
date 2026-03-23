@@ -19,12 +19,14 @@ export function Services() {
   const sectionRef = useRef<HTMLElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
   const gridRef = useRef<HTMLDivElement>(null)
+  const viewAllServicesRef = useRef<HTMLDivElement>(null)
   const processRef = useRef<HTMLDivElement>(null)
   const processStepsRef = useRef<HTMLDivElement>(null)
 
   useTimeline(sectionRef, { id: 'services' }, (reveal) => {
     reveal(headerRef)
     reveal(gridRef, { y: 100, stagger: ANIMATION.stagger.slow })
+    reveal(viewAllServicesRef, { y: 100, delay: ANIMATION.delay.short })
     reveal(processRef, { stagger: ANIMATION.stagger.slow })
     reveal(processStepsRef, { stagger: ANIMATION.stagger.slow })
   })
@@ -124,6 +126,19 @@ export function Services() {
             </div>
           )
         })}
+      </div>
+
+      {/* View All Services CTA */}
+      <div ref={viewAllServicesRef} className="mt-8 flex justify-center">
+        <Button
+          href="/services"
+          variant="outline"
+          size="lg"
+          rightIcon={<ArrowRightIcon className="size-4" />}
+          className="border-primary/20 hover:border-primary px-8"
+        >
+          {t('view_details_cta')}
+        </Button>
       </div>
 
       {/* Process / Workflow Section */}

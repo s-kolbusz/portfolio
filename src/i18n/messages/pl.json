@@ -1,4 +1,7 @@
 {
+  "terms": {
+    "back": "Wróć"
+  },
   "Metadata": {
     "title": "Sebastian Kolbusz | Senior Frontend Specialist & Web Architect",
     "description": "Senior Frontend Developer z Zakopanego, specjalizujący się w wysokowydajnych aplikacjach Next.js i dopracowanych doświadczeniach cyfrowych dla globalnych SaaS oraz lokalnych firm."
@@ -120,11 +123,14 @@
     "cta": "Skontaktuj się",
     "popular_badge": "Główna Usługa",
     "limited_availability": "* Przyjmuję projekty na koniec Q1 2026",
+    "view_details_cta": "Zobacz Pełną Ofertę i FAQ",
     "landing-page": {
       "label": "Landing Page",
       "title": "Wydajna Strona Sprzedażowa",
       "price": "3500 zł",
       "unit": "stała inwestycja",
+      "description": "Skoncentrowana, błyskawicznie działająca strona typu 'one-page' zbudowana z jednym, jasnym celem: skłonienie odwiedzających do działania. Niezależnie od tego, czy wprowadzasz na rynek nowy produkt, zbierasz leady, czy testujesz pomysł na biznes, to doskonały punkt wyjścia. Każdy element projektuję tak, aby ładował się natychmiast, naturalnie pozycjonował się w Google i płynnie prowadził użytkowników do Twojej oferty bez żadnych rozpraszaczy.",
+      "ideal_for": "Kampanie marketingowe, premiery nowych produktów i ukierunkowane zbieranie leadów.",
       "features": {
         "0": "Profesjonalny i dopracowany design",
         "1": "Błyskawiczna wydajność mobilna",
@@ -139,6 +145,8 @@
       "title": "Profesjonalna Platforma Web",
       "price": "8000 zł",
       "unit": "inwestycja bazowa",
+      "description": "Kompleksowa platforma cyfrowa, która działa jak Twój najciężej pracujący handlowiec, 24 godziny na dobę. Tworzę dedykowane, wielostronicowe serwisy, które nie tylko dobrze wyglądają – one budują autorytet i skutecznie edukują Twoich klientów. Od angażującej strony głównej, po łatwy w obsłudze system CMS do zarządzania treścią, ten pakiet zapewnia solidną i zdominowaną pod kątem SEO strukturę, stworzoną, by zarabiać.",
+      "ideal_for": "Rozwijające się lokalne biznesy, agencje oraz ugruntowane firmy konsultingowe.",
       "features": {
         "0": "Wielostronicowy wizerunek web",
         "1": "Dedykowany CMS do zarządzania",
@@ -153,6 +161,8 @@
       "title": "Dedykowany Rozwój SaaS",
       "price": "18 000 zł",
       "unit": "pakiet startowy",
+      "description": "Zamień skomplikowaną logikę biznesową w intuicyjną, łatwą do skalowania aplikację internetową. Wykorzystując nowoczesne technologie, takie jak Next.js oraz bezpieczne bazy danych w chmurze, projektuję rozwiązania full-stack dopasowane dokładnie do tego, jak pracujesz. Niezależnie od tego, czy potrzebujesz wewnętrznego panelu dla zespołu, bezpiecznego portalu dla klientów, czy pełnego produktu SaaS, dostarczam wydajne aplikacje, które rosną razem z Twoim biznesem.",
+      "ideal_for": "Tech startupy, specjalistyczne narzędzia wewnętrzne i portale do obsługi klientów.",
       "features": {
         "0": "Pełny cykl budowy Full-stack",
         "1": "Bezpieczne systemy autoryzacji",
@@ -164,9 +174,11 @@
     },
     "hourly": {
       "label": "Konsultacje",
-      "title": "Wsparcie Techniczne",
+      "title": "Wsparcie i Audyty",
       "price": "250 zł",
       "unit": "za godzinę",
+      "description": "Eksperckie doradztwo techniczne, które pomoże uratować, zrefaktoryzować lub przenieść na wyższy poziom Twoje obecne produkty cyfrowe. Jeśli Twoja strona działa wolno, jest niewidoczna w Google, nie spełnia norm dostępności lub po prostu potrzebuje profesjonalnego spojrzenia w kod, wkraczam do akcji. Pomagam zespołom optymalizować architekturę frontendową, naprawiać zacinające się interfejsy i wdrażać sprawdzone praktyki inżynierskie, które faktycznie przynoszą efekty.",
+      "ideal_for": "Projekty wymagające pilnych poprawek wydajności, audytów dostępności lub technicznego mentoringu.",
       "features": {
         "0": "Optymalizacja wydajności i poprawki",
         "1": "Audyty dostępności i techniczne",
@@ -193,6 +205,31 @@
           "desc": "Wysokiej jakości budowa i testy."
         },
         "3": { "title": "Dostarczenie", "desc": "Strojenie wydajności i start." }
+      }
+    }
+  },
+  "services_page": {
+    "ideal_for_label": "Idealnie sprawdzi się dla",
+    "meta_title": "Tworzenie Stron Internetowych Zakopane & Podhale | Profesjonalne Strony www",
+    "meta_description": "Profesjonalne tworzenie stron internetowych, aplikacji i landing page dla firm z Zakopanego, Podhala i całej Polski. Zbuduj zyskowną obecność online. Sprawdź ofertę!",
+    "h1": "Profesjonalne Tworzenie Stron Internetowych – Zakopane i Podhale",
+    "h2_niche": "Nowoczesne strony i aplikacje internetowe dla Twojego biznesu",
+    "h2_offer": "Poznaj moje usługi webowe",
+    "h2_trust": "Dlaczego warto współpracować ze mną?",
+    "trust_content": "Tworzę rozwiązania techniczne nastawione na wydajność, dostępność i wysokie wskaźniki konwersji. Jako inżynier z doświadczeniem przy globalnych projektach, dostarczam kod najwyższej jakości, niezależnie czy buduję skomplikowaną aplikację dla startupu, czy responsywną stronę dla lokalnego biznesu z Podhala. Każdy projekt opieram na nowoczesnym stosie technologicznym (Next.js, React), co gwarantuje błyskawiczne ładowanie, świetne wyniki w Core Web Vitals i naturalną przewagę w pozycjonowaniu (SEO).",
+    "h2_faq": "Często zadawane pytania",
+    "faq": {
+      "0": {
+        "question": "Ile kosztuje strona internetowa w Zakopanem?",
+        "answer": "Cena zależy od złożoności i wymagań projektu. Proste wizytówki i landing page zaczynają się od 3500 zł, a wielostronicowe serwisy dla hoteli czy firm od 8000 zł. Zawsze przedstawiam jasną wycenę przed rozpoczęciem prac."
+      },
+      "1": {
+        "question": "Jak długo trwa tworzenie strony www?",
+        "answer": "Standardowy landing page powstaje zazwyczaj w 1-2 tygodnie, podczas gdy bardziej rozbudowana strona biznesowa lub serwis dla pensjonatu może zająć 3-5 tygodni, zależnie od dostępności materiałów i procesu akceptacji."
+      },
+      "2": {
+        "question": "Czy zajmujesz się również hostingiem i utrzymaniem?",
+        "answer": "Tak. Pomagam skonfigurować zoptymalizowany, szybki hosting (np. Vercel) i oferuję usługi stałego wsparcia technicznego w modelu godzinowym, aby strona była zawsze aktualna i bezpieczna."
       }
     }
   },

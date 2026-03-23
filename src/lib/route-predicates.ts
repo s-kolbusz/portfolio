@@ -29,3 +29,10 @@ export function isProjectsRoute(pathname: string) {
 export function isProjectDetailRoute(pathname: string) {
   return /^\/(en|pl)?\/?projects\/[^/]+$/.test(pathname)
 }
+
+/**
+ * Matches the dedicated services page.
+ */
+export function isServicesRoute(pathname: string) {
+  return normalizePathname(pathname).includes('/services')
+}

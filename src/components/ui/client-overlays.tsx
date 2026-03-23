@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 
 import { CaseStudyBackButton } from '@/components/ui/case-study-back-button'
+import { ServicesBackButton } from '@/components/ui/services-back-button'
 
 const CustomCursor = dynamic(
   () => import('@/components/ui/custom-cursor').then((mod) => ({ default: mod.CustomCursor })),
@@ -43,6 +44,7 @@ export function ClientOverlays() {
       <CustomCursor />
       <SmoothScroller />
       <CaseStudyBackButton />
+      <ServicesBackButton />
       <SettingsDock />
       <DockNav />
     </>

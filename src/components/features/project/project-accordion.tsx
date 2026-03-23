@@ -1,16 +1,13 @@
 'use client'
 
-import { useRef } from 'react'
-
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 
 import { ArrowUpRightIcon } from '@phosphor-icons/react'
 
+import { Accordion } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
 import type { PortfolioEntry } from '@/data/projects'
-import { ANIMATION } from '@/lib/constants/animations'
-import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap'
 
 interface ProjectAccordionProps {
   project: PortfolioEntry
@@ -20,85 +17,22 @@ interface ProjectAccordionProps {
 
 export function ProjectAccordion({ project, isOpen, onAnimationComplete }: ProjectAccordionProps) {
   const t = useTranslations('projects')
-  const containerRef = useRef<HTMLDivElement>(null)
-  const contentRef = useRef<HTMLDivElement>(null)
-
-  useGSAP(() => {
-    if (!containerRef.current || !contentRef.current) return
-
-    if (isOpen) {
-      const height = contentRef.current.offsetHeight || 0
-      const tl = gsap.timeline()
-
-      // Disable pointer events on the whole container during animation
-      gsap.set(containerRef.current, { pointerEvents: 'none' })
-
-      tl.to(containerRef.current, {
-        height,
-        duration: ANIMATION.duration.fast,
-        ease: ANIMATION.ease.out,
-      })
-
-      tl.fromTo(
-        contentRef.current.children,
-        {
-          y: 20,
-          opacity: 0,
-        },
-        {
-          y: 0,
-          opacity: 1,
-          duration: ANIMATION.duration.medium,
-          ease: ANIMATION.ease.out,
-          stagger: ANIMATION.stagger.tight,
-        },
-        '<0.1'
-      )
-
-      // Re-enable pointer events and refresh ScrollTrigger positions after open
-      tl.call(() => {
-        if (containerRef.current) {
-          containerRef.current.style.pointerEvents = 'auto'
-        }
-        ScrollTrigger.refresh()
-        onAnimationComplete?.()
-      })
-    } else {
-      // Disable pointer events during close
-      gsap.set(containerRef.current, { pointerEvents: 'none' })
-
-      gsap.to(containerRef.current, {
-        height: 0,
-        duration: ANIMATION.duration.fast,
-        ease: ANIMATION.ease.inOut,
-        onComplete: () => {
-          if (containerRef.current) {
-            containerRef.current.style.pointerEvents = 'auto'
-          }
-          // Refresh ScrollTrigger positions after layout shift
-          ScrollTrigger.refresh()
-          onAnimationComplete?.()
-        },
-      })
-    }
-  }, [isOpen, onAnimationComplete])
 
   // Use localized content directly from the project object
   const description = project.tagline
   const highlights = project.pullQuotes || []
 
   return (
-    <div
-      ref={containerRef}
-      className="h-0 overflow-hidden"
-      id={`project-content-${project.id}`}
-      role="region"
-      aria-labelledby={`project-trigger-${project.id}`}
+    <Accordion
+      id={`project-${project.id}`}
+      isOpen={isOpen}
+      onAnimationComplete={onAnimationComplete}
+      trigger={<div className="hidden" />} // No trigger visible here as it's controlled externally
+      hideIcon
+      ariaLabel={`Toggle details for ${project.title}`}
+      className="!py-0"
     >
-      <div
-        ref={contentRef}
-        className="grid grid-cols-1 gap-12 pt-4 pb-12 md:grid-cols-12 md:gap-24 md:pt-8 md:pb-16"
-      >
+      <div className="grid grid-cols-1 gap-12 pt-4 pb-12 md:grid-cols-12 md:gap-24 md:pt-8 md:pb-16">
         <div className="flex flex-col gap-10 md:col-span-7">
           <p className="text-foreground font-serif text-lg leading-relaxed sm:text-2xl md:text-3xl">
             &quot;{description}&quot;
@@ -172,6 +106,6 @@ export function ProjectAccordion({ project, isOpen, onAnimationComplete }: Proje
           </div>
         </div>
       </div>
-    </div>
+    </Accordion>
   )
 }
