@@ -9,6 +9,14 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['@phosphor-icons/react', 'gsap', 'lenis'],
   },
+  async rewrites() {
+    return [
+      {
+        source: '/:locale/sitemap.xml',
+        destination: '/:locale/sitemap',
+      },
+    ]
+  },
 }
 
 export default withNextIntl(nextConfig)

@@ -13,9 +13,10 @@ import { DockTooltip } from './dock-tooltip'
 type DockItemProps = {
   icon: Icon
   label: string
+  href: string
   isActive?: boolean
   ariaCurrent?: 'location' | 'page'
-  onClick?: () => void
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void
   scale?: number
   onHover?: (isHovering: boolean) => void
   className?: string
@@ -24,6 +25,7 @@ type DockItemProps = {
 export function DockItem({
   icon: Icon,
   label,
+  href,
   isActive,
   ariaCurrent,
   onClick,
@@ -32,9 +34,10 @@ export function DockItem({
   className,
 }: DockItemProps) {
   const [isHovered, setIsHovered] = useState(false)
-  const itemRef = useRef<HTMLButtonElement>(null)
+  const itemRef = useRef<HTMLAnchorElement>(null)
 
   useGSAP(() => {
+    if (!itemRef.current) return
     gsap.to(itemRef.current, {
       scale: scale,
       duration: 0.2,
@@ -56,9 +59,9 @@ export function DockItem({
   return (
     <Button
       ref={itemRef}
+      href={href}
       variant="glass"
       size="icon"
-      type="button"
       onClick={onClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

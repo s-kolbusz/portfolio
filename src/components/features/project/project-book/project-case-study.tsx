@@ -108,9 +108,9 @@ export function ProjectCaseStudy({ project, prevProject, nextProject }: ProjectC
             <span>{project.year}</span>
           </div>
 
-          <h2 className="font-serif text-4xl font-light tracking-tight text-white sm:text-5xl lg:text-7xl">
+          <h1 className="font-serif text-4xl font-light tracking-tight text-white sm:text-5xl lg:text-7xl">
             {project.title}
-          </h2>
+          </h1>
 
           <p className="mt-3 max-w-xl text-lg leading-relaxed text-white/70 sm:text-xl">
             {project.subtitle}

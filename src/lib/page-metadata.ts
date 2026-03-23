@@ -30,12 +30,18 @@ export function buildHomePageMetadata({
   title,
   description,
 }: Omit<LocalizedMetadataInput, 'path'>): Metadata {
+  const alternates = getMetadataAlternates('/', locale)
   return {
     title: {
       absolute: title,
     },
     description,
-    alternates: getMetadataAlternates('/', locale),
+    alternates,
+    openGraph: {
+      url: alternates.canonical,
+      title,
+      description,
+    },
   }
 }
 
@@ -44,10 +50,16 @@ export function buildCvPageMetadata({
   title,
   description,
 }: Omit<LocalizedMetadataInput, 'path'>): Metadata {
+  const alternates = getMetadataAlternates('/cv', locale)
   return {
     title,
     description,
-    alternates: getMetadataAlternates('/cv', locale),
+    alternates,
+    openGraph: {
+      url: alternates.canonical,
+      title,
+      description,
+    },
   }
 }
 
@@ -56,10 +68,16 @@ export function buildProjectsPageMetadata({
   title,
   description,
 }: Omit<LocalizedMetadataInput, 'path'>): Metadata {
+  const alternates = getMetadataAlternates('/projects', locale)
   return {
     title,
     description,
-    alternates: getMetadataAlternates('/projects', locale),
+    alternates,
+    openGraph: {
+      url: alternates.canonical,
+      title,
+      description,
+    },
   }
 }
 
@@ -76,11 +94,13 @@ export function buildProjectDetailPageMetadata({
   project,
   categoryLabel,
 }: ProjectDetailMetadataInput): Metadata {
+  const alternates = getMetadataAlternates(`/projects/${slug}`, locale)
   return {
     title: project.title,
     description: project.subtitle,
-    alternates: getMetadataAlternates(`/projects/${slug}`, locale),
+    alternates,
     openGraph: {
+      url: alternates.canonical,
       title: project.title,
       description: project.tagline,
       images: [project.heroImage],

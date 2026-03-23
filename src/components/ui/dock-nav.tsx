@@ -5,7 +5,7 @@ import { useCallback, useMemo, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 
 import { useActiveSection } from '@/hooks/use-active-section'
-import { usePathname, useRouter } from '@/i18n/navigation'
+import { usePathname } from '@/i18n/navigation'
 import { useGSAP } from '@/lib/gsap'
 import { isProjectDetailRoute, isServicesRoute } from '@/lib/route-predicates'
 
@@ -27,7 +27,6 @@ export function DockNav() {
   const sectionIds = useMemo(() => NAV_ITEMS.map((item) => item.id), [])
   const activeSection = useActiveSection(sectionIds)
   const pathname = usePathname()
-  const router = useRouter()
 
   const isHome = isHomeRoute(pathname)
   const isProjectsPage = isProjectsRoute(pathname)
@@ -84,17 +83,16 @@ export function DockNav() {
 
   useWindowResize(syncIndicatorOnResize)
 
-  const handleNavClick = (item: (typeof NAV_ITEMS)[0]) => {
+  const handleNavClick = (e: React.MouseEvent, item: (typeof NAV_ITEMS)[0]) => {
     if (item.isPage) {
-      router.push(item.href)
-      return
+      return // Let the standard link behavior happen
     }
 
     if (!isHome) {
-      router.push(item.href)
-      return
+      return // Let the standard link behavior happen to navigate to home and scroll
     }
 
+    e.preventDefault()
     document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' })
   }
 
@@ -118,12 +116,13 @@ export function DockNav() {
             {item.isPage && index > 0 && <div className="bg-border mx-auto h-px w-8" />}
             <DockItem
               icon={item.icon}
+              href={item.href}
               isActive={activeItemIndex === index}
               label={t(item.id)}
               ariaCurrent={
                 activeItemIndex === index ? (item.isPage ? 'page' : 'location') : undefined
               }
-              onClick={() => handleNavClick(item)}
+              onClick={(e) => handleNavClick(e, item)}
               onHover={(isHovering) => setHoveredIndex(isHovering ? index : null)}
               scale={getHoverScale(index, hoveredIndex)}
             />
@@ -147,12 +146,13 @@ export function DockNav() {
             {item.isPage && index > 0 && <div className="bg-border h-8 w-px" />}
             <DockItem
               icon={item.icon}
+              href={item.href}
               isActive={activeItemIndex === index}
               label={t(item.id)}
               ariaCurrent={
                 activeItemIndex === index ? (item.isPage ? 'page' : 'location') : undefined
               }
-              onClick={() => handleNavClick(item)}
+              onClick={(e) => handleNavClick(e, item)}
             />
           </div>
         ))}

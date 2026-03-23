@@ -6,6 +6,7 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { ClientOverlays } from '@/components/ui/client-overlays'
 import { SkipToMain } from '@/components/ui/skip-to-main'
 import { getLocaleFromParams } from '@/i18n/locale'
+import { Link } from '@/i18n/navigation'
 import { routing } from '@/i18n/routing'
 
 type Props = {
@@ -31,6 +32,12 @@ export default async function LocaleLayout({ children, params }: Props) {
       <NextIntlClientProvider locale={locale} messages={messages}>
         <HtmlLangSync />
         <SkipToMain />
+        <nav className="sr-only" aria-label="Site navigation">
+          <Link href="/">Home</Link>
+          <Link href="/projects">Projects</Link>
+          <Link href="/cv">CV</Link>
+          <Link href="/services">Services</Link>
+        </nav>
         <div id="page-content-start" tabIndex={-1} className="outline-none" />
         <ClientOverlays />
         {children}
