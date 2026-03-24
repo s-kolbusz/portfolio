@@ -1,3 +1,5 @@
+import type { AnchorHTMLAttributes } from 'react'
+
 import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 
@@ -16,6 +18,11 @@ vi.mock('@/hooks/use-active-section', () => ({
 const mockPathname = vi.fn(() => '/en')
 const mockPush = vi.fn()
 vi.mock('@/i18n/navigation', () => ({
+  Link: ({ href, children, ...props }: AnchorHTMLAttributes<HTMLAnchorElement>) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  ),
   usePathname: () => mockPathname(),
   useRouter: vi.fn(() => ({
     push: mockPush,
@@ -68,18 +75,14 @@ describe('DockNav', () => {
     render(<DockNav />)
 
     const aboutButtons = screen.getAllByLabelText('about')
-    fireEvent.click(aboutButtons[0])
-
-    expect(mockPush).toHaveBeenCalledWith('/#about')
+    expect(aboutButtons[0]).toHaveAttribute('href', '/#about')
   })
 
   it('pushes to page href for page items', () => {
     render(<DockNav />)
 
     const cvButtons = screen.getAllByLabelText('cv')
-    fireEvent.click(cvButtons[0])
-
-    expect(mockPush).toHaveBeenCalledWith('/cv')
+    expect(cvButtons[0]).toHaveAttribute('href', '/cv')
   })
 
   it('hides on projects page', () => {

@@ -103,7 +103,7 @@ describe('navigation integration', () => {
 
     render(<DockNav />)
 
-    fireEvent.click(screen.getAllByRole('button', { name: 'Services' })[0])
+    fireEvent.click(screen.getAllByRole('link', { name: 'Services' })[0])
 
     expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth' })
     expect(routerPush).not.toHaveBeenCalled()
@@ -114,8 +114,7 @@ describe('navigation integration', () => {
 
     render(<DockNav />)
 
-    fireEvent.click(screen.getAllByRole('button', { name: 'Services' })[0])
-
-    expect(routerPush).toHaveBeenCalledWith('/#services')
+    const servicesLink = screen.getAllByRole('link', { name: 'Services' })[0]
+    expect(servicesLink).toHaveAttribute('href', '/#services')
   })
 })

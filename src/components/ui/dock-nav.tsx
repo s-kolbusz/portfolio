@@ -102,7 +102,7 @@ export function DockNav() {
     <>
       <nav
         ref={dockRef}
-        className="glass fixed top-1/2 right-6 z-40 hidden -translate-y-1/2 flex-col gap-3 p-3 lg:flex"
+        className="dock-nav glass fixed top-1/2 right-6 z-40 hidden -translate-y-1/2 flex-col gap-3 p-3 lg:flex"
         role="navigation"
         aria-label="Main navigation"
       >
@@ -132,7 +132,7 @@ export function DockNav() {
 
       <nav
         ref={mobileDockRef}
-        className="glass fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 p-2 lg:hidden"
+        className="dock-nav glass fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 p-2 lg:hidden"
         role="navigation"
         aria-label="Mobile navigation"
       >

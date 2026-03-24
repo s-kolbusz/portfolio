@@ -87,10 +87,10 @@ test('desktop dock navigation exposes current position semantics', async ({ page
   await page.goto('/en')
   await page.waitForTimeout(700)
 
-  await expect(page.getByRole('button', { name: 'Home' })).toHaveAttribute(
-    'aria-current',
-    'location'
-  )
+  const dockHomeLink = page
+    .getByRole('navigation', { name: 'Main navigation' })
+    .getByRole('link', { name: 'Home' })
+  await expect(dockHomeLink).toHaveAttribute('aria-current', 'location')
 })
 
 test('custom cursor is available on non-home routes when reduced motion is off', async ({
@@ -115,11 +115,11 @@ test('target sizes meet WCAG 2.2 minimum requirements', async ({ page }) => {
   await page.goto('/en')
   await page.waitForTimeout(1000)
 
-  const dockButtons = page.locator('.dock-nav button')
-  const count = await dockButtons.count()
+  const dockLinks = page.locator('.dock-nav a')
+  const count = await dockLinks.count()
 
   for (let i = 0; i < count; i++) {
-    const box = await dockButtons.nth(i).boundingBox()
+    const box = await dockLinks.nth(i).boundingBox()
     if (box) {
       // WCAG 2.2 AA target size is 24x24 CSS pixels
       expect(box.width).toBeGreaterThanOrEqual(24)

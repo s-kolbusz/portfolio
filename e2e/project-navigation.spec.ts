@@ -19,7 +19,7 @@ test('project list navigation reaches details and preserves prev/next project se
 
   await expect(page).toHaveURL(/\/en\/projects\/zakofy$/)
   // Wait for the new page's heading to ensure transition completed
-  await expect(page.getByRole('heading', { name: /zakofy/i, level: 2 })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /zakofy/i, level: 1 })).toBeVisible()
   await expect(page.getByRole('navigation', { name: 'Project navigation' })).toBeVisible()
 
   const nextProjectLink = page.getByRole('link', { name: /next project/i })
@@ -29,7 +29,7 @@ test('project list navigation reaches details and preserves prev/next project se
 
   await expect(page).toHaveURL(/\/en\/projects\/your-krakow-travel$/)
   // Wait for the new page's heading to ensure transition completed
-  await expect(page.getByRole('heading', { name: /your krakow travel/i, level: 2 })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /your krakow travel/i, level: 1 })).toBeVisible()
 
   const previousProjectLink = page.getByRole('link', { name: /previous project/i })
   await expect(previousProjectLink).toBeVisible()
@@ -38,5 +38,5 @@ test('project list navigation reaches details and preserves prev/next project se
 
   await expect(page).toHaveURL(/\/en\/projects\/zakofy$/)
   // Wait for the new page's heading to ensure transition completed
-  await expect(page.getByRole('heading', { name: /zakofy/i, level: 2 })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /zakofy/i, level: 1 })).toBeVisible()
 })

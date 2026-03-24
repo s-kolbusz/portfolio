@@ -28,6 +28,11 @@ describe('page metadata', () => {
           },
         },
         "description": "Senior Frontend Developer in Zakopane specializing in high-performance Next.js apps and refined digital experiences for global SaaS and local businesses.",
+        "openGraph": {
+          "description": "Senior Frontend Developer in Zakopane specializing in high-performance Next.js apps and refined digital experiences for global SaaS and local businesses.",
+          "title": "Sebastian Kolbusz | Senior Frontend Specialist & Web Architect",
+          "url": "https://www.kolbusz.xyz/en",
+        },
         "title": {
           "absolute": "Sebastian Kolbusz | Senior Frontend Specialist & Web Architect",
         },
@@ -52,6 +57,11 @@ describe('page metadata', () => {
           },
         },
         "description": "Senior Frontend Developer in Zakopane specializing in high-performance Next.js apps and refined digital experiences for global SaaS and local businesses.",
+        "openGraph": {
+          "description": "Senior Frontend Developer in Zakopane specializing in high-performance Next.js apps and refined digital experiences for global SaaS and local businesses.",
+          "title": "Curriculum Vitae",
+          "url": "https://www.kolbusz.xyz/en/cv",
+        },
         "title": "Curriculum Vitae",
       }
     `)
@@ -74,6 +84,11 @@ describe('page metadata', () => {
           },
         },
         "description": "A collection of high-performance web applications and professional digital appearances.",
+        "openGraph": {
+          "description": "A collection of high-performance web applications and professional digital appearances.",
+          "title": "Selected Work",
+          "url": "https://www.kolbusz.xyz/en/projects",
+        },
         "title": "Selected Work",
       }
     `)
@@ -108,6 +123,7 @@ describe('page metadata', () => {
             "/images/projects/zakofy.avif",
           ],
           "title": "Zakofy",
+          "url": "https://www.kolbusz.xyz/en/projects/zakofy",
         },
         "other": {
           "article:section": "Offer Presentation",
