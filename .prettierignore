@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+.next/
+dist/
+build/
+
+# Testing
+coverage/
+test-results/
+
+# Assets
+public/
+
+# Package managers
+pnpm-lock.yaml
+
+# System files
+.DS_Store
