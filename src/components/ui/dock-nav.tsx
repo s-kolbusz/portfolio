@@ -152,7 +152,7 @@ export function DockNav() {
         ref={dockRef}
         className="dock-nav glass fixed top-1/2 right-6 z-40 hidden -translate-y-1/2 flex-col gap-3 p-3 lg:flex"
         role="navigation"
-        aria-label="Main navigation"
+        aria-label={t('main_navigation')}
         onPointerMove={handleDesktopPointerMove}
         onPointerLeave={handleDesktopPointerLeave}
       >
