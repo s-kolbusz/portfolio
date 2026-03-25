@@ -62,7 +62,7 @@ export const About: React.FC = () => {
         {/* Signature / Philosophy Marker */}
         <div className="border-primary mt-8 border-l-2 pl-6">
           <p className="text-primary mb-2 font-mono text-sm">{t('philosophy_label')}</p>
-          <p className="text-foreground font-serif text-xl italic">{t('philosophy.details')}</p>
+          <p className="text-foreground font-serif text-xl italic">{t('philosophy.quote')}</p>
         </div>
 
         {/* SEO Depth: Progressive Disclosure */}

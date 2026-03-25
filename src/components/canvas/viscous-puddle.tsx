@@ -2,14 +2,20 @@
 
 import { useCallback, useEffect, useRef } from 'react'
 
-import { useTheme } from 'next-themes'
-
 import { usePrefersReducedMotion } from '@/hooks/use-media'
 
-import { disposePuddleWebGL, hexToRgb, lerp, setupPuddleWebGL } from './viscous-puddle/webgl'
+import { disposePuddleWebGL, lerp, setupPuddleWebGL } from './viscous-puddle/webgl'
 
-const LIGHT_COLOR = hexToRgb('#7ec58e')
-const DARK_COLOR = hexToRgb('#135534')
+/** Read `--primary-rgb` CSS custom property → [r, g, b] floats (0-1). */
+function getPrimaryRgb(): [number, number, number] {
+  const raw = getComputedStyle(document.documentElement).getPropertyValue('--primary-rgb').trim()
+  const parts = raw.split(/\s+/).map(Number)
+  if (parts.length === 3 && parts.every((n) => !Number.isNaN(n))) {
+    return parts as [number, number, number]
+  }
+  // Fallback if token is missing
+  return [0.494, 0.773, 0.557]
+}
 
 interface PuddleState {
   mouseX: number
@@ -41,9 +47,9 @@ function createInitialState(): PuddleState {
     isInView: true,
     lerpScroll: 0,
     time: 0,
-    colorR: LIGHT_COLOR[0],
-    colorG: LIGHT_COLOR[1],
-    colorB: LIGHT_COLOR[2],
+    colorR: 0.494,
+    colorG: 0.773,
+    colorB: 0.557,
     scale: 1,
     opacity: 0,
     cssTranslateY: 0,
@@ -53,16 +59,10 @@ function createInitialState(): PuddleState {
 
 export function ViscousPuddle() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const { resolvedTheme } = useTheme()
   const prefersReducedMotion = usePrefersReducedMotion()
 
   const stateRef = useRef<PuddleState>(createInitialState())
-  const themeRef = useRef(resolvedTheme)
   const reducedMotionRef = useRef(prefersReducedMotion)
-
-  useEffect(() => {
-    themeRef.current = resolvedTheme
-  }, [resolvedTheme])
 
   useEffect(() => {
     reducedMotionRef.current = prefersReducedMotion
@@ -150,7 +150,7 @@ export function ViscousPuddle() {
       const targetScale = state.isMobile ? 0.6 : 1
       state.scale = lerp(state.scale, targetScale, 0.1)
 
-      const targetColor = themeRef.current === 'dark' ? DARK_COLOR : LIGHT_COLOR
+      const targetColor = getPrimaryRgb()
       state.colorR = lerp(state.colorR, targetColor[0], 0.05)
       state.colorG = lerp(state.colorG, targetColor[1], 0.05)
       state.colorB = lerp(state.colorB, targetColor[2], 0.05)

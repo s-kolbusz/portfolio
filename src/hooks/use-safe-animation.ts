@@ -25,8 +25,6 @@ export const useSafeAnimation = () => {
     },
     ease: {
       ...ANIMATION.ease,
-      elastic: 'power2.out',
-      back: 'power2.out',
     },
   }
 }

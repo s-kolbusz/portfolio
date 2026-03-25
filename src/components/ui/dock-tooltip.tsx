@@ -19,7 +19,7 @@ export function DockTooltip({ label, isVisible }: DockTooltipProps) {
         opacity: 1,
         scale: 1,
         duration: 0.3,
-        ease: 'back.out(1.7)',
+        ease: 'power3.out',
         overwrite: true,
       })
     } else {
@@ -37,7 +37,7 @@ export function DockTooltip({ label, isVisible }: DockTooltipProps) {
   return (
     <div
       ref={tooltipRef}
-      className="border-border pointer-events-none absolute right-full mr-2 hidden rounded-lg border bg-white px-3 py-1.5 font-mono text-sm whitespace-nowrap text-neutral-800 opacity-0 lg:block dark:bg-black dark:text-neutral-200"
+      className="bg-card text-card-foreground border-border pointer-events-none absolute right-full mr-2 hidden rounded-lg border px-3 py-1.5 font-mono text-sm whitespace-nowrap opacity-0 lg:block"
     >
       {label}
     </div>

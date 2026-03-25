@@ -7,7 +7,9 @@
     "description": "Senior Frontend Developer z Zakopanego, specjalizujący się w wysokowydajnych aplikacjach Next.js i dopracowanych doświadczeniach cyfrowych dla globalnych SaaS oraz lokalnych firm."
   },
   "actions": {
-    "skip_to_main": "Przejdź do treści"
+    "skip_to_main": "Przejdź do treści",
+    "toggle_theme": "Zmień motyw",
+    "switch_language": "Zmień język"
   },
   "nav": {
     "hero": "Start",
@@ -59,7 +61,8 @@
     "philosophy": {
       "title": "Mentalność Techniczna",
       "details": "Stawiam na prostotę, wydajność i dostępną architekturę. Buduję systemy, w których niezawodność i czysty kod są fundamentem zaufania do marki.",
-      "craft_details": "Traktuję tworzenie stron jako rzemiosło. Chodzi o budowanie środowisk cyfrowych, które są solidne, responsywne i dopracowane wizualnie."
+      "craft_details": "Traktuję tworzenie stron jako rzemiosło. Chodzi o budowanie środowisk cyfrowych, które są solidne, responsywne i dopracowane wizualnie.",
+      "quote": "Prostota jest najwyższym wyrafinowaniem. Każda linia kodu powinna zasłużyć na swoje miejsce."
     },
     "skills": {
       "title": "Zestaw Narzędzi"
@@ -306,7 +309,17 @@
       "nextProjectLabel": "Następny Projekt",
       "prevProjectLabel": "Poprzedni Projekt",
       "viewImageLabel": "Zobacz w wysokiej rozdzielczości"
-    }
+    },
+    "prevPage": "Poprzednia strona",
+    "nextPage": "Następna strona",
+    "bookPages": "Strony książki",
+    "pageNumber": "Strona {page}"
+  },
+  "lightbox": {
+    "title": "Powiększenie zdjęcia",
+    "close": "Zamknij powiększenie",
+    "previous": "Poprzednie zdjęcie",
+    "next": "Następne zdjęcie"
   },
   "footer": {
     "copyright": "© {year} Sebastian Kolbusz. Engineered for performance."

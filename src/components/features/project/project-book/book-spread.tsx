@@ -72,7 +72,7 @@ export function BookSpread({ entry, index }: BookSpreadProps) {
           scale: 1,
           pointerEvents: 'auto',
           duration: ANIMATION.duration.fast,
-          ease: ANIMATION.ease.back,
+          ease: ANIMATION.ease.outStrong,
           stagger: ANIMATION.stagger.tight,
         },
         '-=0.4'

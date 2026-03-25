@@ -1,6 +1,6 @@
 'use client'
 
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useTheme } from 'next-themes'
 
 import { MoonIcon, SunIcon } from '@phosphor-icons/react'
@@ -13,6 +13,7 @@ export function SettingsDock() {
   const locale = useLocale()
   const router = useRouter()
   const pathname = usePathname()
+  const t = useTranslations('actions')
 
   const toggleTheme = () => {
     if (!resolvedTheme) return
@@ -28,7 +29,7 @@ export function SettingsDock() {
   return (
     <div className="settings-dock glass fixed top-6 right-6 z-50 flex items-center gap-1 p-1.5">
       {/* Theme Toggle */}
-      <Button variant="glass" size="icon" onClick={toggleTheme} aria-label="Toggle theme">
+      <Button variant="glass" size="icon" onClick={toggleTheme} aria-label={t('toggle_theme')}>
         {resolvedTheme === 'dark' ? (
           <MoonIcon weight="duotone" className="h-5 w-5" />
         ) : (
@@ -39,7 +40,7 @@ export function SettingsDock() {
       <div className="bg-border h-4 w-px" />
 
       {/* Language Switcher */}
-      <Button variant="glass" size="icon" onClick={toggleLocale} aria-label="Switch language">
+      <Button variant="glass" size="icon" onClick={toggleLocale} aria-label={t('switch_language')}>
         {locale.toUpperCase()}
       </Button>
     </div>

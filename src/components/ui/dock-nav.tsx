@@ -103,12 +103,11 @@ export function DockNav() {
       <nav
         ref={dockRef}
         className="dock-nav glass fixed top-1/2 right-6 z-40 hidden -translate-y-1/2 flex-col gap-3 p-3 lg:flex"
-        role="navigation"
-        aria-label="Main navigation"
+        aria-label={t('hero')}
       >
         <div
           ref={indicatorRef}
-          className="absolute top-0 -right-1 h-8 w-1 -translate-y-1/2 rounded-full bg-emerald-500 opacity-0 shadow-lg shadow-emerald-500"
+          className="bg-primary shadow-primary absolute top-0 -right-1 h-8 w-1 -translate-y-1/2 rounded-full opacity-0 shadow-lg"
         />
 
         {NAV_ITEMS.map((item, index) => (
@@ -133,12 +132,11 @@ export function DockNav() {
       <nav
         ref={mobileDockRef}
         className="dock-nav glass fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 p-2 lg:hidden"
-        role="navigation"
-        aria-label="Mobile navigation"
+        aria-label={t('hero')}
       >
         <div
           ref={mobileIndicatorRef}
-          className="absolute -bottom-1 left-0 h-1 w-8 -translate-x-1/2 rounded-full bg-emerald-500 opacity-0 shadow-lg shadow-emerald-500"
+          className="bg-primary shadow-primary absolute -bottom-1 left-0 h-1 w-8 -translate-x-1/2 rounded-full opacity-0 shadow-lg"
         />
 
         {NAV_ITEMS.map((item, index) => (

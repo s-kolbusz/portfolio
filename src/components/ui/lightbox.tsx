@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
 
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 
 import { ArrowLeftIcon, ArrowRightIcon, XIcon } from '@phosphor-icons/react'
@@ -26,6 +27,7 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
   const [direction, setDirection] = useState(0) // -1 for prev, 1 for next, 0 for initial
   const overlayRef = useRef<HTMLDivElement>(null)
   const imageRef = useRef<HTMLDivElement>(null)
+  const t = useTranslations('lightbox')
 
   // Ref to store the element that had focus before opening the lightbox
   const previousFocus = useRef<HTMLElement | null>(null)
@@ -91,7 +93,7 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
       ).fromTo(
         imageRef.current,
         { opacity: 0, scale: 0.95 },
-        { opacity: 1, scale: 1, duration: 0.4, ease: 'back.out(1.2)' },
+        { opacity: 1, scale: 1, duration: 0.4, ease: 'power3.out' },
         '-=0.3'
       )
     },
@@ -139,7 +141,7 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
       ref={overlayRef}
       role="dialog"
       aria-modal="true"
-      aria-label="Image lightbox"
+      aria-label={t('title')}
       tabIndex={-1}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 outline-none sm:p-8"
       onClick={(e) => {
@@ -158,7 +160,7 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
           variant="outline-glass"
           size="icon"
           onClick={onClose}
-          aria-label="Close lightbox"
+          aria-label={t('close')}
           className="rounded-full border-transparent bg-white/10 p-2 text-white hover:bg-white/20 focus-visible:rounded-full! focus-visible:ring-offset-0!"
         >
           <XIcon weight="bold" className="size-5" />
@@ -174,7 +176,7 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
           showPrev()
         }}
         className="absolute top-1/2 left-4 z-10 -translate-y-1/2 rounded-full border-transparent bg-white/10 p-3 text-white hover:bg-white/20 focus-visible:rounded-full! focus-visible:ring-offset-0! sm:left-8"
-        aria-label="Previous image"
+        aria-label={t('previous')}
       >
         <ArrowLeftIcon weight="bold" className="size-6" />
       </Button>
@@ -187,7 +189,7 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
           showNext()
         }}
         className="absolute top-1/2 right-4 z-10 -translate-y-1/2 rounded-full border-transparent bg-white/10 p-3 text-white hover:bg-white/20 focus-visible:rounded-full! focus-visible:ring-offset-0! sm:right-8"
-        aria-label="Next image"
+        aria-label={t('next')}
       >
         <ArrowRightIcon weight="bold" className="size-6" />
       </Button>

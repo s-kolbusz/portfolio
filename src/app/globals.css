@@ -49,6 +49,9 @@
 
   /* Radius tokens (shadcn-compatible) */
   --radius: 0.5rem;
+
+  /* WebGL-friendly RGB (0-1 range) for shader uniforms */
+  --primary-rgb: 0.494 0.773 0.557;
 }
 
 /* Dark Theme */
@@ -87,6 +90,9 @@
   --input: oklch(0.28 0.008 65);
   --ring: oklch(0.78 0.17 162);
   --cursor: oklch(0.78 0.17 162);
+
+  /* WebGL-friendly RGB (0-1 range) for shader uniforms */
+  --primary-rgb: 0.075 0.333 0.204;
 }
 
 /* Tailwind CSS 4 Theme Configuration */

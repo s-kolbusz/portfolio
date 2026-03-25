@@ -34,7 +34,7 @@ export const AnimatedNumber = ({
     gsap.to(valueRef, {
       current: value,
       duration: ANIMATION.duration.fast,
-      ease: ANIMATION.ease.elastic,
+      ease: ANIMATION.ease.out,
       onUpdate: () => {
         if (ref.current) {
           ref.current.textContent = formatter(valueRef.current).toString()

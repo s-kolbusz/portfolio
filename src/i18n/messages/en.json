@@ -7,7 +7,9 @@
     "description": "Senior Frontend Developer in Zakopane specializing in high-performance Next.js apps and refined digital experiences for global SaaS and local businesses."
   },
   "actions": {
-    "skip_to_main": "Skip to main content"
+    "skip_to_main": "Skip to main content",
+    "toggle_theme": "Toggle theme",
+    "switch_language": "Switch language"
   },
   "nav": {
     "hero": "Home",
@@ -59,7 +61,8 @@
     "philosophy": {
       "title": "Technical Mindset",
       "details": "I focus on simplicity, performance, and accessible architecture. I build systems where reliability and clean code are the foundation of brand trust.",
-      "craft_details": "I treat web development as a craft. It's about creating digital environments that are solid, responsive, and visually polished."
+      "craft_details": "I treat web development as a craft. It's about creating digital environments that are solid, responsive, and visually polished.",
+      "quote": "Simplicity is the ultimate sophistication. Every line of code should earn its place."
     },
     "skills": {
       "title": "Technical Toolkit"
@@ -306,7 +309,17 @@
       "nextProjectLabel": "Next Project",
       "prevProjectLabel": "Previous Project",
       "viewImageLabel": "View High-Res"
-    }
+    },
+    "prevPage": "Previous page",
+    "nextPage": "Next page",
+    "bookPages": "Book pages",
+    "pageNumber": "Page {page}"
+  },
+  "lightbox": {
+    "title": "Image lightbox",
+    "close": "Close lightbox",
+    "previous": "Previous image",
+    "next": "Next image"
   },
   "footer": {
     "copyright": "© {year} Sebastian Kolbusz. Engineered for performance."
