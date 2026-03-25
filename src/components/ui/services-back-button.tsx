@@ -19,7 +19,7 @@ export function ServicesBackButton() {
   return (
     <div className="pointer-events-none fixed top-6 left-6 z-50">
       <Button
-        variant="outline"
+        variant="outline-glass"
         size="md"
         onClick={() => router.back()}
         className="pointer-events-auto shadow-xl"

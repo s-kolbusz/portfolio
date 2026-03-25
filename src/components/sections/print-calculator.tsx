@@ -29,7 +29,7 @@ export const PrintCalculator = () => {
       duration: ANIMATION.duration.slow,
       ease: ANIMATION.ease.inOut,
     })
-    reveal(ctaRef, { stagger: ANIMATION.stagger.slow })
+    reveal(ctaRef, { self: true, stagger: ANIMATION.stagger.slow })
   })
 
   return (

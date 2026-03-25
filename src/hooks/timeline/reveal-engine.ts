@@ -16,7 +16,7 @@ export interface RevealAnimationTokens {
 }
 
 export const REVEAL = {
-  y: 40,
+  y: 100,
   stagger: ANIMATION.stagger.normal,
   duration: ANIMATION.duration.medium,
   ease: ANIMATION.ease.out,
