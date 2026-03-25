@@ -49,7 +49,7 @@ describe('DockNav', () => {
 
   it('renders navigation items', () => {
     render(<DockNav />)
-    expect(screen.getByLabelText('Main navigation')).toBeInTheDocument()
+    expect(screen.getAllByLabelText('main_navigation').length).toBeGreaterThan(0)
     // Check for some known items (keys from translations mock)
     expect(screen.getAllByLabelText('hero')).toHaveLength(2) // Mobile and desktop
   })

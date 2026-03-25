@@ -30,3 +30,9 @@ if (typeof window !== 'undefined') {
 afterEach(() => {
   cleanup()
 })
+
+// Mock next-intl globally so tests using useTranslations don't fail without the provider context
+vi.mock('next-intl', () => ({
+  useTranslations: vi.fn(() => (key: string) => key),
+  useLocale: vi.fn(() => 'en'),
+}))

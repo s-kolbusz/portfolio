@@ -99,7 +99,7 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
             </Link>
 
             {/* Image — compact, flush edges */}
-            <div className="relative mt-4 aspect-video w-full overflow-hidden bg-neutral-100 dark:bg-neutral-900">
+            <div className="bg-muted relative mt-4 aspect-video w-full overflow-hidden">
               <Image
                 src={entry.heroImage}
                 alt={entry.title}

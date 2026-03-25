@@ -17,6 +17,7 @@ vi.mock('next-themes', () => ({
 // Mock next-intl
 vi.mock('next-intl', () => ({
   useLocale: vi.fn(() => 'en'),
+  useTranslations: vi.fn(() => (key: string) => key),
 }))
 
 // Mock navigation
@@ -40,7 +41,7 @@ describe('SettingsDock', () => {
   it('toggles the theme from light to dark', () => {
     render(<SettingsDock />)
 
-    const themeButton = screen.getByLabelText('Toggle theme')
+    const themeButton = screen.getByLabelText('toggle_theme')
     fireEvent.click(themeButton)
 
     expect(setTheme).toHaveBeenCalledWith('dark')
@@ -54,7 +55,7 @@ describe('SettingsDock', () => {
 
     render(<SettingsDock />)
 
-    const themeButton = screen.getByLabelText('Toggle theme')
+    const themeButton = screen.getByLabelText('toggle_theme')
     fireEvent.click(themeButton)
 
     expect(setTheme).toHaveBeenCalledWith('light')
@@ -63,7 +64,7 @@ describe('SettingsDock', () => {
   it('switches the language when language button is clicked', () => {
     render(<SettingsDock />)
 
-    const langButton = screen.getByLabelText('Switch language')
+    const langButton = screen.getByLabelText('switch_language')
     expect(langButton).toHaveTextContent('EN')
 
     fireEvent.click(langButton)

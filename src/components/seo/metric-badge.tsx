@@ -23,26 +23,20 @@ export const MetricBadge = forwardRef<HTMLDivElement, MetricBadgeProps>(
       <div
         ref={ref}
         className={cn(
-          'flex flex-col gap-1 rounded-sm border border-emerald-500/20 bg-emerald-500/5 p-3 font-mono transition-colors hover:bg-emerald-500/10 dark:border-emerald-400/20 dark:bg-emerald-400/5',
+          'border-primary/20 bg-primary/5 hover:bg-primary/10 flex flex-col gap-1 rounded-sm border p-3 font-mono transition-colors',
           className
         )}
         aria-label={`${label}: ${value}${unit || ''}`}
       >
-        <span className="text-[10px] font-bold tracking-widest text-emerald-600 uppercase dark:text-emerald-400/80">
+        <span className="text-primary text-[10px] font-bold tracking-widest uppercase">
           {label}
         </span>
         <div className="flex items-baseline gap-0.5">
-          <span className="text-2xl font-light tracking-tighter text-emerald-700 dark:text-emerald-300">
-            {value}
-          </span>
-          {unit && (
-            <span className="text-xs font-medium text-emerald-600/60 dark:text-emerald-400/40">
-              {unit}
-            </span>
-          )}
+          <span className="text-primary text-2xl font-light tracking-tighter">{value}</span>
+          {unit && <span className="text-primary/60 text-xs font-medium">{unit}</span>}
         </div>
         {description && (
-          <span className="mt-1 text-[10px] leading-tight text-neutral-500 dark:text-neutral-400">
+          <span className="text-muted-foreground mt-1 text-[10px] leading-tight">
             {description}
           </span>
         )}

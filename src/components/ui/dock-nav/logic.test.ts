@@ -58,7 +58,7 @@ describe('dock-nav logic', () => {
 
   it('computes mobile indicator offset with page separator accounted for', () => {
     const cvIndex = NAV_ITEMS.findIndex((item) => item.id === 'cv')
-    expect(getMobileIndicatorOffset(cvIndex)).toBe(325)
+    expect(getMobileIndicatorOffset(cvIndex)).toBe(351)
   })
 
   it('computes hover scale based on index distance', () => {

@@ -91,7 +91,7 @@ export function ProjectAccordion({ project, isOpen, onAnimationComplete }: Proje
         </div>
 
         <div className="md:col-span-5">
-          <div className="relative aspect-4/3 w-full overflow-hidden bg-neutral-100 dark:bg-neutral-900">
+          <div className="bg-muted relative aspect-4/3 w-full overflow-hidden">
             <Image
               src={project.heroImage}
               alt={project.title}

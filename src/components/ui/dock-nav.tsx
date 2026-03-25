@@ -103,7 +103,7 @@ export function DockNav() {
       <nav
         ref={dockRef}
         className="dock-nav glass fixed top-1/2 right-6 z-40 hidden -translate-y-1/2 flex-col gap-3 p-3 lg:flex"
-        aria-label={t('hero')}
+        aria-label={t('main_navigation')}
       >
         <div
           ref={indicatorRef}
@@ -132,7 +132,7 @@ export function DockNav() {
       <nav
         ref={mobileDockRef}
         className="dock-nav glass fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 p-2 lg:hidden"
-        aria-label={t('hero')}
+        aria-label={t('main_navigation')}
       >
         <div
           ref={mobileIndicatorRef}

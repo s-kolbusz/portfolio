@@ -40,10 +40,10 @@ const DESKTOP_LAYOUT = {
 }
 
 const MOBILE_LAYOUT = {
-  itemSize: 40,
+  itemSize: 44,
   gap: 8,
   padding: 8,
-  centerOffset: 20,
+  centerOffset: 22,
   separatorSize: 1,
   separatorGap: 8,
 }

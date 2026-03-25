@@ -96,8 +96,7 @@ export function ProjectBook({ projects }: ProjectBookProps) {
 
   /* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */
   return (
-    <div
-      role="region"
+    <section
       aria-roledescription="carousel"
       aria-label="Project Book"
       tabIndex={0}
@@ -158,6 +157,6 @@ export function ProjectBook({ projects }: ProjectBookProps) {
 
       {/* Page dots */}
       <BookPageDots total={totalPanels} current={currentIndex} onSelect={scrollToPanel} />
-    </div>
+    </section>
   )
 }

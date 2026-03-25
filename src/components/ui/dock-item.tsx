@@ -73,14 +73,14 @@ export function DockItem({
       aria-current={ariaCurrent}
     >
       {/* Background hover effect */}
-      <div className="absolute inset-0 rounded-md bg-emerald-500/0 transition-colors duration-300 group-hover:bg-emerald-500/10" />
+      <div className="bg-primary/0 group-hover:bg-primary/10 absolute inset-0 rounded-md transition-colors duration-300" />
 
       <Icon
         weight="duotone"
         className={`relative z-10 h-6 w-6 transition-all duration-300 ${
           isActive
-            ? 'text-emerald-600 dark:text-emerald-400'
-            : 'opacity-60 group-hover:scale-110 group-hover:text-emerald-600 group-hover:opacity-100 dark:group-hover:text-emerald-400'
+            ? 'text-primary'
+            : 'group-hover:text-primary opacity-60 group-hover:scale-110 group-hover:opacity-100'
         }`}
       />
 

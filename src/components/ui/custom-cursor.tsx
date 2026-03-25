@@ -228,7 +228,7 @@ export function CustomCursor() {
       {/* Ring */}
       <div
         ref={ringRef}
-        className="border-cursor pointer-events-none fixed top-0 left-0 h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full border opacity-0 transition-colors will-change-transform"
+        className="border-cursor pointer-events-none fixed top-0 left-0 h-11 w-11 -translate-x-1/2 -translate-y-1/2 rounded-full border opacity-0 transition-colors will-change-transform"
       />
     </div>
   )

@@ -69,7 +69,7 @@ export function Button(props: ButtonProps) {
     sm: 'h-9 px-4 text-xs rounded-sm',
     md: 'h-11 px-6 text-sm rounded-md',
     lg: 'h-14 px-8 text-base rounded-lg',
-    icon: 'h-10 w-10 p-0 rounded-md',
+    icon: 'h-11 w-11 p-0 rounded-md',
   }
 
   const combinedClassName = cn(baseStyles, variants[variant], sizes[size], className)
