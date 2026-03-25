@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 
 import { ServicesContent } from '@/components/features/services/services-content'
+import { StructuredData } from '@/components/seo/structured-data'
 
 type Props = {
   params: Promise<{ locale: string }>
@@ -64,13 +65,11 @@ export default async function ServicesPage({ params }: Props) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+      <StructuredData
+        entries={[
+          { id: 'services-faq', data: faqSchema },
+          { id: 'services-business', data: localBusinessSchema },
+        ]}
       />
       <main className="bg-background flex min-h-screen flex-col">
         <ServicesContent />

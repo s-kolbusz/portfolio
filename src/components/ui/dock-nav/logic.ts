@@ -118,9 +118,30 @@ export function getHoverScale(index: number, hoveredIndex: number | null) {
   if (hoveredIndex === null) return 1
 
   const distance = Math.abs(index - hoveredIndex)
-  if (distance === 0) return 1.2
-  if (distance === 1) return 1.1
-  if (distance === 2) return 1.05
+  return Math.max(1, 1.18 - distance * 0.07)
+}
 
-  return 1
+export function getHoverProgress(pointerPosition: number, itemCenters: number[]) {
+  if (itemCenters.length === 0) return null
+
+  if (pointerPosition <= itemCenters[0]) {
+    return 0
+  }
+
+  const lastIndex = itemCenters.length - 1
+  if (pointerPosition >= itemCenters[lastIndex]) {
+    return lastIndex
+  }
+
+  for (let index = 0; index < lastIndex; index += 1) {
+    const start = itemCenters[index]
+    const end = itemCenters[index + 1]
+
+    if (pointerPosition >= start && pointerPosition <= end) {
+      const progress = (pointerPosition - start) / (end - start)
+      return index + progress
+    }
+  }
+
+  return lastIndex
 }

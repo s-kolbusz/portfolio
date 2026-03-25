@@ -115,6 +115,9 @@ export const metadata: Metadata = {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const shouldLoadVercelInsights =
+    process.env.NODE_ENV === 'production' && process.env.VERCEL === '1'
+
   return (
     <html lang={routing.defaultLocale} suppressHydrationWarning>
       <body
@@ -123,8 +126,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <JsonLd />
         {children}
 
-        <SpeedInsights />
-        <Analytics />
+        {shouldLoadVercelInsights ? (
+          <>
+            <SpeedInsights />
+            <Analytics />
+          </>
+        ) : null}
       </body>
     </html>
   )

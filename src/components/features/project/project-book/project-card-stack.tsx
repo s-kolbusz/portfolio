@@ -72,7 +72,7 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
 
       {/* Project list */}
       <div ref={listRef} className="divide-border divide-y">
-        {projects.map((entry) => (
+        {projects.map((entry, index) => (
           <article key={entry.id} data-stack-item className="group py-6 opacity-0 first:pt-0">
             {/* Title row */}
             <Link href={`/projects/${entry.id}`} className="flex items-start justify-between gap-3">
@@ -104,6 +104,7 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
                 src={entry.heroImage}
                 alt={entry.title}
                 fill
+                priority={index === 0}
                 sizes="(max-width: 1280px) 100vw, 1200px"
                 className="object-cover"
               />

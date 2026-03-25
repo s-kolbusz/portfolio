@@ -34,6 +34,10 @@ interface PuddleState {
   opacity: number
   cssTranslateY: number
   cssScale: number
+  canvasLeft: number
+  canvasTop: number
+  canvasWidth: number
+  canvasHeight: number
 }
 
 function createInitialState(): PuddleState {
@@ -54,6 +58,10 @@ function createInitialState(): PuddleState {
     opacity: 0,
     cssTranslateY: 0,
     cssScale: 1,
+    canvasLeft: 0,
+    canvasTop: 0,
+    canvasWidth: 0,
+    canvasHeight: 0,
   }
 }
 
@@ -68,13 +76,19 @@ export function ViscousPuddle() {
     reducedMotionRef.current = prefersReducedMotion
   }, [prefersReducedMotion])
 
-  const handleResize = useCallback((canvas: HTMLCanvasElement) => {
+  const syncCanvasMetrics = useCallback((canvas: HTMLCanvasElement) => {
     const dpr = Math.min(window.devicePixelRatio, 1.5)
-    const width = canvas.clientWidth
-    const height = canvas.clientHeight
+    const rect = canvas.getBoundingClientRect()
+    const width = rect.width
+    const height = rect.height
 
     canvas.width = Math.round(width * dpr)
     canvas.height = Math.round(height * dpr)
+
+    stateRef.current.canvasLeft = rect.left
+    stateRef.current.canvasTop = rect.top + window.scrollY - stateRef.current.cssTranslateY
+    stateRef.current.canvasWidth = width
+    stateRef.current.canvasHeight = height
     stateRef.current.isMobile = width < 768
   }, [])
 
@@ -90,7 +104,7 @@ export function ViscousPuddle() {
 
     const { gl, vao, uniforms } = webgl
 
-    handleResize(canvas)
+    syncCanvasMetrics(canvas)
     requestAnimationFrame(() => {
       canvas.style.opacity = '1'
     })
@@ -104,10 +118,20 @@ export function ViscousPuddle() {
     observer.observe(canvas)
 
     const onMouseMove = (event: MouseEvent) => {
+      const state = stateRef.current
+      if (!state.isInView || state.canvasWidth === 0 || state.canvasHeight === 0) return
+
+      const canvasTop = state.canvasTop - window.scrollY + state.cssTranslateY
+
       stateRef.current.pointerInside = true
-      const rect = canvas.getBoundingClientRect()
-      stateRef.current.targetMouseX = (event.clientX - rect.left) / rect.width
-      stateRef.current.targetMouseY = 1 - (event.clientY - rect.top) / rect.height
+      stateRef.current.targetMouseX = Math.min(
+        1,
+        Math.max(0, (event.clientX - state.canvasLeft) / state.canvasWidth)
+      )
+      stateRef.current.targetMouseY = Math.min(
+        1,
+        Math.max(0, 1 - (event.clientY - canvasTop) / state.canvasHeight)
+      )
     }
 
     const onMouseLeave = () => {
@@ -122,7 +146,12 @@ export function ViscousPuddle() {
     document.addEventListener('mouseleave', onMouseLeave)
     document.addEventListener('mouseenter', onMouseEnter)
 
-    const onResize = () => handleResize(canvas)
+    const resizeObserver = new ResizeObserver(() => {
+      syncCanvasMetrics(canvas)
+    })
+    resizeObserver.observe(canvas)
+
+    const onResize = () => syncCanvasMetrics(canvas)
     window.addEventListener('resize', onResize)
 
     let raf = 0
@@ -165,7 +194,7 @@ export function ViscousPuddle() {
 
       if (!reducedMotionRef.current) {
         const rawScroll = window.scrollY
-        const clampedScroll = Math.min(rawScroll, canvas.clientHeight * 1.5)
+        const clampedScroll = Math.min(rawScroll, state.canvasHeight * 1.5)
 
         state.lerpScroll = lerp(state.lerpScroll, clampedScroll, 0.15)
         if (Math.abs(state.lerpScroll - clampedScroll) < 0.1) {
@@ -187,7 +216,7 @@ export function ViscousPuddle() {
 
       gl.uniform1f(uniforms.uTime, state.time)
       gl.uniform2f(uniforms.uMouse, state.mouseX, state.mouseY)
-      gl.uniform2f(uniforms.uResolution, canvas.clientWidth, canvas.clientHeight)
+      gl.uniform2f(uniforms.uResolution, state.canvasWidth, state.canvasHeight)
       gl.uniform3f(uniforms.uColor, state.colorR, state.colorG, state.colorB)
       gl.uniform1f(uniforms.uScale, state.scale)
       gl.uniform1f(uniforms.uOpacity, state.opacity)
@@ -202,13 +231,14 @@ export function ViscousPuddle() {
     return () => {
       cancelAnimationFrame(raf)
       observer.disconnect()
+      resizeObserver.disconnect()
       window.removeEventListener('mousemove', onMouseMove)
       document.removeEventListener('mouseleave', onMouseLeave)
       document.removeEventListener('mouseenter', onMouseEnter)
       window.removeEventListener('resize', onResize)
       disposePuddleWebGL(webgl)
     }
-  }, [handleResize])
+  }, [syncCanvasMetrics])
 
   return (
     <canvas

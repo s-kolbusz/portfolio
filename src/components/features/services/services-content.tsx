@@ -12,15 +12,19 @@ import { EditorialHeader } from '@/components/ui/editorial-header'
 import { FaqAccordion } from '@/components/ui/faq-accordion'
 import { services } from '@/data/services'
 import { useTimeline } from '@/hooks/timeline'
+import { useSafeAnimation } from '@/hooks/use-safe-animation'
 import { cn } from '@/lib/cn'
 
 export function ServicesContent() {
   const t = useTranslations('services_page')
   const tServices = useTranslations('services')
 
+  const animation = useSafeAnimation()
+
   const sectionRef = useRef<HTMLElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
   const introRef = useRef<HTMLDivElement>(null)
+  const servicesRef = useRef<HTMLDivElement>(null)
   const trustRef = useRef<HTMLDivElement>(null)
   const faqRef = useRef<HTMLDivElement>(null)
 
@@ -33,10 +37,18 @@ export function ServicesContent() {
 
     // Reveal each service individually as it enters the viewport
     serviceRefs.current.forEach((ref) => {
-      if (ref) reveal({ current: ref }, { y: 100 })
+      if (ref) {
+        reveal(ref, { y: 100, self: true, duration: animation.duration.medium })
+        reveal(ref, {
+          y: 200,
+          stagger: animation.stagger.normal,
+          duration: animation.duration.slow,
+        })
+      }
     })
 
-    reveal(trustRef, { y: 50 })
+    reveal(trustRef, { y: 150, self: true, duration: animation.duration.slow })
+    reveal(trustRef, { y: 250, duration: animation.duration.slow })
     reveal(faqRef, { y: 30 })
   })
 
@@ -70,7 +82,7 @@ export function ServicesContent() {
           <h2 className="font-serif text-3xl font-light md:text-4xl">{t('h2_offer')}</h2>
         </div>
 
-        <div className="mt-8 flex flex-col gap-24 lg:gap-32">
+        <div ref={servicesRef} className="mt-8 flex flex-col gap-24 lg:gap-32">
           {services.map((service, index) => {
             const isPopular = service.popular
             const isEven = index % 2 !== 0

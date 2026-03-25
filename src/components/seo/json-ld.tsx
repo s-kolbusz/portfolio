@@ -1,5 +1,6 @@
-import { serializeJsonLd } from '@/lib/serialize-json-ld'
 import { SITE_AUTHOR, SITE_NAME, SITE_ORIGIN } from '@/lib/site'
+
+import { StructuredData } from './structured-data'
 
 export const JsonLd = () => {
   const personSchema = {
@@ -37,15 +38,11 @@ export const JsonLd = () => {
   }
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(personSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(websiteSchema) }}
-      />
-    </>
+    <StructuredData
+      entries={[
+        { id: 'person', data: personSchema },
+        { id: 'website', data: websiteSchema },
+      ]}
+    />
   )
 }

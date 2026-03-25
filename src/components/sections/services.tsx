@@ -11,22 +11,37 @@ import { Button } from '@/components/ui/button'
 import { EditorialHeader } from '@/components/ui/editorial-header'
 import { services } from '@/data/services'
 import { useTimeline } from '@/hooks/timeline'
-import { cn } from '@/lib/cn'
 import { ANIMATION } from '@/lib/constants/animations'
 
 export function Services() {
   const t = useTranslations('services')
   const sectionRef = useRef<HTMLElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
-  const gridRef = useRef<HTMLDivElement>(null)
+  const primaryServiceRef = useRef<HTMLElement>(null)
+  const secondaryServicesRef = useRef<(HTMLElement | null)[]>([])
   const viewAllServicesRef = useRef<HTMLDivElement>(null)
   const processRef = useRef<HTMLDivElement>(null)
   const processStepsRef = useRef<HTMLDivElement>(null)
+  const featuredService = services.find((service) => service.popular) ?? services[0]
+  const secondaryServices = services.filter((service) => service.id !== featuredService.id)
+  const featuredSplitLayout = 'lg:grid-cols-[minmax(0,1fr)_minmax(14rem,16rem)]'
 
   useTimeline(sectionRef, { id: 'services' }, (reveal) => {
     reveal(headerRef)
-    reveal(gridRef, { y: 100, stagger: ANIMATION.stagger.slow })
-    reveal(viewAllServicesRef, { y: 100, delay: ANIMATION.delay.short })
+    reveal(primaryServiceRef, { y: 0, x: -100, self: true, duration: ANIMATION.duration.medium })
+
+    secondaryServicesRef.current.forEach((ref) => {
+      if (!ref) return
+      reveal(ref, {
+        y: 0,
+        x: 100,
+        self: true,
+        duration: ANIMATION.duration.medium,
+      })
+    })
+
+    reveal(viewAllServicesRef, { self: true, y: 100, delay: ANIMATION.delay.short })
+    reveal(processRef, { self: true, delay: ANIMATION.delay.medium })
     reveal(processRef, { stagger: ANIMATION.stagger.slow })
     reveal(processStepsRef, { stagger: ANIMATION.stagger.slow })
   })
@@ -41,95 +56,143 @@ export function Services() {
         tagline={t('limited_availability')}
       />
 
-      {/* Adjusted Grid: Show all 4 in a row on large screens */}
-      <div ref={gridRef} className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4 xl:gap-4">
-        {services.map((service) => {
-          const isPopular = service.popular
-          return (
-            <div
-              key={service.id}
-              className={cn(
-                'group bg-card hover:shadow-primary/5 relative flex flex-col justify-between gap-10 border p-8 text-left transition-[color,border-color,box-shadow] duration-500 hover:shadow-2xl md:p-10',
-                isPopular
-                  ? 'border-primary/50 shadow-primary/5 hover:border-primary shadow-lg'
-                  : 'border-border hover:border-primary/50'
-              )}
-            >
-              {/* Popular Badge */}
-              {isPopular && (
-                <div className="bg-primary text-primary-foreground absolute -top-3 left-8 flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold tracking-widest uppercase shadow-md transition-transform group-hover:-translate-y-1">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-12 xl:gap-8">
+        <article
+          ref={primaryServiceRef}
+          className="border-border bg-card/60 relative overflow-hidden border px-8 py-10 md:px-10 md:py-12 xl:col-span-7"
+        >
+          <div className="bg-primary/8 pointer-events-none absolute -top-16 -right-20 size-72 rounded-full blur-3xl" />
+          <div className="relative flex h-full flex-col justify-between gap-10">
+            <div className="flex flex-col gap-10">
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-primary/30 h-px w-8" />
+                  <span className="text-muted-foreground font-mono text-[10px] font-bold tracking-[0.2em] uppercase">
+                    {t(`${featuredService.id}.label`)}
+                  </span>
+                </div>
+                <div className="border-primary/20 bg-accent text-primary inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[10px] font-bold tracking-widest uppercase">
                   <StarIcon weight="fill" className="size-3" />
                   {t('popular_badge')}
                 </div>
-              )}
+              </div>
 
-              {/* Content Section */}
-              <div className="flex flex-col gap-8">
-                {/* 1. Label */}
-                <div className="flex items-center gap-3">
-                  <div className="bg-primary/30 h-px w-6" />
-                  <span className="text-muted-foreground group-hover:text-primary font-mono text-[10px] font-bold tracking-[0.2em] uppercase transition-colors">
-                    {t(`${service.id}.label`)}
-                  </span>
+              <div className={`grid gap-10 lg:gap-8 ${featuredSplitLayout} lg:items-start`}>
+                <div className="flex min-w-0 flex-col gap-5">
+                  <h3 className="text-foreground max-w-3xl font-serif text-3xl leading-tight font-light text-balance md:text-5xl">
+                    {t(`${featuredService.id}.title`)}
+                  </h3>
+                  <p className="text-muted-foreground max-w-2xl font-sans text-base leading-relaxed md:text-lg">
+                    {t(`${featuredService.id}.description`)}
+                  </p>
                 </div>
 
-                {/* 2. Price & Pricing Type - Consistent Layout */}
-                <div className="flex flex-col gap-2">
-                  <span className="text-primary font-serif text-4xl font-medium whitespace-nowrap md:text-5xl">
-                    {t(`${service.id}.price`)}
+                <div className="border-primary/20 flex min-w-0 flex-col gap-3 border-t pt-5 lg:h-full lg:border-t-0 lg:border-l lg:pt-0 lg:pl-8">
+                  <span className="text-primary font-serif text-4xl font-medium text-balance md:text-5xl">
+                    {t(`${featuredService.id}.price`)}
                   </span>
-                  <span className="text-muted-foreground border-primary/20 border-l-2 pl-3 font-mono text-[10px] font-medium tracking-wider uppercase">
-                    {t(`${service.id}.unit`)}
+                  <span className="text-muted-foreground font-mono text-[10px] leading-relaxed font-medium tracking-wider uppercase">
+                    {t(`${featuredService.id}.unit`)}
                   </span>
                 </div>
+              </div>
+            </div>
 
-                {/* 3. Psychological Subtitle */}
-                <h3 className="text-foreground font-serif text-2xl leading-tight font-light md:text-3xl">
-                  {t(`${service.id}.title`)}
-                </h3>
-
-                {/* Features List */}
-                <ul className="border-border flex flex-col gap-3 border-t pt-6">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <li key={i} className="flex items-start gap-2.5">
-                      <CheckIcon
-                        className={cn(
-                          'mt-1 size-3 shrink-0 transition-all',
-                          isPopular
-                            ? 'text-primary opacity-100'
-                            : 'text-primary opacity-50 group-hover:opacity-100'
-                        )}
-                        weight="bold"
-                      />
-                      <span className="text-muted-foreground group-hover:text-foreground font-sans text-sm transition-colors">
-                        {t(`${service.id}.features.${i}`)}
+            <div className="border-border/70 border-t pt-8">
+              <div className={`grid gap-8 lg:gap-8 ${featuredSplitLayout} lg:items-end`}>
+                <ul className="grid gap-3 sm:grid-cols-2">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <CheckIcon className="text-primary mt-1 size-3 shrink-0" weight="bold" />
+                      <span className="text-muted-foreground font-sans text-sm leading-relaxed md:text-base">
+                        {t(`${featuredService.id}.features.${i}`)}
                       </span>
                     </li>
                   ))}
                 </ul>
+
+                <div className="lg:border-border/70 flex flex-col gap-5 lg:h-full lg:border-l lg:pl-8">
+                  <p className="text-muted-foreground font-sans text-sm leading-relaxed md:text-base">
+                    {t(`${featuredService.id}.ideal_for`)}
+                  </p>
+                  <Button
+                    href="#contact"
+                    variant="primary"
+                    size="sm"
+                    className="w-full justify-between sm:w-auto"
+                    rightIcon={<ArrowRightIcon className="size-3.5" weight="bold" />}
+                  >
+                    <span className="font-mono text-[10px] font-bold tracking-widest uppercase">
+                      {t(`${featuredService.id}.cta`)}
+                    </span>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <div className="flex flex-col gap-4 xl:col-span-5">
+          {secondaryServices.map((service, index) => (
+            <article
+              ref={(el) => {
+                secondaryServicesRef.current[index] = el
+              }}
+              key={service.id}
+              className="border-border bg-card/45 hover:border-primary/30 hover:bg-card/70 relative flex flex-col gap-6 border px-7 py-8 transition-[border-color,background-color] duration-300"
+            >
+              <div className="bg-primary/15 absolute inset-y-0 left-0 w-px" />
+
+              <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                <div className="flex min-w-0 flex-col gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-primary/25 h-px w-6" />
+                    <span className="text-muted-foreground font-mono text-[10px] font-bold tracking-[0.18em] uppercase">
+                      {t(`${service.id}.label`)}
+                    </span>
+                  </div>
+                  <h3 className="text-foreground font-serif text-2xl leading-tight font-light text-balance md:text-[2rem]">
+                    {t(`${service.id}.title`)}
+                  </h3>
+                </div>
+
+                <div className="flex flex-col gap-1 sm:shrink-0 sm:items-end sm:text-right">
+                  <span className="text-primary font-serif text-3xl font-medium text-balance">
+                    {t(`${service.id}.price`)}
+                  </span>
+                  <span className="text-muted-foreground font-mono text-[10px] leading-relaxed tracking-wider uppercase">
+                    {t(`${service.id}.unit`)}
+                  </span>
+                </div>
               </div>
 
-              {/* CTA Button */}
-              <div className="mt-auto pt-4">
+              <p className="text-muted-foreground max-w-xl font-sans text-sm leading-relaxed md:text-base">
+                {t(`${service.id}.ideal_for`)}
+              </p>
+
+              <div className="border-border/60 flex flex-col items-start gap-3 border-t pt-5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                <span className="text-foreground/80 font-mono text-[10px] leading-relaxed tracking-[0.16em] uppercase">
+                  {t(`${service.id}.features.0`)}
+                </span>
                 <Button
                   href="#contact"
-                  variant={isPopular ? 'primary' : 'outline'}
+                  variant="ghost"
                   size="sm"
-                  className="w-full justify-between"
+                  className="text-[11px] sm:self-auto"
                   rightIcon={<ArrowRightIcon className="size-3.5" weight="bold" />}
                 >
-                  <span className="font-mono text-[10px] font-bold tracking-widest uppercase">
+                  <span className="font-mono font-bold tracking-widest uppercase">
                     {t(`${service.id}.cta`)}
                   </span>
                 </Button>
               </div>
-            </div>
-          )
-        })}
+            </article>
+          ))}
+        </div>
       </div>
 
       {/* View All Services CTA */}
-      <div ref={viewAllServicesRef} className="mt-8 flex justify-center">
+      <div ref={viewAllServicesRef} className="flex justify-center">
         <Button
           href="/services"
           variant="outline"

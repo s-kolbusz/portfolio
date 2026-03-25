@@ -52,7 +52,7 @@ export function Button(props: ButtonProps) {
   } = props
 
   const baseStyles =
-    'inline-flex items-center justify-center gap-2 font-medium transition-[colors, box-shadow, scale] duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95 cursor-pointer disabled:cursor-not-allowed opacity-100'
+    'inline-flex items-center justify-center gap-2 font-medium transition-[color, box-shadow] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95 cursor-pointer disabled:cursor-not-allowed opacity-100'
 
   const variants = {
     primary:
@@ -60,7 +60,7 @@ export function Button(props: ButtonProps) {
     secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
     outline: 'border border-input bg-transparent hover:bg-accent hover:text-accent-foreground',
     'outline-glass':
-      'border border-border hover:bg-accent/40 hover:text-accent-foreground rounded-md bg-background/20 backdrop-blur-sm',
+      'rounded-md border border-border/70 bg-card/72 backdrop-blur-sm hover:border-primary/15 hover:bg-accent/70 hover:text-foreground',
     ghost: 'hover:bg-accent hover:text-accent-foreground',
     glass: 'glass-button',
   }

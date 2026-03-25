@@ -4,6 +4,7 @@ import {
   NAV_ITEMS,
   getActiveItemIndex,
   getDesktopIndicatorOffset,
+  getHoverProgress,
   getHoverScale,
   getMobileIndicatorOffset,
   isCvRoute,
@@ -63,9 +64,16 @@ describe('dock-nav logic', () => {
 
   it('computes hover scale based on index distance', () => {
     expect(getHoverScale(2, null)).toBe(1)
-    expect(getHoverScale(2, 2)).toBe(1.2)
-    expect(getHoverScale(2, 1)).toBe(1.1)
-    expect(getHoverScale(2, 0)).toBe(1.05)
+    expect(getHoverScale(2, 2)).toBe(1.18)
+    expect(getHoverScale(2, 1)).toBeCloseTo(1.11)
+    expect(getHoverScale(2, 0)).toBe(1.04)
     expect(getHoverScale(2, 5)).toBe(1)
+  })
+
+  it('interpolates hover progress between item centers', () => {
+    expect(getHoverProgress(100, [100, 160, 220])).toBe(0)
+    expect(getHoverProgress(130, [100, 160, 220])).toBe(0.5)
+    expect(getHoverProgress(190, [100, 160, 220])).toBe(1.5)
+    expect(getHoverProgress(260, [100, 160, 220])).toBe(2)
   })
 })
