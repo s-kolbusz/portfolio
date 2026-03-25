@@ -26,7 +26,7 @@ interface ProjectBookProps {
 }
 
 export function ProjectBook({ projects }: ProjectBookProps) {
-  const t = useTranslations('projectsBook')
+  const t = useTranslations('terms')
   const router = useRouter()
   const scrollRef = useRef<HTMLDivElement>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -111,7 +111,7 @@ export function ProjectBook({ projects }: ProjectBookProps) {
           onClick={handleBack}
           leftIcon={<ArrowLeftIcon weight="bold" className="size-4" />}
         >
-          {isOnToC ? t('backLabel') : t('backToProjects')}
+          {t('back')}
         </Button>
       </div>
 

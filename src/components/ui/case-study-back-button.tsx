@@ -23,12 +23,11 @@ export function CaseStudyBackButton() {
   if (!isProjectDetail) return null
 
   return (
-    <div className="pointer-events-none fixed top-6 left-6 z-50">
+    <div className="fixed top-6 left-6 z-100">
       <Button
-        variant="outline"
+        variant="outline-glass"
         size="md"
         href="/projects"
-        className="pointer-events-auto shadow-xl"
         leftIcon={<ArrowLeftIcon weight="bold" className="size-4" />}
       >
         {t('back')}

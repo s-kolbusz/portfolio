@@ -60,13 +60,13 @@ export function Button(props: ButtonProps) {
     secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
     outline: 'border border-input bg-transparent hover:bg-accent hover:text-accent-foreground',
     'outline-glass':
-      'border border-border hover:bg-accent/40 hover:text-accent-foreground rounded-md bg-white/20 backdrop-blur-sm dark:bg-black/20',
+      'border border-border hover:bg-accent/40 hover:text-accent-foreground rounded-md bg-background/20 backdrop-blur-sm',
     ghost: 'hover:bg-accent hover:text-accent-foreground',
     glass: 'glass-button',
   }
 
   const sizes = {
-    sm: 'h-9 px-4 text-xs rounded-sm',
+    sm: 'min-h-11 min-w-11 px-4 py-2 text-xs rounded-sm',
     md: 'h-11 px-6 text-sm rounded-md',
     lg: 'h-14 px-8 text-base rounded-lg',
     icon: 'h-11 w-11 p-0 rounded-md',

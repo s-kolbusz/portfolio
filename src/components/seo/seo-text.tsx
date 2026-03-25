@@ -37,9 +37,8 @@ export function SEOText({
     if (!containerRef.current || !contentRef.current) return
 
     if (isOpen) {
-      const height = contentRef.current.offsetHeight || 0
       gsap.to(containerRef.current, {
-        height,
+        gridTemplateRows: '1fr',
         duration: ANIMATION.duration.fast,
         ease: ANIMATION.ease.out,
         onComplete: () => {
@@ -48,7 +47,7 @@ export function SEOText({
       })
     } else {
       gsap.to(containerRef.current, {
-        height: 0,
+        gridTemplateRows: '0fr',
         duration: ANIMATION.duration.fast,
         ease: ANIMATION.ease.inOut,
         onComplete: () => {
@@ -81,9 +80,9 @@ export function SEOText({
       <div
         ref={containerRef}
         id={`seo-content-${title.replace(/\s+/g, '-').toLowerCase()}`}
-        className="h-0 overflow-hidden"
+        className={cn('grid overflow-hidden', isOpen ? 'grid-rows-1' : 'grid-rows-0')}
       >
-        <div ref={contentRef} className="pt-4 pb-8">
+        <div ref={contentRef} className="min-h-0">
           <div className="prose prose-sm prose-neutral dark:prose-invert text-muted-foreground max-w-none font-sans text-base leading-relaxed sm:text-lg">
             {children}
           </div>

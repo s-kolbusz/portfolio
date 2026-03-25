@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['@phosphor-icons/react', 'gsap', 'lenis'],
   },
+  images: {
+    qualities: [75, 90],
+  },
   async rewrites() {
     return [
       {

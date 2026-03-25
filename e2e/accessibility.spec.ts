@@ -83,13 +83,18 @@ test('lightbox restores focus to the trigger after keyboard close', async ({ pag
   await expect(trigger).toBeFocused()
 })
 
-test('desktop dock navigation exposes current position semantics', async ({ page }) => {
+test('dock navigation exposes current position semantics', async ({ page }) => {
   await page.goto('/en')
-  await page.waitForTimeout(700)
 
-  const dockHomeLink = page
-    .getByRole('navigation', { name: 'Main navigation' })
-    .getByRole('link', { name: 'Home' })
+  // Find the visible navigation
+  const dockNav = page
+    .getByRole('navigation', { name: /main navigation/i })
+    .filter({ visible: true })
+    .first()
+  await expect(dockNav).toBeVisible()
+
+  const dockHomeLink = dockNav.getByRole('link', { name: /home/i })
+  await expect(dockHomeLink).toBeVisible()
   await expect(dockHomeLink).toHaveAttribute('aria-current', 'location')
 })
 

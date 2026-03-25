@@ -157,11 +157,11 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
           {currentIndex + 1} / {images.length}
         </span>
         <Button
-          variant="outline-glass"
+          variant="outline"
           size="icon"
           onClick={onClose}
           aria-label={t('close')}
-          className="rounded-full border-transparent bg-white/10 p-2 text-white hover:bg-white/20 focus-visible:rounded-full! focus-visible:ring-offset-0!"
+          className="rounded-full border-neutral-800 bg-neutral-900 text-white hover:bg-black hover:text-white focus-visible:rounded-full! focus-visible:ring-offset-0!"
         >
           <XIcon weight="bold" className="size-5" />
         </Button>
@@ -169,26 +169,26 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
 
       {/* Nav Buttons */}
       <Button
-        variant="outline-glass"
+        variant="outline"
         size="icon"
         onClick={(e) => {
           e.stopPropagation()
           showPrev()
         }}
-        className="absolute top-1/2 left-4 z-10 -translate-y-1/2 rounded-full border-transparent bg-white/10 p-3 text-white hover:bg-white/20 focus-visible:rounded-full! focus-visible:ring-offset-0! sm:left-8"
+        className="absolute top-1/2 left-4 z-10 -translate-y-1/2 rounded-full border-neutral-800 bg-neutral-900 text-white hover:bg-black hover:text-white focus-visible:rounded-full! focus-visible:ring-offset-0! sm:left-8"
         aria-label={t('previous')}
       >
         <ArrowLeftIcon weight="bold" className="size-6" />
       </Button>
 
       <Button
-        variant="outline-glass"
+        variant="outline"
         size="icon"
         onClick={(e) => {
           e.stopPropagation()
           showNext()
         }}
-        className="absolute top-1/2 right-4 z-10 -translate-y-1/2 rounded-full border-transparent bg-white/10 p-3 text-white hover:bg-white/20 focus-visible:rounded-full! focus-visible:ring-offset-0! sm:right-8"
+        className="absolute top-1/2 right-4 z-10 -translate-y-1/2 rounded-full border-neutral-800 bg-neutral-900 text-white hover:bg-black hover:text-white focus-visible:rounded-full! focus-visible:ring-offset-0! sm:right-8"
         aria-label={t('next')}
       >
         <ArrowRightIcon weight="bold" className="size-6" />
@@ -214,7 +214,7 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
 
         {/* Caption */}
         <div className="absolute right-0 bottom-4 left-0 text-center">
-          <p className="inline-block rounded-full bg-black/50 px-4 py-1.5 text-sm text-white/90 backdrop-blur-md">
+          <p className="inline-block rounded-full border border-neutral-800 bg-neutral-900 px-4 py-1.5 text-sm text-white">
             {images[currentIndex].alt}
           </p>
         </div>

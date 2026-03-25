@@ -97,7 +97,7 @@ export function BookTableOfContents({ entries, onNavigate }: BookTableOfContents
                 </span>
 
                 {/* Category badge */}
-                <span className="border-border/60 text-muted-foreground rounded-full border px-2.5 py-0.5 text-[11px] font-medium">
+                <span className="border-border/60 text-muted-foreground rounded-md border px-2.5 py-0.5 text-[11px] font-medium">
                   {t(`categories.${entry.category}`)}
                 </span>
 
