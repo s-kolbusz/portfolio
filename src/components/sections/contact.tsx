@@ -56,7 +56,7 @@ export function Contact() {
               </span>
               <ArrowUpRightIcon
                 weight="light"
-                className="text-muted-foreground group-hover:text-primary size-8 transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1 md:size-12"
+                className="text-muted-foreground group-hover:text-primary size-8 transition-[color,transform] duration-300 group-hover:translate-x-1 group-hover:-translate-y-1 md:size-12"
               />
             </div>
           </a>

@@ -79,7 +79,7 @@ export function BookTableOfContents({ entries, onNavigate }: BookTableOfContents
                 onClick={() => onNavigate(i + 1)}
                 onMouseEnter={() => handleHover(entry.id)}
                 onMouseLeave={() => handleHover(null)}
-                className="group flex w-full items-baseline gap-5 py-4 text-left transition-all *:pointer-events-none"
+                className="group flex w-full items-baseline gap-5 py-4 text-left transition-colors *:pointer-events-none"
               >
                 {/* Number */}
                 <span className="text-muted-foreground/60 w-8 font-mono text-xs tracking-wider">
@@ -87,7 +87,7 @@ export function BookTableOfContents({ entries, onNavigate }: BookTableOfContents
                 </span>
 
                 {/* Title */}
-                <span className="group-hover:text-primary flex-1 font-serif text-4xl font-light tracking-tight transition-all group-hover:translate-x-1">
+                <span className="group-hover:text-primary flex-1 font-serif text-4xl font-light tracking-tight transition-[color,transform] group-hover:translate-x-1">
                   {entry.title}
                 </span>
 

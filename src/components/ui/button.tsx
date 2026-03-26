@@ -53,7 +53,7 @@ export function Button(props: ButtonProps) {
   } = props
 
   const baseStyles =
-    'inline-flex items-center justify-center gap-2 font-medium transition-[color, box-shadow] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95 cursor-pointer disabled:cursor-not-allowed opacity-100'
+    'inline-flex items-center justify-center gap-2 font-medium transition-[color,background-color,border-color,box-shadow,transform] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95 cursor-pointer disabled:cursor-not-allowed opacity-100'
 
   const variants = {
     primary:

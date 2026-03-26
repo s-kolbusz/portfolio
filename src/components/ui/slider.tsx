@@ -24,7 +24,7 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>(
           ref={ref}
           className={cn(
             'bg-secondary accent-primary h-2 w-full appearance-none rounded-full',
-            'focus-visible:ring-primary focus-visible:ring-offset-background transition-all focus-visible:ring-2 focus-visible:ring-offset-8 focus-visible:outline-none'
+            'focus-visible:ring-primary focus-visible:ring-offset-background transition-[box-shadow,outline] focus-visible:ring-2 focus-visible:ring-offset-8 focus-visible:outline-none'
           )}
           {...props}
         />

@@ -57,7 +57,7 @@ export function DockItem({
 
         <Icon
           weight="duotone"
-          className={`relative z-10 h-6 w-6 transition-all duration-200 ${
+          className={`relative z-10 h-6 w-6 transition-[color,transform] duration-200 ${
             isActive
               ? 'text-primary'
               : isHovered
