@@ -90,7 +90,7 @@ export const About: React.FC = () => {
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 500px"
               className="h-full w-full object-cover"
               quality={75}
-              loading="lazy"
+              loading="eager"
             />
           </div>
 

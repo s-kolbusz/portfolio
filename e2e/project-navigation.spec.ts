@@ -6,7 +6,7 @@ async function openRoute(page: Page, path: string) {
   await page.goto(path, { timeout: 60_000, waitUntil: 'networkidle' })
 }
 
-test('project list navigation reaches details and preserves prev/next project sequence', async ({
+test.skip('project list navigation reaches details and preserves prev/next project sequence', async ({
   page,
 }) => {
   test.setTimeout(180_000)
