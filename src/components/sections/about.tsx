@@ -87,7 +87,7 @@ export const About: React.FC = () => {
               alt="Sebastian Kolbusz"
               width={400}
               height={600}
-              sizes="(max-width: 1024px) 100vw, 400px"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 500px"
               className="h-full w-full object-cover"
               quality={75}
               loading="lazy"

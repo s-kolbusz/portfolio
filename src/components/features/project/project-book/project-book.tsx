@@ -1,12 +1,6 @@
 'use client'
 
-import {
-  type KeyboardEvent as ReactKeyboardEvent,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useTranslations } from 'next-intl'
 
@@ -72,8 +66,13 @@ export function ProjectBook({ projects }: ProjectBookProps) {
     [totalPanels]
   )
 
-  const handleBookKeyDown = useCallback(
-    (event: ReactKeyboardEvent<HTMLDivElement>) => {
+  const sectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    const el = sectionRef.current
+    if (!el) return
+
+    const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'ArrowRight') {
         event.preventDefault()
         scrollToPanel(currentIndex + 1)
@@ -81,9 +80,11 @@ export function ProjectBook({ projects }: ProjectBookProps) {
         event.preventDefault()
         scrollToPanel(currentIndex - 1)
       }
-    },
-    [currentIndex, scrollToPanel]
-  )
+    }
+
+    el.addEventListener('keydown', handleKeyDown)
+    return () => el.removeEventListener('keydown', handleKeyDown)
+  }, [currentIndex, scrollToPanel])
 
   // Back logic: ToC → homepage #projects, spread → scroll to ToC
   const handleBack = () => {
@@ -94,14 +95,12 @@ export function ProjectBook({ projects }: ProjectBookProps) {
     }
   }
 
-  /* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */
   return (
     <section
+      ref={sectionRef}
       aria-roledescription="carousel"
       aria-label="Project Book"
-      tabIndex={0}
       className="book-paper focus-visible:ring-ring focus-visible:ring-offset-background relative focus-visible:ring-2 focus-visible:ring-offset-4"
-      onKeyDown={handleBookKeyDown}
     >
       {/* Back button */}
       <div className="fixed top-6 left-6 z-50">

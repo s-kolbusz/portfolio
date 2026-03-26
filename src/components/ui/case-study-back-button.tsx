@@ -1,6 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
+import { useSearchParams } from 'next/navigation'
 
 import { ArrowLeftIcon } from '@phosphor-icons/react'
 
@@ -16,18 +17,37 @@ import { isProjectDetailRoute } from '@/lib/route-predicates'
 export function CaseStudyBackButton() {
   const t = useTranslations('terms')
   const pathname = usePathname()
+  const searchParams = useSearchParams()
 
   // Detect if we are on a project detail page
   const isProjectDetail = isProjectDetailRoute(pathname)
 
   if (!isProjectDetail) return null
 
+  const isHome = searchParams.get('origin') === 'home'
+  const href = isHome ? '/' : '/projects'
+
+  if (isHome) {
+    return (
+      <div className="fixed top-6 left-6 z-100">
+        <Button
+          variant="outline-glass"
+          size="md"
+          onClick={() => history.back()}
+          leftIcon={<ArrowLeftIcon weight="bold" className="size-4" />}
+        >
+          {t('back')}
+        </Button>
+      </div>
+    )
+  }
+
   return (
     <div className="fixed top-6 left-6 z-100">
       <Button
         variant="outline-glass"
         size="md"
-        href="/projects"
+        href={href}
         leftIcon={<ArrowLeftIcon weight="bold" className="size-4" />}
       >
         {t('back')}

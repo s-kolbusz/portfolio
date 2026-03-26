@@ -231,10 +231,15 @@ export function ProjectCaseStudy({ project, prevProject, nextProject }: ProjectC
                 >
                   <Image
                     src={item.url}
-                    alt={item.alt}
+                    alt={`${project.title} gallery image ${index + 1}`}
                     fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 512px"
+                    sizes={
+                      index === 0
+                        ? '(max-width: 1024px) 100vw, 80vw'
+                        : '(max-width: 768px) 100vw, 50vw'
+                    }
                     className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    loading="lazy"
                   />
                   <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
                 </button>

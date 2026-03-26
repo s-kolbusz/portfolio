@@ -79,7 +79,7 @@ export function BookTableOfContents({ entries, onNavigate }: BookTableOfContents
                 onClick={() => onNavigate(i + 1)}
                 onMouseEnter={() => handleHover(entry.id)}
                 onMouseLeave={() => handleHover(null)}
-                className="group flex w-full items-baseline gap-5 py-4 text-left transition-all"
+                className="group flex w-full items-baseline gap-5 py-4 text-left transition-all *:pointer-events-none"
               >
                 {/* Number */}
                 <span className="text-muted-foreground/60 w-8 font-mono text-xs tracking-wider">

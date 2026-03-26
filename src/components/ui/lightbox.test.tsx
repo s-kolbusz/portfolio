@@ -92,7 +92,7 @@ describe('Lightbox', () => {
     const onClose = vi.fn()
     render(<Lightbox images={images} initialIndex={0} onClose={onClose} />)
 
-    const closeButton = screen.getByLabelText('close')
+    const closeButton = screen.getAllByLabelText('close')[0]
     fireEvent.click(closeButton)
 
     expect(onClose).toHaveBeenCalled()
@@ -102,7 +102,7 @@ describe('Lightbox', () => {
     const onClose = vi.fn()
     render(<Lightbox images={images} initialIndex={0} onClose={onClose} />)
 
-    const overlay = screen.getByRole('dialog')
+    const overlay = screen.getByTestId('lightbox-backdrop')
     fireEvent.click(overlay)
 
     expect(onClose).toHaveBeenCalled()

@@ -21,8 +21,6 @@ export function BookEdgeNav({ onPrev, onNext, hasPrev, hasNext }: BookEdgeNavPro
         aria-label="Previous page"
         className={cn(
           'group fixed top-0 left-0 z-40 flex h-dvh w-20 items-center justify-center',
-          'opacity-0 transition-opacity duration-300 hover:opacity-100',
-          'focus-visible:opacity-100',
           !hasPrev && 'pointer-events-none'
         )}
       >
@@ -39,8 +37,6 @@ export function BookEdgeNav({ onPrev, onNext, hasPrev, hasNext }: BookEdgeNavPro
         aria-label="Next page"
         className={cn(
           'group fixed top-0 right-0 z-40 flex h-dvh w-20 items-center justify-center',
-          'opacity-0 transition-opacity duration-300 hover:opacity-100',
-          'focus-visible:opacity-100',
           !hasNext && 'pointer-events-none'
         )}
       >

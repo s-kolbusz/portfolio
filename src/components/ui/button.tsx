@@ -28,6 +28,7 @@ type ButtonAsLinkProps = ButtonVisualProps &
   Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof ButtonVisualProps | 'href'> & {
     href: string
     ref?: Ref<HTMLAnchorElement>
+    scroll?: boolean
   }
 
 type ButtonProps = ButtonAsButtonProps | ButtonAsLinkProps
@@ -87,7 +88,7 @@ export function Button(props: ButtonProps) {
   )
 
   if ('href' in rest && typeof rest.href === 'string') {
-    const { href, onClick, target, rel, tabIndex, ref, ...anchorProps } = rest
+    const { href, onClick, target, rel, tabIndex, ref, scroll, ...anchorProps } = rest
     const handleClick: MouseEventHandler<HTMLAnchorElement> | undefined =
       isDisabled || onClick
         ? (event) => {
@@ -126,7 +127,7 @@ export function Button(props: ButtonProps) {
     }
 
     return (
-      <Link href={href} ref={ref as Ref<HTMLAnchorElement>} {...commonLinkProps}>
+      <Link href={href} ref={ref as Ref<HTMLAnchorElement>} scroll={scroll} {...commonLinkProps}>
         {content}
       </Link>
     )

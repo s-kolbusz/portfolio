@@ -17,7 +17,7 @@ export const contactLinks: ContactLink[] = [
   {
     id: 'email',
     labelKey: 'email',
-    url: 'mailto:s.kolbusz@outlook.com',
+    url: 'mailto:office@kolbusz.xyz',
     icon: EnvelopeIcon,
   },
   {

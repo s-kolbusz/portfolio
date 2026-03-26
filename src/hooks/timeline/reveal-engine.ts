@@ -3,6 +3,17 @@ import { gsap } from '@/lib/gsap'
 
 import type { AnimationTarget, RevealOptions } from './types'
 
+if (typeof window !== 'undefined') {
+  const mm = gsap.matchMedia()
+  mm.add('(prefers-reduced-motion: reduce)', () => {
+    // Immediately fast-forward and force-complete all active animations
+    gsap.globalTimeline.timeScale(1000)
+    return () => {
+      gsap.globalTimeline.timeScale(1)
+    }
+  })
+}
+
 export interface RevealAnimationTokens {
   duration: {
     medium: number
@@ -106,5 +117,9 @@ export function createReveal(
     }
   }
 
+  // @[optimize] ARIA / Motion Edge Avoidance:
+  // NEVER animate layout-impacting flow properties (width, height, top, left, padding, margin) via this hook.
+  // Rely exclusively on GPU-accelerated transforms (x, y, scale, rotation) and opacity.
+  // Layout thrashing here would destroy 60fps scrolling performance constraints set out in globals.
   gsap.fromTo(targets, fromVars, toVars)
 }

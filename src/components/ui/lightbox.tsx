@@ -4,13 +4,11 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from '
 import { createPortal } from 'react-dom'
 
 import { useTranslations } from 'next-intl'
-import Image from 'next/image'
 
 import { ArrowLeftIcon, ArrowRightIcon, XIcon } from '@phosphor-icons/react'
 
 import { Button } from '@/components/ui/button'
 import type { MediaItem } from '@/data/projects'
-import { useFocusTrap } from '@/hooks/use-focus-trap'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { useScrollStore } from '@/lib/stores'
 
@@ -52,25 +50,21 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose()
       if (event.key === 'ArrowLeft') showPrev()
       if (event.key === 'ArrowRight') showNext()
+      if (event.key === 'Escape') onClose()
     },
-    [onClose, showPrev, showNext]
+    [showPrev, showNext, onClose]
   )
 
   useEffect(() => {
     previousFocus.current = document.activeElement as HTMLElement
     lenis?.stop()
 
-    const focusTimeoutId = window.setTimeout(() => {
-      overlayRef.current?.focus()
-    }, 50)
-
     return () => {
-      window.clearTimeout(focusTimeoutId)
+      // Return focus asynchronously to prevent quick scroll jumps
+      setTimeout(() => previousFocus.current?.focus(), 0)
       lenis?.start()
-      previousFocus.current?.focus()
     }
   }, [lenis])
 
@@ -97,7 +91,7 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
         '-=0.3'
       )
     },
-    { revertOnUpdate: true }
+    { dependencies: [] }
   )
 
   // GSAP Animation for Slide Change
@@ -116,15 +110,12 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
           scale: 1,
           duration: 0.4,
           ease: 'power2.out',
-          overwrite: true, // Ensure we overwrite any ongoing animation
+          overwrite: true,
         }
       )
     },
     { dependencies: [currentIndex] }
   )
-
-  // Focus Trap
-  useFocusTrap(overlayRef, true)
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown)
@@ -136,21 +127,22 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
   if (!mounted) return null
 
   return createPortal(
-    /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
     <div
       ref={overlayRef}
       role="dialog"
       aria-modal="true"
       aria-label={t('title')}
-      tabIndex={-1}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 outline-none sm:p-8"
-      onClick={(e) => {
-        if (e.target === overlayRef.current) onClose()
-      }}
-      onKeyDown={(e) => {
-        if (e.key === 'Escape') onClose()
-      }}
+      className="fixed inset-0 z-50 m-0 flex h-full max-h-none w-full max-w-none items-center justify-center bg-transparent p-4 outline-none sm:p-8"
     >
+      <button
+        type="button"
+        data-cursor="default"
+        data-testid="lightbox-backdrop"
+        className="absolute inset-0 -z-10 h-full w-full cursor-default border-none bg-black/80"
+        aria-label={t('close')}
+        onClick={onClose}
+      />
+
       {/* Top Bar */}
       <div className="absolute top-0 right-0 left-0 z-10 flex items-center justify-between p-4 sm:p-6">
         <span className="font-mono text-xs tracking-widest text-white/70">
@@ -198,22 +190,20 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
       <div
         ref={imageRef}
         role="presentation"
-        className="relative h-full w-full max-w-7xl select-none"
+        className="relative flex items-center justify-center select-none"
         onClick={(e) => e.stopPropagation()}
       >
-        <Image
-          key={currentIndex} // Force re-mount for animation entry targeting
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          key={currentIndex}
           src={images[currentIndex].url}
           alt={images[currentIndex].alt}
-          fill
-          sizes="100vw"
-          className="object-contain"
-          priority
-          quality={90}
+          className="max-h-[85vh] w-auto max-w-[90vw] object-contain shadow-2xl ring-1 ring-white/10 sm:max-w-7xl"
+          loading="eager"
         />
 
         {/* Caption */}
-        <div className="absolute right-0 bottom-4 left-0 text-center">
+        <div className="absolute right-0 -bottom-14 left-0 text-center">
           <p className="inline-block rounded-full border border-neutral-800 bg-neutral-900 px-4 py-1.5 text-sm text-white">
             {images[currentIndex].alt}
           </p>

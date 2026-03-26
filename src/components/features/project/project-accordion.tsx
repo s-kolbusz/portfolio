@@ -85,7 +85,7 @@ export function ProjectAccordion({ project, isOpen, onAnimationComplete }: Proje
               )}
             </div>
           </div>
-          <Button variant="secondary" size="lg" href={`/projects/${project.id}`}>
+          <Button variant="secondary" size="lg" href={`/projects/${project.id}?origin=home`}>
             {t('explore')}
           </Button>
         </div>

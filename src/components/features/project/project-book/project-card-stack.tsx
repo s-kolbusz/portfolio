@@ -21,6 +21,7 @@ interface ProjectCardStackProps {
 }
 
 export function ProjectCardStack({ projects }: ProjectCardStackProps) {
+  const tt = useTranslations('terms')
   const t = useTranslations('projectsBook')
   const router = useRouter()
   const containerRef = useRef<HTMLDivElement>(null)
@@ -54,7 +55,7 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
           onClick={() => router.push('/#projects')}
           leftIcon={<ArrowLeftIcon weight="bold" className="size-4" />}
         >
-          {t('backLabel')}
+          {tt('back')}
         </Button>
       </div>
 
