@@ -10,7 +10,7 @@ vi.mock('@/i18n/locale', () => ({
 import { generateMetadata } from './layout'
 
 describe('design layout metadata', () => {
-  it('sets a canonical-matching Open Graph URL and noindex robots directives', async () => {
+  it('sets a canonical-matching Open Graph URL and noindex robots directives for pl', async () => {
     const metadata = await generateMetadata({
       params: Promise.resolve({ locale: 'pl' }),
     })
@@ -21,5 +21,15 @@ describe('design layout metadata', () => {
       index: false,
       follow: false,
     })
+  })
+
+  it('uses English title and description for en locale', async () => {
+    const metadata = await generateMetadata({
+      params: Promise.resolve({ locale: 'en' }),
+    })
+
+    expect(metadata.title).toBe('Design System')
+    expect(metadata.description).toContain('Internal design-system preview')
+    expect(metadata.alternates?.canonical).toBe('https://www.kolbusz.xyz/en/design')
   })
 })
