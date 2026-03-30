@@ -4,7 +4,6 @@ interface TimelineStore {
   sections: Set<string>
   register: (id: string) => void
   unregister: (id: string) => void
-  has: (id: string) => boolean
 }
 
 export const useTimelineStore = create<TimelineStore>((set, get) => ({
@@ -21,5 +20,4 @@ export const useTimelineStore = create<TimelineStore>((set, get) => ({
       next.delete(id)
       return { sections: next }
     }),
-  has: (id) => get().sections.has(id),
 }))

@@ -38,6 +38,9 @@ export function getMetadataAlternates(path: string, currentLocale: Locale) {
     languages[locale] = toAbsoluteSiteUrl(`/${locale}${path === '/' ? '' : path}`)
   })
 
+  // x-default indicates the fallback URL for unmatched locales (Google recommendation)
+  languages['x-default'] = languages[routing.defaultLocale]
+
   return {
     canonical: languages[currentLocale],
     languages,

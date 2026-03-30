@@ -95,7 +95,6 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    locale: 'en_US',
     url: SITE_ORIGIN,
     siteName: 'Sebastian Kolbusz Portfolio',
     title: 'Sebastian Kolbusz | Senior Frontend Engineer',

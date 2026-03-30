@@ -269,6 +269,7 @@
   },
   "cv": {
     "title": "Curriculum Vitae",
+    "metaDescription": "CV | Sebastian Kolbusz — Senior Frontend Engineer with 6+ years of experience. Specialist in React, Next.js, and TypeScript. Available for freelance projects.",
     "print": "Print / Save as PDF",
     "summary": "Professional Summary",
     "experience": "Professional Experience",

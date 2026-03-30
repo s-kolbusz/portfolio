@@ -16,6 +16,11 @@ export const JsonLd = () => {
       width: 800,
       height: 800,
     },
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Zakopane',
+      addressCountry: 'PL',
+    },
     worksFor: {
       '@type': 'Organization',
       name: 'Freelance',
@@ -23,7 +28,6 @@ export const JsonLd = () => {
     sameAs: [
       'https://github.com/s-kolbusz',
       'https://linkedin.com/in/skolbusz',
-      // X (formerly Twitter) — using the canonical x.com URL to avoid redirect chains
       'https://x.com/s_kolbusz',
     ],
     knowsAbout: [

@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 
-import { ProjectBook } from '@/components/features/project/project-book'
-import { ProjectCardStack } from '@/components/features/project/project-book'
+import { ProjectBook, ProjectCardStack } from '@/components/features/project/project-book'
 import { StructuredData } from '@/components/seo/structured-data'
 import { getProjects } from '@/data/get-projects'
 import { getLocaleFromParams } from '@/i18n/locale'

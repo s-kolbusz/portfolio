@@ -6,10 +6,17 @@ import { ArrowLeftIcon } from '@phosphor-icons/react/dist/ssr'
 import { CVLayout, CVPrintButton } from '@/components/features/cv'
 import { BaseSection } from '@/components/ui/base-section'
 import { Button } from '@/components/ui/button'
+import type { CVData } from '@/data/cv'
 import { cvDataEn } from '@/data/cv-en'
 import { cvDataPl } from '@/data/cv-pl'
 import { getLocaleFromParams } from '@/i18n/locale'
+import type { Locale } from '@/i18n/routing'
 import { buildCvPageMetadata } from '@/lib/page-metadata'
+
+const cvDataByLocale: Record<Locale, CVData> = {
+  en: cvDataEn,
+  pl: cvDataPl,
+}
 
 type Props = {
   params: Promise<{ locale: string }>
@@ -18,15 +25,12 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = await getLocaleFromParams(params)
 
-  const [cvTranslations, metadataTranslations] = await Promise.all([
-    getTranslations({ locale, namespace: 'cv' }),
-    getTranslations({ locale, namespace: 'Metadata' }),
-  ])
+  const t = await getTranslations({ locale, namespace: 'cv' })
 
   return buildCvPageMetadata({
     locale,
-    title: cvTranslations('title'),
-    description: metadataTranslations('description'),
+    title: t('title'),
+    description: t('metaDescription'),
   })
 }
 
@@ -35,7 +39,7 @@ export default async function CVPage({ params }: Props) {
   setRequestLocale(locale)
   const t = await getTranslations({ locale, namespace: 'cv' })
 
-  const cvData = locale === 'pl' ? cvDataPl : cvDataEn
+  const cvData = cvDataByLocale[locale]
 
   return (
     <main id="main-content" className="bg-neutral-100/50 dark:bg-neutral-900/50 print:bg-white">

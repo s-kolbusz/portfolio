@@ -77,7 +77,7 @@ export function Contact() {
           <span className="text-muted-foreground font-mono text-xs tracking-widest uppercase">
             {t('copyright_label')}
           </span>
-          <span className="text-muted-foreground font-sans text-sm">
+          <span suppressHydrationWarning className="text-muted-foreground font-sans text-sm">
             {tf('copyright', { year: currentYear })}
           </span>
         </div>

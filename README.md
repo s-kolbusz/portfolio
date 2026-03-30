@@ -1,120 +1,135 @@
-# Sebastian Kolbusz Portfolio Website
+# Sebastian Kolbusz Portfolio
 
-A bilingual, high-performance portfolio platform built with Next.js 16 to showcase case studies, services, and technical depth for freelance and product engineering work.
+A bilingual, high-performance portfolio platform built with Next.js 16. Targets 95+ Lighthouse performance, 100 accessibility/SEO, and serves as both a lead funnel for clients and a technical showcase for engineering reviewers.
 
-## Project Overview
+**Live:** [kolbusz.xyz](https://www.kolbusz.xyz)
 
-### Business Context
-
-This project is the public-facing portfolio and lead funnel for a senior frontend engineer. It serves two primary functions:
-
-- **Business Value:** Communicates expertise and results to non-technical clients.
-- **Technical Excellence:** Demonstrates production-grade frontend architecture to technical reviewers and recruiters.
-
-### Engineering Goals
-
-- **Performance:** Deliver lightning-fast, static-first pages with a focus on Core Web Vitals.
-- **SEO & Visibility:** Strong metadata APIs and structured JSON-LD data (ItemList, CreativeWork) for all routes.
-- **Localization:** Full `en` and `pl` support using `next-intl` with route-preserving navigation.
-- **Accessibility (a11y):** WCAG 2.2 AA compliant by default, with functional keyboard paths and skip-links.
-- **Aesthetics:** Cinematic, animation-heavy UI (GSAP + WebGL) that remains performant and respects `prefers-reduced-motion`.
+---
 
 ## Tech Stack
 
-| Layer            | Choice                                      | Why this choice                                                        |
-| ---------------- | ------------------------------------------- | ---------------------------------------------------------------------- |
-| **Framework**    | Next.js 16 (App Router)                     | Static Site Generation (SSG), Turbopack, and mature metadata handling. |
-| **UI Library**   | React 19 + TypeScript                       | Latest React features (Compiler, Actions) with strict typing.          |
-| **Styling**      | Tailwind CSS v4                             | CSS-first configuration, high performance, and modern design tokens.   |
-| **Localization** | `next-intl`                                 | Type-safe messages and locale-aware routing in the App Router.         |
-| **Motion**       | GSAP + Lenis + custom WebGL                 | Fine-grained control over smooth scrolling and complex animations.     |
-| **State**        | Zustand                                     | Lightweight state for scroll and interaction orchestration.            |
-| **Testing**      | Vitest + Testing Library + Playwright + Axe | Comprehensive unit, integration, and E2E testing with a11y checks.     |
-| **Tooling**      | ESLint, Prettier, pnpm, Volta               | Enforced code standards and reproducible environments.                 |
+| Layer | Choice | Why |
+|---|---|---|
+| **Framework** | Next.js 16 (App Router) | Full SSG, React Compiler, mature metadata API |
+| **UI Library** | React 19 + TypeScript (strict) | Latest features, type-safe throughout |
+| **Styling** | Tailwind CSS v4 | CSS-first config, design tokens |
+| **Localization** | next-intl | Type-safe messages, locale-aware App Router routing |
+| **Motion** | GSAP + Lenis + WebGL | Fine-grained scroll and animation control |
+| **State** | Zustand | Lightweight, scroll/interaction orchestration |
+| **Testing** | Vitest + Playwright + Axe | Unit, integration, E2E, and accessibility coverage |
+| **Tooling** | ESLint (Perfectionist), Prettier, pnpm, Volta | Enforced standards, reproducible environments |
 
-## Architectural Decisions
+---
 
-1.  **Locale as a Primary Route Segment (`/[locale]/...`)**
-    Ensures explicit, crawlable URLs and enables static generation per locale while preserving the path during language switches.
+## Setup
 
-2.  **Domain Content & Locale Overlays**
-    Project data is centralized in `src/data/`, with localized copy stored in `src/i18n/messages/`. This reduces content drift and ensures consistency.
-
-3.  **Progressive Enhancement & Motion Control**
-    Heavy client-side features (WebGL, custom cursors, smooth scrolling) are lazy-loaded and delayed. They are automatically disabled for users with `prefers-reduced-motion`.
-
-4.  **Semantic SEO Foundation**
-    Shared metadata builders and schema serializers maintain canonical URLs and structured data integrity across all localized routes.
-
-5.  **Multi-Layered Quality Gate**
-    A combination of Vitest (logic/components) and Playwright (E2E/a11y) ensures that every change meets the project's strict quality standards.
-
-## Setup and Run Instructions
-
-### Prerequisites
-
-- **Node.js:** `24.14.0` (managed via [Volta](https://volta.sh/))
-- **Package Manager:** `pnpm`
-
-### Installation
+**Prerequisites:** Node.js `24.14.0` (via [Volta](https://volta.sh/)), `pnpm`
 
 ```bash
 pnpm install
-pnpm exec playwright install
+pnpm exec playwright install chromium --with-deps  # E2E only
 ```
 
-### Development
+App starts at `http://localhost:3000/en`.
+
+---
+
+## Commands
 
 ```bash
-pnpm dev
+pnpm dev                        # Dev server
+pnpm build                      # Production build
+pnpm start                      # Preview production build (required before E2E)
+
+pnpm typecheck                  # TypeScript
+pnpm lint:fix                   # ESLint with auto-fix
+pnpm format                     # Prettier
+
+pnpm test                       # Vitest (run once)
+pnpm test:watch                 # Vitest watch
+pnpm test:coverage              # With 85% coverage gate
+
+pnpm test:e2e                   # All Playwright E2E
+pnpm test:e2e:functional        # E2E excluding visual regression
+pnpm test:e2e:visual            # Visual regression only
+pnpm test:e2e:update-snapshots  # Regenerate baselines (see note below)
+
+pnpm ci:verify                  # Full pipeline: format → lint → typecheck → test → e2e
 ```
 
-The application will be available at [http://localhost:3000/en](http://localhost:3000/en).
+---
 
-### Production Build
+## Architecture
 
-```bash
-pnpm build
-pnpm start
+### Routing & i18n
+
+All routes are nested under `src/app/[locale]/`. Both locales (`en`, `pl`) have explicit, crawlable URLs — no redirect-based language detection. `dynamicParams = false` and `dynamic = 'force-static'` enforce full SSG at build time. Always use helpers from `src/i18n/navigation.ts` instead of Next.js `Link`/`useRouter` directly to preserve locale.
+
+### Data & Content
+
+Portfolio content is statically defined in `src/data/`. Each entry has a locale-independent base (`projects.ts`) merged with per-locale copy (`projects-en.ts`, `projects-pl.ts`) at build time. No CMS calls at runtime — all content is statically embedded and zero-latency at the edge.
+
+### Animation System
+
+`src/hooks/timeline/` orchestrates all scroll-triggered reveals. Components call `useTimeline(ref, config, setup)` and declare their animations via a `reveal()` callback — the engine handles ScrollTrigger setup, reduced-motion adaptation, and cleanup on unmount.
+
+Animation tokens (duration, easing, stagger values) live in `src/lib/constants/animations.ts`. **Only GPU-accelerated properties** (`transform`, `opacity`) are ever animated — never layout properties (`width`, `height`, `padding`). This is a hard constraint enforced by convention in `reveal-engine.ts`.
+
+Client-heavy features (custom cursor, Lenis, dock nav) are dynamically imported with `ssr: false` and deferred 500ms via `ClientOverlays` to free the main thread during hydration.
+
+### SEO Architecture
+
+- Shared metadata factories in `src/lib/page-metadata.ts` generate canonical + hreflang alternates for every page and locale.
+- JSON-LD structured data: `Person` + `WebSite` globally (layout), `CreativeWork` on project pages, `ItemList` on the projects listing.
+- `SEOText` component provides a progressive-disclosure accordion for keyword-rich long-form content that doesn't break the cinematic visual flow.
+- IndexNow integration (`pnpm seo:indexnow`) submits all URLs to search engines on deployment.
+
+---
+
+## CI/CD
+
+Seven parallel jobs on every PR:
+
+```
+audit ─────────────────────────── dependency audit
+static ─────────────────────────── format / lint / typecheck
+unit-tests ─────────────────────── Vitest coverage gate
+build ──────────────────────────── Next.js build → artifact
+  ├── e2e ────────────────────────── functional Playwright tests
+  ├── e2e-visual ─────────────────── visual regression (Linux Chromium)
+  └── lighthouse ─────────────────── ≥95 perf, 100 a11y/SEO/best-practices
 ```
 
-## Testing
+The build artifact (`.next/`) is shared across the three post-build jobs to avoid rebuilding three times.
 
-### Unit and Integration (Vitest)
+### Visual Regression Snapshots
 
-```bash
-pnpm test
-```
+Snapshots must be generated on **Linux** (same environment as CI). Running `pnpm test:e2e:update-snapshots` locally on macOS produces different font rendering and will immediately fail CI.
 
-### Coverage Reports
+**To update snapshots after a UI change:** trigger the **Update Visual Snapshots** workflow from the Actions tab on your branch. It builds the app, regenerates all snapshot baselines in the correct environment, and commits them back to your branch automatically.
 
-```bash
-pnpm test:coverage
-```
+---
 
-Current thresholds: Lines: `85%`, Statements: `85%`, Functions: `85%`, Branches: `80%`.
+## Performance Budgets
 
-### End-to-End and Accessibility (Playwright)
+| Metric | Target |
+|---|---|
+| Lighthouse Performance | ≥ 95 |
+| Lighthouse Accessibility | 100 |
+| Lighthouse SEO | 100 |
+| Lighthouse Best Practices | 100 |
+| LCP | ≤ 1500ms |
+| TBT | ≤ 200ms |
+| CLS | ≤ 0.1 |
+| Total JS budget | 250 KB |
+| Total page weight | 600 KB |
 
-```bash
-pnpm test:e2e
-```
-
-To run against a specific URL:
-
-```bash
-PLAYWRIGHT_BASE_URL=https://your-preview-url.com pnpm test:e2e
-```
+---
 
 ## Deployment
 
-The project is optimized for **Vercel**, utilizing Next.js App Router features for optimal performance and deployment simplicity.
+Optimized for **Vercel**. Vercel Analytics and Speed Insights load only in production (`NODE_ENV === 'production' && VERCEL === '1'`).
 
-**Note on Build Manifests:** You may see "playwright" references in `.next` build manifests. These are strictly informational paths related to the `pnpm` content-addressable store and do **not** indicate that Playwright code is bundled into the client-side production assets.
-
-## Known Limitations & Roadmap
-
-- **Browser Coverage:** Currently optimized for Chromium; WebKit and Firefox coverage is planned.
-- **CMS Integration:** Transitioning from file-based content to a headless CMS for easier updates.
-- **WebGL Fallbacks:** Enhancing static fallbacks for older devices or restricted environments.
-- **Automated Performance Monitoring:** Integrating Lighthouse CI for automated performance regression testing.
+| Variable | Purpose |
+|---|---|
+| `PLAYWRIGHT_BASE_URL` | Override E2E base URL (e.g. staging preview) |

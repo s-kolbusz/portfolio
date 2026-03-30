@@ -81,7 +81,7 @@ export const About: React.FC = () => {
       <div className="flex flex-col gap-12 lg:col-span-5 lg:pl-12">
         {/* Image with Mask Effect */}
         <div className="relative" ref={imageContainerRef}>
-          <div className="bg-muted transition-[filter, --webkit-filter] relative aspect-2/3 w-full overflow-hidden duration-700 hover:grayscale-0 lg:grayscale">
+          <div className="bg-muted relative aspect-2/3 w-full overflow-hidden transition-[filter] duration-700 hover:grayscale-0 lg:grayscale">
             <Image
               src="/images/sebastian_kolbusz_caricature.avif"
               alt="Sebastian Kolbusz"
@@ -90,7 +90,6 @@ export const About: React.FC = () => {
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 500px"
               className="h-full w-full object-cover"
               quality={75}
-              loading="eager"
             />
           </div>
 
@@ -121,12 +120,12 @@ export const About: React.FC = () => {
               {t('stack_label')}
             </span>
             <div className="text-foreground/80 flex flex-wrap gap-x-4 gap-y-3">
-              {skillCategories[0].skills.map((skill) => (
-                <SkillTag key={skill.name} name={skill.name} />
-              ))}
-              {skillCategories[1].skills.map((skill) => (
-                <SkillTag key={skill.name} name={skill.name} />
-              ))}
+              {skillCategories
+                .filter((c) => c.title === 'Frontend' || c.title === 'Styling')
+                .flatMap((c) => c.skills)
+                .map((skill) => (
+                  <SkillTag key={skill.name} name={skill.name} />
+                ))}
             </div>
           </div>
         </div>

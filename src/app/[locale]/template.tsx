@@ -19,15 +19,10 @@ export default function Template({ children }: { children: React.ReactNode }) {
 
       gsap.fromTo(
         containerRef.current,
-        {
-          opacity: 0,
-          y,
-          filter: prefersReducedMotion ? 'none' : 'blur(8px)',
-        },
+        { opacity: 0, y },
         {
           opacity: 1,
           y: 0,
-          filter: 'none',
           duration,
           ease: ANIMATION.ease.outStrong,
           delay: 0.1,

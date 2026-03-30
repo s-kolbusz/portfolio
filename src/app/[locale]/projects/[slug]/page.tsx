@@ -51,7 +51,6 @@ export default async function ProjectDetailPage({ params }: Props) {
   const currentIdx = allProjects.findIndex((p) => p.id === slug)
   const prevProject = currentIdx > 0 ? allProjects[currentIdx - 1] : undefined
   const nextProject = currentIdx < allProjects.length - 1 ? allProjects[currentIdx + 1] : undefined
-  const structuredDataDate = /^\d{4}$/.test(project.year) ? `${project.year}-01-01` : undefined
   const structuredDataDescription = `${project.subtitle}. ${project.tagline}`
 
   return (
@@ -80,7 +79,6 @@ export default async function ProjectDetailPage({ params }: Props) {
                 '@id': `${toAbsoluteSiteUrl('/')}#person`,
                 name: 'Sebastian Kolbusz',
               },
-              ...(structuredDataDate ? { dateCreated: structuredDataDate } : {}),
             },
           },
         ]}
