@@ -16,33 +16,48 @@ cd "$(git rev-parse --show-toplevel)/website"
 echo "▶ Running CI quality gates before commit…"
 echo ""
 
-echo "  [1/4] Format check"
+echo "  [1/6] Format check"
 pnpm format:check || {
   echo ""
   echo "  ✖ Formatting errors found. Run:  pnpm format"
   exit 1
 }
 
-echo "  [2/4] Lint (zero warnings)"
+echo "  [2/6] Lint (zero warnings)"
 pnpm lint:ci || {
   echo ""
   echo "  ✖ Lint errors found. Run:  pnpm lint:fix"
   exit 1
 }
 
-echo "  [3/4] Type check"
+echo "  [3/6] Type check"
 pnpm typecheck || {
   echo ""
   echo "  ✖ TypeScript errors found."
   exit 1
 }
 
-echo "  [4/4] Unit tests"
+echo "  [4/6] Unit tests"
 pnpm test || {
   echo ""
   echo "  ✖ Tests failed."
   exit 1
 }
+
+echo "  [5/6] Test coverage"
+pnpm test:coverage || {
+  echo ""
+  echo "  ✖ Test coverage not met."
+  exit 1
+}
+
+echo "  [6/6] E2E tests"
+pnpm test:e2e || {
+  echo ""
+  echo "  ✖ E2E tests failed."
+  exit 1
+}
+
 
 echo ""
 echo "  ✔ All quality gates passed."

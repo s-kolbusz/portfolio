@@ -22,8 +22,10 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
+    "test:e2e:functional": "playwright test --grep-invert \"visual regression\"",
+    "test:e2e:visual": "playwright test e2e/visual-regression.spec.ts",
     "test:e2e:update-snapshots": "playwright test e2e/visual-regression.spec.ts --update-snapshots",
-    "ci:verify": "pnpm format:check && pnpm lint:ci && pnpm typecheck && pnpm test",
+    "ci:verify": "pnpm format:check && pnpm lint:ci && pnpm typecheck && pnpm test && pnpm test:coverage && pnpm test:e2e",
     "install-hooks": "cp .git-hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit && echo '✔ Git hooks installed'"
   },
   "dependencies": {
