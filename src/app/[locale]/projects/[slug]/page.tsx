@@ -51,6 +51,8 @@ export default async function ProjectDetailPage({ params }: Props) {
   const currentIdx = allProjects.findIndex((p) => p.id === slug)
   const prevProject = currentIdx > 0 ? allProjects[currentIdx - 1] : undefined
   const nextProject = currentIdx < allProjects.length - 1 ? allProjects[currentIdx + 1] : undefined
+  const structuredDataDate = /^\d{4}$/.test(project.year) ? `${project.year}-01-01` : undefined
+  const structuredDataDescription = `${project.subtitle}. ${project.tagline}`
 
   return (
     <main id="main-content">
@@ -61,16 +63,24 @@ export default async function ProjectDetailPage({ params }: Props) {
             data: {
               '@context': 'https://schema.org',
               '@type': 'CreativeWork',
+              '@id': toAbsoluteSiteUrl(`/${locale}/projects/${project.id}#creative-work`),
+              name: project.title,
               headline: project.title,
-              description: project.tagline,
-              image: project.heroImage,
-              dateCreated: project.year,
+              description: structuredDataDescription,
+              image: {
+                '@type': 'ImageObject',
+                url: toAbsoluteSiteUrl(project.heroImage),
+                contentUrl: toAbsoluteSiteUrl(project.heroImage),
+              },
               category: project.category,
+              inLanguage: locale,
               url: toAbsoluteSiteUrl(`/${locale}/projects/${project.id}`),
               author: {
                 '@type': 'Person',
+                '@id': `${toAbsoluteSiteUrl('/')}#person`,
                 name: 'Sebastian Kolbusz',
               },
+              ...(structuredDataDate ? { dateCreated: structuredDataDate } : {}),
             },
           },
         ]}

@@ -39,6 +39,7 @@ export default async function CVPage({ params }: Props) {
 
   return (
     <main id="main-content" className="bg-neutral-100/50 dark:bg-neutral-900/50 print:bg-white">
+      <h1 className="sr-only">{t('title')}</h1>
       <BaseSection
         id="cv-header-nav"
         className="min-h-0 py-8 md:py-20 print:hidden"
@@ -47,6 +48,7 @@ export default async function CVPage({ params }: Props) {
         <div className="flex items-center justify-between">
           <Button
             href="/"
+            locale={locale}
             variant="ghost"
             leftIcon={
               <ArrowLeftIcon

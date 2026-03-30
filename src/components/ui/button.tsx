@@ -7,6 +7,7 @@ import {
 } from 'react'
 
 import { Link } from '@/i18n/navigation'
+import type { Locale } from '@/i18n/routing'
 import { cn } from '@/lib/cn'
 
 interface ButtonVisualProps {
@@ -27,6 +28,7 @@ type ButtonAsButtonProps = ButtonVisualProps &
 type ButtonAsLinkProps = ButtonVisualProps &
   Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof ButtonVisualProps | 'href'> & {
     href: string
+    locale?: Locale
     ref?: Ref<HTMLAnchorElement>
     scroll?: boolean
   }
@@ -88,7 +90,7 @@ export function Button(props: ButtonProps) {
   )
 
   if ('href' in rest && typeof rest.href === 'string') {
-    const { href, onClick, target, rel, tabIndex, ref, scroll, ...anchorProps } = rest
+    const { href, locale, onClick, target, rel, tabIndex, ref, scroll, ...anchorProps } = rest
     const handleClick: MouseEventHandler<HTMLAnchorElement> | undefined =
       isDisabled || onClick
         ? (event) => {
@@ -127,7 +129,13 @@ export function Button(props: ButtonProps) {
     }
 
     return (
-      <Link href={href} ref={ref as Ref<HTMLAnchorElement>} scroll={scroll} {...commonLinkProps}>
+      <Link
+        href={href}
+        locale={locale}
+        ref={ref as Ref<HTMLAnchorElement>}
+        scroll={scroll}
+        {...commonLinkProps}
+      >
         {content}
       </Link>
     )

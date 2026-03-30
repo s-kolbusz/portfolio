@@ -1,8 +1,9 @@
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { Link } from '@/i18n/navigation'
 
 export default function LocalizedNotFound() {
+  const locale = useLocale()
   const t = useTranslations('notFound')
 
   return (
@@ -15,6 +16,7 @@ export default function LocalizedNotFound() {
       <p className="text-muted-foreground mb-8 max-w-md">{t('description')}</p>
       <Link
         href="/"
+        locale={locale}
         className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-3 font-mono text-sm tracking-widest uppercase transition-colors"
       >
         {t('returnHome')}

@@ -3,8 +3,8 @@
     "back": "Back"
   },
   "Metadata": {
-    "title": "Sebastian Kolbusz | Senior Frontend Specialist & Web Architect",
-    "description": "Senior Frontend Developer in Zakopane specializing in high-performance Next.js apps and refined digital experiences for global SaaS and local businesses."
+    "title": "Sebastian Kolbusz | Senior Frontend Engineer",
+    "description": "Senior Frontend Engineer in Zakopane building fast Next.js websites, SaaS interfaces, and polished digital experiences for ambitious brands."
   },
   "actions": {
     "skip_to_main": "Skip to main content",
@@ -214,8 +214,8 @@
   },
   "services_page": {
     "ideal_for_label": "Perfect For",
-    "meta_title": "Web Development Services | Professional Websites & Apps",
-    "meta_description": "Professional web development, high-performance landing pages, and custom business applications. Focused on speed, technical SEO, and Core Web Vitals.",
+    "meta_title": "Web Development Services",
+    "meta_description": "Web development services focused on fast marketing sites, reliable business platforms, and custom applications built with technical SEO in mind.",
     "h1": "Professional Web Development Services",
     "h2_niche": "Modern Websites and Apps for Your Business",
     "h2_offer": "Explore My Core Services",
@@ -280,7 +280,7 @@
   },
   "projectsBook": {
     "title": "Selected Work",
-    "subtitle": "A collection of high-performance web applications and professional digital appearances.",
+    "subtitle": "Selected case studies covering high-performance websites, SaaS interfaces, and digital platforms built with clarity, speed, and measurable outcomes.",
     "tocTitle": "Project Index",
     "exploreLabel": "Explore Case Study",
     "visitSiteLabel": "Launch Site",

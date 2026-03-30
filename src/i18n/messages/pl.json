@@ -3,8 +3,8 @@
     "back": "Wróć"
   },
   "Metadata": {
-    "title": "Sebastian Kolbusz | Senior Frontend Specialist & Web Architect",
-    "description": "Senior Frontend Developer z Zakopanego, specjalizujący się w wysokowydajnych aplikacjach Next.js i dopracowanych doświadczeniach cyfrowych dla globalnych SaaS oraz lokalnych firm."
+    "title": "Sebastian Kolbusz | Senior Frontend Engineer",
+    "description": "Senior Frontend Engineer z Zakopanego. Projektuję szybkie strony Next.js, aplikacje SaaS i dopracowane doświadczenia cyfrowe dla ambitnych marek."
   },
   "actions": {
     "skip_to_main": "Przejdź do treści",
@@ -214,8 +214,8 @@
   },
   "services_page": {
     "ideal_for_label": "Idealnie sprawdzi się dla",
-    "meta_title": "Tworzenie Stron Internetowych Zakopane & Podhale | Profesjonalne Strony www",
-    "meta_description": "Profesjonalne tworzenie stron internetowych, aplikacji i landing page dla firm z Zakopanego, Podhala i całej Polski. Zbuduj zyskowną obecność online. Sprawdź ofertę!",
+    "meta_title": "Tworzenie Stron Internetowych Zakopane & Podhale",
+    "meta_description": "Tworzę szybkie strony internetowe, landing page i aplikacje dla firm z Zakopanego, Podhala oraz całej Polski, z naciskiem na SEO i Core Web Vitals.",
     "h1": "Profesjonalne Tworzenie Stron Internetowych – Zakopane i Podhale",
     "h2_niche": "Nowoczesne strony i aplikacje internetowe dla Twojego biznesu",
     "h2_offer": "Poznaj moje usługi webowe",
@@ -280,7 +280,7 @@
   },
   "projectsBook": {
     "title": "Wybrane Prace",
-    "subtitle": "Kolekcja wysokowydajnych aplikacji webowych i profesjonalnego wizerunku cyfrowego.",
+    "subtitle": "Wybrane case studies prezentujące szybkie strony, interfejsy SaaS i platformy cyfrowe budowane z myślą o klarowności, wydajności i wynikach.",
     "tocTitle": "Indeks Projektów",
     "exploreLabel": "Zobacz Case Study",
     "visitSiteLabel": "Uruchom Stronę",

@@ -66,6 +66,7 @@ export function ServicesContent() {
         <EditorialHeader
           ref={headerRef}
           title={t('h1')}
+          as="h1"
           subtitle={t('h2_niche')}
           tagline={tServices('limited_availability')}
         />

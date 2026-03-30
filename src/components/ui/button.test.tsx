@@ -4,8 +4,17 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('@/i18n/navigation', () => ({
-  Link: ({ href, children, ...props }: { href: string; children: ReactNode }) => (
-    <a href={href} {...props} data-locale-link="true">
+  Link: ({
+    href,
+    locale,
+    children,
+    ...props
+  }: {
+    href: string
+    locale?: string
+    children: ReactNode
+  }) => (
+    <a href={href} data-link-locale={locale ?? ''} {...props} data-locale-link="true">
       {children}
     </a>
   ),
@@ -81,5 +90,15 @@ describe('Button', () => {
     )
     fireEvent.click(screen.getByRole('button'))
     expect(onClick).not.toHaveBeenCalled()
+  })
+
+  it('passes the locale through to localized links', () => {
+    render(
+      <Button href="/cv" locale="pl">
+        CV
+      </Button>
+    )
+
+    expect(screen.getByRole('link', { name: 'CV' })).toHaveAttribute('data-link-locale', 'pl')
   })
 })
