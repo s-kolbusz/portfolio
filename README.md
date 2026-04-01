@@ -8,16 +8,16 @@ A bilingual, high-performance portfolio platform built with Next.js 16. Targets 
 
 ## Tech Stack
 
-| Layer | Choice | Why |
-|---|---|---|
-| **Framework** | Next.js 16 (App Router) | Full SSG, React Compiler, mature metadata API |
-| **UI Library** | React 19 + TypeScript (strict) | Latest features, type-safe throughout |
-| **Styling** | Tailwind CSS v4 | CSS-first config, design tokens |
-| **Localization** | next-intl | Type-safe messages, locale-aware App Router routing |
-| **Motion** | GSAP + Lenis + WebGL | Fine-grained scroll and animation control |
-| **State** | Zustand | Lightweight, scroll/interaction orchestration |
-| **Testing** | Vitest + Playwright + Axe | Unit, integration, E2E, and accessibility coverage |
-| **Tooling** | ESLint (Perfectionist), Prettier, pnpm, Volta | Enforced standards, reproducible environments |
+| Layer            | Choice                                        | Why                                                 |
+| ---------------- | --------------------------------------------- | --------------------------------------------------- |
+| **Framework**    | Next.js 16 (App Router)                       | Full SSG, React Compiler, mature metadata API       |
+| **UI Library**   | React 19 + TypeScript (strict)                | Latest features, type-safe throughout               |
+| **Styling**      | Tailwind CSS v4                               | CSS-first config, design tokens                     |
+| **Localization** | next-intl                                     | Type-safe messages, locale-aware App Router routing |
+| **Motion**       | GSAP + Lenis + WebGL                          | Fine-grained scroll and animation control           |
+| **State**        | Zustand                                       | Lightweight, scroll/interaction orchestration       |
+| **Testing**      | Vitest + Playwright + Axe                     | Unit, integration, E2E, and accessibility coverage  |
+| **Tooling**      | ESLint (Perfectionist), Prettier, pnpm, Volta | Enforced standards, reproducible environments       |
 
 ---
 
@@ -112,17 +112,17 @@ Snapshots must be generated on **Linux** (same environment as CI). Running `pnpm
 
 ## Performance Budgets
 
-| Metric | Target |
-|---|---|
-| Lighthouse Performance | ≥ 95 |
-| Lighthouse Accessibility | 100 |
-| Lighthouse SEO | 100 |
-| Lighthouse Best Practices | 100 |
-| LCP | ≤ 1500ms |
-| TBT | ≤ 200ms |
-| CLS | ≤ 0.1 |
-| Total JS budget | 250 KB |
-| Total page weight | 600 KB |
+| Metric                    | Target   |
+| ------------------------- | -------- |
+| Lighthouse Performance    | ≥ 95     |
+| Lighthouse Accessibility  | 100      |
+| Lighthouse SEO            | 100      |
+| Lighthouse Best Practices | 100      |
+| LCP                       | ≤ 1500ms |
+| TBT                       | ≤ 200ms  |
+| CLS                       | ≤ 0.1    |
+| Total JS budget           | 250 KB   |
+| Total page weight         | 600 KB   |
 
 ---
 
@@ -130,6 +130,6 @@ Snapshots must be generated on **Linux** (same environment as CI). Running `pnpm
 
 Optimized for **Vercel**. Vercel Analytics and Speed Insights load only in production (`NODE_ENV === 'production' && VERCEL === '1'`).
 
-| Variable | Purpose |
-|---|---|
+| Variable              | Purpose                                      |
+| --------------------- | -------------------------------------------- |
 | `PLAYWRIGHT_BASE_URL` | Override E2E base URL (e.g. staging preview) |

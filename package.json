@@ -25,7 +25,7 @@
     "test:e2e:functional": "playwright test --grep-invert \"visual regression\"",
     "test:e2e:visual": "playwright test e2e/visual-regression.spec.ts",
     "test:e2e:update-snapshots": "playwright test e2e/visual-regression.spec.ts --update-snapshots",
-    "ci:verify": "pnpm format:check && pnpm lint:ci && pnpm typecheck && pnpm test && pnpm test:coverage && pnpm test:e2e",
+    "ci:verify": "pnpm audit --audit-level=high && pnpm format:check && pnpm lint:ci && pnpm typecheck && pnpm test && pnpm test:coverage && pnpm test:e2e",
     "install-hooks": "cp .git-hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit && echo '✔ Git hooks installed'"
   },
   "dependencies": {
@@ -80,7 +80,9 @@
     "overrides": {
       "undici": ">=7.24.0",
       "flatted": ">=3.4.2",
-      "picomatch": ">=4.0.4"
+      "picomatch": ">=4.0.4",
+      "brace-expansion@1": "1.1.13",
+      "brace-expansion@5": "5.0.5"
     }
   }
 }

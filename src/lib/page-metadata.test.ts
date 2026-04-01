@@ -28,6 +28,7 @@ describe('page metadata', () => {
           "languages": {
             "en": "https://www.kolbusz.xyz/en",
             "pl": "https://www.kolbusz.xyz/pl",
+            "x-default": "https://www.kolbusz.xyz/en",
           },
         },
         "description": "Senior Frontend Engineer in Zakopane building fast Next.js websites, SaaS interfaces, and polished digital experiences for ambitious brands.",
@@ -37,7 +38,7 @@ describe('page metadata', () => {
             {
               "alt": "Sebastian Kolbusz - High-performance web engineering",
               "height": 630,
-              "url": "https://www.kolbusz.xyz/images/sebastian_kolbusz_caricature.avif",
+              "url": "https://www.kolbusz.xyz/images/og-image.png",
               "width": 1200,
             },
           ],
@@ -52,10 +53,10 @@ describe('page metadata', () => {
         },
         "twitter": {
           "card": "summary_large_image",
-          "creator": "@s-kolbusz",
+          "creator": "@s_kolbusz",
           "description": "Senior Frontend Engineer in Zakopane building fast Next.js websites, SaaS interfaces, and polished digital experiences for ambitious brands.",
           "images": [
-            "https://www.kolbusz.xyz/images/sebastian_kolbusz_caricature.avif",
+            "https://www.kolbusz.xyz/images/og-image.png",
           ],
           "title": "Sebastian Kolbusz | Senior Frontend Engineer",
         },
@@ -77,6 +78,7 @@ describe('page metadata', () => {
           "languages": {
             "en": "https://www.kolbusz.xyz/en/cv",
             "pl": "https://www.kolbusz.xyz/pl/cv",
+            "x-default": "https://www.kolbusz.xyz/en/cv",
           },
         },
         "description": "Senior Frontend Engineer in Zakopane building fast Next.js websites, SaaS interfaces, and polished digital experiences for ambitious brands.",
@@ -86,7 +88,7 @@ describe('page metadata', () => {
             {
               "alt": "Sebastian Kolbusz - High-performance web engineering",
               "height": 630,
-              "url": "https://www.kolbusz.xyz/images/sebastian_kolbusz_caricature.avif",
+              "url": "https://www.kolbusz.xyz/images/og-image.png",
               "width": 1200,
             },
           ],
@@ -99,10 +101,10 @@ describe('page metadata', () => {
         "title": "Curriculum Vitae",
         "twitter": {
           "card": "summary_large_image",
-          "creator": "@s-kolbusz",
+          "creator": "@s_kolbusz",
           "description": "Senior Frontend Engineer in Zakopane building fast Next.js websites, SaaS interfaces, and polished digital experiences for ambitious brands.",
           "images": [
-            "https://www.kolbusz.xyz/images/sebastian_kolbusz_caricature.avif",
+            "https://www.kolbusz.xyz/images/og-image.png",
           ],
           "title": "Curriculum Vitae",
         },
@@ -124,6 +126,7 @@ describe('page metadata', () => {
           "languages": {
             "en": "https://www.kolbusz.xyz/en/projects",
             "pl": "https://www.kolbusz.xyz/pl/projects",
+            "x-default": "https://www.kolbusz.xyz/en/projects",
           },
         },
         "description": "Selected case studies covering high-performance websites, SaaS interfaces, and digital platforms built with clarity, speed, and measurable outcomes.",
@@ -133,7 +136,7 @@ describe('page metadata', () => {
             {
               "alt": "Sebastian Kolbusz - High-performance web engineering",
               "height": 630,
-              "url": "https://www.kolbusz.xyz/images/sebastian_kolbusz_caricature.avif",
+              "url": "https://www.kolbusz.xyz/images/og-image.png",
               "width": 1200,
             },
           ],
@@ -146,10 +149,10 @@ describe('page metadata', () => {
         "title": "Selected Work",
         "twitter": {
           "card": "summary_large_image",
-          "creator": "@s-kolbusz",
+          "creator": "@s_kolbusz",
           "description": "Selected case studies covering high-performance websites, SaaS interfaces, and digital platforms built with clarity, speed, and measurable outcomes.",
           "images": [
-            "https://www.kolbusz.xyz/images/sebastian_kolbusz_caricature.avif",
+            "https://www.kolbusz.xyz/images/og-image.png",
           ],
           "title": "Selected Work",
         },
@@ -177,6 +180,7 @@ describe('page metadata', () => {
           "languages": {
             "en": "https://www.kolbusz.xyz/en/projects/zakofy",
             "pl": "https://www.kolbusz.xyz/pl/projects/zakofy",
+            "x-default": "https://www.kolbusz.xyz/en/projects/zakofy",
           },
         },
         "description": "Custom Tatra Mountain Offer Platform. Providing a modern digital appearance for mountain tourism with a custom-built offer presentation system.",
@@ -199,7 +203,7 @@ describe('page metadata', () => {
         "title": "Zakofy",
         "twitter": {
           "card": "summary_large_image",
-          "creator": "@s-kolbusz",
+          "creator": "@s_kolbusz",
           "description": "Custom Tatra Mountain Offer Platform. Providing a modern digital appearance for mountain tourism with a custom-built offer presentation system.",
           "images": [
             "https://www.kolbusz.xyz/images/projects/zakofy.avif",

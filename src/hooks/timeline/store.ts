@@ -6,7 +6,7 @@ interface TimelineStore {
   unregister: (id: string) => void
 }
 
-export const useTimelineStore = create<TimelineStore>((set, get) => ({
+export const useTimelineStore = create<TimelineStore>((set) => ({
   sections: new Set(),
   register: (id) =>
     set((state) => {
