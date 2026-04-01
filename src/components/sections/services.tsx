@@ -56,7 +56,7 @@ export function Services() {
         tagline={t('limited_availability')}
       />
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-12 xl:gap-8">
+      <div className="grid grid-cols-1 gap-6 overflow-x-clip xl:grid-cols-12 xl:gap-8">
         <article
           ref={primaryServiceRef}
           className="border-border bg-card/60 relative overflow-hidden border px-8 py-10 md:px-10 md:py-12 xl:col-span-7"
@@ -132,7 +132,7 @@ export function Services() {
           </div>
         </article>
 
-        <div className="flex flex-col gap-4 xl:col-span-5">
+        <div className="flex flex-col gap-4 overflow-x-clip xl:col-span-5">
           {secondaryServices.map((service, index) => (
             <article
               ref={(el) => {
