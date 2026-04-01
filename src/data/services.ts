@@ -1,4 +1,4 @@
-export interface Service {
+interface Service {
   id: string
   popular?: boolean
 }

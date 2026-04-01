@@ -14,7 +14,7 @@ if (typeof window !== 'undefined') {
   })
 }
 
-export interface RevealAnimationTokens {
+interface RevealAnimationTokens {
   duration: {
     medium: number
   }

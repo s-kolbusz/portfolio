@@ -6,7 +6,7 @@ import {
   XLogoIcon,
 } from '@phosphor-icons/react/dist/ssr'
 
-export interface ContactLink {
+interface ContactLink {
   id: string
   labelKey: string
   url: string

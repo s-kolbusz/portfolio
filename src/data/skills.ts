@@ -1,8 +1,8 @@
-export interface Skill {
+interface Skill {
   name: string
 }
 
-export interface SkillCategory {
+interface SkillCategory {
   title: string
   skills: Skill[]
 }

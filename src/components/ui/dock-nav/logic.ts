@@ -13,7 +13,7 @@ import { isCvRoute, isHomeRoute, isProjectsRoute } from '@/lib/route-predicates'
 
 export { isCvRoute, isHomeRoute, isProjectsRoute }
 
-export interface NavItem {
+interface NavItem {
   href: string
   icon: Icon
   id: 'hero' | 'about' | 'projects' | 'services' | 'calculator' | 'contact' | 'cv'

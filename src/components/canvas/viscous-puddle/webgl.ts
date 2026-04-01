@@ -1,6 +1,6 @@
 import { FRAGMENT_SRC, VERTEX_SRC } from './shaders'
 
-export interface PuddleUniforms {
+interface PuddleUniforms {
   uTime: WebGLUniformLocation | null
   uMouse: WebGLUniformLocation | null
   uResolution: WebGLUniformLocation | null
@@ -9,7 +9,7 @@ export interface PuddleUniforms {
   uOpacity: WebGLUniformLocation | null
 }
 
-export interface PuddleWebGLContext {
+interface PuddleWebGLContext {
   gl: WebGL2RenderingContext
   program: WebGLProgram
   vao: WebGLVertexArrayObject
@@ -138,9 +138,4 @@ export function disposePuddleWebGL({ gl, program, vao, vbo }: PuddleWebGLContext
 
 export function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t
-}
-
-export function hexToRgb(hex: string): [number, number, number] {
-  const value = parseInt(hex.replace('#', ''), 16)
-  return [(value >> 16) / 255, ((value >> 8) & 0xff) / 255, (value & 0xff) / 255]
 }

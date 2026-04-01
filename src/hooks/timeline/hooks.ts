@@ -8,7 +8,7 @@ import { useGSAP } from '@/lib/gsap'
 
 import { createReveal, REVEAL } from './reveal-engine'
 import { useTimelineStore } from './store'
-import type { RevealFn, RevealOptions, TimelineConfig, TimelineSetup } from './types'
+import type { RevealFn, TimelineConfig, TimelineSetup } from './types'
 
 export function useTimeline<T extends HTMLElement>(
   ref: RefObject<T | null>,
@@ -51,33 +51,6 @@ export function useTimeline<T extends HTMLElement>(
           useTimelineStore.getState().unregister(id)
         }
       }
-    },
-    {
-      scope: ref,
-      dependencies: [prefersReducedMotion],
-    }
-  )
-}
-
-export function useStandaloneReveal<T extends HTMLElement>(
-  ref: RefObject<T | null>,
-  options: RevealOptions = {}
-) {
-  const prefersReducedMotion = usePrefersReducedMotion()
-  const anim = useSafeAnimation()
-
-  useGSAP(
-    () => {
-      if (!ref.current) return
-
-      createReveal(
-        ref,
-        { self: true, ...options },
-        prefersReducedMotion,
-        anim,
-        REVEAL.start,
-        REVEAL.toggleActions
-      )
     },
     {
       scope: ref,

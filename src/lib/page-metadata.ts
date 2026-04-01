@@ -30,7 +30,7 @@ function toAbsoluteImageUrl(url: string) {
   return toAbsoluteSiteUrl(url)
 }
 
-export function getMetadataAlternates(path: string, currentLocale: Locale) {
+function getMetadataAlternates(path: string, currentLocale: Locale) {
   const languages: Record<string, string> = {}
 
   routing.locales.forEach((locale) => {
@@ -86,7 +86,7 @@ function getOpenGraphImages(
 }
 
 export const MIN_DESCRIPTION_LENGTH = 110
-export const MAX_DESCRIPTION_LENGTH = 160
+const MAX_DESCRIPTION_LENGTH = 160
 
 /**
  * Trims a description to fit within the max character limit.
