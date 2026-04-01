@@ -38,7 +38,7 @@
   }
 
   .section-container {
-    @apply text-foreground relative mx-auto min-h-screen w-full px-6 py-24 lg:px-24 lg:py-32;
+    @apply text-foreground relative mx-auto min-h-screen w-full overflow-x-clip px-6 py-24 lg:px-24 lg:py-32;
   }
 
   .editorial-header {
