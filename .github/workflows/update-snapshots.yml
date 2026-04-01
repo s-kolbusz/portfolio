@@ -1,0 +1,43 @@
+name: Update Visual Snapshots
+
+# Run manually from the Actions tab on any branch.
+# Builds the app in the same Linux environment as CI, regenerates snapshots,
+# and commits them back to the branch — ensuring they always match CI rendering.
+on:
+  workflow_dispatch:
+
+jobs:
+  update-snapshots:
+    name: Regenerate Visual Regression Snapshots
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - name: Build
+        run: pnpm build
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install chromium --with-deps
+      - name: Update snapshots
+        run: pnpm test:e2e:update-snapshots
+      - name: Commit updated snapshots
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add e2e/
+          git diff --staged --quiet && echo "No snapshot changes." || (
+            git commit -m "chore: update visual regression snapshots [skip ci]" &&
+            git push
+          )
