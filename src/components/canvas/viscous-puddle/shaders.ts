@@ -82,6 +82,6 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
     vec3 finalColor = mix(uColor, uColor * 0.85, depthFactor);
     float opacity = alpha * uOpacity;
 
-    fragColor = vec4(finalColor, opacity);
+    fragColor = vec4(finalColor * opacity, opacity);
   }
 `

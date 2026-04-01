@@ -78,7 +78,7 @@ export function setupPuddleWebGL(canvas: HTMLCanvasElement): PuddleWebGLContext 
   const gl = canvas.getContext('webgl2', {
     alpha: true,
     antialias: false,
-    premultipliedAlpha: false,
+    premultipliedAlpha: true,
     powerPreference: 'high-performance',
     depth: false,
     stencil: false,
@@ -119,7 +119,7 @@ export function setupPuddleWebGL(canvas: HTMLCanvasElement): PuddleWebGLContext 
   }
 
   gl.enable(gl.BLEND)
-  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+  gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
 
   return {
     gl,
