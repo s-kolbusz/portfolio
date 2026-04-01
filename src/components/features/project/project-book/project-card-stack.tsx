@@ -21,6 +21,7 @@ interface ProjectCardStackProps {
 }
 
 export function ProjectCardStack({ projects }: ProjectCardStackProps) {
+  const tt = useTranslations('terms')
   const t = useTranslations('projectsBook')
   const router = useRouter()
   const containerRef = useRef<HTMLDivElement>(null)
@@ -54,7 +55,7 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
           onClick={() => router.push('/#projects')}
           leftIcon={<ArrowLeftIcon weight="bold" className="size-4" />}
         >
-          {t('backLabel')}
+          {tt('back')}
         </Button>
       </div>
 
@@ -72,7 +73,7 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
 
       {/* Project list */}
       <div ref={listRef} className="divide-border divide-y">
-        {projects.map((entry) => (
+        {projects.map((entry, index) => (
           <article key={entry.id} data-stack-item className="group py-6 opacity-0 first:pt-0">
             {/* Title row */}
             <Link href={`/projects/${entry.id}`} className="flex items-start justify-between gap-3">
@@ -99,11 +100,12 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
             </Link>
 
             {/* Image — compact, flush edges */}
-            <div className="relative mt-4 aspect-video w-full overflow-hidden bg-neutral-100 dark:bg-neutral-900">
+            <div className="bg-muted relative mt-4 aspect-video w-full overflow-hidden">
               <Image
                 src={entry.heroImage}
                 alt={entry.title}
                 fill
+                priority={index === 0}
                 sizes="(max-width: 1280px) 100vw, 1200px"
                 className="object-cover"
               />

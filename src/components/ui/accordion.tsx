@@ -59,14 +59,13 @@ export function Accordion({
     if (!containerRef.current || !contentRef.current) return
 
     if (isOpen) {
-      const height = contentRef.current.offsetHeight || 0
       const tl = gsap.timeline()
 
       // Disable pointer events on the whole container during animation
       gsap.set(containerRef.current, { pointerEvents: 'none' })
 
       tl.to(containerRef.current, {
-        height,
+        gridTemplateRows: '1fr',
         duration: ANIMATION.duration.fast,
         ease: ANIMATION.ease.out,
       })
@@ -104,7 +103,6 @@ export function Accordion({
       tl.call(() => {
         if (containerRef.current) {
           containerRef.current.style.pointerEvents = 'auto'
-          containerRef.current.style.height = 'auto' // Allow content to dictate height after open
         }
         ScrollTrigger.refresh()
         onAnimationComplete?.()
@@ -116,7 +114,7 @@ export function Accordion({
       const tl = gsap.timeline()
 
       tl.to(containerRef.current, {
-        height: 0,
+        gridTemplateRows: '0fr',
         duration: ANIMATION.duration.fast,
         ease: ANIMATION.ease.inOut,
       })
@@ -187,9 +185,9 @@ export function Accordion({
         role="region"
         aria-labelledby={`accordion-trigger-${id}`}
         ref={containerRef}
-        className="h-0 overflow-hidden"
+        className={cn('grid overflow-hidden', isOpen ? 'grid-rows-1' : 'grid-rows-0')}
       >
-        <div ref={contentRef} className={contentClassName}>
+        <div ref={contentRef} className={cn('min-h-0', contentClassName)}>
           {children}
         </div>
       </div>

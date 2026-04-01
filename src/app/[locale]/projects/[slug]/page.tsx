@@ -3,11 +3,11 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 
 import { ProjectCaseStudy, RoleCaseStudy } from '@/components/features/project/project-book'
+import { StructuredData } from '@/components/seo/structured-data'
 import { getProject, getProjects } from '@/data/get-projects'
 import { requireRoutingLocale } from '@/i18n/locale'
 import { routing } from '@/i18n/routing'
 import { buildProjectDetailPageMetadata } from '@/lib/page-metadata'
-import { serializeJsonLd } from '@/lib/serialize-json-ld'
 import { toAbsoluteSiteUrl } from '@/lib/site'
 
 type Props = {
@@ -51,27 +51,37 @@ export default async function ProjectDetailPage({ params }: Props) {
   const currentIdx = allProjects.findIndex((p) => p.id === slug)
   const prevProject = currentIdx > 0 ? allProjects[currentIdx - 1] : undefined
   const nextProject = currentIdx < allProjects.length - 1 ? allProjects[currentIdx + 1] : undefined
+  const structuredDataDescription = `${project.subtitle}. ${project.tagline}`
 
   return (
     <main id="main-content">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: serializeJsonLd({
-            '@context': 'https://schema.org',
-            '@type': 'CreativeWork',
-            headline: project.title,
-            description: project.tagline,
-            image: project.heroImage,
-            dateCreated: project.year,
-            category: project.category,
-            url: toAbsoluteSiteUrl(`/${locale}/projects/${project.id}`),
-            author: {
-              '@type': 'Person',
-              name: 'Sebastian Kolbusz',
+      <StructuredData
+        entries={[
+          {
+            id: `project-${project.id}`,
+            data: {
+              '@context': 'https://schema.org',
+              '@type': 'CreativeWork',
+              '@id': toAbsoluteSiteUrl(`/${locale}/projects/${project.id}#creative-work`),
+              name: project.title,
+              headline: project.title,
+              description: structuredDataDescription,
+              image: {
+                '@type': 'ImageObject',
+                url: toAbsoluteSiteUrl(project.heroImage),
+                contentUrl: toAbsoluteSiteUrl(project.heroImage),
+              },
+              category: project.category,
+              inLanguage: locale,
+              url: toAbsoluteSiteUrl(`/${locale}/projects/${project.id}`),
+              author: {
+                '@type': 'Person',
+                '@id': `${toAbsoluteSiteUrl('/')}#person`,
+                name: 'Sebastian Kolbusz',
+              },
             },
-          }),
-        }}
+          },
+        ]}
       />
       {project.type === 'role' ? (
         <RoleCaseStudy project={project} prevProject={prevProject} nextProject={nextProject} />

@@ -9,18 +9,24 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "seo:indexnow": "node ./scripts/submit-indexnow.mjs",
+    "seo:indexnow:dry": "node ./scripts/submit-indexnow.mjs --dry-run",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:ci": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
+    "test:e2e:functional": "playwright test --grep-invert \"visual regression\"",
+    "test:e2e:visual": "playwright test e2e/visual-regression.spec.ts",
     "test:e2e:update-snapshots": "playwright test e2e/visual-regression.spec.ts --update-snapshots",
-    "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "ci:verify": "pnpm audit --audit-level=high && pnpm format:check && pnpm lint:ci && pnpm typecheck && pnpm test && pnpm test:coverage && pnpm test:e2e",
+    "install-hooks": "cp .git-hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit && echo '✔ Git hooks installed'"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -73,7 +79,10 @@
   "pnpm": {
     "overrides": {
       "undici": ">=7.24.0",
-      "flatted": ">=3.4.2"
+      "flatted": ">=3.4.2",
+      "picomatch": ">=4.0.4",
+      "brace-expansion@1": "1.1.13",
+      "brace-expansion@5": "5.0.5"
     }
   }
 }

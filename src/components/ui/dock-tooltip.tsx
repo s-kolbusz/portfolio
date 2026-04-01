@@ -15,16 +15,16 @@ export function DockTooltip({ label, isVisible }: DockTooltipProps) {
   useGSAP(() => {
     if (isVisible) {
       gsap.to(tooltipRef.current, {
-        x: -8, // Slide slightly left to its final position
+        x: -10,
         opacity: 1,
         scale: 1,
         duration: 0.3,
-        ease: 'back.out(1.7)',
+        ease: 'power4.out',
         overwrite: true,
       })
     } else {
       gsap.to(tooltipRef.current, {
-        x: 0, // Don't move right
+        x: -2,
         opacity: 0,
         scale: 0.9,
         duration: 0.2,
@@ -37,7 +37,7 @@ export function DockTooltip({ label, isVisible }: DockTooltipProps) {
   return (
     <div
       ref={tooltipRef}
-      className="border-border pointer-events-none absolute right-full mr-2 hidden rounded-lg border bg-white px-3 py-1.5 font-mono text-sm whitespace-nowrap text-neutral-800 opacity-0 lg:block dark:bg-black dark:text-neutral-200"
+      className="border-border/70 bg-card/95 text-foreground shadow-foreground/10 pointer-events-none absolute right-full mr-3 hidden rounded-md border px-3 py-2 font-mono text-[11px] tracking-[0.18em] whitespace-nowrap uppercase opacity-0 shadow-lg lg:block"
     >
       {label}
     </div>

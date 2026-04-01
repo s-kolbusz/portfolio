@@ -7,6 +7,7 @@ import {
 } from 'react'
 
 import { Link } from '@/i18n/navigation'
+import type { Locale } from '@/i18n/routing'
 import { cn } from '@/lib/cn'
 
 interface ButtonVisualProps {
@@ -27,7 +28,9 @@ type ButtonAsButtonProps = ButtonVisualProps &
 type ButtonAsLinkProps = ButtonVisualProps &
   Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof ButtonVisualProps | 'href'> & {
     href: string
+    locale?: Locale
     ref?: Ref<HTMLAnchorElement>
+    scroll?: boolean
   }
 
 type ButtonProps = ButtonAsButtonProps | ButtonAsLinkProps
@@ -52,7 +55,7 @@ export function Button(props: ButtonProps) {
   } = props
 
   const baseStyles =
-    'inline-flex items-center justify-center gap-2 font-medium transition-[colors, box-shadow, scale] duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95 cursor-pointer disabled:cursor-not-allowed opacity-100'
+    'inline-flex items-center justify-center gap-2 font-medium transition-[color,background-color,border-color,box-shadow,transform] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95 cursor-pointer disabled:cursor-not-allowed opacity-100'
 
   const variants = {
     primary:
@@ -60,16 +63,16 @@ export function Button(props: ButtonProps) {
     secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
     outline: 'border border-input bg-transparent hover:bg-accent hover:text-accent-foreground',
     'outline-glass':
-      'border border-border hover:bg-accent/40 hover:text-accent-foreground rounded-md bg-white/20 backdrop-blur-sm dark:bg-black/20',
+      'rounded-md border border-border/70 bg-card/72 backdrop-blur-sm hover:border-primary/15 hover:bg-accent/70 hover:text-foreground',
     ghost: 'hover:bg-accent hover:text-accent-foreground',
     glass: 'glass-button',
   }
 
   const sizes = {
-    sm: 'h-9 px-4 text-xs rounded-sm',
+    sm: 'min-h-11 min-w-11 px-4 py-2 text-xs rounded-sm',
     md: 'h-11 px-6 text-sm rounded-md',
     lg: 'h-14 px-8 text-base rounded-lg',
-    icon: 'h-10 w-10 p-0 rounded-md',
+    icon: 'h-11 w-11 p-0 rounded-md',
   }
 
   const combinedClassName = cn(baseStyles, variants[variant], sizes[size], className)
@@ -87,7 +90,7 @@ export function Button(props: ButtonProps) {
   )
 
   if ('href' in rest && typeof rest.href === 'string') {
-    const { href, onClick, target, rel, tabIndex, ref, ...anchorProps } = rest
+    const { href, locale, onClick, target, rel, tabIndex, ref, scroll, ...anchorProps } = rest
     const handleClick: MouseEventHandler<HTMLAnchorElement> | undefined =
       isDisabled || onClick
         ? (event) => {
@@ -126,7 +129,13 @@ export function Button(props: ButtonProps) {
     }
 
     return (
-      <Link href={href} ref={ref as Ref<HTMLAnchorElement>} {...commonLinkProps}>
+      <Link
+        href={href}
+        locale={locale}
+        ref={ref as Ref<HTMLAnchorElement>}
+        scroll={scroll}
+        {...commonLinkProps}
+      >
         {content}
       </Link>
     )

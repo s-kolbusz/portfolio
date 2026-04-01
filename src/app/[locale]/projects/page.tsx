@@ -1,12 +1,11 @@
 import type { Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 
-import { ProjectBook } from '@/components/features/project/project-book'
-import { ProjectCardStack } from '@/components/features/project/project-book'
+import { ProjectBook, ProjectCardStack } from '@/components/features/project/project-book'
+import { StructuredData } from '@/components/seo/structured-data'
 import { getProjects } from '@/data/get-projects'
 import { getLocaleFromParams } from '@/i18n/locale'
 import { buildProjectsPageMetadata } from '@/lib/page-metadata'
-import { serializeJsonLd } from '@/lib/serialize-json-ld'
 import { toAbsoluteSiteUrl } from '@/lib/site'
 
 type Props = {
@@ -33,6 +32,23 @@ export default async function ProjectsPage({ params }: Props) {
 
   return (
     <main id="main-content">
+      <StructuredData
+        entries={[
+          {
+            id: 'projects-list',
+            data: {
+              '@context': 'https://schema.org',
+              '@type': 'ItemList',
+              itemListElement: projects.map((project, index) => ({
+                '@type': 'ListItem',
+                position: index + 1,
+                url: toAbsoluteSiteUrl(`/${locale}/projects/${project.id}`),
+                name: project.title,
+              })),
+            },
+          },
+        ]}
+      />
       <h1 className="sr-only">{t('title')}</h1>
 
       {/* Desktop: horizontal book */}
@@ -44,22 +60,6 @@ export default async function ProjectsPage({ params }: Props) {
       <div className="lg:hidden">
         <ProjectCardStack projects={projects} />
       </div>
-
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: serializeJsonLd({
-            '@context': 'https://schema.org',
-            '@type': 'ItemList',
-            itemListElement: projects.map((project, index) => ({
-              '@type': 'ListItem',
-              position: index + 1,
-              url: toAbsoluteSiteUrl(`/${locale}/projects/${project.id}`),
-              name: project.title,
-            })),
-          }),
-        }}
-      />
     </main>
   )
 }

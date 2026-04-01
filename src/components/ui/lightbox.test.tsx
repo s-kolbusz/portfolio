@@ -5,6 +5,10 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { Lightbox } from './lightbox'
 
+vi.mock('next-intl', () => ({
+  useTranslations: vi.fn(() => (key: string) => key),
+}))
+
 // Mock i18n navigation
 vi.mock('@/i18n/navigation', () => ({
   Link: ({ children, href, ...props }: { children: ReactNode; href: string }) => (
@@ -67,7 +71,7 @@ describe('Lightbox', () => {
   it('navigates to the next image', () => {
     render(<Lightbox images={images} initialIndex={0} onClose={vi.fn()} />)
 
-    const nextButton = screen.getByLabelText('Next image')
+    const nextButton = screen.getByLabelText('next')
     fireEvent.click(nextButton)
 
     expect(screen.getByAltText('Image 2')).toBeInTheDocument()
@@ -77,7 +81,7 @@ describe('Lightbox', () => {
   it('navigates to the previous image', () => {
     render(<Lightbox images={images} initialIndex={1} onClose={vi.fn()} />)
 
-    const prevButton = screen.getByLabelText('Previous image')
+    const prevButton = screen.getByLabelText('previous')
     fireEvent.click(prevButton)
 
     expect(screen.getByAltText('Image 1')).toBeInTheDocument()
@@ -88,7 +92,7 @@ describe('Lightbox', () => {
     const onClose = vi.fn()
     render(<Lightbox images={images} initialIndex={0} onClose={onClose} />)
 
-    const closeButton = screen.getByLabelText('Close lightbox')
+    const closeButton = screen.getAllByLabelText('close')[0]
     fireEvent.click(closeButton)
 
     expect(onClose).toHaveBeenCalled()
@@ -98,7 +102,7 @@ describe('Lightbox', () => {
     const onClose = vi.fn()
     render(<Lightbox images={images} initialIndex={0} onClose={onClose} />)
 
-    const overlay = screen.getByRole('dialog')
+    const overlay = screen.getByTestId('lightbox-backdrop')
     fireEvent.click(overlay)
 
     expect(onClose).toHaveBeenCalled()

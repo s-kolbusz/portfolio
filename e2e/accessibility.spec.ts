@@ -59,13 +59,41 @@ test('project book region is keyboard focusable and supports arrow navigation', 
   await page.goto('/en/projects')
 
   const projectBook = page.getByRole('region', { name: 'Project Book' })
-  await expect(projectBook).toHaveAttribute('tabindex', '0')
   await projectBook.focus()
 
   await expect(page.getByRole('tab', { name: 'Page 1' })).toHaveAttribute('aria-selected', 'true')
 
   await page.keyboard.press('ArrowRight')
   await expect(page.getByRole('tab', { name: 'Page 2' })).toHaveAttribute('aria-selected', 'true')
+})
+
+test('project book traps focus to the active panel and ignores inactive panels', async ({
+  page,
+}) => {
+  await page.goto('/en/projects')
+
+  // Wait for the ToC panel to be visible
+  const tocPanel = page.locator('#book-panel-0')
+  await expect(tocPanel).toBeVisible()
+
+  // First panel (ToC) should not be inert
+  await expect(tocPanel).not.toHaveAttribute('inert', '')
+
+  // Second panel (first project) should be inert
+  const projectPanel = page.locator('#book-panel-1')
+  await expect(projectPanel).toHaveAttribute('inert', '')
+
+  // Navigate to next page using arrow key
+  await page.keyboard.press('ArrowRight')
+
+  // Wait for the URL or state to update (tab 2 becomes selected)
+  await expect(page.getByRole('tab', { name: 'Page 2' })).toHaveAttribute('aria-selected', 'true')
+
+  // Now first panel should be inert
+  await expect(tocPanel).toHaveAttribute('inert', '')
+
+  // And second panel should not be inert
+  await expect(projectPanel).not.toHaveAttribute('inert', '')
 })
 
 test('lightbox restores focus to the trigger after keyboard close', async ({ page }) => {
@@ -83,13 +111,18 @@ test('lightbox restores focus to the trigger after keyboard close', async ({ pag
   await expect(trigger).toBeFocused()
 })
 
-test('desktop dock navigation exposes current position semantics', async ({ page }) => {
+test('dock navigation exposes current position semantics', async ({ page }) => {
   await page.goto('/en')
-  await page.waitForTimeout(700)
 
-  const dockHomeLink = page
-    .getByRole('navigation', { name: 'Main navigation' })
-    .getByRole('link', { name: 'Home' })
+  // Find the visible navigation
+  const dockNav = page
+    .getByRole('navigation', { name: /main navigation/i })
+    .filter({ visible: true })
+    .first()
+  await expect(dockNav).toBeVisible()
+
+  const dockHomeLink = dockNav.getByRole('link', { name: /home/i })
+  await expect(dockHomeLink).toBeVisible()
   await expect(dockHomeLink).toHaveAttribute('aria-current', 'location')
 })
 

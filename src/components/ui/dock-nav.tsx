@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useTranslations } from 'next-intl'
 
@@ -15,6 +15,7 @@ import {
   NAV_ITEMS,
   getActiveItemIndex,
   getDesktopIndicatorOffset,
+  getHoverProgress,
   getHoverScale,
   getMobileIndicatorOffset,
   isHomeRoute,
@@ -23,7 +24,7 @@ import {
 
 export function DockNav() {
   const t = useTranslations('nav')
-  const [hoveredIndex, setHoveredIndex] = useState<null | number>(null)
+  const [hoverProgress, setHoverProgress] = useState<null | number>(null)
   const sectionIds = useMemo(() => NAV_ITEMS.map((item) => item.id), [])
   const activeSection = useActiveSection(sectionIds)
   const pathname = usePathname()
@@ -37,11 +38,38 @@ export function DockNav() {
   const mobileIndicatorRef = useRef<HTMLDivElement>(null)
   const dockRef = useRef<HTMLDivElement>(null)
   const mobileDockRef = useRef<HTMLDivElement>(null)
+  const hoverFrameRef = useRef<number | null>(null)
+  const pendingHoverProgressRef = useRef<null | number>(null)
 
   const activeItemIndex = getActiveItemIndex({
     pathname,
     activeSection: activeSection || null,
   })
+  const hoveredIndex = hoverProgress === null ? null : Math.round(hoverProgress)
+
+  const flushHoverProgress = useCallback(() => {
+    hoverFrameRef.current = null
+    setHoverProgress(pendingHoverProgressRef.current)
+  }, [])
+
+  const scheduleHoverProgress = useCallback(
+    (nextHoverProgress: null | number) => {
+      pendingHoverProgressRef.current = nextHoverProgress
+
+      if (hoverFrameRef.current !== null) return
+
+      hoverFrameRef.current = window.requestAnimationFrame(flushHoverProgress)
+    },
+    [flushHoverProgress]
+  )
+
+  useEffect(() => {
+    return () => {
+      if (hoverFrameRef.current !== null) {
+        window.cancelAnimationFrame(hoverFrameRef.current)
+      }
+    }
+  }, [])
 
   useGSAP(() => {
     animateIndicator({
@@ -96,19 +124,41 @@ export function DockNav() {
     document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' })
   }
 
+  const handleDesktopPointerMove = useCallback(
+    (event: React.PointerEvent<HTMLElement>) => {
+      if (!dockRef.current) return
+
+      const itemCenters = Array.from(
+        dockRef.current.querySelectorAll<HTMLAnchorElement>('a[aria-label]')
+      ).map((item) => {
+        const rect = item.getBoundingClientRect()
+        return rect.top + rect.height / 2
+      })
+
+      scheduleHoverProgress(getHoverProgress(event.clientY, itemCenters))
+    },
+    [scheduleHoverProgress]
+  )
+
+  const handleDesktopPointerLeave = useCallback(() => {
+    scheduleHoverProgress(null)
+  }, [scheduleHoverProgress])
+
   if (isProjectsPage || isDetail || isServices) return null
 
   return (
     <>
       <nav
         ref={dockRef}
-        className="dock-nav glass fixed top-1/2 right-6 z-40 hidden -translate-y-1/2 flex-col gap-3 p-3 lg:flex"
+        className="dock-nav dock-nav--desktop"
         role="navigation"
-        aria-label="Main navigation"
+        aria-label={t('main_navigation')}
+        onPointerMove={handleDesktopPointerMove}
+        onPointerLeave={handleDesktopPointerLeave}
       >
         <div
           ref={indicatorRef}
-          className="absolute top-0 -right-1 h-8 w-1 -translate-y-1/2 rounded-full bg-emerald-500 opacity-0 shadow-lg shadow-emerald-500"
+          className="bg-primary shadow-primary/30 absolute top-0 -right-1 h-8 w-1 -translate-y-1/2 rounded-full opacity-0 shadow-lg"
         />
 
         {NAV_ITEMS.map((item, index) => (
@@ -123,8 +173,8 @@ export function DockNav() {
                 activeItemIndex === index ? (item.isPage ? 'page' : 'location') : undefined
               }
               onClick={(e) => handleNavClick(e, item)}
-              onHover={(isHovering) => setHoveredIndex(isHovering ? index : null)}
-              scale={getHoverScale(index, hoveredIndex)}
+              isHovered={hoveredIndex === index}
+              visualScale={getHoverScale(index, hoverProgress)}
             />
           </div>
         ))}
@@ -132,13 +182,13 @@ export function DockNav() {
 
       <nav
         ref={mobileDockRef}
-        className="dock-nav glass fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 p-2 lg:hidden"
+        className="dock-nav dock-nav--mobile"
         role="navigation"
         aria-label="Mobile navigation"
       >
         <div
           ref={mobileIndicatorRef}
-          className="absolute -bottom-1 left-0 h-1 w-8 -translate-x-1/2 rounded-full bg-emerald-500 opacity-0 shadow-lg shadow-emerald-500"
+          className="bg-primary shadow-primary/30 absolute -bottom-1 left-0 h-1 w-8 -translate-x-1/2 rounded-full opacity-0 shadow-lg"
         />
 
         {NAV_ITEMS.map((item, index) => (

@@ -72,7 +72,7 @@ export function BookSpread({ entry, index }: BookSpreadProps) {
           scale: 1,
           pointerEvents: 'auto',
           duration: ANIMATION.duration.fast,
-          ease: ANIMATION.ease.back,
+          ease: ANIMATION.ease.outStrong,
           stagger: ANIMATION.stagger.tight,
         },
         '-=0.4'
@@ -242,8 +242,8 @@ export function BookSpread({ entry, index }: BookSpreadProps) {
           />
 
           {/* Category badge */}
-          <div className="absolute top-8 right-8">
-            <span className="bg-background/80 text-foreground rounded-full px-3 py-1 text-xs font-medium backdrop-blur-sm">
+          <div className="absolute top-6 left-6">
+            <span className="glass glass-button px-4 py-2">
               {t(`categories.${entry.category}`)}
             </span>
           </div>

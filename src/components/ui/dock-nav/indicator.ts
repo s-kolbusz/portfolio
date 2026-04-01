@@ -57,7 +57,7 @@ export function animateIndicator({
 
   gsap.to(indicator, {
     duration: 0.4,
-    ease: 'back.out(1.2)',
+    ease: 'power3.out',
     opacity: 1,
     ...getAxisTweenVars(axis, offset),
   })

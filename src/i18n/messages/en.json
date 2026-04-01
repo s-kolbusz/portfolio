@@ -3,13 +3,16 @@
     "back": "Back"
   },
   "Metadata": {
-    "title": "Sebastian Kolbusz | Senior Frontend Specialist & Web Architect",
-    "description": "Senior Frontend Developer in Zakopane specializing in high-performance Next.js apps and refined digital experiences for global SaaS and local businesses."
+    "title": "Sebastian Kolbusz | Senior Frontend Engineer",
+    "description": "Senior Frontend Engineer in Zakopane building fast Next.js websites, SaaS interfaces, and polished digital experiences for ambitious brands."
   },
   "actions": {
-    "skip_to_main": "Skip to main content"
+    "skip_to_main": "Skip to main content",
+    "toggle_theme": "Toggle theme",
+    "switch_language": "Switch language"
   },
   "nav": {
+    "main_navigation": "Main Navigation",
     "hero": "Home",
     "about": "About",
     "projects": "Work",
@@ -59,7 +62,8 @@
     "philosophy": {
       "title": "Technical Mindset",
       "details": "I focus on simplicity, performance, and accessible architecture. I build systems where reliability and clean code are the foundation of brand trust.",
-      "craft_details": "I treat web development as a craft. It's about creating digital environments that are solid, responsive, and visually polished."
+      "craft_details": "I treat web development as a craft. It's about creating digital environments that are solid, responsive, and visually polished.",
+      "quote": "Simplicity is the ultimate sophistication. Every line of code should earn its place."
     },
     "skills": {
       "title": "Technical Toolkit"
@@ -210,8 +214,8 @@
   },
   "services_page": {
     "ideal_for_label": "Perfect For",
-    "meta_title": "Web Development Services | Professional Websites & Apps",
-    "meta_description": "Professional web development, high-performance landing pages, and custom business applications. Focused on speed, technical SEO, and Core Web Vitals.",
+    "meta_title": "Web Development Services",
+    "meta_description": "Web development services focused on fast marketing sites, reliable business platforms, and custom applications built with technical SEO in mind.",
     "h1": "Professional Web Development Services",
     "h2_niche": "Modern Websites and Apps for Your Business",
     "h2_offer": "Explore My Core Services",
@@ -265,6 +269,7 @@
   },
   "cv": {
     "title": "Curriculum Vitae",
+    "metaDescription": "CV | Sebastian Kolbusz — Senior Frontend Engineer with 6+ years of experience. Specialist in React, Next.js, and TypeScript. Available for freelance projects.",
     "print": "Print / Save as PDF",
     "summary": "Professional Summary",
     "experience": "Professional Experience",
@@ -276,12 +281,10 @@
   },
   "projectsBook": {
     "title": "Selected Work",
-    "subtitle": "A collection of high-performance web applications and professional digital appearances.",
+    "subtitle": "Selected case studies covering high-performance websites, SaaS interfaces, and digital platforms built with clarity, speed, and measurable outcomes.",
     "tocTitle": "Project Index",
     "exploreLabel": "Explore Case Study",
     "visitSiteLabel": "Launch Site",
-    "backLabel": "Back",
-    "backToProjects": "Back to Portfolio",
     "prevProject": "← Previous",
     "nextProject": "Next →",
     "roleLabel": "Professional Role",
@@ -306,7 +309,17 @@
       "nextProjectLabel": "Next Project",
       "prevProjectLabel": "Previous Project",
       "viewImageLabel": "View High-Res"
-    }
+    },
+    "prevPage": "Previous page",
+    "nextPage": "Next page",
+    "bookPages": "Book pages",
+    "pageNumber": "Page {page}"
+  },
+  "lightbox": {
+    "title": "Image lightbox",
+    "close": "Close lightbox",
+    "previous": "Previous image",
+    "next": "Next image"
   },
   "footer": {
     "copyright": "© {year} Sebastian Kolbusz. Engineered for performance."

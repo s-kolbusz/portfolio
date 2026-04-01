@@ -1,0 +1,63 @@
+#!/bin/sh
+# Pre-commit hook — runs all CI quality gates before allowing a commit.
+# Installed automatically; to bypass in an emergency: git commit --no-verify
+#
+# To install on a fresh clone, run from the repo root:
+#   cp website/.git-hooks/pre-commit .git/hooks/pre-commit
+#   chmod +x .git/hooks/pre-commit
+#
+# Or configure git to use the shared hooks directory permanently:
+#   git config core.hooksPath website/.git-hooks
+
+set -e
+
+cd "$(git rev-parse --show-toplevel)/website"
+
+echo "▶ Running CI quality gates before commit…"
+echo ""
+
+echo "  [1/6] Format check"
+pnpm format:check || {
+  echo ""
+  echo "  ✖ Formatting errors found. Run:  pnpm format"
+  exit 1
+}
+
+echo "  [2/6] Lint (zero warnings)"
+pnpm lint:ci || {
+  echo ""
+  echo "  ✖ Lint errors found. Run:  pnpm lint:fix"
+  exit 1
+}
+
+echo "  [3/6] Type check"
+pnpm typecheck || {
+  echo ""
+  echo "  ✖ TypeScript errors found."
+  exit 1
+}
+
+echo "  [4/6] Unit tests"
+pnpm test || {
+  echo ""
+  echo "  ✖ Tests failed."
+  exit 1
+}
+
+echo "  [5/6] Test coverage"
+pnpm test:coverage || {
+  echo ""
+  echo "  ✖ Test coverage not met."
+  exit 1
+}
+
+echo "  [6/6] E2E tests"
+pnpm test:e2e || {
+  echo ""
+  echo "  ✖ E2E tests failed."
+  exit 1
+}
+
+
+echo ""
+echo "  ✔ All quality gates passed."

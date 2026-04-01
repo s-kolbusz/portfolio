@@ -1,12 +1,9 @@
 'use client'
 
-import { useRef, useState } from 'react'
-
 import type { Icon } from '@phosphor-icons/react'
 
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/cn'
-import { gsap, useGSAP } from '@/lib/gsap'
 
 import { DockTooltip } from './dock-tooltip'
 
@@ -15,10 +12,10 @@ type DockItemProps = {
   label: string
   href: string
   isActive?: boolean
+  isHovered?: boolean
   ariaCurrent?: 'location' | 'page'
   onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void
-  scale?: number
-  onHover?: (isHovering: boolean) => void
+  visualScale?: number
   className?: string
 }
 
@@ -27,62 +24,48 @@ export function DockItem({
   label,
   href,
   isActive,
+  isHovered = false,
   ariaCurrent,
   onClick,
-  scale = 1,
-  onHover,
+  visualScale = 1,
   className,
 }: DockItemProps) {
-  const [isHovered, setIsHovered] = useState(false)
-  const itemRef = useRef<HTMLAnchorElement>(null)
-
-  useGSAP(() => {
-    if (!itemRef.current) return
-    gsap.to(itemRef.current, {
-      scale: scale,
-      duration: 0.2,
-      ease: 'power2.out',
-      overwrite: true,
-    })
-  }, [scale])
-
-  const handleMouseEnter = () => {
-    setIsHovered(true)
-    onHover?.(true)
-  }
-
-  const handleMouseLeave = () => {
-    setIsHovered(false)
-    onHover?.(false)
-  }
-
   return (
     <Button
-      ref={itemRef}
       href={href}
       variant="glass"
       size="icon"
       onClick={onClick}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
       className={cn(
-        'group relative flex origin-right items-center justify-center lg:h-12 lg:w-12',
+        'group relative flex items-center justify-center overflow-visible border-transparent bg-transparent transition-none hover:border-transparent hover:bg-transparent active:scale-100 lg:h-12 lg:w-12',
         className
       )}
       aria-label={label}
       aria-current={ariaCurrent}
     >
-      {/* Background hover effect */}
-      <div className="absolute inset-0 rounded-md bg-emerald-500/0 transition-colors duration-300 group-hover:bg-emerald-500/10" />
+      <div
+        data-cursor="button"
+        className="relative flex size-full items-center justify-center transition-transform duration-150 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform"
+        style={{ transform: `scale(${visualScale})`, transformOrigin: 'right center' }}
+      >
+        <div
+          className={cn(
+            'absolute inset-0 rounded-md transition-colors duration-200',
+            isHovered ? 'bg-accent/80' : 'bg-primary/0'
+          )}
+        />
 
-      <Icon
-        weight="duotone"
-        className={`relative z-10 h-6 w-6 transition-all duration-300 ${
-          isActive
-            ? 'text-emerald-600 dark:text-emerald-400'
-            : 'opacity-60 group-hover:scale-110 group-hover:text-emerald-600 group-hover:opacity-100 dark:group-hover:text-emerald-400'
-        }`}
-      />
+        <Icon
+          weight="duotone"
+          className={`relative z-10 h-6 w-6 transition-[color,transform] duration-200 ${
+            isActive
+              ? 'text-primary'
+              : isHovered
+                ? 'text-primary scale-110 opacity-100'
+                : 'opacity-60'
+          }`}
+        />
+      </div>
 
       <DockTooltip label={label} isVisible={isHovered} />
     </Button>

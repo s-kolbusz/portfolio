@@ -84,7 +84,7 @@ describe('navigation integration', () => {
 
     render(<SettingsDock />)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Switch language' }))
+    fireEvent.click(screen.getByRole('button', { name: 'switch_language' }))
 
     expect(routerReplace).toHaveBeenCalledWith('/projects/zakofy', { locale: 'pl' })
   })

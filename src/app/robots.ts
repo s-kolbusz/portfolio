@@ -9,6 +9,7 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/not-found', '/404', '/500'],
     },
-    sitemap: toAbsoluteSiteUrl('/sitemap.xml'),
+    // Locale-specific sitemaps served via /:locale/sitemap rewrites in next.config.ts
+    sitemap: [toAbsoluteSiteUrl('/en/sitemap.xml'), toAbsoluteSiteUrl('/pl/sitemap.xml')],
   }
 }

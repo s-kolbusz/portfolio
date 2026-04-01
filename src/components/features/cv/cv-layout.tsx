@@ -44,7 +44,7 @@ export const CVLayout: React.FC<CVLayoutProps> = ({ data }) => {
     <div
       ref={containerRef}
       id="cv-content"
-      className="bg-card mx-auto w-full max-w-[210mm] p-6 shadow-2xl transition-all duration-300 md:min-h-[297mm] md:p-[15mm] print:min-h-0 print:w-full print:max-w-none print:bg-white print:p-0 print:shadow-none print:[print-color-adjust:exact]!"
+      className="bg-card mx-auto w-full max-w-[210mm] p-6 shadow-2xl transition-colors duration-300 md:min-h-[297mm] md:p-[15mm] print:min-h-0 print:w-full print:max-w-none print:bg-white print:p-0 print:shadow-none print:[print-color-adjust:exact]!"
       style={{ boxSizing: 'border-box' }}
     >
       <div ref={headerRef} className="cv-header">

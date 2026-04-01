@@ -30,7 +30,7 @@ export function ProjectAccordion({ project, isOpen, onAnimationComplete }: Proje
       trigger={<div className="hidden" />} // No trigger visible here as it's controlled externally
       hideIcon
       ariaLabel={`Toggle details for ${project.title}`}
-      className="!py-0"
+      className="py-0!"
     >
       <div className="grid grid-cols-1 gap-12 pt-4 pb-12 md:grid-cols-12 md:gap-24 md:pt-8 md:pb-16">
         <div className="flex flex-col gap-10 md:col-span-7">
@@ -85,13 +85,13 @@ export function ProjectAccordion({ project, isOpen, onAnimationComplete }: Proje
               )}
             </div>
           </div>
-          <Button variant="secondary" size="lg" href={`/projects/${project.id}`}>
+          <Button variant="secondary" size="lg" href={`/projects/${project.id}?origin=home`}>
             {t('explore')}
           </Button>
         </div>
 
         <div className="md:col-span-5">
-          <div className="relative aspect-4/3 w-full overflow-hidden bg-neutral-100 dark:bg-neutral-900">
+          <div className="bg-muted relative aspect-4/3 w-full overflow-hidden">
             <Image
               src={project.heroImage}
               alt={project.title}

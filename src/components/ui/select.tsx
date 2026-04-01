@@ -40,7 +40,7 @@ export const Select = ({ id, label, onChange, options, className, defaultValue }
         <SelectPrimitive.Trigger
           id={id}
           className={cn(
-            'border-input bg-background text-foreground group box-border flex w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-3 text-sm font-medium transition-all duration-200',
+            'border-input bg-background text-foreground group box-border flex w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-3 text-sm font-medium transition-[color,box-shadow,border-color] duration-200',
             'hover:border-primary/50',
             'focus-visible:ring-primary focus-visible:ring-offset-background focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
             'data-[state=open]:border-primary data-[state=open]:ring-primary data-[state=open]:ring-offset-background data-[state=open]:ring-2 data-[state=open]:ring-offset-2'
@@ -60,7 +60,7 @@ export const Select = ({ id, label, onChange, options, className, defaultValue }
             position="popper"
             sideOffset={8}
             className={cn(
-              'glass border-border z-50 box-border rounded-2xl border shadow-xl transition-all',
+              'bg-popover border-border z-50 box-border rounded-2xl border shadow-xl transition-opacity',
               'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
               'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
               'min-w-(--radix-select-trigger-width)'

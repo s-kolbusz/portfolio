@@ -1,12 +1,6 @@
 'use client'
 
-import {
-  type KeyboardEvent as ReactKeyboardEvent,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useTranslations } from 'next-intl'
 
@@ -14,6 +8,7 @@ import { ArrowLeftIcon } from '@phosphor-icons/react'
 
 import { Button } from '@/components/ui/button'
 import type { PortfolioEntry } from '@/data/projects'
+import { useFocusTrap } from '@/hooks/use-focus-trap'
 import { useRouter } from '@/i18n/navigation'
 
 import { BookEdgeNav } from './book-edge-nav'
@@ -26,13 +21,17 @@ interface ProjectBookProps {
 }
 
 export function ProjectBook({ projects }: ProjectBookProps) {
-  const t = useTranslations('projectsBook')
+  const t = useTranslations('terms')
   const router = useRouter()
   const scrollRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
   const totalPanels = projects.length + 1 // ToC + spreads
 
   const isOnToC = currentIndex === 0
+
+  // Trap focus inside the entire component (since we manage tabIndex on panels)
+  useFocusTrap(containerRef, true)
 
   // Track current panel via IntersectionObserver
   useEffect(() => {
@@ -68,12 +67,30 @@ export function ProjectBook({ projects }: ProjectBookProps) {
         left: index * container.clientWidth,
         behavior: 'smooth',
       })
+
+      // Move focus to the new panel so next Tab enters it natively
+      const targetPanel = container.querySelector<HTMLElement>(`#book-panel-${index}`)
+      if (targetPanel) {
+        // Small timeout ensures focus is applied properly despite smooth scrolling and observer updates
+        setTimeout(() => {
+          const dataLink: HTMLLinkElement | null = targetPanel.querySelector('[data-spread-link]')
+
+          if (dataLink) {
+            dataLink.focus({ preventScroll: true })
+          } else {
+            targetPanel.focus({ preventScroll: true })
+          }
+        }, 50)
+      }
     },
     [totalPanels]
   )
 
-  const handleBookKeyDown = useCallback(
-    (event: ReactKeyboardEvent<HTMLDivElement>) => {
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Don't intercept if user is typing
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes((event.target as HTMLElement).tagName)) return
+
       if (event.key === 'ArrowRight') {
         event.preventDefault()
         scrollToPanel(currentIndex + 1)
@@ -81,9 +98,11 @@ export function ProjectBook({ projects }: ProjectBookProps) {
         event.preventDefault()
         scrollToPanel(currentIndex - 1)
       }
-    },
-    [currentIndex, scrollToPanel]
-  )
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [currentIndex, scrollToPanel])
 
   // Back logic: ToC → homepage #projects, spread → scroll to ToC
   const handleBack = () => {
@@ -94,15 +113,12 @@ export function ProjectBook({ projects }: ProjectBookProps) {
     }
   }
 
-  /* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */
   return (
-    <div
-      role="region"
+    <section
+      ref={containerRef}
       aria-roledescription="carousel"
       aria-label="Project Book"
-      tabIndex={0}
       className="book-paper focus-visible:ring-ring focus-visible:ring-offset-background relative focus-visible:ring-2 focus-visible:ring-offset-4"
-      onKeyDown={handleBookKeyDown}
     >
       {/* Back button */}
       <div className="fixed top-6 left-6 z-50">
@@ -112,7 +128,7 @@ export function ProjectBook({ projects }: ProjectBookProps) {
           onClick={handleBack}
           leftIcon={<ArrowLeftIcon weight="bold" className="size-4" />}
         >
-          {isOnToC ? t('backLabel') : t('backToProjects')}
+          {t('back')}
         </Button>
       </div>
 
@@ -129,6 +145,7 @@ export function ProjectBook({ projects }: ProjectBookProps) {
           role="tabpanel"
           aria-labelledby="book-tab-0"
           tabIndex={currentIndex === 0 ? 0 : -1}
+          {...(currentIndex !== 0 ? { inert: true } : {})}
         >
           <BookTableOfContents entries={projects} onNavigate={scrollToPanel} />
         </div>
@@ -142,6 +159,7 @@ export function ProjectBook({ projects }: ProjectBookProps) {
             role="tabpanel"
             aria-labelledby={`book-tab-${i + 1}`}
             tabIndex={currentIndex === i + 1 ? 0 : -1}
+            {...(currentIndex !== i + 1 ? { inert: true } : {})}
           >
             <BookSpread entry={project} index={i} />
           </div>
@@ -158,6 +176,6 @@ export function ProjectBook({ projects }: ProjectBookProps) {
 
       {/* Page dots */}
       <BookPageDots total={totalPanels} current={currentIndex} onSelect={scrollToPanel} />
-    </div>
+    </section>
   )
 }

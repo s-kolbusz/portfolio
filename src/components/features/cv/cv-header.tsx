@@ -38,7 +38,7 @@ export const CVHeader: React.FC<CVHeaderProps> = ({ name, title, contact }) => {
           >
             <EnvelopeIcon
               weight="duotone"
-              className="size-4 text-emerald-500 md:size-4 print:size-[10pt] print:text-emerald-600"
+              className="text-primary print:text-primary size-4 md:size-4 print:size-[10pt]"
             />
             {contact.email}
           </a>
@@ -48,14 +48,14 @@ export const CVHeader: React.FC<CVHeaderProps> = ({ name, title, contact }) => {
           >
             <PhoneIcon
               weight="duotone"
-              className="size-4 text-emerald-500 md:size-4 print:size-[10pt] print:text-emerald-600"
+              className="text-primary print:text-primary size-4 md:size-4 print:size-[10pt]"
             />
             {contact.phone}
           </a>
           <div className="text-muted-foreground flex items-center gap-3 md:gap-2 print:gap-2 print:text-black">
             <MapPinIcon
               weight="duotone"
-              className="size-4 text-emerald-500 md:size-4 print:size-[10pt] print:text-emerald-600"
+              className="text-primary print:text-primary size-4 md:size-4 print:size-[10pt]"
             />
             {contact.location}
           </div>
@@ -68,7 +68,7 @@ export const CVHeader: React.FC<CVHeaderProps> = ({ name, title, contact }) => {
             >
               <LinkedinLogoIcon
                 weight="duotone"
-                className="size-4 text-emerald-500 md:size-4 print:size-[10pt] print:text-emerald-600"
+                className="text-primary print:text-primary size-4 md:size-4 print:size-[10pt]"
               />
               LinkedIn
             </a>
@@ -81,7 +81,7 @@ export const CVHeader: React.FC<CVHeaderProps> = ({ name, title, contact }) => {
               >
                 <GithubLogoIcon
                   weight="duotone"
-                  className="size-4 text-emerald-500 md:size-4 print:size-[10pt] print:text-emerald-600"
+                  className="text-primary print:text-primary size-4 md:size-4 print:size-[10pt]"
                 />
                 GitHub
               </a>

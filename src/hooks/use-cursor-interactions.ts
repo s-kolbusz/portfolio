@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 
+import { gsap } from '@/lib/gsap'
 import { useCursorStore, type CursorVariant } from '@/lib/stores'
 
 export function useCursorInteractions() {
@@ -46,11 +47,12 @@ export function useCursorInteractions() {
       const related = e.relatedTarget as HTMLElement
       const cursorEl = target.closest('[data-cursor]')
       const relatedCursorEl = related?.closest?.('[data-cursor]')
+      const relatedDefaultCursorEl = related?.closest?.('[data-cursor="default"]')
 
       // Don't reset if we're actively dragging a slider
       if (activeSliderRef.current) return
 
-      if (cursorEl && !relatedCursorEl) {
+      if ((cursorEl && !relatedCursorEl) || relatedDefaultCursorEl) {
         setVariant('default')
         setMagneticTarget(null)
       } else if (
@@ -82,16 +84,31 @@ export function useCursorInteractions() {
       setMagneticTarget(null)
     }
 
+    // Global click interceptor: block any click if the target or its ancestors are actively animating via GSAP
+    const onClick = (e: MouseEvent) => {
+      let target = e.target as HTMLElement | null
+      while (target && target !== document.body && target !== document.documentElement) {
+        if (gsap.isTweening(target)) {
+          e.preventDefault()
+          e.stopPropagation()
+          return // Swallow the click completely!
+        }
+        target = target.parentElement
+      }
+    }
+
     window.addEventListener('mouseover', onMouseOver)
     window.addEventListener('mouseout', onMouseOut)
     window.addEventListener('mousedown', onMouseDown)
     window.addEventListener('mouseup', onMouseUp)
+    window.addEventListener('click', onClick, true) // Must be capture phase to intercept early
 
     return () => {
       window.removeEventListener('mouseover', onMouseOver)
       window.removeEventListener('mouseout', onMouseOut)
       window.removeEventListener('mousedown', onMouseDown)
       window.removeEventListener('mouseup', onMouseUp)
+      window.removeEventListener('click', onClick, true)
     }
   }, [setVariant, setMagneticTarget])
 }

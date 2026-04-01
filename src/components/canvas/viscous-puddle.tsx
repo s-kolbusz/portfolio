@@ -2,14 +2,20 @@
 
 import { useCallback, useEffect, useRef } from 'react'
 
-import { useTheme } from 'next-themes'
-
 import { usePrefersReducedMotion } from '@/hooks/use-media'
 
-import { disposePuddleWebGL, hexToRgb, lerp, setupPuddleWebGL } from './viscous-puddle/webgl'
+import { disposePuddleWebGL, lerp, setupPuddleWebGL } from './viscous-puddle/webgl'
 
-const LIGHT_COLOR = hexToRgb('#7ec58e')
-const DARK_COLOR = hexToRgb('#135534')
+/** Read `--primary-rgb` CSS custom property → [r, g, b] floats (0-1). */
+function getPrimaryRgb(): [number, number, number] {
+  const raw = getComputedStyle(document.documentElement).getPropertyValue('--primary-rgb').trim()
+  const parts = raw.split(/\s+/).map(Number)
+  if (parts.length === 3 && parts.every((n) => !Number.isNaN(n))) {
+    return parts as [number, number, number]
+  }
+  // Fallback if token is missing
+  return [0.494, 0.773, 0.557]
+}
 
 interface PuddleState {
   mouseX: number
@@ -28,6 +34,10 @@ interface PuddleState {
   opacity: number
   cssTranslateY: number
   cssScale: number
+  canvasLeft: number
+  canvasTop: number
+  canvasWidth: number
+  canvasHeight: number
 }
 
 function createInitialState(): PuddleState {
@@ -41,40 +51,44 @@ function createInitialState(): PuddleState {
     isInView: true,
     lerpScroll: 0,
     time: 0,
-    colorR: LIGHT_COLOR[0],
-    colorG: LIGHT_COLOR[1],
-    colorB: LIGHT_COLOR[2],
+    colorR: 0.494,
+    colorG: 0.773,
+    colorB: 0.557,
     scale: 1,
     opacity: 0,
     cssTranslateY: 0,
     cssScale: 1,
+    canvasLeft: 0,
+    canvasTop: 0,
+    canvasWidth: 0,
+    canvasHeight: 0,
   }
 }
 
 export function ViscousPuddle() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const { resolvedTheme } = useTheme()
   const prefersReducedMotion = usePrefersReducedMotion()
 
   const stateRef = useRef<PuddleState>(createInitialState())
-  const themeRef = useRef(resolvedTheme)
   const reducedMotionRef = useRef(prefersReducedMotion)
-
-  useEffect(() => {
-    themeRef.current = resolvedTheme
-  }, [resolvedTheme])
 
   useEffect(() => {
     reducedMotionRef.current = prefersReducedMotion
   }, [prefersReducedMotion])
 
-  const handleResize = useCallback((canvas: HTMLCanvasElement) => {
+  const syncCanvasMetrics = useCallback((canvas: HTMLCanvasElement) => {
     const dpr = Math.min(window.devicePixelRatio, 1.5)
-    const width = canvas.clientWidth
-    const height = canvas.clientHeight
+    const rect = canvas.getBoundingClientRect()
+    const width = rect.width
+    const height = rect.height
 
     canvas.width = Math.round(width * dpr)
     canvas.height = Math.round(height * dpr)
+
+    stateRef.current.canvasLeft = rect.left
+    stateRef.current.canvasTop = rect.top + window.scrollY - stateRef.current.cssTranslateY
+    stateRef.current.canvasWidth = width
+    stateRef.current.canvasHeight = height
     stateRef.current.isMobile = width < 768
   }, [])
 
@@ -90,7 +104,7 @@ export function ViscousPuddle() {
 
     const { gl, vao, uniforms } = webgl
 
-    handleResize(canvas)
+    syncCanvasMetrics(canvas)
     requestAnimationFrame(() => {
       canvas.style.opacity = '1'
     })
@@ -104,10 +118,20 @@ export function ViscousPuddle() {
     observer.observe(canvas)
 
     const onMouseMove = (event: MouseEvent) => {
+      const state = stateRef.current
+      if (!state.isInView || state.canvasWidth === 0 || state.canvasHeight === 0) return
+
+      const canvasTop = state.canvasTop - window.scrollY + state.cssTranslateY
+
       stateRef.current.pointerInside = true
-      const rect = canvas.getBoundingClientRect()
-      stateRef.current.targetMouseX = (event.clientX - rect.left) / rect.width
-      stateRef.current.targetMouseY = 1 - (event.clientY - rect.top) / rect.height
+      stateRef.current.targetMouseX = Math.min(
+        1,
+        Math.max(0, (event.clientX - state.canvasLeft) / state.canvasWidth)
+      )
+      stateRef.current.targetMouseY = Math.min(
+        1,
+        Math.max(0, 1 - (event.clientY - canvasTop) / state.canvasHeight)
+      )
     }
 
     const onMouseLeave = () => {
@@ -122,7 +146,12 @@ export function ViscousPuddle() {
     document.addEventListener('mouseleave', onMouseLeave)
     document.addEventListener('mouseenter', onMouseEnter)
 
-    const onResize = () => handleResize(canvas)
+    const resizeObserver = new ResizeObserver(() => {
+      syncCanvasMetrics(canvas)
+    })
+    resizeObserver.observe(canvas)
+
+    const onResize = () => syncCanvasMetrics(canvas)
     window.addEventListener('resize', onResize)
 
     let raf = 0
@@ -150,7 +179,7 @@ export function ViscousPuddle() {
       const targetScale = state.isMobile ? 0.6 : 1
       state.scale = lerp(state.scale, targetScale, 0.1)
 
-      const targetColor = themeRef.current === 'dark' ? DARK_COLOR : LIGHT_COLOR
+      const targetColor = getPrimaryRgb()
       state.colorR = lerp(state.colorR, targetColor[0], 0.05)
       state.colorG = lerp(state.colorG, targetColor[1], 0.05)
       state.colorB = lerp(state.colorB, targetColor[2], 0.05)
@@ -165,7 +194,7 @@ export function ViscousPuddle() {
 
       if (!reducedMotionRef.current) {
         const rawScroll = window.scrollY
-        const clampedScroll = Math.min(rawScroll, canvas.clientHeight * 1.5)
+        const clampedScroll = Math.min(rawScroll, state.canvasHeight * 1.5)
 
         state.lerpScroll = lerp(state.lerpScroll, clampedScroll, 0.15)
         if (Math.abs(state.lerpScroll - clampedScroll) < 0.1) {
@@ -187,7 +216,7 @@ export function ViscousPuddle() {
 
       gl.uniform1f(uniforms.uTime, state.time)
       gl.uniform2f(uniforms.uMouse, state.mouseX, state.mouseY)
-      gl.uniform2f(uniforms.uResolution, canvas.clientWidth, canvas.clientHeight)
+      gl.uniform2f(uniforms.uResolution, state.canvasWidth, state.canvasHeight)
       gl.uniform3f(uniforms.uColor, state.colorR, state.colorG, state.colorB)
       gl.uniform1f(uniforms.uScale, state.scale)
       gl.uniform1f(uniforms.uOpacity, state.opacity)
@@ -202,13 +231,14 @@ export function ViscousPuddle() {
     return () => {
       cancelAnimationFrame(raf)
       observer.disconnect()
+      resizeObserver.disconnect()
       window.removeEventListener('mousemove', onMouseMove)
       document.removeEventListener('mouseleave', onMouseLeave)
       document.removeEventListener('mouseenter', onMouseEnter)
       window.removeEventListener('resize', onResize)
       disposePuddleWebGL(webgl)
     }
-  }, [handleResize])
+  }, [syncCanvasMetrics])
 
   return (
     <canvas

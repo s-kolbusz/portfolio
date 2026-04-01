@@ -22,8 +22,6 @@ export const ANIMATION = {
     outStrong: 'power3.out',
     outExpo: 'expo.out',
     inOut: 'power3.inOut',
-    elastic: 'elastic.out(1, 0.5)',
-    back: 'back.out(1.7)',
   },
   scrollTrigger: {
     start: 'top 80%',

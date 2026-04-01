@@ -20,7 +20,7 @@ export const CVEntry: React.FC<CVEntryProps> = ({
       <div className="flex flex-col gap-[2pt]">
         <div className="flex flex-wrap items-baseline justify-between gap-x-[10pt]">
           <h3 className="text-foreground font-serif text-[12pt] font-semibold">{title}</h3>
-          <span className="font-mono text-[8pt] text-emerald-600/80">{period}</span>
+          <span className="text-primary/80 font-mono text-[8pt]">{period}</span>
         </div>
 
         <div className="text-muted-foreground flex items-center justify-between text-[9pt] font-medium">

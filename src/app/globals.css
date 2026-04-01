@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 
 @import './utilities.css';
+@import './components.css';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -49,6 +50,9 @@
 
   /* Radius tokens (shadcn-compatible) */
   --radius: 0.5rem;
+
+  /* WebGL-friendly RGB (0-1 range) for shader uniforms */
+  --primary-rgb: 0.494 0.773 0.557;
 }
 
 /* Dark Theme */
@@ -87,6 +91,9 @@
   --input: oklch(0.28 0.008 65);
   --ring: oklch(0.78 0.17 162);
   --cursor: oklch(0.78 0.17 162);
+
+  /* WebGL-friendly RGB (0-1 range) for shader uniforms */
+  --primary-rgb: 0.075 0.333 0.204;
 }
 
 /* Tailwind CSS 4 Theme Configuration */
@@ -155,6 +162,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  overflow-x: clip;
 }
 
 /* Lenis Recommended CSS */
@@ -202,5 +210,17 @@ html.lenis body {
   .custom-cursor-active select,
   .custom-cursor-active textarea {
     cursor: none !important;
+  }
+}
+
+/* Hardening: Ensure strict reduced motion cutoff for all natively animated features outside GSAP */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

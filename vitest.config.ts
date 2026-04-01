@@ -18,7 +18,17 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],
-      exclude: ['src/**/*.test.{ts,tsx}'],
+      exclude: [
+        'src/**/*.test.{ts,tsx}',
+        // GSAP animation components — side-effects only, no testable branches in jsdom
+        'src/components/ui/dock-tooltip.tsx',
+        'src/components/ui/custom-cursor.tsx',
+        'src/components/ui/smooth-scroller.tsx',
+        // Non-JS assets, type declarations, and entry points that export no logic
+        'src/**/*.d.ts',
+        'src/styles/**',
+        'src/i18n/messages/**',
+      ],
       thresholds: {
         branches: 80,
         functions: 85,

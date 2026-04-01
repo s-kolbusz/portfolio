@@ -1,12 +1,11 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { CaretDownIcon } from '@phosphor-icons/react'
 
 import { cn } from '@/lib/cn'
-import { ANIMATION } from '@/lib/constants/animations'
-import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap'
+import { ScrollTrigger } from '@/lib/gsap'
 
 interface SEOTextProps {
   title: string
@@ -30,33 +29,18 @@ export function SEOText({
   defaultOpen = false,
 }: SEOTextProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen)
-  const contentRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const seoContentId = `seo-content-${title.replace(/\s+/g, '-').toLowerCase()}`
 
-  useGSAP(() => {
-    if (!containerRef.current || !contentRef.current) return
-
-    if (isOpen) {
-      const height = contentRef.current.offsetHeight || 0
-      gsap.to(containerRef.current, {
-        height,
-        duration: ANIMATION.duration.fast,
-        ease: ANIMATION.ease.out,
-        onComplete: () => {
-          ScrollTrigger.refresh()
-        },
-      })
-    } else {
-      gsap.to(containerRef.current, {
-        height: 0,
-        duration: ANIMATION.duration.fast,
-        ease: ANIMATION.ease.inOut,
-        onComplete: () => {
-          ScrollTrigger.refresh()
-        },
-      })
-    }
-  }, [isOpen])
+  // Refresh ScrollTrigger after the CSS transition ends so scroll-triggered
+  // animations below this section recalculate their offsets correctly.
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const handler = () => ScrollTrigger.refresh()
+    el.addEventListener('transitionend', handler)
+    return () => el.removeEventListener('transitionend', handler)
+  }, [])
 
   return (
     <section className={cn('border-border/40 flex flex-col gap-4 border-t py-8', className)}>
@@ -66,7 +50,7 @@ export function SEOText({
           onClick={() => setIsOpen(!isOpen)}
           className="group text-primary hover:text-primary/80 flex items-center gap-2 font-mono text-[10px] font-bold tracking-widest uppercase transition-colors"
           aria-expanded={isOpen}
-          aria-controls={`seo-content-${title.replace(/\s+/g, '-').toLowerCase()}`}
+          aria-controls={seoContentId}
         >
           {buttonLabel}
           <CaretDownIcon
@@ -78,12 +62,14 @@ export function SEOText({
         </button>
       </div>
 
+      {/* CSS grid-template-rows transition — no JS animation on every frame */}
       <div
         ref={containerRef}
-        id={`seo-content-${title.replace(/\s+/g, '-').toLowerCase()}`}
-        className="h-0 overflow-hidden"
+        id={seoContentId}
+        style={{ gridTemplateRows: isOpen ? '1fr' : '0fr' }}
+        className="grid overflow-hidden transition-[grid-template-rows] duration-600 ease-in-out"
       >
-        <div ref={contentRef} className="pt-4 pb-8">
+        <div className="min-h-0">
           <div className="prose prose-sm prose-neutral dark:prose-invert text-muted-foreground max-w-none font-sans text-base leading-relaxed sm:text-lg">
             {children}
           </div>

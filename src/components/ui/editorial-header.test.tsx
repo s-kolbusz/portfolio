@@ -41,4 +41,10 @@ describe('EditorialHeader', () => {
     expect(screen.queryByText('Subtitle')).not.toBeInTheDocument()
     expect(container.querySelector('span.text-primary')).not.toBeInTheDocument()
   })
+
+  it('can render an h1 title when used as a page heading', () => {
+    render(<EditorialHeader title="Page Title" as="h1" />)
+
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Page Title')
+  })
 })

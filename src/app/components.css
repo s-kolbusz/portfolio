@@ -1,0 +1,55 @@
+@layer components {
+  .book-paper {
+    position: relative;
+    background-color: var(--background);
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url('/images/textures/paper.svg');
+      opacity: 0.4;
+      pointer-events: none;
+      mix-blend-mode: multiply;
+      z-index: 0;
+    }
+
+    .dark &::before {
+      opacity: 0.15;
+      mix-blend-mode: soft-light;
+      background-color: transparent;
+    }
+  }
+
+  .dock-nav {
+    @apply glass fixed z-40;
+
+    &.dock-nav--mobile {
+      @apply bottom-6 left-1/2 flex -translate-x-1/2 items-center gap-2 p-2 lg:hidden;
+
+      @media (width <= 375px) {
+        @apply scale-90;
+      }
+    }
+
+    &.dock-nav--desktop {
+      @apply top-1/2 right-6 hidden -translate-y-1/2 flex-col gap-3 p-3 lg:flex;
+    }
+  }
+
+  .section-container {
+    @apply text-foreground relative mx-auto min-h-screen w-full overflow-x-clip px-6 py-24 lg:px-24 lg:py-32;
+  }
+
+  .editorial-header {
+    @apply flex flex-col gap-8 md:flex-row md:items-end md:justify-between;
+
+    &.vertical {
+      @apply text-center md:flex-col md:items-center;
+    }
+  }
+
+  .stack-list {
+    @apply text-muted-foreground flex flex-wrap gap-x-4 gap-y-1 font-mono text-xs sm:text-sm;
+  }
+}

@@ -28,7 +28,7 @@ export function BookPageDots({ total, current, onSelect }: BookPageDotsProps) {
             tabIndex={i === current ? 0 : -1}
             onClick={() => onSelect(i)}
             className={cn(
-              'hover:bg-primary/20 h-3 w-3 rounded-full p-0 transition-all duration-300',
+              'hover:bg-primary/20 h-3 w-3 rounded-full p-0 transition-colors duration-300',
               i === current ? 'bg-primary scale-125' : 'bg-muted-foreground/40 h-2 w-2'
             )}
           />

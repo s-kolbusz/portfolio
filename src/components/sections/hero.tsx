@@ -9,6 +9,7 @@ import { ArrowDownIcon } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { useHeroAnimation } from '@/hooks/use-hero-animation'
 import { usePrefersReducedMotion } from '@/hooks/use-media'
+import { useScrollStore } from '@/lib/stores'
 
 const HeroScene = lazy(() =>
   import('@/components/canvas/hero-scene').then((mod) => ({ default: mod.HeroScene }))
@@ -58,8 +59,12 @@ export function Hero() {
   }, [name])
 
   const handleCtaClick = () => {
-    const element = document.getElementById('about')
-    element?.scrollIntoView({ behavior: 'smooth' })
+    const lenis = useScrollStore.getState().lenis
+    if (lenis) {
+      lenis.scrollTo('#about')
+    } else {
+      document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })
+    }
   }
 
   return (

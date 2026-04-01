@@ -5,9 +5,12 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
-  productionBrowserSourceMaps: true,
   experimental: {
     optimizePackageImports: ['@phosphor-icons/react', 'gsap', 'lenis'],
+  },
+  allowedDevOrigins: ['192.168.1.35'],
+  images: {
+    qualities: [75, 90],
   },
   async rewrites() {
     return [

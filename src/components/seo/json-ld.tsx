@@ -1,17 +1,33 @@
-import { serializeJsonLd } from '@/lib/serialize-json-ld'
 import { SITE_AUTHOR, SITE_NAME, SITE_ORIGIN } from '@/lib/site'
+
+import { StructuredData } from './structured-data'
 
 export const JsonLd = () => {
   const personSchema = {
     '@context': 'https://schema.org',
     '@type': 'Person',
+    '@id': `${SITE_ORIGIN}/#person`,
     name: SITE_AUTHOR,
     url: SITE_ORIGIN,
-    jobTitle: 'Full-stack Developer',
+    jobTitle: 'Senior Frontend Engineer',
+    image: {
+      '@type': 'ImageObject',
+      url: `${SITE_ORIGIN}/images/sebastian_kolbusz_caricature.avif`,
+      width: 800,
+      height: 800,
+    },
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Zakopane',
+      addressCountry: 'PL',
+    },
+    worksFor: {
+      '@type': 'Organization',
+      name: 'Freelance',
+    },
     sameAs: [
       'https://github.com/s-kolbusz',
       'https://linkedin.com/in/skolbusz',
-      'https://twitter.com/s_kolbusz',
       'https://x.com/s_kolbusz',
     ],
     knowsAbout: [
@@ -28,24 +44,21 @@ export const JsonLd = () => {
   const websiteSchema = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
+    '@id': `${SITE_ORIGIN}/#website`,
     name: SITE_NAME,
     url: SITE_ORIGIN,
     author: {
       '@type': 'Person',
-      name: SITE_AUTHOR,
+      '@id': `${SITE_ORIGIN}/#person`,
     },
   }
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(personSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(websiteSchema) }}
-      />
-    </>
+    <StructuredData
+      entries={[
+        { id: 'person', data: personSchema },
+        { id: 'website', data: websiteSchema },
+      ]}
+    />
   )
 }

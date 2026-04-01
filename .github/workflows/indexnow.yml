@@ -1,0 +1,51 @@
+name: IndexNow — Notify Search Engines
+
+# Runs automatically after a successful Vercel production deployment.
+# Vercel calls this via its GitHub Deployment webhook when the environment is "Production".
+#
+# HOW IT WORKS:
+#   1. Vercel deploys the site and marks the GitHub deployment as "success" for environment "Production"
+#   2. GitHub triggers this workflow
+#   3. The script fetches /sitemap.xml from the live site, extracts all <loc> URLs,
+#      and POSTs them to https://api.indexnow.org/indexnow
+#   4. Search engines (Bing, Yandex, and others in the IndexNow consortium) are notified
+#      to re-crawl the updated pages immediately — no waiting for their own crawl schedule
+#
+# REQUIREMENTS:
+#   - The IndexNow key file must exist at public/<KEY>.txt (already committed)
+#   - The file content must match the filename (e.g. 03FD1F23...txt contains "03FD1F23...")
+#   - No secrets needed — the key is intentionally public
+#
+# MANUAL RUN:
+#   pnpm seo:indexnow          # Submit all sitemap URLs to IndexNow
+#   pnpm seo:indexnow:dry      # Preview URLs that would be submitted (no network request)
+
+on:
+  deployment_status:
+
+jobs:
+  indexnow:
+    name: Submit URLs to IndexNow
+    # Only run when Vercel marks the Production deployment as successful
+    if: |
+      github.event.deployment_status.state == 'success' &&
+      github.event.deployment.environment == 'Production'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Submit all sitemap URLs to IndexNow
+        run: pnpm seo:indexnow

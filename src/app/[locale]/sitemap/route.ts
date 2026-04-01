@@ -22,12 +22,15 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
     const path = `/${currentLocale}${route}`
     const url = toAbsoluteSiteUrl(path)
 
-    const alternates = locales
-      .map(
+    // x-default points to the "en" (default) variant for each route
+    const defaultHref = toAbsoluteSiteUrl(`/en${route}`)
+    const alternates = [
+      `<xhtml:link rel="alternate" hreflang="x-default" href="${defaultHref}" />`,
+      ...locales.map(
         (l) =>
           `<xhtml:link rel="alternate" hreflang="${l}" href="${toAbsoluteSiteUrl(`/${l}${route}`)}" />`
-      )
-      .join('\n    ')
+      ),
+    ].join('\n    ')
 
     sitemapEntries.push(`  <url>
     <loc>${url}</loc>
@@ -43,12 +46,15 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
     const path = `/${currentLocale}/projects/${id}`
     const url = toAbsoluteSiteUrl(path)
 
-    const alternates = locales
-      .map(
+    // x-default points to the "en" (default) variant
+    const defaultProjectHref = toAbsoluteSiteUrl(`/en/projects/${id}`)
+    const alternates = [
+      `<xhtml:link rel="alternate" hreflang="x-default" href="${defaultProjectHref}" />`,
+      ...locales.map(
         (l) =>
           `<xhtml:link rel="alternate" hreflang="${l}" href="${toAbsoluteSiteUrl(`/${l}/projects/${id}`)}" />`
-      )
-      .join('\n    ')
+      ),
+    ].join('\n    ')
 
     sitemapEntries.push(`  <url>
     <loc>${url}</loc>

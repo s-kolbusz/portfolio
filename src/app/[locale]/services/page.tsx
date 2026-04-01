@@ -2,30 +2,28 @@ import type { Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 
 import { ServicesContent } from '@/components/features/services/services-content'
+import { StructuredData } from '@/components/seo/structured-data'
+import { getLocaleFromParams } from '@/i18n/locale'
+import { buildServicesPageMetadata } from '@/lib/page-metadata'
+import { toAbsoluteSiteUrl } from '@/lib/site'
 
 type Props = {
   params: Promise<{ locale: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale } = await params
+  const locale = await getLocaleFromParams(params)
   const t = await getTranslations({ locale, namespace: 'services_page' })
 
-  return {
+  return buildServicesPageMetadata({
+    locale,
     title: t('meta_title'),
     description: t('meta_description'),
-    alternates: {
-      canonical: `/${locale}/services`,
-      languages: {
-        en: '/en/services',
-        pl: '/pl/services',
-      },
-    },
-  }
+  })
 }
 
 export default async function ServicesPage({ params }: Props) {
-  const { locale } = await params
+  const locale = await getLocaleFromParams(params)
   setRequestLocale(locale)
 
   const t = await getTranslations({ locale, namespace: 'services_page' })
@@ -48,8 +46,16 @@ export default async function ServicesPage({ params }: Props) {
   const localBusinessSchema = {
     '@context': 'https://schema.org',
     '@type': 'ProfessionalService',
-    name: 'Szymon Kłębowski - Web Development',
+    '@id': toAbsoluteSiteUrl(`/${locale}/services#service`),
+    name: 'Sebastian Kolbusz - Web Development',
     description: t('meta_description'),
+    url: toAbsoluteSiteUrl(`/${locale}/services`),
+    serviceType: 'Web Development',
+    provider: {
+      '@type': 'Person',
+      '@id': `${toAbsoluteSiteUrl('/')}#person`,
+      name: 'Sebastian Kolbusz',
+    },
     areaServed: [
       {
         '@type': 'City',
@@ -64,13 +70,11 @@ export default async function ServicesPage({ params }: Props) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+      <StructuredData
+        entries={[
+          { id: 'services-faq', data: faqSchema },
+          { id: 'services-business', data: localBusinessSchema },
+        ]}
       />
       <main className="bg-background flex min-h-screen flex-col">
         <ServicesContent />

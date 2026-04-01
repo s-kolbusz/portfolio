@@ -12,15 +12,19 @@ import { EditorialHeader } from '@/components/ui/editorial-header'
 import { FaqAccordion } from '@/components/ui/faq-accordion'
 import { services } from '@/data/services'
 import { useTimeline } from '@/hooks/timeline'
+import { useSafeAnimation } from '@/hooks/use-safe-animation'
 import { cn } from '@/lib/cn'
 
 export function ServicesContent() {
   const t = useTranslations('services_page')
   const tServices = useTranslations('services')
 
+  const animation = useSafeAnimation()
+
   const sectionRef = useRef<HTMLElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
   const introRef = useRef<HTMLDivElement>(null)
+  const servicesRef = useRef<HTMLDivElement>(null)
   const trustRef = useRef<HTMLDivElement>(null)
   const faqRef = useRef<HTMLDivElement>(null)
 
@@ -33,11 +37,19 @@ export function ServicesContent() {
 
     // Reveal each service individually as it enters the viewport
     serviceRefs.current.forEach((ref) => {
-      if (ref) reveal({ current: ref }, { y: 100 })
+      if (ref) {
+        reveal(ref, { y: 150, self: true, duration: animation.duration.medium })
+        reveal(ref, {
+          y: 250,
+          stagger: animation.stagger.normal,
+          duration: animation.duration.slow,
+        })
+      }
     })
 
-    reveal(trustRef, { y: 50 })
-    reveal(faqRef, { y: 30 })
+    reveal(trustRef, { y: 150, self: true, duration: animation.duration.slow })
+    reveal(trustRef, { y: 250, duration: animation.duration.slow })
+    reveal(faqRef, { y: 150 })
   })
 
   const faqItems = [0, 1, 2]
@@ -46,7 +58,7 @@ export function ServicesContent() {
     <BaseSection
       id="services-page"
       ref={sectionRef}
-      className="min-h-0 pt-32 pb-24 lg:pt-40 lg:pb-32"
+      className="min-h-0 pt-32 pb-24 xl:pt-40 xl:pb-32"
       containerClassName="gap-24 md:gap-32"
     >
       {/* Hero Section */}
@@ -54,6 +66,7 @@ export function ServicesContent() {
         <EditorialHeader
           ref={headerRef}
           title={t('h1')}
+          as="h1"
           subtitle={t('h2_niche')}
           tagline={tServices('limited_availability')}
         />
@@ -70,7 +83,7 @@ export function ServicesContent() {
           <h2 className="font-serif text-3xl font-light md:text-4xl">{t('h2_offer')}</h2>
         </div>
 
-        <div className="mt-8 flex flex-col gap-24 lg:gap-32">
+        <div ref={servicesRef} className="mt-8 flex flex-col gap-24 xl:gap-32">
           {services.map((service, index) => {
             const isPopular = service.popular
             const isEven = index % 2 !== 0
@@ -82,13 +95,13 @@ export function ServicesContent() {
                   serviceRefs.current[index] = el
                 }}
                 className={cn(
-                  'group relative grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-24',
-                  isPopular ? 'border-primary/20 bg-primary/5 rounded-3xl border p-8 lg:p-16' : ''
+                  'group relative grid grid-cols-1 items-start gap-12 xl:grid-cols-12 xl:gap-24',
+                  isPopular ? 'border-primary/20 bg-primary/5 rounded-3xl border p-8 xl:p-16' : ''
                 )}
               >
                 {/* Popular Badge */}
                 {isPopular && (
-                  <div className="bg-primary text-primary-foreground absolute -top-4 left-8 flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[10px] font-bold tracking-widest uppercase shadow-md lg:left-16">
+                  <div className="bg-primary text-primary-foreground absolute -top-4 left-8 flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[10px] font-bold tracking-widest uppercase shadow-md xl:left-16">
                     <StarIcon weight="fill" className="size-3" />
                     {tServices('popular_badge')}
                   </div>
@@ -97,8 +110,8 @@ export function ServicesContent() {
                 {/* Text Content Column */}
                 <div
                   className={cn(
-                    'flex flex-col gap-8 lg:col-span-6',
-                    isEven ? 'lg:order-2' : 'lg:order-1'
+                    'flex flex-col gap-8 xl:col-span-6',
+                    isEven ? 'xl:order-2' : 'xl:order-1'
                   )}
                 >
                   <div className="flex items-center gap-4">
@@ -112,7 +125,7 @@ export function ServicesContent() {
                     <h3 className="text-foreground font-serif text-3xl leading-tight font-light md:text-5xl">
                       {tServices(`${service.id}.title`)}
                     </h3>
-                    <p className="text-muted-foreground font-sans text-lg leading-relaxed md:text-xl">
+                    <p className="text-muted-foreground font-sans text-xl leading-relaxed md:text-xl">
                       {tServices(`${service.id}.description`)}
                     </p>
                   </div>
@@ -138,8 +151,8 @@ export function ServicesContent() {
                 {/* Features & Ideal For Column */}
                 <div
                   className={cn(
-                    'flex h-full flex-col justify-center gap-12 lg:col-span-6',
-                    isEven ? 'lg:order-1' : 'lg:order-2'
+                    'flex h-full flex-col justify-center gap-12 xl:col-span-6',
+                    isEven ? 'xl:order-1' : 'xl:order-2'
                   )}
                 >
                   {/* Ideal For Block */}
@@ -173,7 +186,7 @@ export function ServicesContent() {
                               weight="bold"
                             />
                           </div>
-                          <span className="text-foreground font-sans text-lg leading-snug">
+                          <span className="text-foreground font-sans text-xl leading-snug">
                             {tServices(`${service.id}.features.${i}`)}
                           </span>
                         </li>
@@ -190,7 +203,7 @@ export function ServicesContent() {
       {/* Trust Section */}
       <div
         ref={trustRef}
-        className="border-border bg-muted/20 relative overflow-hidden border p-10 md:p-16 lg:p-24"
+        className="border-border bg-muted/20 relative overflow-hidden border p-10 md:p-16 xl:p-24"
       >
         {/* Subtle background decoration */}
         <div className="bg-primary/5 absolute -top-24 -right-24 size-96 rounded-full blur-3xl" />
@@ -204,10 +217,10 @@ export function ServicesContent() {
             <div className="bg-primary/50 h-px w-8" />
           </div>
 
-          <h2 className="font-serif text-3xl font-light md:text-5xl lg:leading-tight">
+          <h2 className="font-serif text-3xl font-light md:text-5xl xl:leading-tight">
             {t('h2_trust')}
           </h2>
-          <p className="text-muted-foreground font-sans text-lg leading-relaxed md:text-xl">
+          <p className="text-muted-foreground font-sans text-xl leading-relaxed md:text-xl">
             {t('trust_content')}
           </p>
           <Button

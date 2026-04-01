@@ -6,7 +6,7 @@ import {
   XLogoIcon,
 } from '@phosphor-icons/react/dist/ssr'
 
-export interface ContactLink {
+interface ContactLink {
   id: string
   labelKey: string
   url: string
@@ -17,7 +17,7 @@ export const contactLinks: ContactLink[] = [
   {
     id: 'email',
     labelKey: 'email',
-    url: 'mailto:s.kolbusz@outlook.com',
+    url: 'mailto:office@kolbusz.xyz',
     icon: EnvelopeIcon,
   },
   {

@@ -4,7 +4,7 @@ export const cvDataEn: CVData = {
   name: 'Sebastian Kolbusz',
   title: 'Senior Frontend Engineer',
   contact: {
-    email: 's.kolbusz@outlook.com',
+    email: 'office@kolbusz.xyz',
     phone: '+48 533 542 880',
     location: 'Zakopane, Poland',
     linkedin: 'https://www.linkedin.com/in/skolbusz',
