@@ -46,14 +46,18 @@ export default async function ServicesPage({ params }: Props) {
   const localBusinessSchema = {
     '@context': 'https://schema.org',
     '@type': 'ProfessionalService',
-    '@id': toAbsoluteSiteUrl(`/${locale}/services#service`),
+    '@id': toAbsoluteSiteUrl(`/${locale}/services`),
     name: 'Sebastian Kolbusz - Web Development',
     description: t('meta_description'),
     url: toAbsoluteSiteUrl(`/${locale}/services`),
-    serviceType: 'Web Development',
-    provider: {
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Zakopane',
+      addressCountry: 'PL',
+    },
+    founder: {
       '@type': 'Person',
-      '@id': `${toAbsoluteSiteUrl('/')}#person`,
+      '@id': `${toAbsoluteSiteUrl('/')}#about`,
       name: 'Sebastian Kolbusz',
     },
     areaServed: [

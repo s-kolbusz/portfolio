@@ -24,7 +24,7 @@ describe('JsonLd', () => {
     render(<JsonLd />)
 
     const person = getScriptContent('person') as Record<string, unknown>
-    expect(person['@id']).toMatch(/#person$/)
+    expect(person['@id']).toMatch(/#about$/)
   })
 
   it('Person schema wraps image in ImageObject (schema.org requirement)', () => {
@@ -62,7 +62,7 @@ describe('JsonLd', () => {
     render(<JsonLd />)
 
     const website = getScriptContent('website') as Record<string, unknown>
-    expect(website['@id']).toMatch(/#website$/)
+    expect(website['@id']).toBe('https://www.kolbusz.xyz')
 
     // There is no site search — adding a SearchAction would be misleading to Google
     expect(website['potentialAction']).toBeUndefined()

@@ -1,0 +1,39 @@
+# Sebastian Kolbusz — Senior Frontend Engineer
+
+> Personal portfolio and service site for Sebastian Kolbusz, a Senior Frontend Engineer based in Zakopane, Poland, specialising in high-performance Next.js applications, SaaS interfaces, and cinematic web experiences.
+
+## About
+
+Sebastian Kolbusz is a Senior Frontend Engineer with deep expertise in React, Next.js, TypeScript, GSAP, and WebGL. He builds fast, polished, and accessible websites and web applications for ambitious brands across Poland and internationally.
+
+Location: Zakopane, Poland
+Email: office@kolbusz.xyz
+
+## Services
+
+- **Landing pages** — High-converting, performance-optimised single-page sites
+- **Full websites** — Multi-page websites with CMS integration and i18n support
+- **Web applications** — Complex SaaS and data-driven React/Next.js applications
+- **Hourly consulting** — Frontend architecture, performance audits, and code reviews
+
+## Skills & Technologies
+
+Next.js, React, TypeScript, Tailwind CSS, GSAP, WebGL / Three.js, Lenis (smooth scroll), Zustand, Vitest, Playwright, Vercel, GitHub Actions, PostgreSQL (basic), Figma
+
+## Selected Projects
+
+- **Zakofy** — Custom Tatra Mountain offer platform (Next.js, SSG, performance-focused)
+- **Your Krakow Travel** — Consolidated tour discovery platform with structured data and accessibility-first design
+- **Wellezza** — Professional salon web presence with 100/100 Lighthouse score and booking integration
+- **Billboard Zakopane** — B2B outdoor advertising catalog with interactive map
+- **ready2order** — Senior Frontend Engineer role on an enterprise POS SaaS product
+
+## Links
+
+- Portfolio: https://www.kolbusz.xyz
+- Projects: https://www.kolbusz.xyz/en/projects
+- Services: https://www.kolbusz.xyz/en/services
+- CV: https://www.kolbusz.xyz/en/cv
+- LinkedIn: https://linkedin.com/in/skolbusz
+- GitHub: https://github.com/s-kolbusz
+- X / Twitter: https://x.com/s_kolbusz

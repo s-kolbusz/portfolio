@@ -6,7 +6,7 @@ export const JsonLd = () => {
   const personSchema = {
     '@context': 'https://schema.org',
     '@type': 'Person',
-    '@id': `${SITE_ORIGIN}/#person`,
+    '@id': `${SITE_ORIGIN}/#about`,
     name: SITE_AUTHOR,
     url: SITE_ORIGIN,
     jobTitle: 'Senior Frontend Engineer',
@@ -44,12 +44,12 @@ export const JsonLd = () => {
   const websiteSchema = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    '@id': `${SITE_ORIGIN}/#website`,
+    '@id': SITE_ORIGIN,
     name: SITE_NAME,
     url: SITE_ORIGIN,
     author: {
       '@type': 'Person',
-      '@id': `${SITE_ORIGIN}/#person`,
+      '@id': `${SITE_ORIGIN}/#about`,
     },
   }
 

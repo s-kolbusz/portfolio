@@ -43,10 +43,9 @@ export default async function CVPage({ params }: Props) {
 
   return (
     <main id="main-content" className="bg-neutral-100/50 dark:bg-neutral-900/50 print:bg-white">
-      <h1 className="sr-only">{t('title')}</h1>
       <BaseSection
         id="cv-header-nav"
-        className="min-h-0 py-8 md:py-20 print:hidden"
+        className="min-h-0 py-8 md:py-10 print:hidden"
         containerClassName="max-w-[210mm] lg:px-6 print:hidden"
       >
         <div className="flex items-center justify-between">
@@ -68,6 +67,10 @@ export default async function CVPage({ params }: Props) {
             <CVPrintButton />
           </div>
         </div>
+
+        <h1 className="w-full pt-4 text-center font-serif text-5xl font-normal lg:text-7xl">
+          {t('title')}
+        </h1>
       </BaseSection>
 
       <div className="flex flex-col justify-center gap-8 pt-4 pb-18 print:p-0">

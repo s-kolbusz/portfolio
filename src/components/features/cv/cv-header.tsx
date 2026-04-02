@@ -23,9 +23,9 @@ export const CVHeader: React.FC<CVHeaderProps> = ({ name, title, contact }) => {
     <header className="border-border relative mb-8 flex flex-col gap-6 border-b pb-8 md:mb-6 md:pb-5 print:mb-5 print:border-b-2 print:pb-4">
       <div className="grid grid-cols-1 gap-6 md:grid-cols-[1fr_auto] md:items-end md:justify-between md:gap-5 print:grid-cols-[1fr_auto] print:items-end print:justify-between print:gap-5">
         <div className="flex flex-col gap-2 md:gap-1 print:gap-1">
-          <h1 className="text-foreground font-serif text-4xl leading-none font-bold tracking-tight md:text-[36pt] print:text-[32pt]">
+          <h2 className="text-foreground font-serif text-4xl leading-none font-bold tracking-tight md:text-[36pt] print:text-[32pt]">
             {name}
-          </h1>
+          </h2>
           <p className="text-xl leading-tight font-medium text-emerald-500 md:text-[16pt] print:text-[14pt] print:text-emerald-600">
             {title}
           </p>

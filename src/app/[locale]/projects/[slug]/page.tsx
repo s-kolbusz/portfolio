@@ -62,7 +62,7 @@ export default async function ProjectDetailPage({ params }: Props) {
             data: {
               '@context': 'https://schema.org',
               '@type': 'CreativeWork',
-              '@id': toAbsoluteSiteUrl(`/${locale}/projects/${project.id}#creative-work`),
+              '@id': toAbsoluteSiteUrl(`/${locale}/projects/${project.id}`),
               name: project.title,
               headline: project.title,
               description: structuredDataDescription,
@@ -76,7 +76,7 @@ export default async function ProjectDetailPage({ params }: Props) {
               url: toAbsoluteSiteUrl(`/${locale}/projects/${project.id}`),
               author: {
                 '@type': 'Person',
-                '@id': `${toAbsoluteSiteUrl('/')}#person`,
+                '@id': `${toAbsoluteSiteUrl('/')}#about`,
                 name: 'Sebastian Kolbusz',
               },
             },
