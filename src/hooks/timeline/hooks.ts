@@ -11,6 +11,39 @@ import { createReveal, REVEAL } from './reveal-engine'
 import { useTimelineStore } from './store'
 import type { RevealFn, TimelineConfig, TimelineSetup } from './types'
 
+// Global queue to stagger ScrollTrigger initializations across multiple frames
+const timelineQueue: Array<() => void> = []
+let isProcessingQueue = false
+
+function processTimelineQueue() {
+  if (timelineQueue.length === 0) {
+    isProcessingQueue = false
+    return
+  }
+
+  // Process one timeline setup per frame to prevent long tasks
+  const init = timelineQueue.shift()
+  if (init) init()
+
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(processTimelineQueue, { timeout: 100 })
+  } else {
+    requestAnimationFrame(processTimelineQueue)
+  }
+}
+
+function enqueueTimeline(init: () => void) {
+  timelineQueue.push(init)
+  if (!isProcessingQueue) {
+    isProcessingQueue = true
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(processTimelineQueue, { timeout: 100 })
+    } else {
+      requestAnimationFrame(processTimelineQueue)
+    }
+  }
+}
+
 export function useTimeline<T extends HTMLElement>(
   ref: RefObject<T | null>,
   config: TimelineConfig,
@@ -42,19 +75,22 @@ export function useTimeline<T extends HTMLElement>(
       useTimelineStore.getState().register(id)
     }
 
+    let isMounted = true
+
     const init = contextSafe(() => {
+      if (!isMounted) return
       const reveal: RevealFn = (target, options = {}) => {
         createReveal(target, options, prefersReducedMotion, anim, start, toggleActions)
       }
       setup(reveal)
     })
 
-    // Defer to the next animation frame to unblock the main thread during hydration
-    // This prevents forced synchronous layout thrashing when multiple components mount
-    const rafId = requestAnimationFrame(init)
+    // Stagger timeline setup across multiple frames/idle callbacks
+    // This totally eliminates the massive ~1000ms Layout Thrashing task when 20+ hooks mount simultaneously
+    enqueueTimeline(init)
 
     return () => {
-      cancelAnimationFrame(rafId)
+      isMounted = false
       if (id) {
         useTimelineStore.getState().unregister(id)
       }

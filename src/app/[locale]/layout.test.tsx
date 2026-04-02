@@ -31,14 +31,6 @@ vi.mock('next/font/local', () => ({
   default: () => ({ variable: 'font-sans' }),
 }))
 
-vi.mock('@vercel/analytics/next', () => ({
-  Analytics: () => null,
-}))
-
-vi.mock('@vercel/speed-insights/next', () => ({
-  SpeedInsights: () => null,
-}))
-
 vi.mock('@/components/seo/json-ld', () => ({
   JsonLd: () => null,
 }))

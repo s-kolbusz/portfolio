@@ -86,31 +86,10 @@ export function Hero() {
           </Suspense>
         )}
       </div>
-
       {/* Content */}
       <div className="relative z-10 flex max-w-6xl flex-col items-center gap-8 text-center">
-        {/* LCP Optimization Block (Phantom Element)
-            This invisible text mirrors the hero content and renders with 0.01 opacity,
-            allowing the browser's LCP metric to score it instantly on the first HTML paint
-            without waiting for the heavy GSAP typing animation to finish. */}
-        <div
-          className="pointer-events-none absolute inset-0 z-[-1] flex flex-col items-center gap-8 text-center opacity-[0.01] select-none"
-          aria-hidden="true"
-        >
-          <div className="relative inline-block">
-            <div className="font-serif text-6xl leading-[0.9] font-semibold tracking-tight text-balance md:text-8xl lg:text-9xl">
-              {name}
-            </div>
-          </div>
-          <div className="flex max-w-3xl flex-col gap-4">
-            <div className="font-mono text-xl font-medium md:text-3xl">{t('role')}</div>
-            <div className="text-muted-foreground font-serif text-xl italic md:text-3xl">
-              {t('tagline')}
-            </div>
-          </div>
-        </div>
-
         <div ref={headerRef} className="relative inline-block">
+          {' '}
           {/* Name with Typewriter */}
           <h1
             className="font-serif text-6xl leading-[0.9] font-semibold tracking-tight text-balance md:text-8xl lg:text-9xl"
