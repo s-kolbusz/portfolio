@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import type { RefObject } from 'react'
 
 import { usePrefersReducedMotion } from '@/hooks/use-media'
@@ -32,29 +33,32 @@ export function useTimeline<T extends HTMLElement>(
   const prefersReducedMotion = usePrefersReducedMotion()
   const anim = useSafeAnimation()
 
-  useGSAP(
-    () => {
-      if (!ref.current) return
+  const { contextSafe } = useGSAP({ scope: ref })
 
-      if (id) {
-        useTimelineStore.getState().register(id)
-      }
+  useEffect(() => {
+    if (!ref.current) return
 
+    if (id) {
+      useTimelineStore.getState().register(id)
+    }
+
+    const init = contextSafe(() => {
       const reveal: RevealFn = (target, options = {}) => {
         createReveal(target, options, prefersReducedMotion, anim, start, toggleActions)
       }
-
       setup(reveal)
+    })
 
-      return () => {
-        if (id) {
-          useTimelineStore.getState().unregister(id)
-        }
+    // Defer to the next animation frame to unblock the main thread during hydration
+    // This prevents forced synchronous layout thrashing when multiple components mount
+    const rafId = requestAnimationFrame(init)
+
+    return () => {
+      cancelAnimationFrame(rafId)
+      if (id) {
+        useTimelineStore.getState().unregister(id)
       }
-    },
-    {
-      scope: ref,
-      dependencies: [prefersReducedMotion],
     }
-  )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefersReducedMotion])
 }
