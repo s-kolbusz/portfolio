@@ -47,12 +47,14 @@ export function Hero() {
     return name.split(' ').map((word, wordIndex) => (
       <span key={wordIndex} className="inline-block whitespace-nowrap">
         {word.split('').map((char, charIndex) => (
-          <span key={charIndex} className="char inline-block opacity-0">
+          <span key={charIndex} className="char inline-block" style={{ opacity: 0.01 }}>
             {char}
           </span>
         ))}
         {wordIndex < name.split(' ').length - 1 && (
-          <span className="char inline-block whitespace-pre opacity-0"> </span>
+          <span className="char inline-block whitespace-pre" style={{ opacity: 0.01 }}>
+            {' '}
+          </span>
         )}
       </span>
     ))

@@ -10,7 +10,7 @@ import { StarIcon } from '@phosphor-icons/react'
 import type { PortfolioEntry } from '@/data/projects'
 import { useTimeline } from '@/hooks/timeline'
 import { ANIMATION } from '@/lib/constants/animations'
-import { gsap } from '@/lib/gsap'
+import { gsap } from '@/lib/gsap-core'
 
 interface BookTableOfContentsProps {
   entries: PortfolioEntry[]

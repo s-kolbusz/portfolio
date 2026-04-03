@@ -5,7 +5,7 @@ import type { RefObject } from 'react'
 
 import { usePrefersReducedMotion } from '@/hooks/use-media'
 import { useSafeAnimation } from '@/hooks/use-safe-animation'
-import { useGSAP } from '@/lib/gsap'
+import { useGSAP } from '@/lib/gsap-core'
 
 import { createReveal, REVEAL } from './reveal-engine'
 import { useTimelineStore } from './store'

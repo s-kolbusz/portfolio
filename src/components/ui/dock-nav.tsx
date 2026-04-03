@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl'
 
 import { useActiveSection } from '@/hooks/use-active-section'
 import { usePathname } from '@/i18n/navigation'
-import { useGSAP } from '@/lib/gsap'
+import { useGSAP } from '@/lib/gsap-core'
 import { isProjectDetailRoute, isServicesRoute } from '@/lib/route-predicates'
 
 import { DockItem } from './dock-item'

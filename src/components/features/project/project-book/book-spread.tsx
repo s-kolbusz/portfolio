@@ -10,7 +10,7 @@ import { ArrowRightIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
 import type { PortfolioEntry } from '@/data/projects'
 import { Link } from '@/i18n/navigation'
 import { ANIMATION } from '@/lib/constants/animations'
-import { gsap, useGSAP } from '@/lib/gsap'
+import { gsap, useGSAP } from '@/lib/gsap-core'
 
 interface BookSpreadProps {
   entry: PortfolioEntry

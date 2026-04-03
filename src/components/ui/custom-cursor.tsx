@@ -4,23 +4,20 @@ import { useEffect, useRef } from 'react'
 
 import { useCursorInteractions } from '@/hooks/use-cursor-interactions'
 import { useMedia, usePrefersReducedMotion } from '@/hooks/use-media'
-import { gsap, useGSAP } from '@/lib/gsap'
+import { gsap, useGSAP } from '@/lib/gsap-core'
 import { useCursorStore } from '@/lib/stores'
 
 export function CustomCursor() {
   const prefersReducedMotion = usePrefersReducedMotion()
   const isEnabled = useMedia('(pointer: fine)') && !prefersReducedMotion
 
-  // Use selectors for actions only to avoid re-renders on state changes
   const setMagneticTarget = useCursorStore((state) => state.setMagneticTarget)
 
-  // Initialize cursor interactions (global listeners)
   useCursorInteractions()
 
   const cursorRef = useRef<HTMLDivElement>(null)
   const ringRef = useRef<HTMLDivElement>(null)
 
-  // Transient state for the ticker to read without causing re-renders
   const magneticTargetRef = useRef<HTMLElement | null>(null)
   const targetRectRef = useRef({ left: 0, top: 0, width: 0, height: 0 })
   const mouse = useRef({ x: 0, y: 0 })
@@ -56,16 +53,13 @@ export function CustomCursor() {
     }
   }, [])
 
-  // Subscribe to store changes manually to handle visual updates
   useGSAP(() => {
-    // Initialize mouse position if window is available
     if (typeof window !== 'undefined') {
       mouse.current.x = window.innerWidth / 2
       mouse.current.y = window.innerHeight / 2
     }
 
     const unsubscribe = useCursorStore.subscribe((state, prevState) => {
-      // Handle magnetic target changes
       if (state.magneticTarget !== prevState.magneticTarget) {
         magneticTargetRef.current = state.magneticTarget
         updateTargetRect()
@@ -75,7 +69,6 @@ export function CustomCursor() {
           const targetRadius = parseInt(style.borderRadius)
           const targetHeight = parseInt(style.height)
 
-          // If it's a pill shape (rounded-full), we want to maintain that for the larger ring
           const isPill = targetRadius >= targetHeight / 2
           const newRadius = isPill ? '9999px' : `${targetRadius + 10}px`
 
@@ -85,11 +78,10 @@ export function CustomCursor() {
         }
       }
 
-      // Handle variant changes
       if (state.variant !== prevState.variant && ringRef.current && cursorRef.current) {
         if (state.variant === 'button') {
           gsap.to(ringRef.current, {
-            backgroundColor: 'rgba(255, 255, 255, 0.05)', // White for better contrast in difference mode
+            backgroundColor: 'rgba(255, 255, 255, 0.05)',
           })
         } else {
           gsap.to(ringRef.current, {
@@ -100,12 +92,9 @@ export function CustomCursor() {
         if (state.variant === 'hidden') {
           gsap.to([ringRef.current, cursorRef.current], { opacity: 0 })
         } else if (state.variant === 'slider') {
-          // Slider active: hide dot immediately, keep ring visible
           gsap.to(cursorRef.current, { opacity: 0, duration: 0.1 })
           gsap.to(ringRef.current, { opacity: 1 })
         } else if (prevState.variant === 'slider') {
-          // Coming back FROM slider: delay dot fade-in so GSAP lerps
-          // it to the real mouse position first (avoids visible jump)
           gsap.to(cursorRef.current, { opacity: 1, delay: 0.2, duration: 0.15 })
           gsap.to(ringRef.current, { opacity: 1 })
         } else {
@@ -117,7 +106,6 @@ export function CustomCursor() {
     return () => unsubscribe()
   }, [])
 
-  // Update mouse position
   useGSAP(() => {
     const onMouseMove = (e: MouseEvent) => {
       mouse.current.x = e.clientX
@@ -134,7 +122,6 @@ export function CustomCursor() {
     return () => window.removeEventListener('mousemove', onMouseMove)
   }, [])
 
-  // Animation Loop
   useGSAP(() => {
     if (!isEnabled || !cursorRef.current || !ringRef.current) return
 
@@ -148,64 +135,121 @@ export function CustomCursor() {
 
     const DEFAULT_SIZE = 40
 
+    let lastMouseX = mouse.current.x
+    let lastMouseY = mouse.current.y
+    let lastRingX = mouse.current.x
+    let lastRingY = mouse.current.y
+    let lastRingW = DEFAULT_SIZE
+    let lastRingH = DEFAULT_SIZE
+    let lastHasTarget = false
+
+    const POSITION_THRESHOLD = 0.5
+    const SIZE_THRESHOLD = 0.5
+
+    const CONNECTIVITY_CHECK_INTERVAL = 30
+    let frameCount = 0
+
     const tickerCallback = () => {
       const currentTarget = magneticTargetRef.current
+      const mouseX = mouse.current.x
+      const mouseY = mouse.current.y
 
-      let ringTargetX = mouse.current.x
-      let ringTargetY = mouse.current.y
+      let ringTargetX = mouseX
+      let ringTargetY = mouseY
       let targetWidth = DEFAULT_SIZE
       let targetHeight = DEFAULT_SIZE
+      let hasTarget = false
 
       if (currentTarget) {
-        // Check if element is still in DOM
-        if (!currentTarget.isConnected) {
-          setMagneticTarget(null)
-          magneticTargetRef.current = null
-        } else {
-          const rect = targetRectRef.current
-          if (rect.width === 0) {
+        frameCount++
+        if (frameCount % CONNECTIVITY_CHECK_INTERVAL === 0) {
+          if (!currentTarget.isConnected || targetRectRef.current.width === 0) {
             setMagneticTarget(null)
             magneticTargetRef.current = null
-          } else {
-            let centerX = rect.left + rect.width / 2
-            const centerY = rect.top + rect.height / 2
-            let w = rect.width + 20
-            let h = rect.height + 20
-
-            // Special handling for range sliders to follow the thumb
-            if (
-              currentTarget.tagName === 'INPUT' &&
-              (currentTarget as HTMLInputElement).type === 'range'
-            ) {
-              const input = currentTarget as HTMLInputElement
-              const min = parseFloat(input.min || '0')
-              const max = parseFloat(input.max || '100')
-              const val = parseFloat(input.value)
-              const percent = (val - min) / (max - min)
-
-              // 12px is a common thumb width, but we'll approximate
-              const thumbPadding = 12
-              const trackWidth = rect.width - thumbPadding * 2
-              centerX = rect.left + thumbPadding + percent * trackWidth
-              w = 30
-              h = 30
-            }
-
-            ringTargetX = centerX
-            ringTargetY = centerY
-            targetWidth = w
-            targetHeight = h
+            frameCount = 0
           }
+        }
+
+        if (magneticTargetRef.current) {
+          const rect = targetRectRef.current
+          hasTarget = rect.width > 0
+          let centerX = rect.left + rect.width / 2
+          const centerY = rect.top + rect.height / 2
+          let w = rect.width + 20
+          let h = rect.height + 20
+
+          if (
+            currentTarget.tagName === 'INPUT' &&
+            (currentTarget as HTMLInputElement).type === 'range'
+          ) {
+            const input = currentTarget as HTMLInputElement
+            const min = parseFloat(input.min || '0')
+            const max = parseFloat(input.max || '100')
+            const val = parseFloat(input.value)
+            const percent = (val - min) / (max - min)
+
+            const thumbPadding = 12
+            const trackWidth = rect.width - thumbPadding * 2
+            centerX = rect.left + thumbPadding + percent * trackWidth
+            w = 30
+            h = 30
+          }
+
+          ringTargetX = centerX
+          ringTargetY = centerY
+          targetWidth = w
+          targetHeight = h
         }
       }
 
-      xTo(mouse.current.x)
-      yTo(mouse.current.y)
+      if (
+        mouseX === lastMouseX &&
+        mouseY === lastMouseY &&
+        ringTargetX === lastRingX &&
+        ringTargetY === lastRingY &&
+        targetWidth === lastRingW &&
+        targetHeight === lastRingH
+      ) {
+        return
+      }
 
-      ringXTo(ringTargetX)
-      ringYTo(ringTargetY)
-      ringWidthTo(targetWidth)
-      ringHeightTo(targetHeight)
+      if (Math.abs(mouseX - lastMouseX) > POSITION_THRESHOLD) {
+        xTo(mouseX)
+        lastMouseX = mouseX
+      }
+      if (Math.abs(mouseY - lastMouseY) > POSITION_THRESHOLD) {
+        yTo(mouseY)
+        lastMouseY = mouseY
+      }
+
+      if (hasTarget !== lastHasTarget) {
+        ringXTo(ringTargetX)
+        ringYTo(ringTargetY)
+        ringWidthTo(targetWidth)
+        ringHeightTo(targetHeight)
+        lastRingX = ringTargetX
+        lastRingY = ringTargetY
+        lastRingW = targetWidth
+        lastRingH = targetHeight
+        lastHasTarget = hasTarget
+      } else {
+        if (Math.abs(ringTargetX - lastRingX) > POSITION_THRESHOLD) {
+          ringXTo(ringTargetX)
+          lastRingX = ringTargetX
+        }
+        if (Math.abs(ringTargetY - lastRingY) > POSITION_THRESHOLD) {
+          ringYTo(ringTargetY)
+          lastRingY = ringTargetY
+        }
+        if (Math.abs(targetWidth - lastRingW) > SIZE_THRESHOLD) {
+          ringWidthTo(targetWidth)
+          lastRingW = targetWidth
+        }
+        if (Math.abs(targetHeight - lastRingH) > SIZE_THRESHOLD) {
+          ringHeightTo(targetHeight)
+          lastRingH = targetHeight
+        }
+      }
     }
 
     gsap.ticker.add(tickerCallback)
@@ -219,13 +263,11 @@ export function CustomCursor() {
       data-testid="custom-cursor"
       className="pointer-events-none fixed inset-0 z-9998 overflow-hidden mix-blend-difference print:hidden"
     >
-      {/* Dot */}
       <div
         ref={cursorRef}
         className="bg-cursor pointer-events-none fixed top-0 left-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0 will-change-transform"
       />
 
-      {/* Ring */}
       <div
         ref={ringRef}
         className="border-cursor pointer-events-none fixed top-0 left-0 h-11 w-11 -translate-x-1/2 -translate-y-1/2 rounded-full border opacity-0 transition-colors will-change-transform"

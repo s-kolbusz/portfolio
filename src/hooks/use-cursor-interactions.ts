@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 
-import { gsap } from '@/lib/gsap'
+import { gsap } from '@/lib/gsap-core'
 import { useCursorStore, type CursorVariant } from '@/lib/stores'
 
 export function useCursorInteractions() {
@@ -85,15 +85,17 @@ export function useCursorInteractions() {
     }
 
     // Global click interceptor: block any click if the target or its ancestors are actively animating via GSAP
+    // Uses event.composedPath() which is O(1) native vs manual DOM tree walking
     const onClick = (e: MouseEvent) => {
-      let target = e.target as HTMLElement | null
-      while (target && target !== document.body && target !== document.documentElement) {
-        if (gsap.isTweening(target)) {
+      const path = e.composedPath()
+      for (let i = 0; i < path.length; i++) {
+        const el = path[i]
+        if (el === window || el === document || el === document.documentElement) break
+        if (el instanceof HTMLElement && gsap.isTweening(el)) {
           e.preventDefault()
           e.stopPropagation()
-          return // Swallow the click completely!
+          return
         }
-        target = target.parentElement
       }
     }
 
@@ -101,7 +103,7 @@ export function useCursorInteractions() {
     window.addEventListener('mouseout', onMouseOut)
     window.addEventListener('mousedown', onMouseDown)
     window.addEventListener('mouseup', onMouseUp)
-    window.addEventListener('click', onClick, true) // Must be capture phase to intercept early
+    window.addEventListener('click', onClick, true)
 
     return () => {
       window.removeEventListener('mouseover', onMouseOver)

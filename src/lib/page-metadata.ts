@@ -2,24 +2,11 @@ import type { Metadata } from 'next'
 
 import type { PortfolioEntry } from '@/data/projects'
 import { routing, type Locale } from '@/i18n/routing'
-import {
-  SITE_NAME,
-  SITE_SOCIAL_IMAGE_ALT,
-  SITE_SOCIAL_IMAGE_PATH,
-  SITE_TWITTER_HANDLE,
-  toAbsoluteSiteUrl,
-} from '@/lib/site'
+import { SITE_NAME, SITE_TWITTER_HANDLE, toAbsoluteSiteUrl } from '@/lib/site'
 
 const OPEN_GRAPH_LOCALE: Record<Locale, string> = {
   en: 'en_US',
   pl: 'pl_PL',
-}
-
-const DEFAULT_SOCIAL_IMAGE = {
-  url: toAbsoluteSiteUrl(SITE_SOCIAL_IMAGE_PATH),
-  width: 1200,
-  height: 630,
-  alt: SITE_SOCIAL_IMAGE_ALT,
 }
 
 function toAbsoluteImageUrl(url: string) {
@@ -68,9 +55,11 @@ type SocialImage = {
   alt?: string
 }
 
-function getOpenGraphImages(
-  images: PageMetadataInput['images'] = [DEFAULT_SOCIAL_IMAGE]
-): SocialImage[] {
+function getOpenGraphImages(images?: PageMetadataInput['images']): SocialImage[] {
+  if (!images || images.length === 0) {
+    return []
+  }
+
   return images.map((image) => {
     if (typeof image === 'string') {
       return {

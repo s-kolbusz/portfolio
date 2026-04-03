@@ -4,7 +4,7 @@ import { useRef } from 'react'
 
 import { usePrefersReducedMotion } from '@/hooks/use-media'
 import { ANIMATION } from '@/lib/constants/animations'
-import { gsap, useGSAP } from '@/lib/gsap'
+import { gsap, useGSAP } from '@/lib/gsap-core'
 
 export default function Template({ children }: { children: React.ReactNode }) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -27,7 +27,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
           ease: ANIMATION.ease.outStrong,
           delay: 0.1,
           onComplete: () => {
-            import('@/lib/gsap').then(({ ScrollTrigger }) => {
+            import('@/lib/gsap-scroll').then(({ ScrollTrigger }) => {
               ScrollTrigger.refresh()
             })
           },

@@ -3,13 +3,14 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
 
+import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 
 import { ArrowLeftIcon, ArrowRightIcon, XIcon } from '@phosphor-icons/react'
 
 import { Button } from '@/components/ui/button'
 import type { MediaItem } from '@/data/projects'
-import { gsap, useGSAP } from '@/lib/gsap'
+import { gsap, useGSAP } from '@/lib/gsap-core'
 import { useScrollStore } from '@/lib/stores'
 
 interface LightboxProps {
@@ -193,11 +194,13 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
         className="relative flex items-center justify-center select-none"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           key={currentIndex}
           src={images[currentIndex].url}
           alt={images[currentIndex].alt}
+          width={1920}
+          height={1080}
+          quality={90}
           className="max-h-[85vh] w-auto max-w-[90vw] object-contain shadow-2xl ring-1 ring-white/10 sm:max-w-7xl"
           loading="eager"
         />
