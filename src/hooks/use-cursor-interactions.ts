@@ -5,12 +5,13 @@ import { useEffect, useRef } from 'react'
 import { gsap } from '@/lib/gsap-core'
 import { useCursorStore, type CursorVariant } from '@/lib/stores'
 
-export function useCursorInteractions() {
+export function useCursorInteractions(enabled = true) {
   const setVariant = useCursorStore((state) => state.setVariant)
   const setMagneticTarget = useCursorStore((state) => state.setMagneticTarget)
   const activeSliderRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
+    if (!enabled) return
     const onMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement
       const cursorEl = target.closest('[data-cursor]') as HTMLElement
@@ -112,5 +113,5 @@ export function useCursorInteractions() {
       window.removeEventListener('mouseup', onMouseUp)
       window.removeEventListener('click', onClick, true)
     }
-  }, [setVariant, setMagneticTarget])
+  }, [setVariant, setMagneticTarget, enabled])
 }

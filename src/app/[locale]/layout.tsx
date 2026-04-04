@@ -37,7 +37,14 @@ const satoshi = localFont({
   variable: '--font-sans',
   display: 'optional',
   preload: true,
-  fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+  fallback: [
+    'system-ui',
+    '-apple-system',
+    'BlinkMacSystemFont',
+    'Segoe UI',
+    'Roboto',
+    'sans-serif',
+  ],
 })
 
 const fraunces = Fraunces({

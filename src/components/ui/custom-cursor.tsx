@@ -13,7 +13,7 @@ export function CustomCursor() {
 
   const setMagneticTarget = useCursorStore((state) => state.setMagneticTarget)
 
-  useCursorInteractions()
+  useCursorInteractions(isEnabled)
 
   const cursorRef = useRef<HTMLDivElement>(null)
   const ringRef = useRef<HTMLDivElement>(null)
@@ -45,19 +45,21 @@ export function CustomCursor() {
   }
 
   useEffect(() => {
+    if (!isEnabled) return
+
     window.addEventListener('scroll', updateTargetRect, { passive: true })
     window.addEventListener('resize', updateTargetRect)
     return () => {
       window.removeEventListener('scroll', updateTargetRect)
       window.removeEventListener('resize', updateTargetRect)
     }
-  }, [])
+  }, [isEnabled])
 
   useGSAP(() => {
-    if (typeof window !== 'undefined') {
-      mouse.current.x = window.innerWidth / 2
-      mouse.current.y = window.innerHeight / 2
-    }
+    if (!isEnabled) return
+
+    mouse.current.x = 0
+    mouse.current.y = 0
 
     const unsubscribe = useCursorStore.subscribe((state, prevState) => {
       if (state.magneticTarget !== prevState.magneticTarget) {
@@ -104,9 +106,11 @@ export function CustomCursor() {
     })
 
     return () => unsubscribe()
-  }, [])
+  }, [isEnabled])
 
   useGSAP(() => {
+    if (!isEnabled) return
+
     const onMouseMove = (e: MouseEvent) => {
       mouse.current.x = e.clientX
       mouse.current.y = e.clientY
@@ -120,7 +124,7 @@ export function CustomCursor() {
 
     window.addEventListener('mousemove', onMouseMove)
     return () => window.removeEventListener('mousemove', onMouseMove)
-  }, [])
+  }, [isEnabled])
 
   useGSAP(() => {
     if (!isEnabled || !cursorRef.current || !ringRef.current) return
