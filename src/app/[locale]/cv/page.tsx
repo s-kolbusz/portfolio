@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 
-import { ArrowLeftIcon } from '@phosphor-icons/react'
+import { ArrowLeftIcon } from '@phosphor-icons/react/dist/ssr'
 
 import { CVLayout, CVPrintButton } from '@/components/features/cv'
 import { BaseSection } from '@/components/ui/base-section'

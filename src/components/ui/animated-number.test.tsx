@@ -11,7 +11,7 @@ vi.mock('@/hooks/use-media', () => ({
 
 // Mock GSAP
 const mockTo = vi.fn()
-vi.mock('@/lib/gsap', () => ({
+vi.mock('@/lib/gsap-core', () => ({
   gsap: {
     to: (obj: unknown, props: { onUpdate?: () => void }) => {
       mockTo(obj, props)
