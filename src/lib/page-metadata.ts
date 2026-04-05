@@ -68,9 +68,11 @@ type SocialImage = {
   alt?: string
 }
 
-function getOpenGraphImages(
-  images: PageMetadataInput['images'] = [DEFAULT_SOCIAL_IMAGE]
-): SocialImage[] {
+function getOpenGraphImages(images?: PageMetadataInput['images']): SocialImage[] {
+  if (!images || images.length === 0) {
+    return [{ ...DEFAULT_SOCIAL_IMAGE, url: toAbsoluteImageUrl(DEFAULT_SOCIAL_IMAGE.url) }]
+  }
+
   return images.map((image) => {
     if (typeof image === 'string') {
       return {

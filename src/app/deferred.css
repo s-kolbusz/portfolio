@@ -1,0 +1,42 @@
+/*
+ * Deferred CSS - Non-critical styles loaded after first paint
+ * These styles are only needed for client-side features that activate after hydration
+ * Imported by smooth-scroller.tsx (a dynamically-loaded component) so CSS is code-split
+ */
+
+/* Lenis Recommended CSS - only needed when smooth scroll initializes */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* Opt-in cursor suppression when the custom cursor experience is active */
+@media (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .custom-cursor-active,
+  .custom-cursor-active body,
+  .custom-cursor-active a,
+  .custom-cursor-active button,
+  .custom-cursor-active [role='button'],
+  .custom-cursor-active [data-cursor],
+  .custom-cursor-active input,
+  .custom-cursor-active select,
+  .custom-cursor-active textarea {
+    cursor: none !important;
+  }
+}

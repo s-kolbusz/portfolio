@@ -38,7 +38,7 @@ describe('page metadata', () => {
             {
               "alt": "Sebastian Kolbusz - High-performance web engineering",
               "height": 630,
-              "url": "https://www.kolbusz.xyz/images/og-image.png",
+              "url": "https://www.kolbusz.xyz/og-image",
               "width": 1200,
             },
           ],
@@ -56,7 +56,7 @@ describe('page metadata', () => {
           "creator": "@s_kolbusz",
           "description": "Senior Frontend Engineer in Zakopane building fast Next.js websites, SaaS interfaces, and polished digital experiences for ambitious brands.",
           "images": [
-            "https://www.kolbusz.xyz/images/og-image.png",
+            "https://www.kolbusz.xyz/og-image",
           ],
           "title": "Sebastian Kolbusz | Senior Frontend Engineer",
         },
@@ -88,7 +88,7 @@ describe('page metadata', () => {
             {
               "alt": "Sebastian Kolbusz - High-performance web engineering",
               "height": 630,
-              "url": "https://www.kolbusz.xyz/images/og-image.png",
+              "url": "https://www.kolbusz.xyz/og-image",
               "width": 1200,
             },
           ],
@@ -104,7 +104,7 @@ describe('page metadata', () => {
           "creator": "@s_kolbusz",
           "description": "Senior Frontend Engineer in Zakopane building fast Next.js websites, SaaS interfaces, and polished digital experiences for ambitious brands.",
           "images": [
-            "https://www.kolbusz.xyz/images/og-image.png",
+            "https://www.kolbusz.xyz/og-image",
           ],
           "title": "Curriculum Vitae",
         },
@@ -136,7 +136,7 @@ describe('page metadata', () => {
             {
               "alt": "Sebastian Kolbusz - High-performance web engineering",
               "height": 630,
-              "url": "https://www.kolbusz.xyz/images/og-image.png",
+              "url": "https://www.kolbusz.xyz/og-image",
               "width": 1200,
             },
           ],
@@ -152,7 +152,7 @@ describe('page metadata', () => {
           "creator": "@s_kolbusz",
           "description": "Selected case studies covering high-performance websites, SaaS interfaces, and digital platforms built with clarity, speed, and measurable outcomes.",
           "images": [
-            "https://www.kolbusz.xyz/images/og-image.png",
+            "https://www.kolbusz.xyz/og-image",
           ],
           "title": "Selected Work",
         },

@@ -1,6 +1,6 @@
 import type { RefObject } from 'react'
 
-import type { gsap } from '@/lib/gsap'
+import type { gsap } from '@/lib/gsap-core'
 
 export type AnimationTarget =
   | string

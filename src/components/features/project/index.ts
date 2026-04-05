@@ -1,5 +1,0 @@
-export * from './project-accordion'
-export * from './project-hover-preview'
-export * from './project-item'
-export * from './project-list'
-export * from './project-meta'

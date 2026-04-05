@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl'
 
 import { ArrowRightIcon } from '@phosphor-icons/react'
 
-import { CalculatorPanel } from '@/components/features/calculator'
+import { CalculatorPanel } from '@/components/features/calculator/calculator-panel'
 import { BaseSection } from '@/components/ui/base-section'
 import { Button } from '@/components/ui/button'
 import { EditorialHeader } from '@/components/ui/editorial-header'

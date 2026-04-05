@@ -33,14 +33,28 @@ vi.mock('lenis', () => {
 })
 
 // Mock GSAP
-vi.mock('@/lib/gsap', () => ({
-  gsap: {
+vi.mock('gsap/ScrollTrigger', () => ({
+  default: {
+    update: vi.fn(),
+  },
+}))
+
+vi.mock('@/lib/gsap-core', () => {
+  const mockGsap = {
     ticker: {
       add: vi.fn(),
       remove: vi.fn(),
       lagSmoothing: vi.fn(),
     },
-  },
+    registerPlugin: vi.fn(),
+  }
+  return {
+    gsap: mockGsap,
+    useGSAP: vi.fn((cb: () => void) => cb()),
+  }
+})
+
+vi.mock('@/lib/gsap-scroll', () => ({
   ScrollTrigger: {
     update: vi.fn(),
   },

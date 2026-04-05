@@ -5,8 +5,7 @@ import { createPortal } from 'react-dom'
 
 import Image from 'next/image'
 
-import { useMedia } from '@/hooks/use-media'
-import { gsap, useGSAP } from '@/lib/gsap'
+import { gsap, useGSAP } from '@/lib/gsap-core'
 
 interface ProjectHoverPreviewProps {
   image: string | null
@@ -18,47 +17,31 @@ export function ProjectHoverPreview({ image, isActive, isVisible }: ProjectHover
   const containerRef = useRef<HTMLDivElement>(null)
 
   // Check for fine pointer (mouse)
-  const isEnabled = useMedia('(pointer: fine)')
-  const isListening = isEnabled && isVisible && isActive
+  const isListening = isVisible && isActive
 
   // 1. Mouse Follow Logic - Using useGSAP for automatic cleanup and scoping
   useGSAP(
     () => {
       const container = containerRef.current
-      if (!isListening || !container) return
+      if (!container) return
 
-      // Spring physics for smooth follow
-      const xTo = gsap.quickTo(container, 'x', { duration: 0.6, ease: 'power3.out' })
-      const yTo = gsap.quickTo(container, 'y', { duration: 0.6, ease: 'power3.out' })
+      if (isListening) {
+        // Spring physics for smooth follow
+        const xTo = gsap.quickTo(container, 'x', { duration: 0.6, ease: 'power3.out' })
+        const yTo = gsap.quickTo(container, 'y', { duration: 0.6, ease: 'power3.out' })
 
-      // Initialize position to center of screen (approximate dimensions to avoid reading layout)
-      const centerX = window.innerWidth / 2 - 150
-      const centerY = window.innerHeight / 2 - 100
-      gsap.set(container, { x: centerX, y: centerY })
+        // Initialize position to center of screen (approximate dimensions to avoid reading layout)
+        const centerX = window.innerWidth / 2 - 150
+        const centerY = window.innerHeight / 2 - 100
+        gsap.set(container, { x: centerX, y: centerY })
 
-      const onMove = (e: MouseEvent) => {
-        xTo(e.clientX + 20)
-        yTo(e.clientY + 20)
-      }
+        const onMove = (e: MouseEvent) => {
+          xTo(e.clientX + 20)
+          yTo(e.clientY + 20)
+        }
 
-      window.addEventListener('mousemove', onMove)
+        window.addEventListener('mousemove', onMove)
 
-      return () => {
-        window.removeEventListener('mousemove', onMove)
-      }
-    },
-    { dependencies: [isListening], scope: containerRef }
-  )
-
-  // 2. Visibility & Transition Logic
-  useGSAP(
-    () => {
-      const container = containerRef.current
-      if (!isEnabled || !container) return
-
-      const shouldShow = isActive && isVisible
-
-      if (shouldShow) {
         gsap.to(container, {
           autoAlpha: 1,
           scale: 1,
@@ -66,6 +49,10 @@ export function ProjectHoverPreview({ image, isActive, isVisible }: ProjectHover
           ease: 'power2.out',
           overwrite: 'auto',
         })
+
+        return () => {
+          window.removeEventListener('mousemove', onMove)
+        }
       } else {
         gsap.to(container, {
           autoAlpha: 0,
@@ -78,17 +65,13 @@ export function ProjectHoverPreview({ image, isActive, isVisible }: ProjectHover
             // But checking isListening here might be stale closure if not careful.
             // Safest is to just let it finish.
             // If we really want to stop ticker, we can kill everything.
-            if (!shouldShow) {
-              gsap.killTweensOf(container)
-            }
+            gsap.killTweensOf(container)
           },
         })
       }
     },
-    { dependencies: [isActive, isVisible, isEnabled], scope: containerRef }
+    { dependencies: [isListening], scope: containerRef }
   )
-
-  if (!isEnabled) return null
 
   return createPortal(
     <div

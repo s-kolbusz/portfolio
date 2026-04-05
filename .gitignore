@@ -14,6 +14,11 @@
 /coverage
 /test-results
 
+# lighthouse
+lh-report.json
+lh-report-optimized.json
+.lighthouseci
+
 # next.js
 /.next/
 /out/

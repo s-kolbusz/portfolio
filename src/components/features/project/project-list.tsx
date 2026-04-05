@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import type { PortfolioEntry } from '@/data/projects'
 import { useTimeline } from '@/hooks/timeline'
+import { useMedia } from '@/hooks/use-media'
 import { ANIMATION } from '@/lib/constants/animations'
 
 import { ProjectHoverPreview } from './project-hover-preview'
@@ -21,6 +22,8 @@ export function ProjectList({ projects }: ProjectListProps) {
   const [isVisible, setIsVisible] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
+
+  const hasPointer = useMedia('(pointer: fine)')
 
   useTimeline(containerRef, { id: 'project-list' }, (reveal) => {
     reveal(listRef, {
@@ -67,7 +70,13 @@ export function ProjectList({ projects }: ProjectListProps) {
   return (
     <div ref={containerRef} className="relative" onMouseLeave={() => setActiveImage(null)}>
       <div className="hidden md:block">
-        <ProjectHoverPreview image={imageToRender} isActive={!!activeImage} isVisible={isVisible} />
+        {hasPointer && (
+          <ProjectHoverPreview
+            image={imageToRender}
+            isActive={!!activeImage}
+            isVisible={isVisible}
+          />
+        )}
       </div>
 
       <div className="flex flex-col" ref={listRef}>

@@ -10,7 +10,7 @@ import {
   SunIcon,
 } from '@phosphor-icons/react'
 
-import { ProjectMeta } from '@/components/features/project'
+import { ProjectMeta } from '@/components/features/project/project-meta'
 import { BaseSection } from '@/components/ui/base-section'
 import { Button } from '@/components/ui/button'
 import { Select } from '@/components/ui/select'

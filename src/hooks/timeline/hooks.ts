@@ -1,14 +1,48 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
 import type { RefObject } from 'react'
 
 import { usePrefersReducedMotion } from '@/hooks/use-media'
 import { useSafeAnimation } from '@/hooks/use-safe-animation'
-import { useGSAP } from '@/lib/gsap'
+import { useGSAP } from '@/lib/gsap-core'
 
 import { createReveal, REVEAL } from './reveal-engine'
 import { useTimelineStore } from './store'
 import type { RevealFn, TimelineConfig, TimelineSetup } from './types'
+
+// Global queue to stagger ScrollTrigger initializations across multiple frames
+const timelineQueue: Array<() => void> = []
+let isProcessingQueue = false
+
+function processTimelineQueue() {
+  if (timelineQueue.length === 0) {
+    isProcessingQueue = false
+    return
+  }
+
+  // Process one timeline setup per frame to prevent long tasks
+  const init = timelineQueue.shift()
+  if (init) init()
+
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(processTimelineQueue, { timeout: 100 })
+  } else {
+    requestAnimationFrame(processTimelineQueue)
+  }
+}
+
+function enqueueTimeline(init: () => void) {
+  timelineQueue.push(init)
+  if (!isProcessingQueue) {
+    isProcessingQueue = true
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(processTimelineQueue, { timeout: 100 })
+    } else {
+      requestAnimationFrame(processTimelineQueue)
+    }
+  }
+}
 
 export function useTimeline<T extends HTMLElement>(
   ref: RefObject<T | null>,
@@ -32,29 +66,39 @@ export function useTimeline<T extends HTMLElement>(
   const prefersReducedMotion = usePrefersReducedMotion()
   const anim = useSafeAnimation()
 
-  useGSAP(
-    () => {
-      if (!ref.current) return
+  const { contextSafe } = useGSAP({ scope: ref })
 
-      if (id) {
-        useTimelineStore.getState().register(id)
-      }
+  const setupRef = useRef(setup)
 
+  useEffect(() => {
+    setupRef.current = setup
+    if (!ref.current) return
+
+    if (id) {
+      useTimelineStore.getState().register(id)
+    }
+
+    let isMounted = true
+
+    const init = contextSafe(() => {
+      if (!isMounted) return
       const reveal: RevealFn = (target, options = {}) => {
         createReveal(target, options, prefersReducedMotion, anim, start, toggleActions)
       }
+      setupRef.current(reveal)
+    })
 
-      setup(reveal)
+    // Stagger timeline setup across multiple frames/idle callbacks
+    // This totally eliminates the massive ~1000ms Layout Thrashing task when 20+ hooks mount simultaneously
+    enqueueTimeline(init)
 
-      return () => {
-        if (id) {
-          useTimelineStore.getState().unregister(id)
-        }
+    return () => {
+      isMounted = false
+      if (id) {
+        useTimelineStore.getState().unregister(id)
       }
-    },
-    {
-      scope: ref,
-      dependencies: [prefersReducedMotion],
     }
-  )
+    // anim, contextSafe, start, toggleActions are stable; setup is captured via ref
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefersReducedMotion, ref, id])
 }

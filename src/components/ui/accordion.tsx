@@ -7,7 +7,8 @@ import { CaretDownIcon } from '@phosphor-icons/react'
 
 import { cn } from '@/lib/cn'
 import { ANIMATION } from '@/lib/constants/animations'
-import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap'
+import { gsap, useGSAP } from '@/lib/gsap-core'
+import { ScrollTrigger } from '@/lib/gsap-scroll'
 
 interface AccordionProps {
   id: string

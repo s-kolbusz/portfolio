@@ -238,6 +238,7 @@ export function ProjectCaseStudy({ project, prevProject, nextProject }: ProjectC
                         ? '(max-width: 1024px) 100vw, 80vw'
                         : '(max-width: 768px) 100vw, 50vw'
                     }
+                    quality={85}
                     className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                     loading="lazy"
                   />

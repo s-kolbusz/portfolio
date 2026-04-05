@@ -3,7 +3,7 @@
 import type { RefObject } from 'react'
 
 import { ANIMATION } from '@/lib/constants/animations'
-import { gsap, useGSAP } from '@/lib/gsap'
+import { gsap, useGSAP } from '@/lib/gsap-core'
 
 interface UseHeroAnimationProps {
   containerRef: RefObject<HTMLElement | null>
@@ -35,7 +35,7 @@ export function useHeroAnimation({
       // Initial state
       gsap.set(ctaRef.current, { y: 20, opacity: 0 })
 
-      const tl = gsap.timeline({ delay: 0.1 }) // Just run it, it's at the very top of the page!
+      const tl = gsap.timeline({ delay: 0.1 })
 
       // READ phase: Get all bounding rects before applying any mutations
       const parentRect = caretRef.current?.parentElement?.getBoundingClientRect() || {

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { CaretDownIcon } from '@phosphor-icons/react'
 
 import { cn } from '@/lib/cn'
-import { ScrollTrigger } from '@/lib/gsap'
+import { ScrollTrigger } from '@/lib/gsap-scroll'
 
 interface SEOTextProps {
   title: string

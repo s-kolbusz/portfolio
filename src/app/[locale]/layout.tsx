@@ -12,12 +12,7 @@ import { SkipToMain } from '@/components/ui/skip-to-main'
 import { getLocaleFromParams } from '@/i18n/locale'
 import { Link } from '@/i18n/navigation'
 import { routing } from '@/i18n/routing'
-import {
-  SITE_ORIGIN,
-  SITE_SOCIAL_IMAGE_ALT,
-  SITE_SOCIAL_IMAGE_PATH,
-  SITE_TWITTER_HANDLE,
-} from '@/lib/site'
+import { SITE_ORIGIN, SITE_TWITTER_HANDLE } from '@/lib/site'
 
 import '../globals.css'
 
@@ -40,19 +35,30 @@ const satoshi = localFont({
     },
   ],
   variable: '--font-sans',
-  display: 'swap',
+  display: 'optional',
+  preload: true,
+  fallback: [
+    'system-ui',
+    '-apple-system',
+    'BlinkMacSystemFont',
+    'Segoe UI',
+    'Roboto',
+    'sans-serif',
+  ],
 })
 
 const fraunces = Fraunces({
   subsets: ['latin'],
   variable: '--font-serif',
-  display: 'swap',
+  display: 'optional',
+  fallback: ['Georgia', 'Cambria', 'Times New Roman', 'Times', 'serif'],
 })
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
-  display: 'swap',
+  display: 'optional',
+  fallback: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
 })
 
 export const viewport: Viewport = {
@@ -98,21 +104,12 @@ export const metadata: Metadata = {
     title: 'Sebastian Kolbusz | Senior Frontend Engineer',
     description:
       'Senior Frontend Engineer in Zakopane building fast Next.js websites, SaaS interfaces, and polished digital experiences for ambitious brands.',
-    images: [
-      {
-        url: SITE_SOCIAL_IMAGE_PATH,
-        width: 1200,
-        height: 630,
-        alt: SITE_SOCIAL_IMAGE_ALT,
-      },
-    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Sebastian Kolbusz | Senior Frontend Engineer',
     description:
       'Senior Frontend Engineer in Zakopane building fast Next.js websites, SaaS interfaces, and polished digital experiences for ambitious brands.',
-    images: [SITE_SOCIAL_IMAGE_PATH],
     creator: SITE_TWITTER_HANDLE,
   },
   robots: {
