@@ -58,8 +58,8 @@ export function CustomCursor() {
   useGSAP(() => {
     if (!isEnabled) return
 
-    mouse.current.x = 0
-    mouse.current.y = 0
+    mouse.current.x = window.innerWidth / 2
+    mouse.current.y = window.innerHeight / 2
 
     const unsubscribe = useCursorStore.subscribe((state, prevState) => {
       if (state.magneticTarget !== prevState.magneticTarget) {
