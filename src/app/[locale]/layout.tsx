@@ -4,9 +4,7 @@ import { getMessages, setRequestLocale } from 'next-intl/server'
 import { Fraunces, JetBrains_Mono } from 'next/font/google'
 import localFont from 'next/font/local'
 
-import { Analytics } from '@vercel/analytics/next'
-import { SpeedInsights } from '@vercel/speed-insights/next'
-
+import { UmamiAnalytics } from '@/components/analytics/umami'
 import { JsonLd } from '@/components/seo/json-ld'
 import { ThemeProvider } from '@/components/theme-provider'
 import { ClientOverlays } from '@/components/ui/client-overlays'
@@ -139,8 +137,6 @@ export function generateStaticParams() {
 
 export default async function LocaleLayout({ children, params }: Props) {
   const locale = await getLocaleFromParams(params)
-  const shouldLoadVercelInsights =
-    process.env.NODE_ENV === 'production' && process.env.VERCEL === '1'
 
   setRequestLocale(locale)
   const messages = await getMessages({ locale })
@@ -177,12 +173,7 @@ export default async function LocaleLayout({ children, params }: Props) {
             <ClientOverlays />
             {children}
 
-            {shouldLoadVercelInsights ? (
-              <>
-                <SpeedInsights />
-                <Analytics />
-              </>
-            ) : null}
+            <UmamiAnalytics />
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>
