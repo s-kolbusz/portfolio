@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import type { RefObject } from 'react'
 
 import { usePrefersReducedMotion } from '@/hooks/use-media'
@@ -68,7 +68,10 @@ export function useTimeline<T extends HTMLElement>(
 
   const { contextSafe } = useGSAP({ scope: ref })
 
+  const setupRef = useRef(setup)
+
   useEffect(() => {
+    setupRef.current = setup
     if (!ref.current) return
 
     if (id) {
@@ -82,7 +85,7 @@ export function useTimeline<T extends HTMLElement>(
       const reveal: RevealFn = (target, options = {}) => {
         createReveal(target, options, prefersReducedMotion, anim, start, toggleActions)
       }
-      setup(reveal)
+      setupRef.current(reveal)
     })
 
     // Stagger timeline setup across multiple frames/idle callbacks
@@ -95,6 +98,7 @@ export function useTimeline<T extends HTMLElement>(
         useTimelineStore.getState().unregister(id)
       }
     }
+    // anim, contextSafe, start, toggleActions are stable; setup is captured via ref
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prefersReducedMotion])
+  }, [prefersReducedMotion, ref, id])
 }

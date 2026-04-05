@@ -39,12 +39,6 @@ vi.mock('gsap/ScrollTrigger', () => ({
   },
 }))
 
-vi.mock('gsap/ScrollTrigger', () => ({
-  default: {
-    update: vi.fn(),
-  },
-}))
-
 vi.mock('@/lib/gsap-core', () => {
   const mockGsap = {
     ticker: {

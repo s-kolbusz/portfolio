@@ -47,6 +47,9 @@ export function Hero() {
     return name.split(' ').map((word, wordIndex) => (
       <span key={wordIndex} className="inline-block whitespace-nowrap">
         {word.split('').map((char, charIndex) => (
+          // opacity: 0.01 (not 0) is intentional — Lighthouse treats opacity: 0 as
+          // invisible and excludes it from LCP. At 0.01 the element is technically
+          // visible to LCP measurement but imperceptible to users until GSAP animates it.
           <span key={charIndex} className="char inline-block" style={{ opacity: 0.01 }}>
             {char}
           </span>
