@@ -19,7 +19,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
 
       gsap.fromTo(
         containerRef.current,
-        { opacity: 0, y },
+        { opacity: 0.01, y },
         {
           opacity: 1,
           y: 0,
@@ -38,7 +38,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
   )
 
   return (
-    <div ref={containerRef} id="page-transition-container" style={{ opacity: 0 }}>
+    <div ref={containerRef} id="page-transition-container" style={{ opacity: 0.01 }}>
       {children}
     </div>
   )

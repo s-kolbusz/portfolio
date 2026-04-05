@@ -3,7 +3,8 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 
 import { ArrowLeftIcon } from '@phosphor-icons/react/dist/ssr'
 
-import { CVLayout, CVPrintButton } from '@/components/features/cv'
+import { CVLayout } from '@/components/features/cv/cv-layout'
+import { CVPrintButton } from '@/components/features/cv/cv-print-button'
 import { BaseSection } from '@/components/ui/base-section'
 import { Button } from '@/components/ui/button'
 import type { CVData } from '@/data/cv'
