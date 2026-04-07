@@ -28,25 +28,32 @@ const SettingsDock = dynamic(
   { ssr: false }
 )
 
+// Load overlays in three staggered phases to avoid a synchronized burst on the main thread.
+// Phase 1 (300ms):  SmoothScroller + back buttons — needed early for scroll/navigation
+// Phase 2 (700ms):  CustomCursor — interactive, but not blocking
+// Phase 3 (1200ms): DockNav + SettingsDock — decorative UI, load last
 export function ClientOverlays() {
-  const [mounted, setMounted] = useState(false)
+  const [phase, setPhase] = useState(0)
 
   useEffect(() => {
-    // Delay loading overlays to free up main thread during initial render
-    const timer = setTimeout(() => setMounted(true), 500)
-    return () => clearTimeout(timer)
+    const t1 = setTimeout(() => setPhase(1), 300)
+    const t2 = setTimeout(() => setPhase(2), 700)
+    const t3 = setTimeout(() => setPhase(3), 1200)
+    return () => {
+      clearTimeout(t1)
+      clearTimeout(t2)
+      clearTimeout(t3)
+    }
   }, [])
-
-  if (!mounted) return null
 
   return (
     <>
-      <CustomCursor />
-      <SmoothScroller />
-      <CaseStudyBackButton />
-      <ServicesBackButton />
-      <SettingsDock />
-      <DockNav />
+      {phase >= 1 && <SmoothScroller />}
+      {phase >= 1 && <CustomCursor />}
+      {phase >= 2 && <DockNav />}
+      {phase >= 2 && <SettingsDock />}
+      {phase >= 3 && <CaseStudyBackButton />}
+      {phase >= 3 && <ServicesBackButton />}
     </>
   )
 }

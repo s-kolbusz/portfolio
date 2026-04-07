@@ -7,14 +7,34 @@ import { usePrefersReducedMotion } from '@/hooks/use-media'
 import { disposePuddleWebGL, lerp, setupPuddleWebGL } from './viscous-puddle/webgl'
 
 /** Read `--primary-rgb` CSS custom property → [r, g, b] floats (0-1). */
-function getPrimaryRgb(): [number, number, number] {
+function readPrimaryRgb(): [number, number, number] {
   const raw = getComputedStyle(document.documentElement).getPropertyValue('--primary-rgb').trim()
   const parts = raw.split(/\s+/).map(Number)
   if (parts.length === 3 && parts.every((n) => !Number.isNaN(n))) {
     return parts as [number, number, number]
   }
-  // Fallback if token is missing
   return [0.494, 0.773, 0.557]
+}
+
+// Cached color value — recomputed only when the theme class on <html> changes,
+// not on every animation frame (avoids forcing a style recalculation at 60fps).
+let cachedPrimaryRgb: [number, number, number] | null = null
+
+function getPrimaryRgb(): [number, number, number] {
+  if (!cachedPrimaryRgb) {
+    cachedPrimaryRgb = readPrimaryRgb()
+  }
+  return cachedPrimaryRgb
+}
+
+// Stored so it can be disconnected if needed and to prevent duplicate registration.
+let themeObserver: MutationObserver | null = null
+
+if (typeof document !== 'undefined' && !themeObserver) {
+  themeObserver = new MutationObserver(() => {
+    cachedPrimaryRgb = null
+  })
+  themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
 }
 
 interface PuddleState {

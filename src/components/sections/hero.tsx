@@ -30,7 +30,7 @@ export function Hero() {
     if (prefersReducedMotion) return
     const timer = setTimeout(() => {
       setShowScene(true)
-    }, 500)
+    }, 900)
     return () => clearTimeout(timer)
   }, [prefersReducedMotion])
 
