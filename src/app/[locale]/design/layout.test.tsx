@@ -15,8 +15,8 @@ describe('design layout metadata', () => {
       params: Promise.resolve({ locale: 'pl' }),
     })
 
-    expect(metadata.alternates?.canonical).toBe('https://www.kolbusz.xyz/pl/design')
-    expect(metadata.openGraph?.url).toBe('https://www.kolbusz.xyz/pl/design')
+    expect(metadata.alternates?.canonical).toBe('https://kolbusz.xyz/pl/design')
+    expect(metadata.openGraph?.url).toBe('https://kolbusz.xyz/pl/design')
     expect(metadata.robots).toMatchObject({
       index: false,
       follow: false,
@@ -30,6 +30,6 @@ describe('design layout metadata', () => {
 
     expect(metadata.title).toBe('Design System')
     expect(metadata.description).toContain('Internal design-system preview')
-    expect(metadata.alternates?.canonical).toBe('https://www.kolbusz.xyz/en/design')
+    expect(metadata.alternates?.canonical).toBe('https://kolbusz.xyz/en/design')
   })
 })

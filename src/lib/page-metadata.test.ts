@@ -24,11 +24,11 @@ describe('page metadata', () => {
     expect(metadata).toMatchInlineSnapshot(`
       {
         "alternates": {
-          "canonical": "https://www.kolbusz.xyz/en",
+          "canonical": "https://kolbusz.xyz/en",
           "languages": {
-            "en": "https://www.kolbusz.xyz/en",
-            "pl": "https://www.kolbusz.xyz/pl",
-            "x-default": "https://www.kolbusz.xyz/en",
+            "en": "https://kolbusz.xyz/en",
+            "pl": "https://kolbusz.xyz/pl",
+            "x-default": "https://kolbusz.xyz/en",
           },
         },
         "description": "Senior Frontend Engineer in Zakopane building fast Next.js websites, SaaS interfaces, and polished digital experiences for ambitious brands.",
@@ -38,7 +38,7 @@ describe('page metadata', () => {
             {
               "alt": "Sebastian Kolbusz - High-performance web engineering",
               "height": 630,
-              "url": "https://www.kolbusz.xyz/og-image",
+              "url": "https://kolbusz.xyz/og-image",
               "width": 1200,
             },
           ],
@@ -46,7 +46,7 @@ describe('page metadata', () => {
           "siteName": "Sebastian Kolbusz Portfolio",
           "title": "Sebastian Kolbusz | Senior Frontend Engineer",
           "type": "website",
-          "url": "https://www.kolbusz.xyz/en",
+          "url": "https://kolbusz.xyz/en",
         },
         "title": {
           "absolute": "Sebastian Kolbusz | Senior Frontend Engineer",
@@ -56,7 +56,7 @@ describe('page metadata', () => {
           "creator": "@s_kolbusz",
           "description": "Senior Frontend Engineer in Zakopane building fast Next.js websites, SaaS interfaces, and polished digital experiences for ambitious brands.",
           "images": [
-            "https://www.kolbusz.xyz/og-image",
+            "https://kolbusz.xyz/og-image",
           ],
           "title": "Sebastian Kolbusz | Senior Frontend Engineer",
         },
@@ -74,11 +74,11 @@ describe('page metadata', () => {
     expect(metadata).toMatchInlineSnapshot(`
       {
         "alternates": {
-          "canonical": "https://www.kolbusz.xyz/en/cv",
+          "canonical": "https://kolbusz.xyz/en/cv",
           "languages": {
-            "en": "https://www.kolbusz.xyz/en/cv",
-            "pl": "https://www.kolbusz.xyz/pl/cv",
-            "x-default": "https://www.kolbusz.xyz/en/cv",
+            "en": "https://kolbusz.xyz/en/cv",
+            "pl": "https://kolbusz.xyz/pl/cv",
+            "x-default": "https://kolbusz.xyz/en/cv",
           },
         },
         "description": "Senior Frontend Engineer in Zakopane building fast Next.js websites, SaaS interfaces, and polished digital experiences for ambitious brands.",
@@ -88,7 +88,7 @@ describe('page metadata', () => {
             {
               "alt": "Sebastian Kolbusz - High-performance web engineering",
               "height": 630,
-              "url": "https://www.kolbusz.xyz/og-image",
+              "url": "https://kolbusz.xyz/og-image",
               "width": 1200,
             },
           ],
@@ -96,7 +96,7 @@ describe('page metadata', () => {
           "siteName": "Sebastian Kolbusz Portfolio",
           "title": "Curriculum Vitae",
           "type": "website",
-          "url": "https://www.kolbusz.xyz/en/cv",
+          "url": "https://kolbusz.xyz/en/cv",
         },
         "title": "Curriculum Vitae",
         "twitter": {
@@ -104,7 +104,7 @@ describe('page metadata', () => {
           "creator": "@s_kolbusz",
           "description": "Senior Frontend Engineer in Zakopane building fast Next.js websites, SaaS interfaces, and polished digital experiences for ambitious brands.",
           "images": [
-            "https://www.kolbusz.xyz/og-image",
+            "https://kolbusz.xyz/og-image",
           ],
           "title": "Curriculum Vitae",
         },
@@ -122,11 +122,11 @@ describe('page metadata', () => {
     expect(metadata).toMatchInlineSnapshot(`
       {
         "alternates": {
-          "canonical": "https://www.kolbusz.xyz/en/projects",
+          "canonical": "https://kolbusz.xyz/en/projects",
           "languages": {
-            "en": "https://www.kolbusz.xyz/en/projects",
-            "pl": "https://www.kolbusz.xyz/pl/projects",
-            "x-default": "https://www.kolbusz.xyz/en/projects",
+            "en": "https://kolbusz.xyz/en/projects",
+            "pl": "https://kolbusz.xyz/pl/projects",
+            "x-default": "https://kolbusz.xyz/en/projects",
           },
         },
         "description": "Selected case studies covering high-performance websites, SaaS interfaces, and digital platforms built with clarity, speed, and measurable outcomes.",
@@ -136,7 +136,7 @@ describe('page metadata', () => {
             {
               "alt": "Sebastian Kolbusz - High-performance web engineering",
               "height": 630,
-              "url": "https://www.kolbusz.xyz/og-image",
+              "url": "https://kolbusz.xyz/og-image",
               "width": 1200,
             },
           ],
@@ -144,7 +144,7 @@ describe('page metadata', () => {
           "siteName": "Sebastian Kolbusz Portfolio",
           "title": "Selected Work",
           "type": "website",
-          "url": "https://www.kolbusz.xyz/en/projects",
+          "url": "https://kolbusz.xyz/en/projects",
         },
         "title": "Selected Work",
         "twitter": {
@@ -152,7 +152,7 @@ describe('page metadata', () => {
           "creator": "@s_kolbusz",
           "description": "Selected case studies covering high-performance websites, SaaS interfaces, and digital platforms built with clarity, speed, and measurable outcomes.",
           "images": [
-            "https://www.kolbusz.xyz/og-image",
+            "https://kolbusz.xyz/og-image",
           ],
           "title": "Selected Work",
         },
@@ -176,11 +176,11 @@ describe('page metadata', () => {
     expect(metadata).toMatchInlineSnapshot(`
       {
         "alternates": {
-          "canonical": "https://www.kolbusz.xyz/en/projects/zakofy",
+          "canonical": "https://kolbusz.xyz/en/projects/zakofy",
           "languages": {
-            "en": "https://www.kolbusz.xyz/en/projects/zakofy",
-            "pl": "https://www.kolbusz.xyz/pl/projects/zakofy",
-            "x-default": "https://www.kolbusz.xyz/en/projects/zakofy",
+            "en": "https://kolbusz.xyz/en/projects/zakofy",
+            "pl": "https://kolbusz.xyz/pl/projects/zakofy",
+            "x-default": "https://kolbusz.xyz/en/projects/zakofy",
           },
         },
         "description": "Custom Tatra Mountain Offer Platform. Providing a modern digital appearance for mountain tourism with a custom-built offer presentation system.",
@@ -188,14 +188,14 @@ describe('page metadata', () => {
           "description": "Custom Tatra Mountain Offer Platform. Providing a modern digital appearance for mountain tourism with a custom-built offer presentation system.",
           "images": [
             {
-              "url": "https://www.kolbusz.xyz/images/projects/zakofy.avif",
+              "url": "https://kolbusz.xyz/images/projects/zakofy.avif",
             },
           ],
           "locale": "en_US",
           "siteName": "Sebastian Kolbusz Portfolio",
           "title": "Zakofy",
           "type": "article",
-          "url": "https://www.kolbusz.xyz/en/projects/zakofy",
+          "url": "https://kolbusz.xyz/en/projects/zakofy",
         },
         "other": {
           "article:section": "Offer Presentation",
@@ -206,7 +206,7 @@ describe('page metadata', () => {
           "creator": "@s_kolbusz",
           "description": "Custom Tatra Mountain Offer Platform. Providing a modern digital appearance for mountain tourism with a custom-built offer presentation system.",
           "images": [
-            "https://www.kolbusz.xyz/images/projects/zakofy.avif",
+            "https://kolbusz.xyz/images/projects/zakofy.avif",
           ],
           "title": "Zakofy",
         },
@@ -223,7 +223,7 @@ describe('page metadata', () => {
     })
 
     expect(metadata.openGraph).toMatchObject({
-      url: 'https://www.kolbusz.xyz/pl/services',
+      url: 'https://kolbusz.xyz/pl/services',
       title: 'Tworzenie stron internetowych',
     })
     expect(metadata.twitter).toMatchObject({
@@ -241,8 +241,8 @@ describe('page metadata', () => {
       path: '/design',
     })
 
-    expect(metadata.alternates?.canonical).toBe('https://www.kolbusz.xyz/en/design')
-    expect(metadata.openGraph?.url).toBe('https://www.kolbusz.xyz/en/design')
+    expect(metadata.alternates?.canonical).toBe('https://kolbusz.xyz/en/design')
+    expect(metadata.openGraph?.url).toBe('https://kolbusz.xyz/en/design')
   })
 
   it('builds project detail metadata with a search-result-ready description', () => {

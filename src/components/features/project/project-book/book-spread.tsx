@@ -11,6 +11,7 @@ import type { PortfolioEntry } from '@/data/projects'
 import { Link } from '@/i18n/navigation'
 import { ANIMATION } from '@/lib/constants/animations'
 import { gsap, useGSAP } from '@/lib/gsap-core'
+import { useNavigationStore } from '@/lib/stores/navigation'
 
 interface BookSpreadProps {
   entry: PortfolioEntry
@@ -20,6 +21,7 @@ interface BookSpreadProps {
 export function BookSpread({ entry, index }: BookSpreadProps) {
   const t = useTranslations('projectsBook')
   const panelRef = useRef<HTMLDivElement>(null)
+  const setProjectOrigin = useNavigationStore((state) => state.setProjectOrigin)
 
   useGSAP(
     () => {
@@ -202,6 +204,7 @@ export function BookSpread({ entry, index }: BookSpreadProps) {
             href={`/projects/${entry.id}`}
             data-spread-link
             className="group text-primary hover:text-primary/80 inline-flex items-center gap-2 text-sm font-medium opacity-0 transition-colors"
+            onClick={() => setProjectOrigin('projects')}
           >
             {t('exploreLabel')}
             <ArrowRightIcon

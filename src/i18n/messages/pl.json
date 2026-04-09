@@ -277,7 +277,8 @@
     "skills": "Ekspertyza Techniczna",
     "languages": "Języki",
     "contact": "Kontakt Bezpośredni",
-    "backHome": "Powrót do strony"
+    "backHome": "Powrót do strony",
+    "selectedWork": "Wybrane Projekty"
   },
   "projectsBook": {
     "title": "Wybrane Prace",

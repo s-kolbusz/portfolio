@@ -72,7 +72,7 @@ export default async function ProjectDetailPage({ params }: Props) {
                 url: toAbsoluteSiteUrl(project.heroImage),
                 contentUrl: toAbsoluteSiteUrl(project.heroImage),
               },
-              category: project.category,
+              genre: project.category,
               inLanguage: locale,
               url: toAbsoluteSiteUrl(`/${locale}/projects/${project.id}`),
               author: {

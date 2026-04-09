@@ -13,6 +13,7 @@ import { useTimeline } from '@/hooks/timeline'
 import { Link } from '@/i18n/navigation'
 import { useRouter } from '@/i18n/navigation'
 import { ANIMATION } from '@/lib/constants/animations'
+import { useNavigationStore } from '@/lib/stores/navigation'
 
 import { ProjectMeta } from '../project-meta'
 
@@ -25,6 +26,7 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
   const t = useTranslations('projectsBook')
   const router = useRouter()
   const containerRef = useRef<HTMLDivElement>(null)
+  const setProjectOrigin = useNavigationStore((state) => state.setProjectOrigin)
   const headerRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
 
@@ -76,7 +78,11 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
         {projects.map((entry, index) => (
           <article key={entry.id} data-stack-item className="group py-6 opacity-0 first:pt-0">
             {/* Title row */}
-            <Link href={`/projects/${entry.id}`} className="flex items-start justify-between gap-3">
+            <Link
+              href={`/projects/${entry.id}`}
+              className="flex items-start justify-between gap-3"
+              onClick={() => setProjectOrigin('projects')}
+            >
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <h2 className="font-serif text-2xl font-light sm:text-3xl">{entry.title}</h2>
@@ -124,6 +130,7 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
               <Link
                 href={`/projects/${entry.id}`}
                 className="group/link text-foreground hover:text-primary flex items-center gap-1 font-mono text-xs font-bold tracking-widest uppercase transition-colors"
+                onClick={() => setProjectOrigin('projects')}
               >
                 {t('exploreLabel')}
               </Link>

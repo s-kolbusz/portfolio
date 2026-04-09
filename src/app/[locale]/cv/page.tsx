@@ -5,11 +5,13 @@ import { ArrowLeftIcon } from '@phosphor-icons/react/dist/ssr'
 
 import { CVLayout } from '@/components/features/cv/cv-layout'
 import { CVPrintButton } from '@/components/features/cv/cv-print-button'
+import { CvProjectLinks } from '@/components/features/cv/cv-project-links'
 import { BaseSection } from '@/components/ui/base-section'
 import { Button } from '@/components/ui/button'
 import type { CVData } from '@/data/cv'
 import { cvDataEn } from '@/data/cv-en'
 import { cvDataPl } from '@/data/cv-pl'
+import { getProjects } from '@/data/get-projects'
 import { getLocaleFromParams } from '@/i18n/locale'
 import type { Locale } from '@/i18n/routing'
 import { buildCvPageMetadata } from '@/lib/page-metadata'
@@ -41,6 +43,7 @@ export default async function CVPage({ params }: Props) {
   const t = await getTranslations({ locale, namespace: 'cv' })
 
   const cvData = cvDataByLocale[locale]
+  const projects = getProjects(locale)
 
   return (
     <main id="main-content" className="bg-neutral-100/50 dark:bg-neutral-900/50 print:bg-white">
@@ -80,6 +83,11 @@ export default async function CVPage({ params }: Props) {
         <div className="flex items-center justify-center lg:hidden">
           <CVPrintButton />
         </div>
+
+        <CvProjectLinks
+          projects={projects.map((p) => ({ id: p.id, title: p.title }))}
+          label={t('selectedWork')}
+        />
       </div>
     </main>
   )

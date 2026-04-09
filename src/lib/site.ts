@@ -1,4 +1,4 @@
-export const SITE_ORIGIN = 'https://www.kolbusz.xyz'
+export const SITE_ORIGIN = 'https://kolbusz.xyz'
 export const SITE_AUTHOR = 'Sebastian Kolbusz'
 export const SITE_NAME = 'Sebastian Kolbusz Portfolio'
 export const SITE_TWITTER_HANDLE = '@s_kolbusz'

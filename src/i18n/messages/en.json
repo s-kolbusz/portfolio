@@ -277,7 +277,8 @@
     "skills": "Technical Expertise",
     "languages": "Languages",
     "contact": "Direct Contact",
-    "backHome": "Back to Overview"
+    "backHome": "Back to Overview",
+    "selectedWork": "Selected Case Studies"
   },
   "projectsBook": {
     "title": "Selected Work",

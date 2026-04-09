@@ -8,6 +8,7 @@ import { ArrowUpRightIcon } from '@phosphor-icons/react'
 import { Accordion } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
 import type { PortfolioEntry } from '@/data/projects'
+import { useNavigationStore } from '@/lib/stores/navigation'
 
 interface ProjectAccordionProps {
   project: PortfolioEntry
@@ -17,6 +18,7 @@ interface ProjectAccordionProps {
 
 export function ProjectAccordion({ project, isOpen, onAnimationComplete }: ProjectAccordionProps) {
   const t = useTranslations('projects')
+  const setProjectOrigin = useNavigationStore((state) => state.setProjectOrigin)
 
   // Use localized content directly from the project object
   const description = project.tagline
@@ -85,7 +87,12 @@ export function ProjectAccordion({ project, isOpen, onAnimationComplete }: Proje
               )}
             </div>
           </div>
-          <Button variant="secondary" size="lg" href={`/projects/${project.id}?origin=home`}>
+          <Button
+            variant="secondary"
+            size="lg"
+            href={`/projects/${project.id}`}
+            onClick={() => setProjectOrigin(null)}
+          >
             {t('explore')}
           </Button>
         </div>

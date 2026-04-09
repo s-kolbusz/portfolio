@@ -62,7 +62,7 @@ describe('JsonLd', () => {
     render(<JsonLd />)
 
     const website = getScriptContent('website') as Record<string, unknown>
-    expect(website['@id']).toBe('https://www.kolbusz.xyz')
+    expect(website['@id']).toBe('https://kolbusz.xyz')
 
     // There is no site search — adding a SearchAction would be misleading to Google
     expect(website['potentialAction']).toBeUndefined()
