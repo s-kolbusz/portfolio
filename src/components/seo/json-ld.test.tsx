@@ -10,14 +10,16 @@ function getScriptContent(id: string): unknown {
 }
 
 describe('JsonLd', () => {
-  it('renders Person and WebSite schemas', () => {
+  it('renders Person, WebSite, and ProfessionalService schemas', () => {
     render(<JsonLd />)
 
     const person = getScriptContent('person') as Record<string, unknown>
     const website = getScriptContent('website') as Record<string, unknown>
+    const professionalService = getScriptContent('professionalservice') as Record<string, unknown>
 
     expect(person['@type']).toBe('Person')
     expect(website['@type']).toBe('WebSite')
+    expect(professionalService['@type']).toBe('ProfessionalService')
   })
 
   it('Person schema has @id for entity linking', () => {

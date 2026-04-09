@@ -53,11 +53,43 @@ export const JsonLd = () => {
     },
   }
 
+  const professionalServiceSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ProfessionalService',
+    '@id': `${SITE_ORIGIN}/#service`,
+    name: SITE_NAME,
+    url: SITE_ORIGIN,
+    image: `${SITE_ORIGIN}/images/sebastian_kolbusz_caricature.avif`,
+    telephone: '',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Zakopane',
+      addressRegion: 'Małopolskie',
+      addressCountry: 'PL',
+    },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: 49.299181,
+      longitude: 19.949562,
+    },
+    areaServed: [
+      { '@type': 'City', name: 'Zakopane' },
+      { '@type': 'AdministrativeArea', name: 'Podhale' },
+      { '@type': 'Country', name: 'Poland' },
+    ],
+    priceRange: '$$$',
+    founder: {
+      '@type': 'Person',
+      '@id': `${SITE_ORIGIN}/#about`,
+    },
+  }
+
   return (
     <StructuredData
       entries={[
         { id: 'person', data: personSchema },
         { id: 'website', data: websiteSchema },
+        { id: 'professionalservice', data: professionalServiceSchema },
       ]}
     />
   )
