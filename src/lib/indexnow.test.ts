@@ -19,31 +19,24 @@ describe('indexnow', () => {
   it('extracts loc URLs from sitemap XML', () => {
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://www.kolbusz.xyz/en</loc></url>
-  <url><loc>https://www.kolbusz.xyz/pl</loc></url>
+  <url><loc>https://kolbusz.xyz/en</loc></url>
+  <url><loc>https://kolbusz.xyz/pl</loc></url>
 </urlset>`
 
-    expect(extractLocUrls(xml)).toEqual([
-      'https://www.kolbusz.xyz/en',
-      'https://www.kolbusz.xyz/pl',
-    ])
+    expect(extractLocUrls(xml)).toEqual(['https://kolbusz.xyz/en', 'https://kolbusz.xyz/pl'])
   })
 
   it('builds an IndexNow payload with a deduplicated URL list', () => {
     const payload = buildIndexNowPayload({
       key: '03FD1F23-71A6-49A0-97B4-5233F1351B67',
-      origin: 'https://www.kolbusz.xyz',
-      urlList: [
-        'https://www.kolbusz.xyz/en',
-        'https://www.kolbusz.xyz/pl',
-        'https://www.kolbusz.xyz/en',
-      ],
+      origin: 'https://kolbusz.xyz',
+      urlList: ['https://kolbusz.xyz/en', 'https://kolbusz.xyz/pl', 'https://kolbusz.xyz/en'],
     })
 
     expect(payload).toEqual({
-      host: 'www.kolbusz.xyz',
+      host: 'kolbusz.xyz',
       key: '03FD1F23-71A6-49A0-97B4-5233F1351B67',
-      urlList: ['https://www.kolbusz.xyz/en', 'https://www.kolbusz.xyz/pl'],
+      urlList: ['https://kolbusz.xyz/en', 'https://kolbusz.xyz/pl'],
     })
   })
 
@@ -51,21 +44,21 @@ describe('indexnow', () => {
     expect(() =>
       buildIndexNowPayload({
         key: '03FD1F23-71A6-49A0-97B4-5233F1351B67',
-        origin: 'https://www.kolbusz.xyz',
+        origin: 'https://kolbusz.xyz',
         urlList: ['https://example.com/en'],
       })
-    ).toThrow('IndexNow only accepts URLs for www.kolbusz.xyz')
+    ).toThrow('IndexNow only accepts URLs for kolbusz.xyz')
   })
 
   it('rejects payloads larger than the IndexNow limit', () => {
     const urlList = Array.from({ length: INDEXNOW_MAX_URLS_PER_REQUEST + 1 }, (_, index) => {
-      return `https://www.kolbusz.xyz/en/page-${index}`
+      return `https://kolbusz.xyz/en/page-${index}`
     })
 
     expect(() =>
       buildIndexNowPayload({
         key: '03FD1F23-71A6-49A0-97B4-5233F1351B67',
-        origin: 'https://www.kolbusz.xyz',
+        origin: 'https://kolbusz.xyz',
         urlList,
       })
     ).toThrow(`IndexNow submissions are limited to ${INDEXNOW_MAX_URLS_PER_REQUEST} URLs.`)
@@ -74,27 +67,27 @@ describe('indexnow', () => {
   it('collects localized page URLs from a sitemap index', async () => {
     const responses = new Map<string, string>([
       [
-        'https://www.kolbusz.xyz/sitemap.xml',
+        'https://kolbusz.xyz/sitemap.xml',
         `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <sitemap><loc>https://www.kolbusz.xyz/en/sitemap.xml</loc></sitemap>
-  <sitemap><loc>https://www.kolbusz.xyz/pl/sitemap.xml</loc></sitemap>
+  <sitemap><loc>https://kolbusz.xyz/en/sitemap.xml</loc></sitemap>
+  <sitemap><loc>https://kolbusz.xyz/pl/sitemap.xml</loc></sitemap>
 </sitemapindex>`,
       ],
       [
-        'https://www.kolbusz.xyz/en/sitemap.xml',
+        'https://kolbusz.xyz/en/sitemap.xml',
         `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://www.kolbusz.xyz/en</loc></url>
-  <url><loc>https://www.kolbusz.xyz/en/projects</loc></url>
+  <url><loc>https://kolbusz.xyz/en</loc></url>
+  <url><loc>https://kolbusz.xyz/en/projects</loc></url>
 </urlset>`,
       ],
       [
-        'https://www.kolbusz.xyz/pl/sitemap.xml',
+        'https://kolbusz.xyz/pl/sitemap.xml',
         `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://www.kolbusz.xyz/pl</loc></url>
-  <url><loc>https://www.kolbusz.xyz/pl/projects</loc></url>
+  <url><loc>https://kolbusz.xyz/pl</loc></url>
+  <url><loc>https://kolbusz.xyz/pl/projects</loc></url>
 </urlset>`,
       ],
     ])
@@ -116,15 +109,15 @@ describe('indexnow', () => {
     })
 
     const urls = await collectSiteUrls({
-      origin: 'https://www.kolbusz.xyz',
+      origin: 'https://kolbusz.xyz',
       fetchImpl: fetchImpl as typeof fetch,
     })
 
     expect(urls).toEqual([
-      'https://www.kolbusz.xyz/en',
-      'https://www.kolbusz.xyz/en/projects',
-      'https://www.kolbusz.xyz/pl',
-      'https://www.kolbusz.xyz/pl/projects',
+      'https://kolbusz.xyz/en',
+      'https://kolbusz.xyz/en/projects',
+      'https://kolbusz.xyz/pl',
+      'https://kolbusz.xyz/pl/projects',
     ])
   })
 

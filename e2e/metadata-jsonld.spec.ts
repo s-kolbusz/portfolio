@@ -34,7 +34,7 @@ test('projects index page exposes canonical metadata and ItemList JSON-LD', asyn
   )
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://www.kolbusz.xyz/en/projects'
+    'https://kolbusz.xyz/en/projects'
   )
 
   const itemListPayload = await getJsonLdPayloadByType(page, 'ItemList')
@@ -49,7 +49,7 @@ test('projects index page exposes canonical metadata and ItemList JSON-LD', asyn
         '@type': 'ListItem',
         position: 1,
         name: 'Zakofy',
-        url: 'https://www.kolbusz.xyz/en/projects/zakofy',
+        url: 'https://kolbusz.xyz/en/projects/zakofy',
       }),
     ])
   )
@@ -68,7 +68,7 @@ test('project detail page exposes canonical metadata and CreativeWork JSON-LD', 
   )
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://www.kolbusz.xyz/en/projects/zakofy'
+    'https://kolbusz.xyz/en/projects/zakofy'
   )
 
   const creativeWorkPayload = await getJsonLdPayloadByType(page, 'CreativeWork')
@@ -77,6 +77,6 @@ test('project detail page exposes canonical metadata and CreativeWork JSON-LD', 
     '@context': 'https://schema.org',
     '@type': 'CreativeWork',
     headline: 'Zakofy',
-    url: 'https://www.kolbusz.xyz/en/projects/zakofy',
+    url: 'https://kolbusz.xyz/en/projects/zakofy',
   })
 })
