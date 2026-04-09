@@ -2,7 +2,7 @@
 
 A bilingual, high-performance portfolio platform built with Next.js 16. Targets 95+ Lighthouse performance, 100 accessibility/SEO, and serves as both a lead funnel for clients and a technical showcase for engineering reviewers.
 
-**Live:** [kolbusz.xyz](https://www.kolbusz.xyz)
+**Live:** [kolbusz.xyz](https://kolbusz.xyz)
 
 ---
 

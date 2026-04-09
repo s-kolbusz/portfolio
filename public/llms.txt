@@ -30,10 +30,10 @@ Next.js, React, TypeScript, Tailwind CSS, GSAP, WebGL / Three.js, Lenis (smooth 
 
 ## Links
 
-- Portfolio: https://www.kolbusz.xyz
-- Projects: https://www.kolbusz.xyz/en/projects
-- Services: https://www.kolbusz.xyz/en/services
-- CV: https://www.kolbusz.xyz/en/cv
+- Portfolio: https://kolbusz.xyz
+- Projects: https://kolbusz.xyz/en/projects
+- Services: https://kolbusz.xyz/en/services
+- CV: https://kolbusz.xyz/en/cv
 - LinkedIn: https://linkedin.com/in/skolbusz
 - GitHub: https://github.com/s-kolbusz
 - X / Twitter: https://x.com/s_kolbusz

@@ -10,7 +10,7 @@ import {
 function parseCliArgs(argv) {
   const options = {
     dryRun: false,
-    origin: 'https://www.kolbusz.xyz',
+    origin: 'https://kolbusz.xyz',
   }
 
   for (const arg of argv) {
