@@ -35,8 +35,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
     sitemapEntries.push(`  <url>
     <loc>${url}</loc>
     <lastmod>${new Date().toISOString()}</lastmod>
-    <changefreq>${route === '' ? 'monthly' : 'weekly'}</changefreq>
-    <priority>${route === '' ? '1.0' : '0.8'}</priority>
     ${alternates}
   </url>`)
   }
@@ -59,8 +57,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
     sitemapEntries.push(`  <url>
     <loc>${url}</loc>
     <lastmod>${new Date().toISOString()}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
     ${alternates}
   </url>`)
   }
