@@ -73,7 +73,9 @@ export const JsonLd = () => {
     },
     areaServed: [
       { '@type': 'City', name: 'Zakopane' },
+      { '@type': 'City', name: 'Nowy Targ' },
       { '@type': 'AdministrativeArea', name: 'Podhale' },
+      { '@type': 'AdministrativeArea', name: 'Małopolska' },
       { '@type': 'Country', name: 'Poland' },
     ],
     priceRange: '$$$',
