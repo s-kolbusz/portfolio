@@ -14,7 +14,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
   const projects = getProjects(currentLocale)
   const uniqueProjectIds = Array.from(new Set(projects.map((p) => p.id)))
 
-  const staticRoutes = ['', '/projects', '/cv', '/services']
+  const staticRoutes = ['', '/projects', '/cv', '/services', '/design']
   const sitemapEntries = []
 
   // Add static routes
@@ -34,9 +34,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
 
     sitemapEntries.push(`  <url>
     <loc>${url}</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
-    <changefreq>${route === '' ? 'monthly' : 'weekly'}</changefreq>
-    <priority>${route === '' ? '1.0' : '0.8'}</priority>
     ${alternates}
   </url>`)
   }
@@ -58,9 +55,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
 
     sitemapEntries.push(`  <url>
     <loc>${url}</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
     ${alternates}
   </url>`)
   }

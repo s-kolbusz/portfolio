@@ -60,7 +60,6 @@ export const JsonLd = () => {
     name: SITE_NAME,
     url: SITE_ORIGIN,
     image: `${SITE_ORIGIN}/images/sebastian_kolbusz_caricature.avif`,
-    telephone: '',
     address: {
       '@type': 'PostalAddress',
       addressLocality: 'Zakopane',
@@ -74,7 +73,9 @@ export const JsonLd = () => {
     },
     areaServed: [
       { '@type': 'City', name: 'Zakopane' },
+      { '@type': 'City', name: 'Nowy Targ' },
       { '@type': 'AdministrativeArea', name: 'Podhale' },
+      { '@type': 'AdministrativeArea', name: 'Małopolska' },
       { '@type': 'Country', name: 'Poland' },
     ],
     priceRange: '$$$',
