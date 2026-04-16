@@ -60,7 +60,7 @@ export const Select = ({ id, label, onChange, options, className, defaultValue }
             position="popper"
             sideOffset={8}
             className={cn(
-              'bg-popover border-border z-50 box-border rounded-2xl border shadow-xl transition-opacity',
+              'glass border-border z-50 box-border rounded-2xl border shadow-xl focus-visible:ring-0',
               'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
               'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
               'min-w-(--radix-select-trigger-width)'
@@ -73,9 +73,9 @@ export const Select = ({ id, label, onChange, options, className, defaultValue }
                   value={option.value}
                   data-cursor="button"
                   className={cn(
-                    'box-border flex w-full cursor-none items-center justify-between rounded-xl px-4 py-2.5 text-left text-sm transition-colors outline-none select-none',
-                    'focus:bg-muted/50 focus:text-foreground',
-                    'data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground data-[state=selected]:font-bold'
+                    'box-border flex w-full cursor-none items-center justify-between rounded-lg px-4 py-2.5 text-left text-sm transition-colors outline-none select-none',
+                    'focus:bg-muted/50 focus:font-semibold focus-visible:rounded-lg! focus-visible:pointer-fine:ring-0!',
+                    'data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground data-[state=checked]:font-bold'
                   )}
                 >
                   <div className="pointer-events-none flex items-center gap-3">
