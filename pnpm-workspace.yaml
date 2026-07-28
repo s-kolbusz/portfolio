@@ -1,3 +1,28 @@
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
+
+# Lives here, not under `pnpm.overrides` in package.json — pnpm 11 stopped
+# reading that field, which broke `install --frozen-lockfile` on CI.
+overrides:
+  undici: '^7.28.0'
+  flatted: '>=3.4.2'
+  picomatch: '>=4.0.4'
+  brace-expansion@1: '^1.1.16'
+  brace-expansion@5: '^5.0.8'
+  vite: '^8.0.16'
+  postcss: '^8.5.18'
+  js-yaml: '^4.3.0'
+  sharp: '^0.35.0'
+
+auditConfig:
+  ignoreGhsas:
+    # brace-expansion 1.1.16, reached only via eslint > minimatch 3 — a dev
+    # dependency, nothing in the shipped bundle. The advisory declares
+    # "<=5.0.7" vulnerable, which semver-wise swallows the whole 1.x line, and
+    # no 1.x patch exists (1.1.16 predates the 5.0.8 fix, it is not a backport).
+    # Forcing 5.x here breaks eslint: minimatch 3 requires a callable default
+    # export, which 5.x dropped. eslint 10 does not help — eslint-plugin-react,
+    # -import, -jsx-a11y and @eslint/eslintrc all still pin minimatch 3.
+    # Drop this entry once those plugins move off it.
+    - GHSA-mh99-v99m-4gvg

@@ -3,10 +3,7 @@ import type { RefObject } from 'react'
 import type { gsap } from '@/lib/gsap-core'
 
 export type AnimationTarget =
-  | string
-  | HTMLElement
-  | Array<HTMLElement | null>
-  | RefObject<HTMLElement | null>
+  string | HTMLElement | Array<HTMLElement | null> | RefObject<HTMLElement | null>
 
 export interface RevealOptions {
   y?: number
