@@ -50,5 +50,32 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build the site
+        run: pnpm build
+
+      # Cloudflare answers datacenter IPs with a managed challenge, so a runner
+      # fetching https://kolbusz.xyz/sitemap.xml gets a 403 challenge page
+      # instead of XML. Serve the same sitemap route locally and read it there.
+      # SITE_ORIGIN is a constant, so the URLs inside still point at the
+      # production host — which is what gets submitted.
       - name: Submit all sitemap URLs to IndexNow
-        run: pnpm seo:indexnow
+        run: |
+          set -euo pipefail
+
+          # Redirecting the server's output is what keeps the job from hanging:
+          # a background process holding the step's stdout open blocks the step
+          # from finishing. The listener re-parents itself away from whatever
+          # started it, so the trap matches it by name rather than by PID.
+          pnpm start > /tmp/next-start.log 2>&1 &
+          trap 'pkill -f next-server 2>/dev/null || true' EXIT
+
+          for _ in $(seq 1 60); do
+            if curl -sf -o /dev/null http://localhost:3000/sitemap.xml; then
+              node ./scripts/submit-indexnow.mjs --sitemap-origin=http://localhost:3000
+              exit 0
+            fi
+            sleep 1
+          done
+
+          echo "Server did not come up in time" >&2
+          exit 1

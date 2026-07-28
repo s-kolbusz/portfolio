@@ -121,6 +121,48 @@ describe('indexnow', () => {
     ])
   })
 
+  it('reads child sitemaps from the sitemap origin, not the host inside the XML', async () => {
+    const responses = new Map<string, string>([
+      [
+        'http://localhost:3000/sitemap.xml',
+        `<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap><loc>https://kolbusz.xyz/pl/sitemap.xml</loc></sitemap>
+</sitemapindex>`,
+      ],
+      [
+        'http://localhost:3000/pl/sitemap.xml',
+        `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://kolbusz.xyz/pl/services</loc></url>
+</urlset>`,
+      ],
+    ])
+
+    const requested: string[] = []
+    const fetchImpl = vi.fn(async (input: string | URL | Request) => {
+      const url =
+        typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url
+      requested.push(url)
+      const body = responses.get(url)
+
+      return body
+        ? new Response(body, { headers: { 'Content-Type': 'text/xml; charset=utf-8' } })
+        : new Response('Not found', { status: 404 })
+    })
+
+    const urls = await collectSiteUrls({
+      origin: 'https://kolbusz.xyz',
+      sitemapOrigin: 'http://localhost:3000',
+      fetchImpl: fetchImpl as typeof fetch,
+    })
+
+    // Nothing may leave for the public host — that is what Cloudflare blocks.
+    expect(requested.every((url) => url.startsWith('http://localhost:3000'))).toBe(true)
+    // The submitted URLs still carry the production host.
+    expect(urls).toEqual(['https://kolbusz.xyz/pl/services'])
+  })
+
   it('reads the root IndexNow key file from public/', async () => {
     const cwd = await fs.mkdtemp(path.join(os.tmpdir(), 'indexnow-'))
     const publicDirectory = path.join(cwd, 'public')

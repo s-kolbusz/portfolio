@@ -11,6 +11,7 @@ function parseCliArgs(argv) {
   const options = {
     dryRun: false,
     origin: 'https://kolbusz.xyz',
+    sitemapOrigin: undefined,
   }
 
   for (const arg of argv) {
@@ -21,16 +22,24 @@ function parseCliArgs(argv) {
 
     if (arg.startsWith('--origin=')) {
       options.origin = arg.slice('--origin='.length)
+      continue
+    }
+
+    // Where to read the sitemap from, when that is not the host being
+    // submitted — CI serves the build locally because Cloudflare answers the
+    // public domain with a challenge page for datacenter IPs.
+    if (arg.startsWith('--sitemap-origin=')) {
+      options.sitemapOrigin = arg.slice('--sitemap-origin='.length)
     }
   }
 
   return options
 }
 
-async function submitIndexNow({ dryRun, origin }) {
+async function submitIndexNow({ dryRun, origin, sitemapOrigin }) {
   const [{ key }, siteUrls] = await Promise.all([
     readIndexNowKey({ cwd: process.cwd() }),
-    collectSiteUrls({ origin }),
+    collectSiteUrls({ origin, sitemapOrigin }),
   ])
 
   const payload = buildIndexNowPayload({

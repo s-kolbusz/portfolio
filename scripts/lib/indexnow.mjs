@@ -68,8 +68,16 @@ async function fetchText(fetchImpl, url) {
   return response.text()
 }
 
-export async function collectSiteUrls({ origin, fetchImpl = fetch }) {
-  const sitemapIndexUrl = new URL('/sitemap.xml', origin).toString()
+// The sitemap index lists absolute production URLs. When it is being read from
+// somewhere else — a locally served build, say — the child sitemaps have to be
+// requested from that same place, not from the host written in the XML.
+function rebaseUrl(url, origin) {
+  const source = new URL(url)
+  return new URL(`${source.pathname}${source.search}`, origin).toString()
+}
+
+export async function collectSiteUrls({ origin, sitemapOrigin = origin, fetchImpl = fetch }) {
+  const sitemapIndexUrl = new URL('/sitemap.xml', sitemapOrigin).toString()
   const sitemapIndexXml = await fetchText(fetchImpl, sitemapIndexUrl)
 
   if (URLSET_PATTERN.test(sitemapIndexXml)) {
@@ -80,7 +88,7 @@ export async function collectSiteUrls({ origin, fetchImpl = fetch }) {
     throw new Error(`${sitemapIndexUrl} is not a sitemap index or URL set.`)
   }
 
-  const sitemapUrls = extractLocUrls(sitemapIndexXml)
+  const sitemapUrls = extractLocUrls(sitemapIndexXml).map((url) => rebaseUrl(url, sitemapOrigin))
   const sitemapXmlDocuments = await Promise.all(
     sitemapUrls.map((sitemapUrl) => fetchText(fetchImpl, sitemapUrl))
   )
