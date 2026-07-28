@@ -25,6 +25,10 @@ export function SmoothScroller() {
       gestureOrientation: 'vertical',
       smoothWheel: true,
       touchMultiplier: 2,
+      // Same-page #hash links go through Lenis. Without this the Next router
+      // swallows the click and refuses to re-scroll when the URL already
+      // carries that hash, so every repeat click is a no-op.
+      anchors: true,
     })
 
     // Synchronize Lenis scroll with GSAP ScrollTrigger
@@ -49,6 +53,25 @@ export function SmoothScroller() {
       gsap.ticker.remove(tickerCallback)
     }
   }, [setLenis, prefersReducedMotion])
+
+  // Without Lenis there is nothing to honour `anchors: true`, so the same
+  // repeat-click no-op comes back. Jump instantly — smooth is off by request.
+  useEffect(() => {
+    if (!prefersReducedMotion) return
+
+    const onClick = (event: MouseEvent) => {
+      const anchor = (event.target as Element | null)?.closest?.('a[href*="#"]')
+      if (!(anchor instanceof HTMLAnchorElement)) return
+
+      const url = new URL(anchor.href)
+      if (url.host !== location.host || url.pathname !== location.pathname || !url.hash) return
+
+      document.getElementById(url.hash.slice(1))?.scrollIntoView()
+    }
+
+    window.addEventListener('click', onClick)
+    return () => window.removeEventListener('click', onClick)
+  }, [prefersReducedMotion])
 
   return null
 }

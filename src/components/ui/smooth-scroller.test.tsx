@@ -88,4 +88,23 @@ describe('SmoothScroller', () => {
 
     expect(setLenis).not.toHaveBeenCalled()
   })
+
+  it('scrolls same-page hash links itself under reduced motion', () => {
+    mockPrefersReducedMotion.mockReturnValue(true)
+    render(<SmoothScroller />)
+
+    const target = document.createElement('section')
+    target.id = 'contact'
+    target.scrollIntoView = vi.fn()
+    const link = document.createElement('a')
+    link.href = `${location.origin}${location.pathname}#contact`
+    document.body.append(target, link)
+
+    link.click()
+
+    expect(target.scrollIntoView).toHaveBeenCalled()
+
+    target.remove()
+    link.remove()
+  })
 })
