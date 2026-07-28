@@ -95,18 +95,10 @@ export function ServicesContent() {
                   serviceRefs.current[index] = el
                 }}
                 className={cn(
-                  'group relative grid grid-cols-1 items-start gap-12 xl:grid-cols-12 xl:gap-24',
-                  isPopular ? 'border-primary/20 bg-primary/5 rounded-3xl border p-8 xl:p-16' : ''
+                  'group relative grid grid-cols-1 items-start gap-12 border px-8 py-10 md:px-10 md:py-12 xl:grid-cols-12 xl:gap-24 xl:p-16',
+                  isPopular ? 'border-primary/30 bg-card/60' : 'border-border bg-card/60'
                 )}
               >
-                {/* Popular Badge */}
-                {isPopular && (
-                  <div className="bg-primary text-primary-foreground absolute -top-4 left-8 flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[10px] font-bold tracking-widest uppercase shadow-md xl:left-16">
-                    <StarIcon weight="fill" className="size-3" />
-                    {tServices('popular_badge')}
-                  </div>
-                )}
-
                 {/* Text Content Column */}
                 <div
                   className={cn(
@@ -114,11 +106,19 @@ export function ServicesContent() {
                     isEven ? 'xl:order-2' : 'xl:order-1'
                   )}
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="bg-primary/30 h-px w-8" />
-                    <span className="text-muted-foreground font-mono text-[10px] font-bold tracking-[0.2em] uppercase">
-                      {tServices(`${service.id}.label`)}
-                    </span>
+                  <div className="flex flex-wrap items-center gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-primary/30 h-px w-8" />
+                      <span className="text-muted-foreground font-mono text-[10px] font-bold tracking-[0.2em] uppercase">
+                        {tServices(`${service.id}.label`)}
+                      </span>
+                    </div>
+                    {isPopular && (
+                      <div className="border-primary/20 bg-accent text-primary inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[10px] font-bold tracking-widest uppercase">
+                        <StarIcon weight="fill" className="size-3" />
+                        {tServices('popular_badge')}
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex flex-col gap-4">
@@ -134,14 +134,14 @@ export function ServicesContent() {
                     <span className="text-primary font-serif text-4xl font-medium md:text-5xl">
                       {tServices(`${service.id}.price`)}
                     </span>
-                    <span className="text-muted-foreground border-primary/20 border-l-2 pl-3 font-mono text-[10px] font-medium tracking-wider uppercase">
+                    <span className="text-muted-foreground border-primary/20 border-l pl-3 font-mono text-[10px] font-medium tracking-wider uppercase">
                       {tServices(`${service.id}.unit`)}
                     </span>
                   </div>
 
                   <div className="mt-4">
-                    <Button href="/#contact" variant={isPopular ? 'primary' : 'outline'} size="lg">
-                      <span className="font-mono text-[12px] font-bold tracking-widest uppercase">
+                    <Button href="/#contact" variant={isPopular ? 'primary' : 'outline'} size="sm">
+                      <span className="font-mono text-[10px] font-bold tracking-widest uppercase">
                         {tServices(`${service.id}.cta`)}
                       </span>
                     </Button>
@@ -151,13 +151,13 @@ export function ServicesContent() {
                 {/* Features & Ideal For Column */}
                 <div
                   className={cn(
-                    'flex h-full flex-col justify-center gap-12 xl:col-span-6',
+                    'flex h-full flex-col gap-10 xl:col-span-6',
                     isEven ? 'xl:order-1' : 'xl:order-2'
                   )}
                 >
                   {/* Ideal For Block */}
-                  <div className="bg-muted/30 border-border flex flex-col gap-4 rounded-2xl border p-8">
-                    <h4 className="text-foreground font-serif text-xl font-medium">
+                  <div className="border-primary/20 flex flex-col gap-3 border-l pl-6">
+                    <h4 className="text-muted-foreground font-mono text-[10px] font-bold tracking-[0.2em] uppercase">
                       {t('ideal_for_label')}
                     </h4>
                     <p className="text-muted-foreground font-sans text-base leading-relaxed">
@@ -169,24 +169,9 @@ export function ServicesContent() {
                   <div className="flex flex-col gap-6">
                     <ul className="flex flex-col gap-4">
                       {Array.from({ length: 5 }).map((_, i) => (
-                        <li key={i} className="flex items-start gap-4">
-                          <div
-                            className={cn(
-                              'mt-1 flex size-6 shrink-0 items-center justify-center rounded-full border',
-                              isPopular
-                                ? 'border-primary/30 bg-primary/10'
-                                : 'border-border bg-muted/50'
-                            )}
-                          >
-                            <CheckIcon
-                              className={cn(
-                                'size-3',
-                                isPopular ? 'text-primary' : 'text-muted-foreground'
-                              )}
-                              weight="bold"
-                            />
-                          </div>
-                          <span className="text-foreground font-sans text-xl leading-snug">
+                        <li key={i} className="flex items-start gap-3">
+                          <CheckIcon className="text-primary mt-2 size-3 shrink-0" weight="bold" />
+                          <span className="text-foreground font-sans text-lg leading-snug">
                             {tServices(`${service.id}.features.${i}`)}
                           </span>
                         </li>
@@ -206,7 +191,7 @@ export function ServicesContent() {
         className="border-border bg-muted/20 relative overflow-hidden border p-10 md:p-16 xl:p-24"
       >
         {/* Subtle background decoration */}
-        <div className="bg-primary/5 absolute -top-24 -right-24 size-96 rounded-full blur-3xl" />
+        <div className="bg-primary/5 pointer-events-none absolute -top-24 -right-24 size-96 rounded-full blur-3xl" />
 
         <div className="relative mx-auto flex max-w-4xl flex-col items-center gap-8 text-center">
           <div className="flex items-center gap-3">
@@ -222,6 +207,20 @@ export function ServicesContent() {
           </h2>
           <p className="text-muted-foreground font-sans text-xl leading-relaxed md:text-xl">
             {t('trust_content')}
+          </p>
+          <p className="text-muted-foreground font-sans text-base leading-relaxed">
+            {t.rich('local_note', {
+              link: (chunks) => (
+                <a
+                  href="https://stronypodhale.pl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary underline underline-offset-4"
+                >
+                  {chunks}
+                </a>
+              ),
+            })}
           </p>
           <Button
             href="/#contact"

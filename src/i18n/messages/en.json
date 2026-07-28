@@ -221,6 +221,7 @@
     "h2_offer": "Explore My Core Services",
     "h2_trust": "Why Work With Me?",
     "trust_content": "I build technical solutions focusing on performance, accessibility, and high conversion rates. As a senior engineer with experience in global projects, I deliver top-tier code quality, whether I'm building a complex application for a tech startup or a responsive platform for a local business. Every project is built on a modern technology stack (Next.js, React), ensuring lightning-fast load times, excellent Core Web Vitals scores, and a natural advantage in SEO.",
+    "local_note": "For small businesses in the Podhale region I build sites at lower rates, under a separate brand — <link>stronypodhale.pl</link>.",
     "h2_faq": "Frequently Asked Questions",
     "faq": {
       "0": {

@@ -221,6 +221,7 @@
     "h2_offer": "Poznaj moje usługi webowe",
     "h2_trust": "Dlaczego warto współpracować ze mną?",
     "trust_content": "Tworzę rozwiązania techniczne nastawione na wydajność, dostępność i wysokie wskaźniki konwersji. Jako inżynier z doświadczeniem przy globalnych projektach, dostarczam kod najwyższej jakości, niezależnie czy buduję skomplikowaną aplikację dla startupu, czy responsywną stronę dla lokalnego biznesu z Podhala. Każdy projekt opieram na nowoczesnym stosie technologicznym (Next.js, React), co gwarantuje błyskawiczne ładowanie, świetne wyniki w Core Web Vitals i naturalną przewagę w pozycjonowaniu (SEO).",
+    "local_note": "Małym firmom z Podhala robię strony taniej, pod osobną marką — <link>stronypodhale.pl</link>.",
     "h2_faq": "Często zadawane pytania",
     "faq": {
       "0": {
