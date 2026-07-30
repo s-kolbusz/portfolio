@@ -4,7 +4,7 @@ import { getMessages, setRequestLocale } from 'next-intl/server'
 import { Fraunces, JetBrains_Mono } from 'next/font/google'
 import localFont from 'next/font/local'
 
-import { UmamiAnalytics } from '@/components/analytics/umami'
+import { RybbitAnalytics } from '@/components/analytics/rybbit'
 import { JsonLd } from '@/components/seo/json-ld'
 import { ThemeProvider } from '@/components/theme-provider'
 import { ClientOverlays } from '@/components/ui/client-overlays'
@@ -170,7 +170,7 @@ export default async function LocaleLayout({ children, params }: Props) {
             <ClientOverlays />
             {children}
 
-            <UmamiAnalytics />
+            <RybbitAnalytics />
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>
