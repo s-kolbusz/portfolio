@@ -2,7 +2,8 @@
 
 Date: 2026-09-21
 Status: Execution sequence approved by the owner on 2026-09-21. Task 1 audit and
-structural recommendations delivered; Task 2 is next.
+structural recommendations delivered; Task 2 is in progress and its first visual
+studies were rejected. No visual direction has been selected.
 Source of truth: [Discovery brief](./2026-09-20-portfolio-redesign-brief.md).
 
 ## Delivery principles
@@ -84,6 +85,10 @@ the information and action they need, and each current page has a disposition.
 **Boundary:** Read-only audit and planning; no application redesign.
 
 ## Task 2 — Define the visual and motion language
+
+**Status:** Both initial studies rejected by the owner for losing the site's cold,
+technical identity. Follow the [visual reset](./2026-09-21-portfolio-visual-reset.md)
+before producing further comparisons. Typography remains exploratory, not approved.
 
 **Depends on:** Task 1's page purposes.
 

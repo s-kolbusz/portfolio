@@ -47,6 +47,14 @@ stronypodhale.pl is the owner's specialist brand serving local businesses.
 - The work leads the visual story. Customers' identities should remain recognisable.
 - Personal imagery is selective and supporting. Process photography is unnecessary.
 - This is refinement of an existing identity, not permission to replace it wholesale.
+- Owner correction after the first visual studies: preserve the cold, artificial
+  green and clean, distinguished developer/technology character. Muted sage/olive,
+  cream-heavy wellness styling and a decorative replacement blob were rejected.
+- Technical character is an identity asset. Refine the relationship between serif,
+  sans and monospace typography; do not erase the technical layer to reduce clutter.
+- Both initial visual studies are rejected. Typography alone may be worth further
+  exploration; no part of those studies is an approved direction. See the
+  [visual reset](./2026-09-21-portfolio-visual-reset.md).
 
 ### Work and brand relationships
 
