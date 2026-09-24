@@ -1,5 +1,7 @@
 # Portfolio visual exploration — correction after rejected studies
 
+> **ZASTĄPIONE 2026-09-24** przez [decyzje redesignu](./2026-09-24-redesign-decyzje.md). Archiwum. Lista usterek z audytu (A1–A9) nadal obowiązuje, ale kierunek wizualny, założenia o ograniczaniu ruchu, pozycjonowanie i mapa strony z tego dokumentu już nie.
+
 Date: 2026-09-21
 Status: Owner feedback recorded. Both initial studies rejected. Task 2 remains open.
 
