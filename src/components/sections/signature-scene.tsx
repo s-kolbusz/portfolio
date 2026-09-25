@@ -10,7 +10,8 @@ import { ArrowUpRightIcon } from '@phosphor-icons/react'
 import {
   HEADING_AT,
   mixColour,
-  readoutOpacity,
+  readoutMotion,
+  smoothstep,
   toHex,
   type ReadoutKey,
 } from '@/components/canvas/viscous-puddle/choreography'
@@ -112,13 +113,14 @@ export function SignatureScene() {
           const element = elements[key]
           if (!element) continue
           element.style.opacity = '0'
+          element.style.transform = ''
           if (key !== 'target') element.style.display = 'none'
         }
         return
       }
 
       const { step, startColour, targetColour } = frame
-      const opacity = readoutOpacity(step.progress, isMobile)
+      const motion = readoutMotion(step.progress, isMobile)
       const values: Record<Exclude<ReadoutKey, 'target'>, string> = {
         viscosity: step.viscosity.toFixed(2),
         aspect: `${(step.halfWidth / step.halfHeight).toFixed(2)}:1`,
@@ -129,10 +131,27 @@ export function SignatureScene() {
       for (const key of READOUTS) {
         const element = elements[key]
         if (!element) continue
-        element.style.opacity = opacity[key].toFixed(3)
+        const { enter, exit } = motion[key]
+
+        // The site's reveal (rise and fade in, lift and fade out), but
+        // scrubbed by the scroll instead of timed.
+        const opacity = Math.min(smoothstep(0.3, 1, enter), 1 - smoothstep(0, 0.6, exit))
+        const rise = (1 - smoothstep(0, 1, enter)) * 14 - smoothstep(0, 1, exit) * 10
+        element.style.opacity = opacity.toFixed(3)
+        element.style.transform = `translateY(${rise.toFixed(1)}px)`
         if (key === 'target') continue
-        element.style.display = opacity[key] > 0 ? '' : 'none'
+
         element.textContent = `${labels[key]} ${values[key]}`
+        if (isMobile) {
+          element.style.display = opacity > 0 ? '' : 'none'
+          continue
+        }
+        // A new readout opens its slot before it fades in and closes it after
+        // it has faded, so the row slides instead of jumping.
+        const room = Math.min(smoothstep(0, 0.6, enter), 1 - smoothstep(0.4, 1, exit))
+        element.style.display = ''
+        element.style.maxWidth = `${(room * 16).toFixed(2)}em`
+        element.style.marginLeft = `${(room * 2).toFixed(3)}rem`
       }
     })
   }, [t, isMobile])
@@ -171,14 +190,14 @@ export function SignatureScene() {
                 >
                   01 — {t('title')}
                 </span>
-                <span className="text-muted-foreground flex flex-col items-end gap-1 tabular-nums md:flex-row md:gap-8">
+                <span className="text-muted-foreground flex flex-col items-end gap-1 tabular-nums md:flex-row md:gap-0">
                   {READOUTS.filter((key) => key !== 'target').map((key) => (
                     <span
                       key={key}
                       ref={(element) => {
                         readoutRefs.current[key] = element
                       }}
-                      className="whitespace-nowrap"
+                      className="overflow-hidden whitespace-nowrap will-change-transform"
                       style={{ opacity: 0, display: 'none' }}
                     />
                   ))}

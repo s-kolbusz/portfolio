@@ -153,7 +153,9 @@ describe('signature transition choreography', () => {
 
   it('narrates with readouts that all give way before the heading enters', () => {
     expect(readoutOpacity(0, false).target).toBe(0)
-    expect(readoutOpacity(0.01, false).target).toBe(1)
+    expect(readoutOpacity(0.02, false).target).toBeGreaterThan(0)
+    expect(readoutOpacity(0.02, false).target).toBeLessThan(1)
+    expect(readoutOpacity(0.05, false).target).toBe(1)
     expect(readoutOpacity(0.2, false).viscosity).toBe(1)
     expect(readoutOpacity(0.2, false).colour).toBe(0)
     for (const value of Object.values(readoutOpacity(HEADING_AT, false))) {

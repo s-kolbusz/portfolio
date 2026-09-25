@@ -276,22 +276,46 @@ const READOUT_WINDOWS: Record<ReadoutKey, [number, number]> = {
   clarity: [BEATS.clear[0], BEATS.clear[1]],
 }
 
-/** Opacity of each readout at pin progress P. Phones keep the target plus the latest one. */
-export function readoutOpacity(progress: number, compact: boolean): Record<ReadoutKey, number> {
+export interface ReadoutMotion {
+  /** 0 → 1 across the readout's entrance (scroll-bound, not timed). */
+  enter: number
+  /** 0 → 1 across its exit. */
+  exit: number
+}
+
+/**
+ * Scroll-bound entrance and exit of each readout at pin progress P, so they
+ * move with the scroll like everything else in the scene. Phones keep the
+ * target plus the latest one.
+ */
+export function readoutMotion(
+  progress: number,
+  compact: boolean
+): Record<ReadoutKey, ReadoutMotion> {
   const entries = Object.entries(READOUT_WINDOWS) as Array<[ReadoutKey, [number, number]]>
-  const result = {} as Record<ReadoutKey, number>
+  const result = {} as Record<ReadoutKey, ReadoutMotion>
   for (const [key, [from, until]] of entries) {
-    // The pin start itself shows the target at once; others fade in on their beat.
-    const fadeIn = from === 0 ? (progress > 0 ? 1 : 0) : linear(from, from + READOUT_FADE, progress)
-    result[key] = Math.min(fadeIn, 1 - linear(until, until + READOUT_FADE, progress))
+    result[key] = {
+      enter: linear(from, from + READOUT_FADE, progress),
+      exit: linear(until, until + READOUT_FADE, progress),
+    }
   }
   if (compact) {
-    const latest = entries
-      .filter(([key, [from]]) => key !== 'target' && progress >= from && result[key] > 0)
-      .at(-1)?.[0]
+    const showing = (key: ReadoutKey) => result[key].enter > 0 && result[key].exit < 1
+    const latest = entries.filter(([key]) => key !== 'target' && showing(key)).at(-1)?.[0]
     for (const [key] of entries) {
-      if (key !== 'target' && key !== latest) result[key] = 0
+      if (key !== 'target' && key !== latest) result[key] = { enter: 0, exit: 0 }
     }
+  }
+  return result
+}
+
+/** Opacity of each readout at pin progress P (entrance and exit combined). */
+export function readoutOpacity(progress: number, compact: boolean): Record<ReadoutKey, number> {
+  const motion = readoutMotion(progress, compact)
+  const result = {} as Record<ReadoutKey, number>
+  for (const key of Object.keys(motion) as ReadoutKey[]) {
+    result[key] = Math.min(motion[key].enter, 1 - motion[key].exit)
   }
   return result
 }
