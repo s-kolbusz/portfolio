@@ -39,10 +39,13 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
   uniform float uHasImage;
   uniform vec4 uImageRect;
   uniform float uImageIn;
-  uniform float uFront;
+  // 0 = murky, rippling surface over the page; 1 = still, clear glass.
+  uniform float uClarity;
 
-  // Detached droplet: xy position, z radius, w smooth-union width (px).
+  // Droplet: xy position, z radius, w smooth-union width (px).
   uniform vec4 uDrop;
+  // Droplet shape: x elongation towards the body, yz unit direction to the body.
+  uniform vec3 uDropShape;
 
   in vec2 vUv;
   out vec4 fragColor;
@@ -113,8 +116,14 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
 
     float drop = 1e3;
     if (uDrop.z > 0.0) {
+      // Elongated towards the body while the neck thins, round once free.
+      float stretch = uDropShape.x;
+      vec2 toward = uDropShape.yz;
+      vec2 p = px - uDrop.xy - toward * uDrop.z * (stretch - 1.0) * 0.5;
+      vec2 local = vec2(dot(p, toward) / stretch, dot(p, vec2(-toward.y, toward.x)));
       float dropBreathe = 1.0 + sin(uTime * 0.8) * 0.05;
-      drop = (length(px - uDrop.xy) - uDrop.z * dropBreathe) / unit;
+      drop = (length(local) - uDrop.z * dropBreathe) / unit;
+      drop += snoise(px / unit * 6.0 + uTime * 0.3) * 0.006 * uDetail;
     }
 
     float d = uDrop.w > 0.0 ? smin(body, drop, uDrop.w / unit) : min(body, drop);
@@ -133,24 +142,34 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
     vec3 matter = mix(uColor, uTargetColor, uSolid);
     vec3 shaded = mix(matter, matter * 0.85, depthFactor * (1.0 - uSolid * 0.6));
 
-    // The page inside the matter: refracted and tinted while liquid, sharp
-    // and true behind the solidification front spreading from the centre.
+    // The page under the matter, seen through its surface: murky and bent by
+    // waves at first, then the water calms and clears until it is plain
+    // glass and the page shows exactly as it is. Scrolling stirs it again.
     vec3 bodyColor = shaded;
     if (uHasImage > 0.5 && uImageIn > 0.0) {
       vec2 imageUv = clamp((px - uImageRect.xy) / uImageRect.zw, 0.0, 1.0);
-      vec2 fromCenter = (px - uCenter) / max(uHalfSize, vec2(1.0));
-      float reach = length(fromCenter) / 1.4142 + snoise(px / unit * 2.5) * 0.08;
-      float front = uFront * 1.3 - 0.1;
-      float solidified = 1.0 - smoothstep(front - 0.06, front, reach);
+      float unrest = (1.0 - uClarity) * (1.0 + uFlow * 2.0);
 
-      vec2 bend = vec2(
-        snoise(imageUv * 3.0 + uTime * 0.1),
-        snoise(imageUv * 3.0 + 17.0 - uTime * 0.1)
-      ) * 0.035 * (1.0 - solidified);
-      vec3 liquid = mix(texture(uImage, clamp(imageUv + bend, 0.0, 1.0)).rgb, shaded, 0.55);
-      vec3 sharp = texture(uImage, imageUv).rgb;
+      // Long, slow swells: a settling surface, not a choppy one.
+      vec2 q = (px - uImageRect.xy) / unit * 1.1;
+      float e = 0.05;
+      vec2 t1 = vec2(uTime * 0.07, uTime * 0.05);
+      vec2 t2 = vec2(-uTime * 0.09, uTime * 0.06);
+      float h = snoise(q + t1) + 0.3 * snoise(q * 1.9 + t2);
+      float hx = snoise(q + vec2(e, 0.0) + t1) + 0.3 * snoise((q + vec2(e, 0.0)) * 1.9 + t2);
+      float hy = snoise(q + vec2(0.0, e) + t1) + 0.3 * snoise((q + vec2(0.0, e)) * 1.9 + t2);
+      vec2 slope = vec2(hx - h, hy - h) / e;
 
-      bodyColor = mix(shaded, mix(liquid, sharp, solidified), uImageIn);
+      vec2 bent = clamp(imageUv + slope * 0.009 * unrest, 0.0, 1.0);
+      vec3 seen = texture(uImage, bent).rgb;
+
+      // A soft sheen rolling over the swells.
+      vec3 normal = normalize(vec3(-slope * 0.25 * unrest, 1.0));
+      float sheen = pow(max(dot(normal, normalize(vec3(-0.35, -0.45, 1.0))), 0.0), 12.0);
+      float murk = (1.0 - uClarity) * 0.7;
+
+      vec3 through = mix(seen, shaded, murk) + (sheen - 0.55) * 0.12 * unrest;
+      bodyColor = mix(shaded, through, uImageIn);
     }
 
     // The droplet stays liquid: it keeps the blob's own green.

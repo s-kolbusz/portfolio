@@ -21,7 +21,8 @@ interface PuddleUniforms {
   uHasImage: WebGLUniformLocation | null
   uImageRect: WebGLUniformLocation | null
   uImageIn: WebGLUniformLocation | null
-  uFront: WebGLUniformLocation | null
+  uClarity: WebGLUniformLocation | null
+  uDropShape: WebGLUniformLocation | null
   uDrop: WebGLUniformLocation | null
 }
 
@@ -146,7 +147,8 @@ export function setupPuddleWebGL(canvas: HTMLCanvasElement): PuddleWebGLContext 
     uHasImage: gl.getUniformLocation(program, 'uHasImage'),
     uImageRect: gl.getUniformLocation(program, 'uImageRect'),
     uImageIn: gl.getUniformLocation(program, 'uImageIn'),
-    uFront: gl.getUniformLocation(program, 'uFront'),
+    uClarity: gl.getUniformLocation(program, 'uClarity'),
+    uDropShape: gl.getUniformLocation(program, 'uDropShape'),
     uDrop: gl.getUniformLocation(program, 'uDrop'),
   }
 

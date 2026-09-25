@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   boxRect,
   choreograph,
+  HEADING_AT,
   mixColour,
   readoutOpacity,
   toHex,
@@ -51,22 +52,31 @@ describe('signature transition choreography', () => {
 
   it('follows the beats of the script', () => {
     expect(atProgress(0.05).fluid).toBe(1)
-    expect(atProgress(0.45).halfWidth).toBeCloseTo(560)
-    expect(atProgress(0.45).halfHeight).toBeCloseTo(315)
-    expect(atProgress(0.45).solid).toBe(0)
-    expect(atProgress(0.7).solid).toBe(1)
-    expect(atProgress(0.59).imageIn).toBeLessThan(0.05)
-    expect(atProgress(0.6).front).toBe(0)
-    expect(atProgress(0.92).front).toBe(1)
-    expect(atProgress(0.92).imageIn).toBe(1)
-    expect(atProgress(0.92).fluid).toBe(0)
+    expect(atProgress(0.36).halfWidth).toBeCloseTo(560)
+    expect(atProgress(0.36).halfHeight).toBeCloseTo(315)
+    expect(atProgress(0.34).solid).toBe(0)
+    expect(atProgress(0.58).solid).toBe(1)
+    expect(atProgress(0.48).imageIn).toBe(0)
+    expect(atProgress(0.58).imageIn).toBe(1)
+    expect(atProgress(0.52).clarity).toBe(0)
+    expect(atProgress(0.82).clarity).toBe(1)
+    expect(atProgress(0.82).fluid).toBe(0)
+  })
+
+  it('clears the surface gradually, the same everywhere (no spreading front)', () => {
+    let previous = -1
+    for (let p = 0.5; p <= 0.85; p += 0.01) {
+      const { clarity } = atProgress(p)
+      expect(clarity).toBeGreaterThanOrEqual(previous)
+      previous = clarity
+    }
   })
 
   it('reads out viscosity 0.82 → 0.30 → 0.05 → 0', () => {
     expect(viscosityAt(0)).toBe(0.82)
-    expect(viscosityAt(0.45)).toBeCloseTo(0.3)
-    expect(viscosityAt(0.7)).toBeCloseTo(0.05)
-    expect(viscosityAt(0.92)).toBe(0)
+    expect(viscosityAt(0.36)).toBeCloseTo(0.3)
+    expect(viscosityAt(0.58)).toBeCloseTo(0.05)
+    expect(viscosityAt(0.82)).toBe(0)
     let previous = Infinity
     for (let p = 0; p <= 1; p += 0.01) {
       expect(viscosityAt(p)).toBeLessThanOrEqual(previous)
@@ -83,7 +93,7 @@ describe('signature transition choreography', () => {
     expect(step.cornerRadius).toBeCloseTo(16)
     expect(step.reveal).toBe(1)
     expect(step.body).toBe(false)
-    expect(atProgress(0.9).reveal).toBe(0)
+    expect(atProgress(0.82).reveal).toBe(0)
   })
 
   it('stays one soft shape: corners only tighten, never below the box radius', () => {
@@ -103,13 +113,34 @@ describe('signature transition choreography', () => {
     expect(backward).toEqual(forward)
   })
 
-  it('buds a droplet that pinches off and stays below the box', () => {
-    expect(atProgress(0.49).droplet).toBeNull()
-    const budding = atProgress(0.5).droplet!
-    const settled = atProgress(0.7).droplet!
+  it('pulls a droplet off the stretching body while it forms', () => {
+    expect(atProgress(0.17).droplet).toBeNull()
+    const budding = atProgress(0.19).droplet!
+    const necking = atProgress(0.3).droplet!
+    const free = atProgress(0.4).droplet!
     expect(budding.merge).toBeGreaterThan(0)
-    expect(settled.merge).toBe(0)
-    expect(settled.y).toBeGreaterThan(135 + 630)
+    expect(budding.radius).toBeLessThan(free.radius)
+    expect(necking.stretch).toBeGreaterThan(1.3)
+    expect(free.merge).toBe(0)
+    expect(free.stretch).toBeCloseTo(1)
+    // Rests beside the box when there is room (1440 wide: 160px margin).
+    expect(free.x).toBeGreaterThan(160 + 1120)
+  })
+
+  it('puts the droplet below the box when there is no room beside it', () => {
+    const narrow: StageLayout = {
+      ...stage,
+      box: { ...stage.box, left: 24, width: 342, height: 192 },
+    }
+    const free = choreograph({
+      viewportWidth: 390,
+      viewportHeight: 844,
+      scrollY: narrow.trackDocTop + narrow.pinDistance * 0.5,
+      stage: narrow,
+      scale: 0.6,
+    }).droplet!
+    expect(free.x).toBeLessThan(24 + 342)
+    expect(free.y).toBeGreaterThan(135 + 192)
   })
 
   it('keeps rendering for the droplet after the pin, and sleeps once it scrolls away', () => {
@@ -117,12 +148,14 @@ describe('signature transition choreography', () => {
     expect(at(pinEnd + 2000).active).toBe(false)
   })
 
-  it('narrates with readouts: target on pin, at most one other on phones', () => {
+  it('narrates with readouts that all give way before the heading enters', () => {
     expect(readoutOpacity(0, false).target).toBe(0)
     expect(readoutOpacity(0.01, false).target).toBe(1)
-    expect(readoutOpacity(0.3, false).viscosity).toBe(1)
-    expect(readoutOpacity(0.3, false).colour).toBe(0)
-    expect(readoutOpacity(0.99, false).target).toBe(0)
+    expect(readoutOpacity(0.2, false).viscosity).toBe(1)
+    expect(readoutOpacity(0.2, false).colour).toBe(0)
+    for (const value of Object.values(readoutOpacity(HEADING_AT, false))) {
+      expect(value).toBe(0)
+    }
 
     for (let p = 0; p <= 1; p += 0.01) {
       const compact = readoutOpacity(p, true)

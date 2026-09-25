@@ -84,6 +84,12 @@ interface PuddleState {
   flow: number
   dropOffsetX: number
   dropOffsetY: number
+  /** Droplet spring state: it follows its scripted path with a little inertia. */
+  dropReady: boolean
+  dropX: number
+  dropY: number
+  dropVX: number
+  dropVY: number
 }
 
 function createInitialState(): PuddleState {
@@ -111,6 +117,11 @@ function createInitialState(): PuddleState {
     flow: 0,
     dropOffsetX: 0,
     dropOffsetY: 0,
+    dropReady: false,
+    dropX: 0,
+    dropY: 0,
+    dropVX: 0,
+    dropVY: 0,
   }
 }
 
@@ -339,6 +350,46 @@ export function ViscousPuddle() {
       state.dropOffsetX = lerp(state.dropOffsetX, dropTargetX, 0.08)
       state.dropOffsetY = lerp(state.dropOffsetY, dropTargetY, 0.08)
 
+      // Once free, the droplet chases its scripted spot on an underdamped
+      // spring: it overshoots a touch, wobbles and settles. While still
+      // attached it stays exactly on the path so the neck holds together.
+      let dropX = 0
+      let dropY = 0
+      let dropStretch = 1
+      let dropTowardX = 1
+      let dropTowardY = 0
+      if (drop) {
+        const targetX = drop.x + state.dropOffsetX
+        const targetY = drop.y + state.dropOffsetY
+        if (!state.dropReady) {
+          state.dropReady = true
+          state.dropX = targetX
+          state.dropY = targetY
+          state.dropVX = 0
+          state.dropVY = 0
+        }
+        const stiffness = 90
+        const damping = 11
+        state.dropVX += ((targetX - state.dropX) * stiffness - state.dropVX * damping) * delta
+        state.dropVY += ((targetY - state.dropY) * stiffness - state.dropVY * damping) * delta
+        state.dropX += state.dropVX * delta
+        state.dropY += state.dropVY * delta
+
+        const attached = drop.radius > 0 ? Math.min(1, drop.merge / (drop.radius * 3)) : 0
+        dropX = lerp(state.dropX, targetX, attached)
+        dropY = lerp(state.dropY, targetY, attached)
+
+        // Free drops squash along their motion; attached ones along the neck.
+        const speed = Math.hypot(state.dropVX, state.dropVY)
+        const freeStretch = 1 + Math.min(speed / 1500, 0.35)
+        const moving = speed > 1
+        dropStretch = lerp(freeStretch, drop.stretch, attached)
+        dropTowardX = attached > 0.5 || !moving ? drop.towardX : -state.dropVX / speed
+        dropTowardY = attached > 0.5 || !moving ? drop.towardY : -state.dropVY / speed
+      } else {
+        state.dropReady = false
+      }
+
       gl.viewport(0, 0, canvas.width, canvas.height)
       gl.disable(gl.SCISSOR_TEST)
       gl.clearColor(0, 0, 0, 0)
@@ -347,9 +398,9 @@ export function ViscousPuddle() {
       // Once the DOM image has taken over only the droplet is left: draw
       // just its neighbourhood.
       if (!step.body && drop) {
-        const pad = drop.radius * 2
-        const x = (drop.x + state.dropOffsetX - pad) * state.dpr
-        const y = (state.canvasHeight - (drop.y + state.dropOffsetY + pad)) * state.dpr
+        const pad = drop.radius * 3
+        const x = (dropX - pad) * state.dpr
+        const y = (state.canvasHeight - (dropY + pad)) * state.dpr
         gl.enable(gl.SCISSOR_TEST)
         gl.scissor(
           Math.floor(x),
@@ -384,14 +435,9 @@ export function ViscousPuddle() {
         step.box.height
       )
       gl.uniform1f(uniforms.uImageIn, step.imageIn)
-      gl.uniform1f(uniforms.uFront, step.front)
-      gl.uniform4f(
-        uniforms.uDrop,
-        drop ? drop.x + state.dropOffsetX : 0,
-        drop ? drop.y + state.dropOffsetY : 0,
-        drop ? drop.radius : 0,
-        drop ? drop.merge : 0
-      )
+      gl.uniform1f(uniforms.uClarity, step.clarity)
+      gl.uniform4f(uniforms.uDrop, dropX, dropY, drop ? drop.radius : 0, drop ? drop.merge : 0)
+      gl.uniform3f(uniforms.uDropShape, dropStretch, dropTowardX, dropTowardY)
 
       gl.bindVertexArray(vao)
       gl.drawArrays(gl.TRIANGLES, 0, 6)

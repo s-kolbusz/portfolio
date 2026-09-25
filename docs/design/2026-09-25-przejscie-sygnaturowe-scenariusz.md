@@ -2,7 +2,7 @@
 
 Data: 2026-09-25
 Zadanie: [SEB-63](https://linear.app/sklbsz/issue/SEB-63)
-Status: **do akceptacji.** Po akceptacji kod powstaje według tego dokumentu.
+Status: **zaakceptowany**, zmieniony po przeglądzie wersji 3 (nagłówek w kadrze, kropla, tafla zamiast frontu krzepnięcia).
 Źródło osi: [decyzje redesignu](./2026-09-24-redesign-decyzje.md) (Fluid → Solid, prawo ruchu, 4 plany).
 
 ## Co ma opowiedzieć
@@ -22,6 +22,9 @@ częścią przemiany, a nie ozdobnikiem.
 - Pusta ramka, w którą blob „próbuje się wpasować”.
 - Crossfade zrzutu nad zielonym prostokątem, czyli podmiana zamiast przemiany.
 - Elementy sceny, które nie używają komponentów i animacji reszty strony.
+- Nagłówek pod przypiętą sceną, przez co strona przesuwa się, zamiast pokazać całość w jednym kadrze.
+- Kropla, która odrywa się późno, po prostej linii i jak idealne koło.
+- „Front krzepnięcia”, który wygląda jak rozchodzące się zdejmowanie filtra, a nie jak proces w naturze.
 
 ## Budowa sceny
 
@@ -32,22 +35,27 @@ częścią przemiany, a nie ozdobnikiem.
   działa tak samo przy szybkim i wolnym scrollu, wstecz i po przerwaniu.
 - Blob renderuje się na stałym canvasie za treścią. Zrzut strony trafia do
   shadera jako tekstura (ten sam plik co obraz w DOM).
+- **Jeden kadr:** w przypiętej warstwie są nagłówek (etykieta, tytuł, opis),
+  obraz i link. Miejsce nagłówka jest zarezerwowane od początku: najpierw
+  zajmują je odczyty, a na końcu wjeżdża w nie nagłówek.
 
 ## Klatki
 
-| P         | Etap              | Obraz                                                                                                                                                                                                                                                                | Odczyty (mono, pierwszy plan)                      |
-| --------- | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| przed     | **Hero**          | Blob żyje jak dziś: kursor, oddech, dryf. Tekst hero odjeżdża normalnie, a blob płynie na środek kadru.                                                                                                                                                              | —                                                  |
-| 0.00–0.10 | **Wejście**       | Scena się przypina. Blob na środku, jeszcze płynny, kursor nadal działa.                                                                                                                                                                                             | Pojawia się cel: `01 — stronypodhale.pl`           |
-| 0.10–0.45 | **Formowanie**    | Blob się uspokaja i sam wyciąga do docelowego 16:9. Jeden kształt: koło → zaokrąglony prostokąt, rogi tylko maleją. Wpływ kursora gaśnie.                                                                                                                            | `lepkość 0.82 → 0.30`, `proporcje 1.00:1 → 1.78:1` |
-| 0.45–0.70 | **Krzepnięcie**   | Kolor schodzi do koloru strony. Rogi dochodzą do promienia docelowego. Przy P≈0.55 odrywa się **kropla** i osiada przy krawędzi sceny.                                                                                                                               | `lepkość 0.30 → 0.05`, kolor `#7EC58E → #314638`   |
-| 0.60–0.92 | **Przeobrażenie** | Wewnątrz materii jest już obraz, zniekształcony jak przez ciecz i zabarwiony na zielono. Od najgęstszego punktu (środka) rozchodzi się **front krzepnięcia** o nieregularnej krawędzi. Za frontem obraz jest ostry i w prawdziwych kolorach, przed nim nadal płynny. | `krzepnięcie 0 → 100%`                             |
-| 0.92–1.00 | **Spoczynek**     | Ostatnia klatka canvasa to piksel w piksel obraz DOM, więc zamiana jest niewidoczna. Odczyty gasną.                                                                                                                                                                  | gasną                                              |
-| po        | **Odpięcie**      | Nagłówek sceny (etykieta, tytuł, opis, link) wchodzi zwykłym reveal strony, z tym samym komponentem i parametrami co sekcja Projekty. Scroll rusza dalej. Kropla zostaje żywa.                                                                                       | —                                                  |
+| P         | Etap            | Obraz                                                                                                                                                                                                                                        | Odczyty (mono, pierwszy plan)                      |
+| --------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| przed     | **Hero**        | Blob żyje jak dziś: kursor, oddech, dryf. Tekst hero odjeżdża normalnie, a blob czeka na środku kadru.                                                                                                                                       | —                                                  |
+| 0.00–0.06 | **Wejście**     | Scena się przypina. Blob jeszcze płynny, kursor nadal działa.                                                                                                                                                                                | Pojawia się cel: `01 — stronypodhale.pl`           |
+| 0.06–0.36 | **Formowanie**  | Blob się uspokaja, sam wyciąga do docelowego 16:9 i przesuwa na miejsce obrazu. Jeden kształt: koło → zaokrąglony prostokąt, rogi tylko maleją. Wpływ kursora gaśnie.                                                                        | `lepkość 0.82 → 0.30`, `proporcje 1.00:1 → 1.78:1` |
+| 0.18–0.40 | **Kropla**      | Rozciągana ciecz odrywa kroplę z końca kształtu: najpierw puchnie płat, potem cienka szyjka wydłuża kroplę, aż ta się odrywa, leci łukiem (w bok, potem w dół) i osiada obok obrazu (na telefonie pod nim).                                  | —                                                  |
+| 0.34–0.58 | **Ciemnienie**  | Kolor schodzi do koloru strony. Rogi dochodzą do promienia docelowego.                                                                                                                                                                       | `lepkość 0.30 → 0.05`, kolor `#7EC58E → #314638`   |
+| 0.48–0.58 | **Dno**         | Przez mętną, falującą taflę zaczyna być widać stronę, mocno załamaną i zabarwioną.                                                                                                                                                           | —                                                  |
+| 0.52–0.82 | **Uspokojenie** | Tafla się uspokaja i robi się przejrzysta: długie fale słabną, załamanie maleje, zielone zmętnienie znika, łagodny połysk gaśnie. Wszędzie jednocześnie, bez frontu. Scroll znów ją mąci.                                                    | `przejrzystość 0 → 100%`                           |
+| 0.83–0.85 | **Spoczynek**   | Tafla jest jak szkło, a ostatnia klatka canvasa to piksel w piksel obraz DOM, więc zamiana jest niewidoczna. Odczyty gasną.                                                                                                                  | gasną                                              |
+| 0.88–1.00 | **Nagłówek**    | W miejsce odczytów wjeżdża nagłówek i link, tym samym ruchem co reveal w reszcie strony (y 100 → 0, 1 s, `power2.out`, stagger 0.1). Scena nadal stoi, więc całość czyta się jako jeden kadr. Wstecz nagłówek wycofuje się tym samym ruchem. | —                                                  |
+| po        | **Odpięcie**    | Cały kadr odjeżdża razem, scroll rusza dalej. Kropla zostaje żywa.                                                                                                                                                                           | —                                                  |
 
-Czasy etapów stroimy w prototypie. Zakładka przeobrażenia i krzepnięcia
-(0.60–0.70) jest celowa: obraz zaczyna prześwitywać, zanim materia skończy
-ciemnieć.
+Czasy etapów stroimy w prototypie. Zakładki są celowe: kropla odrywa się
+w trakcie rozciągania, a dno zaczyna prześwitywać, zanim materia skończy ciemnieć.
 
 ## Odczyty
 
@@ -55,7 +63,8 @@ ciemnieć.
   i **jak daleko** jest proces.
 - Wartości są prawdziwe: to te same liczby, które sterują shaderem.
 - Styl: mono, `text-xs`, `tracking-widest`, kolor `muted-foreground`, cel w `primary`.
-  Pozycja: przy lewej górnej krawędzi docelowego kadru (plan 3, ~1.2×).
+  Pozycja: w miejscu nagłówka, cel po lewej, wartości po prawej (plan 3, ~1.2×).
+  Wartości ustawione w kolejności gaśnięcia, więc znikająca nie przesuwa pozostałych.
 - `aria-hidden`, bo to dekoracja. Treść sceny jest w nagłówku DOM.
 
 ## Prawo ruchu w tej scenie
@@ -72,10 +81,19 @@ ciemnieć.
 
 ## Kropla
 
-Przy krzepnięciu mała część materii (ok. 4% objętości) odrywa się od kształtu,
-zanim ten stwardnieje, i osiada przy prawej krawędzi sceny. Po odpięciu zostaje
-żywa (oddech, kursor) i przewija się razem ze sceną. Dalsza droga kropli
-(kolejne sceny, kontakt) należy do kroków 2 i 5 roadmapy. Tutaj tylko się odrywa i zostaje.
+Odrywa się w trakcie formowania, bo tak zachowuje się rozciągana ciecz
+(przewężenie i oderwanie kropli). Organicznie, nie po sznurku:
+
+- rośnie z płata na krawędzi kształtu, masa do niej dopływa;
+- szyjka się przewęża, a kropla wydłuża w stronę plamy, aż się oderwie;
+- po oderwaniu prowadzi ją sprężyna z niedotłumieniem: lekko się rozpędza,
+  przestrzeliwuje i drga, a w ruchu spłaszcza się wzdłuż kierunku lotu;
+- powierzchnia ma ten sam szum co blob, a oddech jest wolny.
+
+Osiada obok obrazu, a gdy brakuje miejsca (telefon), pod jego prawym rogiem.
+Wtedy link stoi po lewej. Po odpięciu kropla zostaje żywa (oddech, kursor)
+i przewija się razem z kadrem. Dalsza droga kropli (kolejne sceny, kontakt)
+należy do kroków 2 i 5 roadmapy.
 
 ## Nawigacja i skoki
 
@@ -86,8 +104,8 @@ zanim ten stwardnieje, i osiada przy prawej krawędzi sceny. Po odpięciu zostaj
 ## Telefon
 
 Te same etapy. Przypięcie ok. 1,5 ekranu (propozycja, stroimy na urządzeniu).
-Bez kursora, DPR 1, tekstura do 1024 px szerokości, prostszy front krzepnięcia
-(mniej oktaw szumu). Odczyty nad kadrem, maksymalnie dwa naraz.
+Bez kursora, DPR 1, spokojniejsza powierzchnia. Odczyty w miejscu nagłówka,
+maksymalnie dwa naraz (cel i najnowszy odczyt).
 
 ## Reduced motion i brak WebGL
 
@@ -107,9 +125,10 @@ niezależnie od animacji. Canvas i odczyty mają `aria-hidden`.
 
 ## Do sprawdzenia przy implementacji
 
-- Nagłówek z prototypu 2 miał inny timing niż reszta strony. Trzeba znaleźć
-  przyczynę (podejrzenie: ScrollTrigger liczył pozycje przed ustabilizowaniem
-  layoutu), a nie tylko ją obejść.
+- ~~Nagłówek z prototypu 2 miał inny timing niż reszta strony.~~ Zmierzone:
+  mechanizm był identyczny jak w Projektach (reveal przy ~700 z 900 px).
+  Problemem było miejsce: reveal odpalał się, gdy hero było jeszcze na ekranie.
+  Teraz nagłówek wchodzi w kadrze sceny, na etapie ustalonym w tabeli.
 
 ## Gotowe gdy
 
