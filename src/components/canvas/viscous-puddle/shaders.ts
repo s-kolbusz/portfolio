@@ -20,12 +20,14 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
   uniform float uOpacity;
   uniform float uDetail;
 
-  // Signature transition: metaball (uShape = 0) → rounded rectangle (uShape = 1).
+  // Signature transition: one rounded box that starts as a circle.
   uniform vec2 uCenter;
-  uniform float uRadius;
   uniform vec2 uHalfSize;
   uniform float uCorner;
-  uniform float uShape;
+  // 1 = liquid hero blob, 0 = solid frame.
+  uniform float uFluid;
+  // Smoothed scroll speed, 0–1: moving matter ripples, still matter sets.
+  uniform float uFlow;
 
   in vec2 vUv;
   out vec4 fragColor;
@@ -78,30 +80,27 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
     float unit = uViewport.y * 0.5;
     vec2 uv = (px - uCenter) / unit;
 
-    // The fluid parts (drift, breathing, cursor, surface noise) settle as the
-    // shape solidifies, so the rectangle lands still and crisp.
-    float fluid = 1.0 - uShape;
-
-    float breathe = sin(uTime * 0.3) * 0.03 * fluid;
+    float breathe = sin(uTime * 0.3) * 0.03 * uFluid;
     vec2 drift = vec2(
       snoise(vec2(uTime * 0.1, 0.0)),
       snoise(vec2(0.0, uTime * 0.15))
-    ) * 0.15 * fluid;
+    ) * 0.15 * uFluid;
 
-    float d1 = sdCircle(uv - drift, uRadius / unit + breathe * uScale);
+    vec2 halfSize = uHalfSize / unit + breathe * uScale;
+    float d1 = sdRoundBox(uv - drift, halfSize, uCorner / unit + breathe * uScale);
 
     vec2 mouseUV = (uMouse - uCenter) / unit;
     float d2 = sdCircle(uv - mouseUV, 0.25 * uScale);
-    float blob = mix(d1, smin(d1, d2, 0.6 * uScale), fluid);
+    float d = mix(d1, smin(d1, d2, 0.6 * uScale), uFluid);
 
-    float box = sdRoundBox(uv, uHalfSize / unit, uCorner / unit);
-
-    float d = mix(blob, box, uShape);
-
+    // Surface ripple: always there while liquid, plus whatever the scroll
+    // stirs up. Both die out as the shape sets, so it lands still and crisp.
+    float settle = smoothstep(0.0, 0.25, uFluid);
+    float ripple = (uFluid + uFlow * 1.5 * settle) * uDetail;
     float noise = snoise(uv * 1.5 + uTime * 0.15);
-    d += noise * 0.04 * uScale * fluid * uDetail;
+    d += noise * 0.04 * uScale * ripple;
 
-    float aa = mix(0.04, 0.75 / unit, uShape);
+    float aa = mix(0.75 / unit, 0.04, uFluid);
     float alpha = smoothstep(aa, -aa, d);
     float dither = snoise(px * 0.5) * 0.025;
     float depthFactor = smoothstep(0.0, -0.5 * uScale, d + dither);

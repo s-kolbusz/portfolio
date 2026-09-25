@@ -63,6 +63,8 @@ interface PuddleState {
   canvasHeight: number
   frameElement: HTMLElement | null
   frame: FrameRect | null
+  lastScrollY: number
+  flow: number
 }
 
 function createInitialState(): PuddleState {
@@ -84,6 +86,8 @@ function createInitialState(): PuddleState {
     canvasHeight: 0,
     frameElement: null,
     frame: null,
+    lastScrollY: 0,
+    flow: 0,
   }
 }
 
@@ -190,6 +194,7 @@ export function ViscousPuddle() {
       if (awake) return
       awake = true
       lastTime = performance.now()
+      state.lastScrollY = window.scrollY
       canvas.style.visibility = 'visible'
       // Appended after Lenis on the same ticker, so the scroll position read
       // below is the one painted this frame and the rectangle never trails.
@@ -222,6 +227,13 @@ export function ViscousPuddle() {
 
       setReveal(step.reveal)
 
+      // Scroll speed stirs the surface (0–1), then eases off when it stops.
+      const scrollY = window.scrollY
+      const speed = delta > 0 ? Math.abs(scrollY - state.lastScrollY) / delta : 0
+      state.lastScrollY = scrollY
+      const targetFlow = reduced ? 0 : Math.min(speed / 2500, 1)
+      state.flow = lerp(state.flow, targetFlow, targetFlow > state.flow ? 0.2 : 0.04)
+
       if (step.settled) {
         sleep()
         return
@@ -253,10 +265,10 @@ export function ViscousPuddle() {
       gl.uniform1f(uniforms.uOpacity, state.opacity)
       gl.uniform1f(uniforms.uDetail, state.isMobile ? 0.5 : 1)
       gl.uniform2f(uniforms.uCenter, step.centerX, step.centerY)
-      gl.uniform1f(uniforms.uRadius, step.radius)
       gl.uniform2f(uniforms.uHalfSize, step.halfWidth, step.halfHeight)
       gl.uniform1f(uniforms.uCorner, step.cornerRadius)
-      gl.uniform1f(uniforms.uShape, step.shape)
+      gl.uniform1f(uniforms.uFluid, step.fluid)
+      gl.uniform1f(uniforms.uFlow, state.flow)
 
       gl.bindVertexArray(vao)
       gl.drawArrays(gl.TRIANGLES, 0, 6)

@@ -10,10 +10,10 @@ interface PuddleUniforms {
   uOpacity: WebGLUniformLocation | null
   uDetail: WebGLUniformLocation | null
   uCenter: WebGLUniformLocation | null
-  uRadius: WebGLUniformLocation | null
+  uFluid: WebGLUniformLocation | null
   uHalfSize: WebGLUniformLocation | null
   uCorner: WebGLUniformLocation | null
-  uShape: WebGLUniformLocation | null
+  uFlow: WebGLUniformLocation | null
 }
 
 interface PuddleWebGLContext {
@@ -126,10 +126,10 @@ export function setupPuddleWebGL(canvas: HTMLCanvasElement): PuddleWebGLContext 
     uOpacity: gl.getUniformLocation(program, 'uOpacity'),
     uDetail: gl.getUniformLocation(program, 'uDetail'),
     uCenter: gl.getUniformLocation(program, 'uCenter'),
-    uRadius: gl.getUniformLocation(program, 'uRadius'),
+    uFluid: gl.getUniformLocation(program, 'uFluid'),
     uHalfSize: gl.getUniformLocation(program, 'uHalfSize'),
     uCorner: gl.getUniformLocation(program, 'uCorner'),
-    uShape: gl.getUniformLocation(program, 'uShape'),
+    uFlow: gl.getUniformLocation(program, 'uFlow'),
   }
 
   gl.enable(gl.BLEND)

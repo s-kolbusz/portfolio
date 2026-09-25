@@ -40,7 +40,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
   return (
     <main id="main-content" className="flex min-h-screen flex-col items-center justify-between">
       <Hero />
-      <SignatureScene locale={locale} />
+      <SignatureScene />
       <About />
       <Projects locale={locale} />
       <Services />

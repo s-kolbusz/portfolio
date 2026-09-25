@@ -66,9 +66,9 @@ export function Hero() {
   const handleCtaClick = () => {
     const lenis = useScrollStore.getState().lenis
     if (lenis) {
-      lenis.scrollTo('#about')
+      lenis.scrollTo('#work')
     } else {
-      document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })
+      document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' })
     }
   }
 
