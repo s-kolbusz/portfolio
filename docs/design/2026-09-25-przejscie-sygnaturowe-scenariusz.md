@@ -2,7 +2,7 @@
 
 Data: 2026-09-25
 Zadanie: [SEB-63](https://linear.app/sklbsz/issue/SEB-63)
-Status: **zaakceptowany**, zmieniony po przeglądzie wersji 3 (nagłówek w kadrze, kropla, tafla zamiast frontu krzepnięcia).
+Status: **zaakceptowany**, zmieniony po przeglądach wersji 3 i 4 (nagłówek w kadrze, kropla jako kulka kursora z hero, tafla zamiast frontu krzepnięcia).
 Źródło osi: [decyzje redesignu](./2026-09-24-redesign-decyzje.md) (Fluid → Solid, prawo ruchu, 4 plany).
 
 ## Co ma opowiedzieć
@@ -23,7 +23,7 @@ częścią przemiany, a nie ozdobnikiem.
 - Crossfade zrzutu nad zielonym prostokątem, czyli podmiana zamiast przemiany.
 - Elementy sceny, które nie używają komponentów i animacji reszty strony.
 - Nagłówek pod przypiętą sceną, przez co strona przesuwa się, zamiast pokazać całość w jednym kadrze.
-- Kropla, która odrywa się późno, po prostej linii i jak idealne koło.
+- Kropla ze skryptem (odrywanie po sznurku, sprężyna, sztuczne wydłużanie). Wystarczy kulka kursora z hero.
 - „Front krzepnięcia”, który wygląda jak rozchodzące się zdejmowanie filtra, a nie jak proces w naturze.
 
 ## Budowa sceny
@@ -46,13 +46,13 @@ częścią przemiany, a nie ozdobnikiem.
 | przed     | **Hero**        | Blob żyje jak dziś: kursor, oddech, dryf. Tekst hero odjeżdża normalnie, a blob czeka na środku kadru.                                                                                                                                       | —                                                  |
 | 0.00–0.06 | **Wejście**     | Scena się przypina. Blob jeszcze płynny, kursor nadal działa.                                                                                                                                                                                | Pojawia się cel: `01 — stronypodhale.pl`           |
 | 0.06–0.36 | **Formowanie**  | Blob się uspokaja, sam wyciąga do docelowego 16:9 i przesuwa na miejsce obrazu. Jeden kształt: koło → zaokrąglony prostokąt, rogi tylko maleją. Wpływ kursora gaśnie.                                                                        | `lepkość 0.82 → 0.30`, `proporcje 1.00:1 → 1.78:1` |
-| 0.18–0.40 | **Kropla**      | Rozciągana ciecz odrywa kroplę z końca kształtu: najpierw puchnie płat, potem cienka szyjka wydłuża kroplę, aż ta się odrywa, leci łukiem (w bok, potem w dół) i osiada obok obrazu (na telefonie pod nim).                                  | —                                                  |
+| 0.18–0.42 | **Kulka**       | Kulka kursora z hero (ten sam rozmiar i to samo lepkie łączenie) odrywa się sama, bo w miarę krzepnięcia łączenie z plamą słabnie. Z kursorem dalej za nim idzie, a bez niego (dotyk) spływa na miejsce przy obrazie.                        | —                                                  |
 | 0.34–0.58 | **Ciemnienie**  | Kolor schodzi do koloru strony. Rogi dochodzą do promienia docelowego.                                                                                                                                                                       | `lepkość 0.30 → 0.05`, kolor `#7EC58E → #314638`   |
 | 0.48–0.58 | **Dno**         | Przez mętną, falującą taflę zaczyna być widać stronę, mocno załamaną i zabarwioną.                                                                                                                                                           | —                                                  |
 | 0.52–0.82 | **Uspokojenie** | Tafla się uspokaja i robi się przejrzysta: długie fale słabną, załamanie maleje, zielone zmętnienie znika, łagodny połysk gaśnie. Wszędzie jednocześnie, bez frontu. Scroll znów ją mąci.                                                    | `przejrzystość 0 → 100%`                           |
 | 0.83–0.85 | **Spoczynek**   | Tafla jest jak szkło, a ostatnia klatka canvasa to piksel w piksel obraz DOM, więc zamiana jest niewidoczna. Odczyty gasną.                                                                                                                  | gasną                                              |
 | 0.88–1.00 | **Nagłówek**    | W miejsce odczytów wjeżdża nagłówek i link, tym samym ruchem co reveal w reszcie strony (y 100 → 0, 1 s, `power2.out`, stagger 0.1). Scena nadal stoi, więc całość czyta się jako jeden kadr. Wstecz nagłówek wycofuje się tym samym ruchem. | —                                                  |
-| po        | **Odpięcie**    | Cały kadr odjeżdża razem, scroll rusza dalej. Kropla zostaje żywa.                                                                                                                                                                           | —                                                  |
+| po        | **Odpięcie**    | Cały kadr odjeżdża razem, scroll rusza dalej. Kulka zostaje żywa.                                                                                                                                                                            | —                                                  |
 
 Czasy etapów stroimy w prototypie. Zakładki są celowe: kropla odrywa się
 w trakcie rozciągania, a dno zaczyna prześwitywać, zanim materia skończy ciemnieć.
@@ -79,21 +79,22 @@ w trakcie rozciągania, a dno zaczyna prześwitywać, zanim materia skończy cie
 - Cel: średni kolor zrzutu, liczony z tekstury przy ładowaniu. Dla obecnego zrzutu to ≈ `#314638`.
   Po wymianie zrzutu cel zmienia się sam.
 
-## Kropla
+## Kropla (kulka kursora)
 
-Odrywa się w trakcie formowania, bo tak zachowuje się rozciągana ciecz
-(przewężenie i oderwanie kropli). Organicznie, nie po sznurku:
+Kroplą jest kulka, która w hero idzie za kursorem i zlewa się z blobem. To ta
+część materii, która zostaje płynna. Nie ma osobnej animacji: ten sam kształt,
+rozmiar (0,25 jednostki bloba) i to samo lepkie łączenie (`smin` 0,6), co w hero.
 
-- rośnie z płata na krawędzi kształtu, masa do niej dopływa;
-- szyjka się przewęża, a kropla wydłuża w stronę plamy, aż się oderwie;
-- po oderwaniu prowadzi ją sprężyna z niedotłumieniem: lekko się rozpędza,
-  przestrzeliwuje i drga, a w ruchu spłaszcza się wzdłuż kierunku lotu;
-- powierzchnia ma ten sam szum co blob, a oddech jest wolny.
+- W trakcie krzepnięcia (P 0.18–0.42) szerokość łączenia z plamą spada do zera,
+  więc kulka odrywa się tak samo, jak w hero, gdy kursor odjeżdża od bloba.
+- Z kursorem (`pointer: fine`) kulka dalej idzie za nim, z tą samą płynnością co w hero.
+- Bez kursora (dotyk) spływa na swoje miejsce: obok obrazu, gdy jest miejsce,
+  inaczej pod jego prawym rogiem albo oparta o ten róg (za obrazem).
+- Nie krzepnie: zachowuje zieleń bloba i ruchomą powierzchnię.
+- Porusza się względem obrazu, więc po odpięciu przewija się razem z kadrem.
+  Canvas śpi, gdy kadr zniknie z ekranu.
 
-Osiada obok obrazu, a gdy brakuje miejsca (telefon), pod jego prawym rogiem.
-Wtedy link stoi po lewej. Po odpięciu kropla zostaje żywa (oddech, kursor)
-i przewija się razem z kadrem. Dalsza droga kropli (kolejne sceny, kontakt)
-należy do kroków 2 i 5 roadmapy.
+Dalsza droga kulki (kolejne sceny, kontakt) należy do kroków 2 i 5 roadmapy.
 
 ## Nawigacja i skoki
 

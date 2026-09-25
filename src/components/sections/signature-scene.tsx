@@ -48,43 +48,51 @@ export function SignatureScene() {
   const isMobile = useIsMobile()
 
   // The heading's entrance: the same motion as every section reveal on the
-  // site, but played when the pin reaches the heading beat instead of on a
-  // scroll position, and reversed when scrolling back.
+  // site (y 100 → 0, fade, stagger), but started when the pin reaches the
+  // heading beat instead of on a scroll position, and undone when scrolling back.
   useEffect(() => {
     const header = headerRef.current
     const link = linkRef.current
     if (!header || !link) return
 
-    const heading = gsap.timeline({ paused: true }).fromTo(
-      [...Array.from(header.children), link],
-      { y: REVEAL.y, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        // Stay visible until the canvas reports in: reduced motion and
-        // no-WebGL visitors never get a frame and must still see the heading.
-        immediateRender: false,
-        duration: REVEAL.duration,
-        ease: REVEAL.ease,
-        stagger: REVEAL.stagger,
-      }
-    )
+    const targets = [...Array.from(header.children), link]
+    const hidden = { y: REVEAL.y, opacity: 0 }
+    const visible = { y: 0, opacity: 1 }
+    // Until the canvas reports in, the heading stays visible: reduced motion
+    // and no-WebGL visitors never get a frame and must still see it.
     let shown: boolean | null = null
 
     const unsubscribe = subscribeSignature((frame) => {
-      const show = !frame || frame.step.progress >= HEADING_AT
+      if (!frame) {
+        // The canvas went away (unmount, no WebGL): show the heading, and let
+        // the next canvas frame, if any, set the state again from scratch.
+        gsap.set(targets, { ...visible, overwrite: true })
+        shown = null
+        return
+      }
+      const show = frame.step.progress >= HEADING_AT
       if (show === shown) return
-      // First frame: jump straight to the right state instead of animating.
-      if (shown === null || !frame) heading.progress(show ? 1 : 0).pause()
-      else if (show) heading.play()
-      else heading.reverse()
+      if (shown === null) {
+        // First frame: jump straight to the right state instead of animating.
+        gsap.set(targets, { ...(show ? visible : hidden), overwrite: true })
+      } else {
+        // Tween to the target state from wherever it is, so reversing
+        // half-way through the entrance is smooth.
+        gsap.to(targets, {
+          ...(show ? visible : hidden),
+          duration: REVEAL.duration,
+          ease: REVEAL.ease,
+          stagger: show ? REVEAL.stagger : -REVEAL.stagger,
+          overwrite: true,
+        })
+      }
       shown = show
     })
 
     return () => {
       unsubscribe()
-      heading.kill()
-      gsap.set([...Array.from(header.children), link], { clearProps: 'transform,opacity' })
+      gsap.killTweensOf(targets)
+      gsap.set(targets, { clearProps: 'transform,opacity' })
     }
   }, [])
 

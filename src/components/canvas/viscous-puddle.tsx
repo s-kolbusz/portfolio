@@ -61,8 +61,10 @@ interface SignatureElements {
 }
 
 interface PuddleState {
-  mouseX: number
-  mouseY: number
+  /** Cursor ball, stored relative to the box so it rides along with scrolling. */
+  ballReady: boolean
+  ballRelX: number
+  ballRelY: number
   targetMouseX: number
   targetMouseY: number
   pointerInside: boolean
@@ -82,20 +84,13 @@ interface PuddleState {
   stage: StageLayout | null
   lastScrollY: number
   flow: number
-  dropOffsetX: number
-  dropOffsetY: number
-  /** Droplet spring state: it follows its scripted path with a little inertia. */
-  dropReady: boolean
-  dropX: number
-  dropY: number
-  dropVX: number
-  dropVY: number
 }
 
 function createInitialState(): PuddleState {
   return {
-    mouseX: -1,
-    mouseY: -1,
+    ballReady: false,
+    ballRelX: 0,
+    ballRelY: 0,
     targetMouseX: -1,
     targetMouseY: -1,
     pointerInside: false,
@@ -115,13 +110,6 @@ function createInitialState(): PuddleState {
     stage: null,
     lastScrollY: 0,
     flow: 0,
-    dropOffsetX: 0,
-    dropOffsetY: 0,
-    dropReady: false,
-    dropX: 0,
-    dropY: 0,
-    dropVX: 0,
-    dropVY: 0,
   }
 }
 
@@ -323,84 +311,35 @@ export function ViscousPuddle() {
         return
       }
 
-      const followPointer = state.pointerInside && !state.isMobile && !reduced
-      if (!followPointer || state.targetMouseX < 0) {
-        state.targetMouseX = step.centerX
-        state.targetMouseY = step.centerY
+      // The cursor ball moves exactly as in the hero: it chases the pointer,
+      // or rests (inside the blob, later beside the image) without one.
+      const followPointer =
+        state.pointerInside && state.targetMouseX >= 0 && !state.isMobile && !reduced
+      const ball = step.ball
+      const targetX = (followPointer ? state.targetMouseX : ball.restX) - step.box.left
+      const targetY = (followPointer ? state.targetMouseY : ball.restY) - step.box.top
+      if (!state.ballReady) {
+        state.ballReady = true
+        state.ballRelX = targetX
+        state.ballRelY = targetY
       }
-      if (state.mouseX < 0) {
-        state.mouseX = state.targetMouseX
-        state.mouseY = state.targetMouseY
-      }
-      const pointerLerp = followPointer ? 0.06 : 0.02
-      state.mouseX = lerp(state.mouseX, state.targetMouseX, pointerLerp)
-      state.mouseY = lerp(state.mouseY, state.targetMouseY, pointerLerp)
-
-      // The droplet leans towards a nearby cursor, the way the blob does.
-      const drop = step.droplet
-      let dropTargetX = 0
-      let dropTargetY = 0
-      if (drop && followPointer) {
-        const dx = state.mouseX - drop.x
-        const dy = state.mouseY - drop.y
-        const pull = Math.max(0, 1 - Math.hypot(dx, dy) / 200) * 0.25
-        dropTargetX = dx * pull
-        dropTargetY = dy * pull
-      }
-      state.dropOffsetX = lerp(state.dropOffsetX, dropTargetX, 0.08)
-      state.dropOffsetY = lerp(state.dropOffsetY, dropTargetY, 0.08)
-
-      // Once free, the droplet chases its scripted spot on an underdamped
-      // spring: it overshoots a touch, wobbles and settles. While still
-      // attached it stays exactly on the path so the neck holds together.
-      let dropX = 0
-      let dropY = 0
-      let dropStretch = 1
-      let dropTowardX = 1
-      let dropTowardY = 0
-      if (drop) {
-        const targetX = drop.x + state.dropOffsetX
-        const targetY = drop.y + state.dropOffsetY
-        if (!state.dropReady) {
-          state.dropReady = true
-          state.dropX = targetX
-          state.dropY = targetY
-          state.dropVX = 0
-          state.dropVY = 0
-        }
-        const stiffness = 90
-        const damping = 11
-        state.dropVX += ((targetX - state.dropX) * stiffness - state.dropVX * damping) * delta
-        state.dropVY += ((targetY - state.dropY) * stiffness - state.dropVY * damping) * delta
-        state.dropX += state.dropVX * delta
-        state.dropY += state.dropVY * delta
-
-        const attached = drop.radius > 0 ? Math.min(1, drop.merge / (drop.radius * 3)) : 0
-        dropX = lerp(state.dropX, targetX, attached)
-        dropY = lerp(state.dropY, targetY, attached)
-
-        // Free drops squash along their motion; attached ones along the neck.
-        const speed = Math.hypot(state.dropVX, state.dropVY)
-        const freeStretch = 1 + Math.min(speed / 1500, 0.35)
-        const moving = speed > 1
-        dropStretch = lerp(freeStretch, drop.stretch, attached)
-        dropTowardX = attached > 0.5 || !moving ? drop.towardX : -state.dropVX / speed
-        dropTowardY = attached > 0.5 || !moving ? drop.towardY : -state.dropVY / speed
-      } else {
-        state.dropReady = false
-      }
+      const ballLerp = followPointer ? 0.06 : 0.02 + 0.04 * ball.detach
+      state.ballRelX = lerp(state.ballRelX, targetX, ballLerp)
+      state.ballRelY = lerp(state.ballRelY, targetY, ballLerp)
+      const ballX = state.ballRelX + step.box.left
+      const ballY = state.ballRelY + step.box.top
 
       gl.viewport(0, 0, canvas.width, canvas.height)
       gl.disable(gl.SCISSOR_TEST)
       gl.clearColor(0, 0, 0, 0)
       gl.clear(gl.COLOR_BUFFER_BIT)
 
-      // Once the DOM image has taken over only the droplet is left: draw
+      // Once the DOM image has taken over only the ball is left: draw
       // just its neighbourhood.
-      if (!step.body && drop) {
-        const pad = drop.radius * 3
-        const x = (dropX - pad) * state.dpr
-        const y = (state.canvasHeight - (dropY + pad)) * state.dpr
+      if (!step.body) {
+        const pad = ball.radius * 1.6
+        const x = (ballX - pad) * state.dpr
+        const y = (state.canvasHeight - (ballY + pad)) * state.dpr
         gl.enable(gl.SCISSOR_TEST)
         gl.scissor(
           Math.floor(x),
@@ -413,7 +352,6 @@ export function ViscousPuddle() {
       gl.uniform1f(uniforms.uTime, state.time)
       gl.uniform2f(uniforms.uViewport, state.canvasWidth, state.canvasHeight)
       gl.uniform1f(uniforms.uDpr, state.dpr)
-      gl.uniform2f(uniforms.uMouse, state.mouseX, state.mouseY)
       gl.uniform1f(uniforms.uScale, state.scale)
       gl.uniform1f(uniforms.uOpacity, state.opacity)
       gl.uniform1f(uniforms.uDetail, state.isMobile ? 0.5 : 1)
@@ -436,8 +374,7 @@ export function ViscousPuddle() {
       )
       gl.uniform1f(uniforms.uImageIn, step.imageIn)
       gl.uniform1f(uniforms.uClarity, step.clarity)
-      gl.uniform4f(uniforms.uDrop, dropX, dropY, drop ? drop.radius : 0, drop ? drop.merge : 0)
-      gl.uniform3f(uniforms.uDropShape, dropStretch, dropTowardX, dropTowardY)
+      gl.uniform4f(uniforms.uBall, ballX, ballY, ball.radius, ball.merge)
 
       gl.bindVertexArray(vao)
       gl.drawArrays(gl.TRIANGLES, 0, 6)

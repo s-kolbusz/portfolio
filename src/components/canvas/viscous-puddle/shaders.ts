@@ -14,7 +14,6 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
   // Everything positional is in CSS pixels, viewport space, origin top-left.
   uniform vec2 uViewport;
   uniform float uDpr;
-  uniform vec2 uMouse;
   uniform float uScale;
   uniform float uOpacity;
   uniform float uDetail;
@@ -42,10 +41,9 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
   // 0 = murky, rippling surface over the page; 1 = still, clear glass.
   uniform float uClarity;
 
-  // Droplet: xy position, z radius, w smooth-union width (px).
-  uniform vec4 uDrop;
-  // Droplet shape: x elongation towards the body, yz unit direction to the body.
-  uniform vec3 uDropShape;
+  // The hero's cursor ball, the part that stays liquid: xy position,
+  // z radius, w smooth-union width with the body (all px).
+  uniform vec4 uBall;
 
   in vec2 vUv;
   out vec4 fragColor;
@@ -108,33 +106,20 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
     if (uBody > 0.5) {
       vec2 halfSize = uHalfSize / unit + breathe * uScale;
       body = sdRoundBox(uv - drift, halfSize, uCorner / unit + breathe * uScale);
-
-      vec2 mouseUV = (uMouse - uCenter) / unit;
-      float cursor = sdCircle(uv - mouseUV, 0.25 * uScale);
-      body = mix(body, smin(body, cursor, 0.6 * uScale), uFluid);
     }
 
-    float drop = 1e3;
-    if (uDrop.z > 0.0) {
-      // Elongated towards the body while the neck thins, round once free.
-      float stretch = uDropShape.x;
-      vec2 toward = uDropShape.yz;
-      vec2 p = px - uDrop.xy - toward * uDrop.z * (stretch - 1.0) * 0.5;
-      vec2 local = vec2(dot(p, toward) / stretch, dot(p, vec2(-toward.y, toward.x)));
-      float dropBreathe = 1.0 + sin(uTime * 0.8) * 0.05;
-      drop = (length(local) - uDrop.z * dropBreathe) / unit;
-      drop += snoise(px / unit * 6.0 + uTime * 0.3) * 0.006 * uDetail;
-    }
-
-    float d = uDrop.w > 0.0 ? smin(body, drop, uDrop.w / unit) : min(body, drop);
+    float ball = sdCircle((px - uBall.xy) / unit, uBall.z / unit);
+    float d = uBall.w > 0.5 ? smin(body, ball, uBall.w / unit) : min(body, ball);
+    float ballness = smoothstep(-0.02, 0.02, body - ball);
 
     // Surface ripple: there while liquid, plus whatever the scroll stirs up.
     // Both die out as the matter sets, so it lands still and crisp.
     float settle = smoothstep(0.0, 0.25, uFluid);
-    float ripple = (uFluid + uFlow * 1.5 * settle) * uDetail;
+    // The ball never sets, so its surface keeps moving.
+    float ripple = mix(uFluid + uFlow * 1.5 * settle, 1.0 + uFlow, ballness) * uDetail;
     d += snoise(uv * 1.5 + uTime * 0.15) * 0.04 * uScale * ripple;
 
-    float aa = mix(0.75 / unit, 0.04, uFluid);
+    float aa = mix(mix(0.75 / unit, 0.04, uFluid), 0.04, ballness);
     float alpha = smoothstep(aa, -aa, d);
 
     float dither = snoise(px * 0.5) * 0.025;
@@ -172,10 +157,9 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
       bodyColor = mix(shaded, through, uImageIn);
     }
 
-    // The droplet stays liquid: it keeps the blob's own green.
-    float dropness = smoothstep(-0.02, 0.02, body - drop);
-    vec3 dropColor = mix(uColor, uColor * 0.85, depthFactor);
-    vec3 finalColor = mix(bodyColor, dropColor, dropness);
+    // The ball stays liquid: it keeps the blob's own green.
+    vec3 ballColor = mix(uColor, uColor * 0.85, depthFactor);
+    vec3 finalColor = mix(bodyColor, ballColor, ballness);
 
     float opacity = alpha * uOpacity;
     fragColor = vec4(finalColor * opacity, opacity);

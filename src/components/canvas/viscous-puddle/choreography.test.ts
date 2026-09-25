@@ -113,37 +113,40 @@ describe('signature transition choreography', () => {
     expect(backward).toEqual(forward)
   })
 
-  it('pulls a droplet off the stretching body while it forms', () => {
-    expect(atProgress(0.17).droplet).toBeNull()
-    const budding = atProgress(0.19).droplet!
-    const necking = atProgress(0.3).droplet!
-    const free = atProgress(0.4).droplet!
-    expect(budding.merge).toBeGreaterThan(0)
-    expect(budding.radius).toBeLessThan(free.radius)
-    expect(necking.stretch).toBeGreaterThan(1.3)
+  it('keeps the hero cursor ball: same size and union, coming away as the body sets', () => {
+    const hero = at(0).ball
+    expect(hero.radius).toBeCloseTo(0.25 * 450)
+    expect(hero.merge).toBeCloseTo(0.6 * 450)
+    expect(hero.detach).toBe(0)
+
+    expect(atProgress(0.18).ball.merge).toBeCloseTo(hero.merge)
+    expect(atProgress(0.3).ball.merge).toBeLessThan(hero.merge)
+    const free = atProgress(0.42).ball
     expect(free.merge).toBe(0)
-    expect(free.stretch).toBeCloseTo(1)
-    // Rests beside the box when there is room (1440 wide: 160px margin).
-    expect(free.x).toBeGreaterThan(160 + 1120)
+    expect(free.detach).toBe(1)
+    expect(free.radius).toBeCloseTo(hero.radius)
   })
 
-  it('puts the droplet below the box when there is no room beside it', () => {
+  it('rests the ball inside the blob, then beside or below the image without a pointer', () => {
+    const inside = atProgress(0.1)
+    expect(inside.ball.restX).toBeCloseTo(inside.centerX)
+    expect(inside.ball.restY).toBeCloseTo(inside.centerY)
+
     const narrow: StageLayout = {
       ...stage,
-      box: { ...stage.box, left: 24, width: 342, height: 192 },
+      box: { ...stage.box, left: 24, offsetTop: 300, width: 342, height: 192 },
     }
-    const free = choreograph({
+    const phone = choreograph({
       viewportWidth: 390,
       viewportHeight: 844,
-      scrollY: narrow.trackDocTop + narrow.pinDistance * 0.5,
+      scrollY: narrow.trackDocTop + narrow.pinDistance * 0.9,
       stage: narrow,
       scale: 0.6,
-    }).droplet!
-    expect(free.x).toBeLessThan(24 + 342)
-    expect(free.y).toBeGreaterThan(135 + 192)
+    }).ball
+    expect(phone.restY).toBeGreaterThan(300 + 192)
   })
 
-  it('keeps rendering for the droplet after the pin, and sleeps once it scrolls away', () => {
+  it('keeps rendering for the ball while the scene is on screen, then sleeps', () => {
     expect(at(pinEnd + 300).active).toBe(true)
     expect(at(pinEnd + 2000).active).toBe(false)
   })

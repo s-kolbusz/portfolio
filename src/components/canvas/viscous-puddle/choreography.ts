@@ -40,18 +40,22 @@ export interface Rect {
   height: number
 }
 
-export interface Droplet {
-  /** Where the droplet is heading; the canvas follows it with a spring. */
-  x: number
-  y: number
+/**
+ * The hero's cursor ball: the small metaball that follows the pointer and
+ * merges into the blob. It is the part of the matter that stays liquid.
+ * Same size and same smooth-union as in the hero; as the body sets the
+ * union narrows, so the ball comes away on its own, the way it does in the
+ * hero when the cursor moves off.
+ */
+export interface Ball {
   radius: number
-  /** Smooth-union width in px: wide while attached, 0 once it has pinched off. */
+  /** Smooth-union width with the body in px: the hero's value, fading to 0 as the body sets. */
   merge: number
-  /** Elongation towards the body while the neck thins (1 = round). */
-  stretch: number
-  /** Direction from the droplet back to the body it came from (unit vector). */
-  towardX: number
-  towardY: number
+  /** 0 = part of the hero blob, 1 = free. */
+  detach: number
+  /** Where it settles without a pointer (touch), in viewport space. */
+  restX: number
+  restY: number
 }
 
 export interface ChoreographyFrame {
@@ -78,8 +82,8 @@ export interface ChoreographyFrame {
   cornerRadius: number
   /** Where the box currently is in the viewport (it scrolls away after the pin). */
   box: Rect
-  /** Detached droplet, or null before it forms. */
-  droplet: Droplet | null
+  /** The cursor ball (see `Ball`). */
+  ball: Ball
   /** False when nothing on the canvas is visible and rendering can stop. */
   active: boolean
 }
@@ -90,7 +94,7 @@ export const VISCOSITY_START = 0.82
 export const BEATS = {
   enter: [0, 0.06],
   form: [0.06, 0.36],
-  droplet: [0.18, 0.4],
+  detach: [0.18, 0.42],
   set: [0.34, 0.58],
   image: [0.48, 0.58],
   clear: [0.52, 0.82],
@@ -147,14 +151,6 @@ export function boxRect(scrollY: number, stage: StageLayout): Rect {
   }
 }
 
-export function dropletRadius(viewportHeight: number) {
-  return Math.min(28, Math.max(10, viewportHeight * 0.022))
-}
-
-function easeOutCubic(t: number) {
-  return 1 - Math.pow(1 - t, 3)
-}
-
 interface BodyShape {
   centerX: number
   centerY: number
@@ -162,48 +158,26 @@ interface BodyShape {
   halfHeight: number
 }
 
-/**
- * The droplet is pulled off the end of the stretching body, the way a
- * stretched liquid pinches off a drop: a lobe swells at the edge, a neck
- * thins and elongates it, it snaps free and arcs out (flung sideways, then
- * falling) to rest beside the box, or below it when there is no room.
- */
-function droplet(
-  progress: number,
-  body: BodyShape,
-  box: Rect,
-  viewportWidth: number,
-  viewportHeight: number
-): Droplet | null {
-  if (progress < BEATS.droplet[0]) return null
-  const full = dropletRadius(viewportHeight)
-  const t = linear(...BEATS.droplet, progress)
+/** Hero cursor ball radius and smooth-union width (shader units are half the viewport height). */
+export function ballMetrics(viewportHeight: number, scale: number) {
+  const unit = viewportHeight / 2
+  return { radius: 0.25 * scale * unit, merge: 0.6 * scale * unit }
+}
 
-  const startX = body.centerX + body.halfWidth * 0.9
-  const startY = body.centerY + body.halfHeight * 0.3
+/**
+ * Resting spot without a pointer: beside the image when there is room,
+ * otherwise below its right corner, otherwise leaning on that corner.
+ */
+function ballRest(box: Rect, radius: number, viewportWidth: number, viewportHeight: number) {
   const right = box.left + box.width
   const bottom = box.top + box.height
-  const roomOnRight = viewportWidth - right > full * 6
-  const restX = roomOnRight ? right + full * 2.5 : right - full * 2
-  const restY = roomOnRight ? bottom - full * 2 : bottom + full * 3
-
-  const x = mix(startX, restX, easeOutCubic(t))
-  const y = mix(startY, restY, t * t)
-  const dx = startX - x
-  const dy = startY - y
-  const distance = Math.hypot(dx, dy) || 1
-  // The neck is thinnest just before it snaps (t ≈ 0.6).
-  const pinch = Math.sin(Math.PI * linear(0.15, 0.75, t))
-
-  return {
-    x,
-    y,
-    radius: full * mix(0.55, 1, smoothstep(0, 0.5, t)),
-    merge: full * 3 * (1 - smoothstep(0.35, 0.62, t)),
-    stretch: 1 + 0.55 * pinch,
-    towardX: dx / distance,
-    towardY: dy / distance,
+  if (viewportWidth - right > radius * 2.4) {
+    return { x: right + radius * 1.3, y: bottom - radius * 1.2 }
   }
+  if (bottom + radius * 2.6 < viewportHeight) {
+    return { x: right - radius * 1.2, y: bottom + radius * 1.3 }
+  }
+  return { x: right, y: bottom }
 }
 
 export function choreograph({
@@ -231,7 +205,12 @@ export function choreograph({
       halfHeight: radius,
       cornerRadius: radius,
       box: { left: 0, top: 0, width: 0, height: 0 },
-      droplet: null,
+      ball: {
+        ...ballMetrics(viewportHeight, scale),
+        detach: 0,
+        restX: viewportWidth / 2,
+        restY: viewportHeight / 2,
+      },
       active: scrollY < viewportHeight * 1.5,
     }
   }
@@ -252,9 +231,10 @@ export function choreograph({
     halfWidth: mix(radius, box.width / 2, form),
     halfHeight: mix(radius, box.height / 2, form),
   }
-  const drop = droplet(progress, body, box, viewportWidth, viewportHeight)
-  const dropletOnScreen =
-    drop !== null && drop.y + drop.radius * 3 > 0 && drop.y - drop.radius * 3 < viewportHeight
+  const metrics = ballMetrics(viewportHeight, scale)
+  const detach = smoothstep(...BEATS.detach, progress)
+  const rest = ballRest(box, metrics.radius, viewportWidth, viewportHeight)
+  const sceneOnScreen = box.top + box.height + metrics.radius * 3 > 0 && box.top < viewportHeight
 
   return {
     progress,
@@ -269,8 +249,16 @@ export function choreograph({
     // One shape throughout: corners only ever tighten, never sharper than the box.
     cornerRadius: mix(radius, stage.box.radius, smoothstep(BEATS.form[0], BEATS.set[1], progress)),
     box,
-    droplet: drop,
-    active: reveal < 1 || dropletOnScreen,
+    ball: {
+      radius: metrics.radius,
+      merge: metrics.merge * (1 - detach),
+      detach,
+      // Until it comes away it rests inside the body, as in the hero.
+      restX: mix(body.centerX, rest.x, detach),
+      restY: mix(body.centerY, rest.y, detach),
+    },
+    // The free ball keeps the canvas awake while the scene is on screen.
+    active: reveal < 1 || sceneOnScreen,
   }
 }
 

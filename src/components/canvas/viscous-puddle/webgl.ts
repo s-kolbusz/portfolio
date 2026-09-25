@@ -4,7 +4,6 @@ interface PuddleUniforms {
   uTime: WebGLUniformLocation | null
   uViewport: WebGLUniformLocation | null
   uDpr: WebGLUniformLocation | null
-  uMouse: WebGLUniformLocation | null
   uScale: WebGLUniformLocation | null
   uOpacity: WebGLUniformLocation | null
   uDetail: WebGLUniformLocation | null
@@ -22,8 +21,7 @@ interface PuddleUniforms {
   uImageRect: WebGLUniformLocation | null
   uImageIn: WebGLUniformLocation | null
   uClarity: WebGLUniformLocation | null
-  uDropShape: WebGLUniformLocation | null
-  uDrop: WebGLUniformLocation | null
+  uBall: WebGLUniformLocation | null
 }
 
 interface PuddleWebGLContext {
@@ -130,7 +128,6 @@ export function setupPuddleWebGL(canvas: HTMLCanvasElement): PuddleWebGLContext 
     uTime: gl.getUniformLocation(program, 'uTime'),
     uViewport: gl.getUniformLocation(program, 'uViewport'),
     uDpr: gl.getUniformLocation(program, 'uDpr'),
-    uMouse: gl.getUniformLocation(program, 'uMouse'),
     uScale: gl.getUniformLocation(program, 'uScale'),
     uOpacity: gl.getUniformLocation(program, 'uOpacity'),
     uDetail: gl.getUniformLocation(program, 'uDetail'),
@@ -148,8 +145,7 @@ export function setupPuddleWebGL(canvas: HTMLCanvasElement): PuddleWebGLContext 
     uImageRect: gl.getUniformLocation(program, 'uImageRect'),
     uImageIn: gl.getUniformLocation(program, 'uImageIn'),
     uClarity: gl.getUniformLocation(program, 'uClarity'),
-    uDropShape: gl.getUniformLocation(program, 'uDropShape'),
-    uDrop: gl.getUniformLocation(program, 'uDrop'),
+    uBall: gl.getUniformLocation(program, 'uBall'),
   }
 
   gl.enable(gl.BLEND)
