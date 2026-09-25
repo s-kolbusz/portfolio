@@ -28,8 +28,9 @@ częścią przemiany, a nie ozdobnikiem.
 
 ## Budowa sceny
 
-- Hero, a zaraz pod nim **scena przypięta**: sekcja o wysokości `100vh + 250vh`
-  z wewnętrzną warstwą `position: sticky` o wysokości 100vh. Przez 2,5 ekranu
+- Hero, a zaraz pod nim **scena przypięta**: sekcja o wysokości `100vh + 200vh`
+  z wewnętrzną warstwą `position: sticky` o wysokości 100vh. Przez 2 ekrany
+  (było 2,5; skrócone, bo część pracy przejmuje [zanurzenie w hero](./2026-09-25-scroll-hero-scenariusz.md))
   scroll steruje przemianą, a strona stoi.
 - Wszystko jest funkcją pozycji scrolla (`P` = postęp przypięcia 0–1), więc
   działa tak samo przy szybkim i wolnym scrollu, wstecz i po przerwaniu.
@@ -41,18 +42,18 @@ częścią przemiany, a nie ozdobnikiem.
 
 ## Klatki
 
-| P         | Etap            | Obraz                                                                                                                                                                                                                                        | Odczyty (mono, pierwszy plan)                      |
-| --------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| przed     | **Hero**        | Blob żyje jak dziś: kursor, oddech, dryf. Tekst hero odjeżdża normalnie, a blob czeka na środku kadru.                                                                                                                                       | —                                                  |
-| 0.00–0.06 | **Wejście**     | Scena się przypina. Blob jeszcze płynny, kursor nadal działa.                                                                                                                                                                                | Pojawia się cel: `01 — stronypodhale.pl`           |
-| 0.06–0.36 | **Formowanie**  | Blob się uspokaja, sam wyciąga do docelowego 16:9 i przesuwa na miejsce obrazu. Jeden kształt: koło → zaokrąglony prostokąt, rogi tylko maleją. Wpływ kursora gaśnie.                                                                        | `lepkość 0.82 → 0.30`, `proporcje 1.00:1 → 1.78:1` |
-| 0.18–0.42 | **Kulka**       | Kulka kursora z hero (ten sam rozmiar i to samo lepkie łączenie) odrywa się sama, bo w miarę krzepnięcia łączenie z plamą słabnie. Z kursorem dalej za nim idzie, a bez niego (dotyk) spływa na miejsce przy obrazie.                        | —                                                  |
-| 0.34–0.58 | **Ciemnienie**  | Kolor schodzi do koloru strony. Rogi dochodzą do promienia docelowego.                                                                                                                                                                       | `lepkość 0.30 → 0.05`, kolor `#7EC58E → #314638`   |
-| 0.48–0.58 | **Dno**         | Przez mętną, falującą taflę zaczyna być widać stronę, mocno załamaną i zabarwioną.                                                                                                                                                           | —                                                  |
-| 0.52–0.82 | **Uspokojenie** | Tafla się uspokaja i robi się przejrzysta: długie fale słabną, załamanie maleje, zielone zmętnienie znika, łagodny połysk gaśnie. Wszędzie jednocześnie, bez frontu. Scroll znów ją mąci.                                                    | `przejrzystość 0 → 100%`                           |
-| 0.83–0.85 | **Spoczynek**   | Tafla jest jak szkło, a ostatnia klatka canvasa to piksel w piksel obraz DOM, więc zamiana jest niewidoczna. Odczyty gasną.                                                                                                                  | gasną                                              |
-| 0.88–1.00 | **Nagłówek**    | W miejsce odczytów wjeżdża nagłówek i link, tym samym ruchem co reveal w reszcie strony (y 100 → 0, 1 s, `power2.out`, stagger 0.1). Scena nadal stoi, więc całość czyta się jako jeden kadr. Wstecz nagłówek wycofuje się tym samym ruchem. | —                                                  |
-| po        | **Odpięcie**    | Cały kadr odjeżdża razem, scroll rusza dalej. Kulka zostaje żywa.                                                                                                                                                                            | —                                                  |
+| P         | Etap            | Obraz                                                                                                                                                                                                                                        | Odczyty (mono, pierwszy plan)                       |
+| --------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| przed     | **Hero**        | Scroll hero według [osobnego scenariusza](./2026-09-25-scroll-hero-scenariusz.md): przeostrzenie, wchłonięcie imienia, zanurzenie. Kończy się kadrem wypełnionym materią.                                                                    | —                                                   |
+| 0.00–0.06 | **Wejście**     | Scena się przypina. Blob jeszcze płynny, kursor nadal działa.                                                                                                                                                                                | Pojawia się cel: `01 — stronypodhale.pl`            |
+| 0.06–0.36 | **Formowanie**  | Materia wypełniająca kadr cofa się, uspokaja i formuje w docelowe 16:9 na miejscu obrazu. Jeden kształt: rogi tylko maleją. Wpływ kursora gaśnie.                                                                                            | `lepkość 0.82 → 0.30`, `proporcje (ekran) → 1.78:1` |
+| 0.18–0.42 | **Kulka**       | Kulka kursora z hero (ten sam rozmiar i to samo lepkie łączenie) odrywa się sama, bo w miarę krzepnięcia łączenie z plamą słabnie. Z kursorem dalej za nim idzie, a bez niego (dotyk) spływa na miejsce przy obrazie.                        | —                                                   |
+| 0.34–0.58 | **Ciemnienie**  | Kolor schodzi do koloru strony. Rogi dochodzą do promienia docelowego.                                                                                                                                                                       | `lepkość 0.30 → 0.05`, kolor `#7EC58E → #314638`    |
+| 0.48–0.58 | **Dno**         | Przez mętną, falującą taflę zaczyna być widać stronę, mocno załamaną i zabarwioną.                                                                                                                                                           | —                                                   |
+| 0.52–0.82 | **Uspokojenie** | Tafla się uspokaja i robi się przejrzysta: długie fale słabną, załamanie maleje, zielone zmętnienie znika, łagodny połysk gaśnie. Wszędzie jednocześnie, bez frontu. Scroll znów ją mąci.                                                    | `przejrzystość 0 → 100%`                            |
+| 0.83–0.85 | **Spoczynek**   | Tafla jest jak szkło, a ostatnia klatka canvasa to piksel w piksel obraz DOM, więc zamiana jest niewidoczna. Odczyty gasną.                                                                                                                  | gasną                                               |
+| 0.88–1.00 | **Nagłówek**    | W miejsce odczytów wjeżdża nagłówek i link, tym samym ruchem co reveal w reszcie strony (y 100 → 0, 1 s, `power2.out`, stagger 0.1). Scena nadal stoi, więc całość czyta się jako jeden kadr. Wstecz nagłówek wycofuje się tym samym ruchem. | —                                                   |
+| po        | **Odpięcie**    | Cały kadr odjeżdża razem, scroll rusza dalej. Kulka zostaje żywa.                                                                                                                                                                            | —                                                   |
 
 Czasy etapów stroimy w prototypie. Zakładki są celowe: kropla odrywa się
 w trakcie rozciągania, a dno zaczyna prześwitywać, zanim materia skończy ciemnieć.
@@ -104,7 +105,7 @@ Dalsza droga kulki (kolejne sceny, kontakt) należy do kroków 2 i 5 roadmapy.
 
 ## Telefon
 
-Te same etapy. Przypięcie ok. 1,5 ekranu (propozycja, stroimy na urządzeniu).
+Te same etapy i ta sama długość przypięcia co na desktopie (2 ekrany).
 Bez kursora, DPR 1, spokojniejsza powierzchnia. Odczyty w miejscu nagłówka,
 maksymalnie dwa naraz (cel i najnowszy odczyt).
 
