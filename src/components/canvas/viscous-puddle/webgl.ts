@@ -5,15 +5,24 @@ interface PuddleUniforms {
   uViewport: WebGLUniformLocation | null
   uDpr: WebGLUniformLocation | null
   uMouse: WebGLUniformLocation | null
-  uColor: WebGLUniformLocation | null
   uScale: WebGLUniformLocation | null
   uOpacity: WebGLUniformLocation | null
   uDetail: WebGLUniformLocation | null
+  uColor: WebGLUniformLocation | null
+  uTargetColor: WebGLUniformLocation | null
+  uSolid: WebGLUniformLocation | null
+  uBody: WebGLUniformLocation | null
   uCenter: WebGLUniformLocation | null
-  uFluid: WebGLUniformLocation | null
   uHalfSize: WebGLUniformLocation | null
   uCorner: WebGLUniformLocation | null
+  uFluid: WebGLUniformLocation | null
   uFlow: WebGLUniformLocation | null
+  uImage: WebGLUniformLocation | null
+  uHasImage: WebGLUniformLocation | null
+  uImageRect: WebGLUniformLocation | null
+  uImageIn: WebGLUniformLocation | null
+  uFront: WebGLUniformLocation | null
+  uDrop: WebGLUniformLocation | null
 }
 
 interface PuddleWebGLContext {
@@ -121,15 +130,24 @@ export function setupPuddleWebGL(canvas: HTMLCanvasElement): PuddleWebGLContext 
     uViewport: gl.getUniformLocation(program, 'uViewport'),
     uDpr: gl.getUniformLocation(program, 'uDpr'),
     uMouse: gl.getUniformLocation(program, 'uMouse'),
-    uColor: gl.getUniformLocation(program, 'uColor'),
     uScale: gl.getUniformLocation(program, 'uScale'),
     uOpacity: gl.getUniformLocation(program, 'uOpacity'),
     uDetail: gl.getUniformLocation(program, 'uDetail'),
+    uColor: gl.getUniformLocation(program, 'uColor'),
+    uTargetColor: gl.getUniformLocation(program, 'uTargetColor'),
+    uSolid: gl.getUniformLocation(program, 'uSolid'),
+    uBody: gl.getUniformLocation(program, 'uBody'),
     uCenter: gl.getUniformLocation(program, 'uCenter'),
-    uFluid: gl.getUniformLocation(program, 'uFluid'),
     uHalfSize: gl.getUniformLocation(program, 'uHalfSize'),
     uCorner: gl.getUniformLocation(program, 'uCorner'),
+    uFluid: gl.getUniformLocation(program, 'uFluid'),
     uFlow: gl.getUniformLocation(program, 'uFlow'),
+    uImage: gl.getUniformLocation(program, 'uImage'),
+    uHasImage: gl.getUniformLocation(program, 'uHasImage'),
+    uImageRect: gl.getUniformLocation(program, 'uImageRect'),
+    uImageIn: gl.getUniformLocation(program, 'uImageIn'),
+    uFront: gl.getUniformLocation(program, 'uFront'),
+    uDrop: gl.getUniformLocation(program, 'uDrop'),
   }
 
   gl.enable(gl.BLEND)
@@ -142,6 +160,45 @@ export function setupPuddleWebGL(canvas: HTMLCanvasElement): PuddleWebGLContext 
     vbo,
     uniforms,
   }
+}
+
+/** Uploads a decoded image as the texture the matter turns into (unit 0). */
+export function createImageTexture(gl: WebGL2RenderingContext, image: TexImageSource) {
+  const texture = gl.createTexture()
+  if (!texture) return null
+  gl.activeTexture(gl.TEXTURE0)
+  gl.bindTexture(gl.TEXTURE_2D, texture)
+  // Rows stay top-down: the shader samples with a top-left origin.
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false)
+  gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false)
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)
+  gl.generateMipmap(gl.TEXTURE_2D)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+  return texture
+}
+
+/** Mean sRGB colour of an image (0–1 floats), sampled on a tiny 2D canvas. */
+export function averageColour(image: CanvasImageSource): [number, number, number] | null {
+  const canvas = document.createElement('canvas')
+  canvas.width = 32
+  canvas.height = 18
+  const context = canvas.getContext('2d', { willReadFrequently: true })
+  if (!context) return null
+  context.drawImage(image, 0, 0, canvas.width, canvas.height)
+  const { data } = context.getImageData(0, 0, canvas.width, canvas.height)
+  let r = 0
+  let g = 0
+  let b = 0
+  for (let i = 0; i < data.length; i += 4) {
+    r += data[i]
+    g += data[i + 1]
+    b += data[i + 2]
+  }
+  const count = (data.length / 4) * 255
+  return [r / count, g / count, b / count]
 }
 
 export function disposePuddleWebGL({ gl, program, vao, vbo }: PuddleWebGLContext) {

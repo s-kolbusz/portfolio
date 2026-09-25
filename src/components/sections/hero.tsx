@@ -6,6 +6,10 @@ import { useTranslations } from 'next-intl'
 
 import { ArrowDownIcon } from '@phosphor-icons/react'
 
+import {
+  SIGNATURE_STATIC_ATTR,
+  SIGNATURE_TRACK_SELECTOR,
+} from '@/components/canvas/viscous-puddle/signature-bus'
 import { Button } from '@/components/ui/button'
 import { useHeroAnimation } from '@/hooks/use-hero-animation'
 import { usePrefersReducedMotion } from '@/hooks/use-media'
@@ -64,11 +68,17 @@ export function Hero() {
   }, [name])
 
   const handleCtaClick = () => {
+    // Land where the signature scene has finished forming, so the whole
+    // transformation plays on the way. Without the pin, just go to the scene.
+    const pinned =
+      !prefersReducedMotion &&
+      !document.querySelector(`${SIGNATURE_TRACK_SELECTOR}[${SIGNATURE_STATIC_ATTR}]`)
+    const target = pinned ? '#work-formed' : '#work'
     const lenis = useScrollStore.getState().lenis
     if (lenis) {
-      lenis.scrollTo('#work')
+      lenis.scrollTo(target, { duration: pinned ? 3.2 : 1.2 })
     } else {
-      document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' })
+      document.querySelector(target)?.scrollIntoView({ behavior: 'smooth' })
     }
   }
 
