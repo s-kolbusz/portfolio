@@ -3,11 +3,13 @@ import { describe, expect, it } from 'vitest'
 import {
   boxRect,
   choreograph,
+  coverRadius,
   HEADING_AT,
   mixColour,
   readoutOpacity,
   toHex,
   viscosityAt,
+  type HeroLayout,
   type StageLayout,
 } from './choreography'
 
@@ -172,5 +174,75 @@ describe('signature transition choreography', () => {
   it('formats the colour readout as hex', () => {
     expect(toHex([0.494, 0.773, 0.557])).toBe('#7EC58E')
     expect(toHex(mixColour([0, 0, 0], [1, 1, 1], 0.5))).toBe('#808080')
+  })
+})
+
+describe('hero scroll choreography', () => {
+  // 1440×900: hero pinned for one screen, the signature pin starts where it ends.
+  const hero: HeroLayout = {
+    trackDocTop: 0,
+    pinDistance: 900,
+    nameCenterX: 720,
+    nameCenterY: 250,
+    // A row of letters across the name, the middle ones nearest the blob.
+    letters: Array.from({ length: 9 }, (_, index) => ({ x: 320 + index * 100, y: 250, size: 110 })),
+  }
+  const signature: StageLayout = { ...stage, trackDocTop: 900 }
+
+  function heroAt(scrollY: number) {
+    return choreograph({ ...viewport, scrollY, hero, stage: signature, scale: 1 })
+  }
+
+  it('starts as the resting hero: name sharp, every letter there, no drops', () => {
+    const step = heroAt(0)
+    expect(step.hero?.focus).toBe(0)
+    expect(step.hero?.nameBlur).toBe(0)
+    expect(step.hero?.letters.every((opacity) => opacity === 1)).toBe(true)
+    expect(step.drops).toHaveLength(0)
+    expect(step.progress).toBe(0)
+  })
+
+  it('pulls focus off the name onto the matter first', () => {
+    const step = heroAt(270)
+    expect(step.hero?.focus).toBe(1)
+    expect(step.hero?.nameBlur).toBe(8)
+    expect(step.halfWidth).toBeGreaterThan(heroAt(0).halfWidth)
+  })
+
+  it('absorbs the letters nearest the blob first, as drops of ink', () => {
+    const early = heroAt(900 * 0.33).hero!.letters
+    const middle = early[4]
+    const outer = early[0]
+    expect(middle).toBeLessThan(outer)
+    const inFlight = heroAt(900 * 0.4).drops
+    expect(inFlight.length).toBeGreaterThan(0)
+    expect(inFlight.every((drop) => drop.ink >= 0 && drop.ink <= 1)).toBe(true)
+    expect(heroAt(900 * 0.66).hero!.letters.every((opacity) => opacity === 0)).toBe(true)
+  })
+
+  it('grows the blob with every letter it takes in', () => {
+    const before = heroAt(900 * 0.3).halfWidth
+    const after = heroAt(900 * 0.6).halfWidth
+    expect(after).toBeGreaterThan(before)
+  })
+
+  it('dives: the matter fills the whole frame when the hero ends', () => {
+    const step = heroAt(899.9)
+    expect(step.halfWidth).toBeCloseTo(coverRadius(1440, 900), 0)
+    expect(step.aspect).toBeCloseTo(1440 / 900, 2)
+  })
+
+  it('hands the same matter to the signature scene without a jump', () => {
+    const last = heroAt(899.99)
+    const first = heroAt(900)
+    expect(first.hero).toBeNull()
+    expect(first.halfWidth).toBeCloseTo(last.halfWidth, 0)
+    expect(first.centerX).toBeCloseTo(last.centerX, 0)
+    expect(first.centerY).toBeCloseTo(last.centerY, 0)
+  })
+
+  it('sends the role and offer under the surface as the blob swells over them', () => {
+    expect(heroAt(0).hero!.underwater).toBe(0)
+    expect(heroAt(900 * 0.95).hero!.underwater).toBe(1)
   })
 })

@@ -6,8 +6,14 @@ import { createPortal } from 'react-dom'
 import { usePrefersReducedMotion } from '@/hooks/use-media'
 import { gsap } from '@/lib/gsap-core'
 
-import { choreograph, type StageLayout } from './viscous-puddle/choreography'
+import { choreograph, type HeroLayout, type StageLayout } from './viscous-puddle/choreography'
+import { MAX_DROPS } from './viscous-puddle/shaders'
 import {
+  HERO_CHAR_SELECTOR,
+  HERO_NAME_SELECTOR,
+  HERO_STAGE_SELECTOR,
+  HERO_STATIC_ATTR,
+  HERO_TRACK_SELECTOR,
   publishSignature,
   SIGNATURE_FRAME_SELECTOR,
   SIGNATURE_REVEAL_VAR,
@@ -33,6 +39,28 @@ function readPrimaryRgb(): [number, number, number] {
   return [0.494, 0.773, 0.557]
 }
 
+/**
+ * The page's text colour as sRGB floats: the ink the name's letters turn
+ * into. Resolved through a 2D canvas so any CSS colour syntax (oklch) works.
+ */
+function readInkRgb(): [number, number, number] {
+  const context = document.createElement('canvas').getContext('2d')
+  if (!context) return [0.1, 0.1, 0.1]
+  context.fillStyle = getComputedStyle(document.body).color
+  context.fillRect(0, 0, 1, 1)
+  const [r, g, b] = context.getImageData(0, 0, 1, 1).data
+  return [r / 255, g / 255, b / 255]
+}
+
+let cachedInkRgb: [number, number, number] | null = null
+
+function getInkRgb(): [number, number, number] {
+  if (!cachedInkRgb) {
+    cachedInkRgb = readInkRgb()
+  }
+  return cachedInkRgb
+}
+
 // Cached color value — recomputed only when the theme class on <html> changes,
 // not on every animation frame (avoids forcing a style recalculation at 60fps).
 let cachedPrimaryRgb: [number, number, number] | null = null
@@ -50,6 +78,7 @@ let themeObserver: MutationObserver | null = null
 if (typeof document !== 'undefined' && !themeObserver) {
   themeObserver = new MutationObserver(() => {
     cachedPrimaryRgb = null
+    cachedInkRgb = null
   })
   themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
 }
@@ -82,6 +111,7 @@ interface PuddleState {
   canvasHeight: number
   elements: SignatureElements | null
   stage: StageLayout | null
+  hero: HeroLayout | null
   lastScrollY: number
   flow: number
 }
@@ -108,6 +138,7 @@ function createInitialState(): PuddleState {
     canvasHeight: 0,
     elements: null,
     stage: null,
+    hero: null,
     lastScrollY: 0,
     flow: 0,
   }
@@ -118,6 +149,43 @@ function findSignatureElements(): SignatureElements | null {
   const stage = track?.querySelector<HTMLElement>(SIGNATURE_STAGE_SELECTOR)
   const frame = stage?.querySelector<HTMLElement>(SIGNATURE_FRAME_SELECTOR)
   return track && stage && frame ? { track, stage, frame } : null
+}
+
+/**
+ * The hero at rest: the hero scales and blurs its name while it plays, so
+ * that is lifted for the instant of measuring the letters.
+ */
+function measureHero(): HeroLayout | null {
+  const track = document.querySelector<HTMLElement>(HERO_TRACK_SELECTOR)
+  const stage = track?.querySelector<HTMLElement>(HERO_STAGE_SELECTOR)
+  const name = stage?.querySelector<HTMLElement>(HERO_NAME_SELECTOR)
+  if (!track || !stage || !name) return null
+
+  const saved = [name.style.transform, name.style.filter]
+  name.style.transform = 'none'
+  name.style.filter = 'none'
+
+  const stageTop = stage.getBoundingClientRect().top
+  const nameRect = name.getBoundingClientRect()
+  const letters = Array.from(name.querySelectorAll<HTMLElement>(HERO_CHAR_SELECTOR)).map((char) => {
+    const rect = char.getBoundingClientRect()
+    return {
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2 - stageTop,
+      size: rect.height,
+    }
+  })
+
+  name.style.transform = saved[0]
+  name.style.filter = saved[1]
+
+  return {
+    trackDocTop: track.getBoundingClientRect().top + window.scrollY,
+    pinDistance: Math.max(1, track.offsetHeight - stage.offsetHeight),
+    nameCenterX: nameRect.left + nameRect.width / 2,
+    nameCenterY: nameRect.top + nameRect.height / 2 - stageTop,
+    letters: letters.slice(0, MAX_DROPS),
+  }
 }
 
 function measureStage({ track, stage, frame }: SignatureElements): StageLayout {
@@ -167,10 +235,12 @@ export function ViscousPuddle() {
       console.warn('WebGL2 not supported')
       // Without the canvas a 2.5-screen pin would just be a long static image.
       findSignatureElements()?.track.setAttribute(SIGNATURE_STATIC_ATTR, '')
+      document.querySelector(HERO_TRACK_SELECTOR)?.setAttribute(HERO_STATIC_ATTR, '')
       return
     }
 
     const { gl, vao, uniforms } = webgl
+    const drops = new Float32Array(MAX_DROPS * 4)
     gl.uniform1i(uniforms.uImage, 0)
 
     const syncLayout = () => {
@@ -186,6 +256,7 @@ export function ViscousPuddle() {
 
       state.elements = findSignatureElements()
       state.stage = state.elements ? measureStage(state.elements) : null
+      state.hero = measureHero()
     }
 
     syncLayout()
@@ -253,6 +324,7 @@ export function ViscousPuddle() {
         scrollY: window.scrollY,
         viewportWidth: state.canvasWidth,
         viewportHeight: window.innerHeight,
+        hero: state.hero,
         stage: state.stage,
         scale: state.scale,
       })
@@ -375,6 +447,13 @@ export function ViscousPuddle() {
       gl.uniform1f(uniforms.uImageIn, step.imageIn)
       gl.uniform1f(uniforms.uClarity, step.clarity)
       gl.uniform4f(uniforms.uBall, ballX, ballY, ball.radius, ball.merge)
+      const dropCount = Math.min(step.drops.length, MAX_DROPS)
+      step.drops.slice(0, dropCount).forEach((drop, index) => {
+        drops.set([drop.x, drop.y, drop.radius, drop.ink], index * 4)
+      })
+      gl.uniform4fv(uniforms.uDrops, drops)
+      gl.uniform1i(uniforms.uDropCount, dropCount)
+      gl.uniform3f(uniforms.uInk, ...getInkRgb())
 
       gl.bindVertexArray(vao)
       gl.drawArrays(gl.TRIANGLES, 0, 6)

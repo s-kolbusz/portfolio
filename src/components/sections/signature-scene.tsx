@@ -30,7 +30,7 @@ const READOUTS: ReadoutKey[] = ['target', 'aspect', 'viscosity', 'colour', 'clar
  * First scene after the hero, where the hero blob sets into stronypodhale.pl.
  * Script: docs/design/2026-09-25-przejscie-sygnaturowe-scenariusz.md
  *
- * A tall track pins the stage for 2.5 screens (1.5 on phones) while the blob
+ * A tall track pins the stage for 2 screens while the blob
  * canvas (`ViscousPuddle`) plays the transformation and reports its state for
  * the mono readouts. Heading, image and link are one frame: once the page
  * has formed, the readouts give way and the heading enters in their place
@@ -123,7 +123,7 @@ export function SignatureScene() {
       const motion = readoutMotion(step.progress, isMobile)
       const values: Record<Exclude<ReadoutKey, 'target'>, string> = {
         viscosity: step.viscosity.toFixed(2),
-        aspect: `${(step.halfWidth / step.halfHeight).toFixed(2)}:1`,
+        aspect: `${step.aspect.toFixed(2)}:1`,
         colour: toHex(mixColour(startColour, targetColour, step.solid)),
         clarity: `${Math.round(step.clarity * 100)}%`,
       }
@@ -158,9 +158,11 @@ export function SignatureScene() {
 
   return (
     <section id="work" className="w-full">
+      {/* Overlaps the hero's last screen, so this pin starts the moment the
+          hero's ends and the matter that filled the frame carries straight on. */}
       <div
         data-signature-track
-        className="relative h-[350svh] data-signature-static:h-auto motion-reduce:h-auto max-md:h-[250svh]"
+        className="relative -mt-[100svh] h-[300svh] data-signature-static:mt-0 data-signature-static:h-auto motion-reduce:mt-0 motion-reduce:h-auto"
       >
         {/* Where the pin ends: the hero CTA scrolls here so the whole transformation plays. */}
         <div

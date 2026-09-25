@@ -1,6 +1,9 @@
 /**
- * Signature transition: the hero blob sets into the stronypodhale.pl page.
- * Script: docs/design/2026-09-25-przejscie-sygnaturowe-scenariusz.md
+ * The opening sequence as one piece of matter: the hero (focus pull, the name
+ * absorbed into the blob, the dive under its surface), then the signature
+ * transition where it sets into the stronypodhale.pl page.
+ * Scripts: docs/design/2026-09-25-scroll-hero-scenariusz.md
+ *          docs/design/2026-09-25-przejscie-sygnaturowe-scenariusz.md
  *
  * Everything here is a pure function of the scroll position and measured
  * layout, so fast or slow scrolling, reversing and stopping half-way all land
@@ -23,11 +26,24 @@ export interface StageLayout {
   }
 }
 
+/** Pinned hero measurements, taken on resize with the hero's own motion reset. */
+export interface HeroLayout {
+  trackDocTop: number
+  pinDistance: number
+  /** Name centre, relative to the pinned hero stage (the focus pull scales around it). */
+  nameCenterX: number
+  nameCenterY: number
+  /** Letter centres and glyph height, relative to the stage, in DOM order. */
+  letters: ReadonlyArray<{ x: number; y: number; size: number }>
+}
+
 export interface ChoreographyInput {
   scrollY: number
   viewportWidth: number
   viewportHeight: number
-  /** The pinned stage, or null on pages without one. */
+  /** The pinned hero, or null on pages without one. */
+  hero?: HeroLayout | null
+  /** The pinned signature stage, or null on pages without one. */
   stage: StageLayout | null
   /** Blob size multiplier (smaller on phones). */
   scale: number
@@ -58,9 +74,42 @@ export interface Ball {
   restY: number
 }
 
-export interface ChoreographyFrame {
-  /** Pin progress P, 0–1. */
+/** A letter of the name, turned to a drop of ink on its way into the blob. */
+export interface LetterDrop {
+  x: number
+  y: number
+  radius: number
+  /** How much ink is left in it: 1 = the letter's colour, 0 = dissolved into the green. */
+  ink: number
+}
+
+export interface HeroFrame {
+  /** Hero pin progress H, 0–1. */
   progress: number
+  /** Focus pull, 0 (on the name) → 1 (on the matter). */
+  focus: number
+  nameScale: number
+  /** Blur of the name as focus leaves it, px (the DOM skips it on phones). */
+  nameBlur: number
+  /** Opacity of each letter of the name, DOM order. */
+  letters: number[]
+  /** Role / offer / CTA: drift (px), opacity, how far under the surface (0–1). */
+  contentShift: number
+  contentOpacity: number
+  underwater: number
+  /** The surface passing the camera, 0–1 (peaks mid-dive): drives the refraction. */
+  refraction: number
+}
+
+export interface ChoreographyFrame {
+  /** Signature pin progress P, 0–1 (0 throughout the hero). */
+  progress: number
+  /** The hero's state while it plays, otherwise null. */
+  hero: HeroFrame | null
+  /** Letters on their way into the blob (hero only). */
+  drops: LetterDrop[]
+  /** Proportions of the visible shape (clipped to the viewport), for the readout. */
+  aspect: number
   /** Readout value: 0.82 liquid → 0 set. */
   viscosity: number
   /** viscosity / 0.82: drives drift, breathing, cursor and ripple. */
@@ -99,6 +148,13 @@ export const BEATS = {
   image: [0.48, 0.58],
   clear: [0.52, 0.82],
   swap: [0.83, 0.85],
+} as const
+
+/** Beat boundaries on the hero pin progress H (see the hero script). */
+export const HERO_BEATS = {
+  focus: [0, 0.3],
+  absorb: [0.25, 0.65],
+  dive: [0.6, 1],
 } as const
 
 /** Pin progress at which the heading enters the frame; the rest of the pin lets it be read. */
@@ -180,18 +236,153 @@ function ballRest(box: Rect, radius: number, viewportWidth: number, viewportHeig
   return { x: right, y: bottom }
 }
 
+/** Radius that covers the whole viewport even with the surface drifting. */
+export function coverRadius(viewportWidth: number, viewportHeight: number) {
+  return Math.hypot(viewportWidth, viewportHeight) / 2 + 0.25 * (viewportHeight / 2)
+}
+
+function visibleAspect(
+  halfWidth: number,
+  halfHeight: number,
+  viewportWidth: number,
+  viewportHeight: number
+) {
+  return Math.min(halfWidth, viewportWidth / 2) / Math.min(halfHeight, viewportHeight / 2)
+}
+
+export function heroProgress(scrollY: number, hero: HeroLayout) {
+  return linear(hero.trackDocTop, hero.trackDocTop + hero.pinDistance, scrollY)
+}
+
+/** Share of the absorb beat each letter takes; they start staggered across the rest. */
+const LETTER_SPAN = 0.12
+/** How much the blob grows per absorbed letter (area of its drop × this). */
+const LETTER_GAIN = 3
+
+function heroFrame(
+  scrollY: number,
+  viewportWidth: number,
+  viewportHeight: number,
+  hero: HeroLayout,
+  scale: number
+): ChoreographyFrame {
+  const unit = viewportHeight / 2
+  const baseRadius = 0.75 * unit * scale
+  const progress = heroProgress(scrollY, hero)
+  const pinned = Math.min(Math.max(scrollY - hero.trackDocTop, 0), hero.pinDistance)
+  const stageTop = hero.trackDocTop - scrollY + pinned
+
+  const focus = easeInOutCubic(linear(...HERO_BEATS.focus, progress))
+  const dive = easeInOutCubic(linear(...HERO_BEATS.dive, progress))
+  const centerX = viewportWidth / 2
+  const centerY = stageTop + viewportHeight / 2
+  const nameScale = 1 + 0.06 * focus
+
+  // Letters nearest the blob go first: the wave of absorption spreads outwards.
+  const letters = hero.letters.map((letter) => ({
+    x: hero.nameCenterX + (letter.x - hero.nameCenterX) * nameScale,
+    y: stageTop + hero.nameCenterY + (letter.y - hero.nameCenterY) * nameScale,
+    size: letter.size * nameScale,
+  }))
+  const order = letters
+    .map((letter, index) => ({
+      index,
+      distance: Math.hypot(letter.x - centerX, letter.y - centerY),
+    }))
+    .sort((a, b) => a.distance - b.distance)
+  const count = Math.max(1, letters.length)
+  const [absorbStart, absorbEnd] = HERO_BEATS.absorb
+  const stagger = absorbEnd - absorbStart - LETTER_SPAN
+
+  const letterOpacity = new Array<number>(letters.length).fill(1)
+  const drops: LetterDrop[] = []
+  let absorbedArea = 0
+  order.forEach(({ index }, rank) => {
+    const letter = letters[index]
+    const start = absorbStart + (rank / count) * stagger
+    const t = linear(start, start + LETTER_SPAN, progress)
+    // The glyph turns into a drop of its own ink: it swells where the letter
+    // was, flows in (sagging a little, the way a drop does) and dissolves
+    // into the green like ink in water, giving its volume to the blob.
+    letterOpacity[index] = 1 - smoothstep(0, 0.3, t)
+    const full = letter.size * 0.32
+    const radius = full * smoothstep(0, 0.3, t) * (1 + 1.4 * smoothstep(0.35, 1, t))
+    const ink = 1 - smoothstep(0.5, 1, t)
+    absorbedArea += full * full * LETTER_GAIN * smoothstep(0.5, 1, t)
+    if (t > 0 && t < 1) {
+      const travel = easeInOutCubic(t)
+      drops.push({
+        x: mix(letter.x, centerX, travel),
+        y: mix(letter.y, centerY, travel) + Math.sin(Math.PI * t) * letter.size * 0.4,
+        radius,
+        ink,
+      })
+    }
+  })
+
+  const grown = Math.sqrt((baseRadius * (1 + 0.12 * focus)) ** 2 + absorbedArea)
+  const radius = mix(grown, coverRadius(viewportWidth, viewportHeight), dive)
+
+  const contentShift = -0.12 * viewportHeight * progress
+  const metrics = ballMetrics(viewportHeight, scale)
+
+  return {
+    progress: 0,
+    hero: {
+      progress,
+      focus,
+      nameScale,
+      nameBlur: 8 * focus,
+      letters: letterOpacity,
+      contentShift,
+      contentOpacity: (1 - 0.3 * focus) * (1 - smoothstep(0.85, 0.98, progress)),
+      // The text already sits over the blob; what the dive changes is the
+      // camera going under the surface: the surface passes (bending the text
+      // most mid-way) and from then on the text is seen through the water.
+      underwater: smoothstep(0.2, 0.8, dive),
+      refraction: Math.sin(Math.PI * dive),
+    },
+    drops,
+    aspect: visibleAspect(radius, radius, viewportWidth, viewportHeight),
+    viscosity: VISCOSITY_START,
+    fluid: 1,
+    solid: 0,
+    imageIn: 0,
+    clarity: 0,
+    reveal: 0,
+    body: true,
+    centerX,
+    centerY,
+    halfWidth: radius,
+    halfHeight: radius,
+    cornerRadius: radius,
+    box: { left: 0, top: 0, width: 0, height: 0 },
+    ball: { ...metrics, detach: 0, restX: centerX, restY: centerY },
+    active: stageTop + viewportHeight > 0,
+  }
+}
+
 export function choreograph({
   scrollY,
   viewportWidth,
   viewportHeight,
+  hero = null,
   stage,
   scale,
 }: ChoreographyInput): ChoreographyFrame {
   const radius = 0.75 * (viewportHeight / 2) * scale
 
+  // The hero plays until the signature pin takes over the same matter.
+  if (hero && (!stage || scrollY < stage.trackDocTop)) {
+    return heroFrame(scrollY, viewportWidth, viewportHeight, hero, scale)
+  }
+
   if (!stage) {
     return {
       progress: 0,
+      hero: null,
+      drops: [],
+      aspect: 1,
       viscosity: VISCOSITY_START,
       fluid: 1,
       solid: 0,
@@ -221,15 +412,16 @@ export function choreograph({
   const form = easeInOutCubic(linear(...BEATS.form, progress))
   const reveal = smoothstep(...BEATS.swap, progress)
 
-  // Before the pin the blob waits mid-viewport while the hero text leaves;
-  // as it forms it glides onto the box, wherever the layout put it.
+  // After the dive the matter fills the frame; it draws back into the box.
+  // Without a hero it starts as the resting blob instead.
+  const start = hero ? coverRadius(viewportWidth, viewportHeight) : radius
   const boxCenterX = box.left + box.width / 2
   const boxCenterY = box.top + box.height / 2
   const body: BodyShape = {
     centerX: mix(viewportWidth / 2, boxCenterX, form),
     centerY: mix(Math.min(viewportHeight / 2, boxCenterY), boxCenterY, form),
-    halfWidth: mix(radius, box.width / 2, form),
-    halfHeight: mix(radius, box.height / 2, form),
+    halfWidth: mix(start, box.width / 2, form),
+    halfHeight: mix(start, box.height / 2, form),
   }
   const metrics = ballMetrics(viewportHeight, scale)
   const detach = smoothstep(...BEATS.detach, progress)
@@ -238,6 +430,9 @@ export function choreograph({
 
   return {
     progress,
+    hero: null,
+    drops: [],
+    aspect: visibleAspect(body.halfWidth, body.halfHeight, viewportWidth, viewportHeight),
     viscosity,
     fluid: viscosity / VISCOSITY_START,
     solid: easeInOutCubic(linear(...BEATS.set, progress)),
@@ -247,7 +442,7 @@ export function choreograph({
     body: reveal < 1,
     ...body,
     // One shape throughout: corners only ever tighten, never sharper than the box.
-    cornerRadius: mix(radius, stage.box.radius, smoothstep(BEATS.form[0], BEATS.set[1], progress)),
+    cornerRadius: mix(start, stage.box.radius, smoothstep(BEATS.form[0], BEATS.set[1], progress)),
     box,
     ball: {
       radius: metrics.radius,

@@ -31,3 +31,11 @@ export const SIGNATURE_FRAME_SELECTOR = '[data-signature-frame]'
 export const SIGNATURE_REVEAL_VAR = '--signature-reveal'
 /** Set on the track when the canvas cannot run: the pin collapses to a plain section. */
 export const SIGNATURE_STATIC_ATTR = 'data-signature-static'
+
+/** Hero hooks: the pinned hero, the name and its letters. */
+export const HERO_TRACK_SELECTOR = '[data-hero-track]'
+export const HERO_STAGE_SELECTOR = '[data-hero-stage]'
+export const HERO_NAME_SELECTOR = '[data-hero-name]'
+export const HERO_CHAR_SELECTOR = '[data-hero-char]'
+/** Set on the hero track when the canvas cannot run: the hero is not pinned. */
+export const HERO_STATIC_ATTR = 'data-hero-static'

@@ -7,8 +7,12 @@ export const VERTEX_SRC = /* glsl */ `#version 300 es
   }
 `
 
+/** Most letters of the name the shader can carry into the blob at once. */
+export const MAX_DROPS = 24
+
 export const FRAGMENT_SRC = /* glsl */ `#version 300 es
   precision highp float;
+  #define MAX_DROPS ${MAX_DROPS}
 
   uniform float uTime;
   // Everything positional is in CSS pixels, viewport space, origin top-left.
@@ -40,6 +44,14 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
   uniform float uImageIn;
   // 0 = murky, rippling surface over the page; 1 = still, clear glass.
   uniform float uClarity;
+
+  // Letters of the name turned to drops of ink, flowing into the blob:
+  // xy position, z radius (px), w ink left (1 = letter colour, 0 = dissolved).
+  // Only the first uDropCount are live.
+  uniform vec4 uDrops[MAX_DROPS];
+  uniform int uDropCount;
+  // The text colour the ink starts as.
+  uniform vec3 uInk;
 
   // The hero's cursor ball, the part that stays liquid: xy position,
   // z radius, w smooth-union width with the body (all px).
@@ -108,6 +120,20 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
       body = sdRoundBox(uv - drift, halfSize, uCorner / unit + breathe * uScale);
     }
 
+    // Ink drops join the body as liquid and colour it where they are, softly,
+    // fading as they dissolve.
+    float ink = 0.0;
+    for (int i = 0; i < MAX_DROPS; i++) {
+      if (i >= uDropCount) break;
+      vec4 letter = uDrops[i];
+      float edge = length(px - letter.xy) - letter.z;
+      body = smin(body, edge / unit, letter.z * 3.0 / unit);
+      // Ink, not a ball: a ragged, soft-edged cloud that spreads as it thins.
+      float wisp = snoise((px - letter.xy) / max(letter.z, 1.0) * 0.55 + uTime * 0.3 + float(i) * 7.1);
+      float cloud = 1.0 - smoothstep(-letter.z * 0.8, letter.z * (0.7 + 0.5 * wisp), edge);
+      ink = max(ink, cloud * letter.w);
+    }
+
     float ball = sdCircle((px - uBall.xy) / unit, uBall.z / unit);
     float d = uBall.w > 0.5 ? smin(body, ball, uBall.w / unit) : min(body, ball);
     float ballness = smoothstep(-0.02, 0.02, body - ball);
@@ -156,6 +182,8 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
       vec3 through = mix(seen, shaded, murk) + (sheen - 0.55) * 0.12 * unrest;
       bodyColor = mix(shaded, through, uImageIn);
     }
+
+    bodyColor = mix(bodyColor, uInk, ink * 0.8);
 
     // The ball stays liquid: it keeps the blob's own green.
     vec3 ballColor = mix(uColor, uColor * 0.85, depthFactor);

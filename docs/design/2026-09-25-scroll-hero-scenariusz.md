@@ -24,16 +24,27 @@ pierwsza realizacja. Jeden ciągły ruch od pierwszej klatki do stronypodhale.pl
 
 ## Klatki
 
-| H         | Etap              | Obraz                                                                                                                                                                                                                                                                                                                                           |
-| --------- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0         | **Spoczynek**     | Hero jak dziś: imię, rola, zdanie oferty, CTA, żywy blob, kulka kursora.                                                                                                                                                                                                                                                                        |
-| 0.00–0.30 | **Przeostrzenie** | Ostrość przechodzi z imienia na materię. Imię (pierwszy plan) lekko rośnie (1 → 1.06) i się rozmywa (0 → 8 px). Blob wychodzi do przodu (1 → 1.12) i ma ostrzejszą krawędź. Rola, zdanie i CTA (plan treści) odpływają w górę w tempie scrolla i gasną.                                                                                         |
-| 0.25–0.65 | **Wchłonięcie**   | Litery imienia, od najbliższych blobowi do najdalszych, zamieniają się w małe kulki materii: litera gaśnie tam, gdzie pojawia się kulka, a kulka lepko spływa do bloba (to samo łączenie co kulka kursora). Blob rośnie z każdą wchłoniętą literą, bo objętość się sumuje. Rozmycie z poprzedniego etapu maskuje moment zamiany litery w kulkę. |
-| 0.60–1.00 | **Zanurzenie**    | Blob puchnie, aż wypełni kadr, a kamera wchodzi pod powierzchnię. Tekst, po którym przesuwa się krawędź, załamuje się, a potem jest już „pod wodą”: zabarwiony i miękki. Na końcu cały kadr jest zieloną, lekko falującą taflą.                                                                                                                 |
-| → P 0     | **Przekazanie**   | Scena sygnaturowa zaczyna się od kadru wypełnionego materią. Materia cofa się i formuje w 16:9 (zamiast rosnąć z koła). Dalej bez zmian: ciemnienie, tafla, nagłówek, kulka.                                                                                                                                                                    |
+| H         | Etap              | Obraz                                                                                                                                                                                                                                                                                                                                                               |
+| --------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0         | **Spoczynek**     | Hero jak dziś: imię, rola, zdanie oferty, CTA, żywy blob, kulka kursora.                                                                                                                                                                                                                                                                                            |
+| 0.00–0.30 | **Przeostrzenie** | Ostrość przechodzi z imienia na materię. Imię (pierwszy plan) lekko rośnie (1 → 1.06) i się rozmywa (0 → 8 px). Blob wychodzi do przodu (1 → 1.12) i ma ostrzejszą krawędź. Rola, zdanie i CTA (plan treści) odpływają w górę w tempie scrolla i gasną.                                                                                                             |
+| 0.25–0.65 | **Wchłonięcie**   | Litery imienia, od najbliższych blobowi do najdalszych, zamieniają się w krople własnego **tuszu**: litera gaśnie tam, gdzie wzbiera ciemna kropla w kolorze tekstu. Kropla spływa do bloba (lekko opadając, jak kropla), rozlewa się i rozpuszcza w zieleni jak tusz w wodzie, a blob rośnie o jej objętość. Rozmycie z poprzedniego etapu maskuje moment zamiany. |
+| 0.60–1.00 | **Zanurzenie**    | Blob puchnie, aż wypełni kadr, a kamera wchodzi pod powierzchnię. W chwili przejścia przez taflę tekst roli i oferty najmocniej się załamuje, a potem jest już „pod wodą”: zabarwiony zielenią (mnożenie), miękki i przygaszony. Na końcu cały kadr jest zieloną, lekko falującą taflą.                                                                             |
+| → P 0     | **Przekazanie**   | Scena sygnaturowa zaczyna się od kadru wypełnionego materią. Materia cofa się i formuje w 16:9 (zamiast rosnąć z koła). Dalej bez zmian: ciemnienie, tafla, nagłówek, kulka.                                                                                                                                                                                        |
 
 Czasy etapów stroimy w prototypie. Zakładki są celowe: wchłanianie zaczyna się,
 zanim imię całkiem straci ostrość, a zanurzenie, zanim ostatnie litery spłyną.
+
+## Zmiany przy implementacji
+
+- **Tusz zamiast zielonych kulek.** Imię leży na blobie, więc kulki w kolorze
+  materii znikały w nim od razu. Krople w kolorze tekstu widać wszędzie, a ich
+  rozpuszczanie się w zieleni opowiada wchłonięcie lepiej. W ciemnym motywie
+  tusz jest jasny (jak mleko w wodzie).
+- **„Pod wodą” zależy od zanurzenia, a nie od promienia bloba.** Tekst leży na
+  blobie od początku, więc liczenie z promienia przyciemniało go w spoczynku.
+  Teraz to kamera schodzi pod taflę: załamanie jest najsilniejsze w połowie
+  zanurzenia, a zabarwienie i zmiękczenie narastają od jego 20% do 80%.
 
 ## Kulka kursora
 
