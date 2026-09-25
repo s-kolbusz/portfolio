@@ -2,11 +2,18 @@ import { FRAGMENT_SRC, VERTEX_SRC } from './shaders'
 
 interface PuddleUniforms {
   uTime: WebGLUniformLocation | null
+  uViewport: WebGLUniformLocation | null
+  uDpr: WebGLUniformLocation | null
   uMouse: WebGLUniformLocation | null
-  uResolution: WebGLUniformLocation | null
   uColor: WebGLUniformLocation | null
   uScale: WebGLUniformLocation | null
   uOpacity: WebGLUniformLocation | null
+  uDetail: WebGLUniformLocation | null
+  uCenter: WebGLUniformLocation | null
+  uRadius: WebGLUniformLocation | null
+  uHalfSize: WebGLUniformLocation | null
+  uCorner: WebGLUniformLocation | null
+  uShape: WebGLUniformLocation | null
 }
 
 interface PuddleWebGLContext {
@@ -111,11 +118,18 @@ export function setupPuddleWebGL(canvas: HTMLCanvasElement): PuddleWebGLContext 
 
   const uniforms: PuddleUniforms = {
     uTime: gl.getUniformLocation(program, 'uTime'),
+    uViewport: gl.getUniformLocation(program, 'uViewport'),
+    uDpr: gl.getUniformLocation(program, 'uDpr'),
     uMouse: gl.getUniformLocation(program, 'uMouse'),
-    uResolution: gl.getUniformLocation(program, 'uResolution'),
     uColor: gl.getUniformLocation(program, 'uColor'),
     uScale: gl.getUniformLocation(program, 'uScale'),
     uOpacity: gl.getUniformLocation(program, 'uOpacity'),
+    uDetail: gl.getUniformLocation(program, 'uDetail'),
+    uCenter: gl.getUniformLocation(program, 'uCenter'),
+    uRadius: gl.getUniformLocation(program, 'uRadius'),
+    uHalfSize: gl.getUniformLocation(program, 'uHalfSize'),
+    uCorner: gl.getUniformLocation(program, 'uCorner'),
+    uShape: gl.getUniformLocation(program, 'uShape'),
   }
 
   gl.enable(gl.BLEND)

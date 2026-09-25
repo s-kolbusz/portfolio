@@ -1,10 +1,18 @@
 'use client'
 
-import { useCallback, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 
 import { usePrefersReducedMotion } from '@/hooks/use-media'
+import { gsap } from '@/lib/gsap-core'
 
+import { choreograph, type FrameRect } from './viscous-puddle/choreography'
 import { disposePuddleWebGL, lerp, setupPuddleWebGL } from './viscous-puddle/webgl'
+
+/** Marks the DOM frame the blob pours into (first scene on the home page). */
+export const SIGNATURE_FRAME_SELECTOR = '[data-signature-frame]'
+/** CSS custom property on the frame: opacity of its real image, 0–1. */
+export const SIGNATURE_REVEAL_VAR = '--signature-reveal'
 
 /** Read `--primary-rgb` CSS custom property → [r, g, b] floats (0-1). */
 function readPrimaryRgb(): [number, number, number] {
@@ -44,47 +52,58 @@ interface PuddleState {
   targetMouseY: number
   pointerInside: boolean
   isMobile: boolean
-  isInView: boolean
-  lerpScroll: number
   time: number
   colorR: number
   colorG: number
   colorB: number
   scale: number
   opacity: number
-  cssTranslateY: number
-  cssScale: number
-  canvasLeft: number
-  canvasTop: number
+  dpr: number
   canvasWidth: number
   canvasHeight: number
+  frameElement: HTMLElement | null
+  frame: FrameRect | null
 }
 
 function createInitialState(): PuddleState {
   return {
-    mouseX: 0.5,
-    mouseY: 0.5,
-    targetMouseX: 0.5,
-    targetMouseY: 0.5,
+    mouseX: -1,
+    mouseY: -1,
+    targetMouseX: -1,
+    targetMouseY: -1,
     pointerInside: false,
     isMobile: false,
-    isInView: true,
-    lerpScroll: 0,
     time: 0,
     colorR: 0.494,
     colorG: 0.773,
     colorB: 0.557,
     scale: 1,
     opacity: 0,
-    cssTranslateY: 0,
-    cssScale: 1,
-    canvasLeft: 0,
-    canvasTop: 0,
+    dpr: 1,
     canvasWidth: 0,
     canvasHeight: 0,
+    frameElement: null,
+    frame: null,
   }
 }
 
+function measureFrame(element: HTMLElement): FrameRect {
+  const rect = element.getBoundingClientRect()
+  return {
+    left: rect.left,
+    docTop: rect.top + window.scrollY,
+    width: rect.width,
+    height: rect.height,
+    radius: parseFloat(getComputedStyle(element).borderTopLeftRadius) || 0,
+  }
+}
+
+/**
+ * Hero blob on a fixed, viewport-sized canvas behind the page. On scroll it
+ * solidifies into a rounded rectangle that lands exactly on the first scene's
+ * frame, where the real image fades in over it. Once the image covers it the
+ * canvas stops rendering until the user scrolls back up.
+ */
 export function ViscousPuddle() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const prefersReducedMotion = usePrefersReducedMotion()
@@ -96,25 +115,10 @@ export function ViscousPuddle() {
     reducedMotionRef.current = prefersReducedMotion
   }, [prefersReducedMotion])
 
-  const syncCanvasMetrics = useCallback((canvas: HTMLCanvasElement) => {
-    const dpr = Math.min(window.devicePixelRatio, 1.5)
-    const rect = canvas.getBoundingClientRect()
-    const width = rect.width
-    const height = rect.height
-
-    canvas.width = Math.round(width * dpr)
-    canvas.height = Math.round(height * dpr)
-
-    stateRef.current.canvasLeft = rect.left
-    stateRef.current.canvasTop = rect.top + window.scrollY - stateRef.current.cssTranslateY
-    stateRef.current.canvasWidth = width
-    stateRef.current.canvasHeight = height
-    stateRef.current.isMobile = width < 768
-  }, [])
-
   useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
+    const canvasElement = canvasRef.current
+    if (!canvasElement) return
+    const canvas: HTMLCanvasElement = canvasElement
 
     const webgl = setupPuddleWebGL(canvas)
     if (!webgl) {
@@ -123,149 +127,187 @@ export function ViscousPuddle() {
     }
 
     const { gl, vao, uniforms } = webgl
+    const state = stateRef.current
 
-    syncCanvasMetrics(canvas)
+    const syncLayout = () => {
+      const rect = canvas.getBoundingClientRect()
+      state.isMobile = rect.width < 768
+      // Phones get the same idea in a lighter form: lower resolution, no
+      // cursor, calmer surface.
+      state.dpr = Math.min(window.devicePixelRatio, state.isMobile ? 1 : 1.5)
+      state.canvasWidth = rect.width
+      state.canvasHeight = rect.height
+      canvas.width = Math.round(rect.width * state.dpr)
+      canvas.height = Math.round(rect.height * state.dpr)
+
+      state.frameElement = document.querySelector<HTMLElement>(SIGNATURE_FRAME_SELECTOR)
+      state.frame = state.frameElement ? measureFrame(state.frameElement) : null
+    }
+
+    syncLayout()
     requestAnimationFrame(() => {
       canvas.style.opacity = '1'
     })
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        stateRef.current.isInView = entry.isIntersecting
-      },
-      { threshold: 0 }
-    )
-    observer.observe(canvas)
-
     const onMouseMove = (event: MouseEvent) => {
-      const state = stateRef.current
-      if (!state.isInView || state.canvasWidth === 0 || state.canvasHeight === 0) return
-
-      const canvasTop = state.canvasTop - window.scrollY + state.cssTranslateY
-
-      stateRef.current.pointerInside = true
-      stateRef.current.targetMouseX = Math.min(
-        1,
-        Math.max(0, (event.clientX - state.canvasLeft) / state.canvasWidth)
-      )
-      stateRef.current.targetMouseY = Math.min(
-        1,
-        Math.max(0, 1 - (event.clientY - canvasTop) / state.canvasHeight)
-      )
+      state.pointerInside = true
+      state.targetMouseX = event.clientX
+      state.targetMouseY = event.clientY
     }
-
     const onMouseLeave = () => {
-      stateRef.current.pointerInside = false
+      state.pointerInside = false
     }
-
     const onMouseEnter = () => {
-      stateRef.current.pointerInside = true
+      state.pointerInside = true
     }
 
-    window.addEventListener('mousemove', onMouseMove)
+    window.addEventListener('mousemove', onMouseMove, { passive: true })
     document.addEventListener('mouseleave', onMouseLeave)
     document.addEventListener('mouseenter', onMouseEnter)
 
-    const resizeObserver = new ResizeObserver(() => {
-      syncCanvasMetrics(canvas)
-    })
+    const resizeObserver = new ResizeObserver(() => syncLayout())
     resizeObserver.observe(canvas)
+    resizeObserver.observe(document.body)
 
-    const onResize = () => syncCanvasMetrics(canvas)
-    window.addEventListener('resize', onResize)
-
-    let raf = 0
+    let awake = false
     let lastTime = performance.now()
 
-    const render = (now: number) => {
-      raf = requestAnimationFrame(render)
+    const setReveal = (value: number | null) => {
+      const element = state.frameElement
+      if (!element) return
+      if (value === null) element.style.removeProperty(SIGNATURE_REVEAL_VAR)
+      else element.style.setProperty(SIGNATURE_REVEAL_VAR, value.toFixed(3))
+    }
 
-      const state = stateRef.current
-      if (!state.isInView) {
-        lastTime = now
-        return
-      }
+    const sleep = () => {
+      if (!awake) return
+      awake = false
+      gsap.ticker.remove(render)
+      canvas.style.visibility = 'hidden'
+    }
 
-      const rawDelta = (now - lastTime) / 1000
-      const delta = Math.min(rawDelta, 0.05)
+    const wake = () => {
+      if (awake) return
+      awake = true
+      lastTime = performance.now()
+      canvas.style.visibility = 'visible'
+      // Appended after Lenis on the same ticker, so the scroll position read
+      // below is the one painted this frame and the rectangle never trails.
+      gsap.ticker.add(render)
+    }
+
+    function render() {
+      const now = performance.now()
+      const delta = Math.min((now - lastTime) / 1000, 0.05)
       lastTime = now
 
-      if (!reducedMotionRef.current) {
-        state.time += delta
-      }
+      const reduced = reducedMotionRef.current
+      if (!reduced) state.time += delta
 
       state.opacity = lerp(state.opacity, 1, 0.025)
-
-      const targetScale = state.isMobile ? 0.6 : 1
-      state.scale = lerp(state.scale, targetScale, 0.1)
+      state.scale = lerp(state.scale, state.isMobile ? 0.6 : 1, 0.1)
 
       const targetColor = getPrimaryRgb()
       state.colorR = lerp(state.colorR, targetColor[0], 0.05)
       state.colorG = lerp(state.colorG, targetColor[1], 0.05)
       state.colorB = lerp(state.colorB, targetColor[2], 0.05)
 
-      const pointerLerp = state.pointerInside && !reducedMotionRef.current ? 0.06 : 0.02
-      if (state.isMobile || !state.pointerInside || reducedMotionRef.current) {
-        state.targetMouseX = 0.5
-        state.targetMouseY = 0.5
+      const step = choreograph({
+        scrollY: window.scrollY,
+        viewportWidth: state.canvasWidth,
+        viewportHeight: window.innerHeight,
+        frame: state.frame,
+        scale: state.scale,
+      })
+
+      setReveal(step.reveal)
+
+      if (step.settled) {
+        sleep()
+        return
       }
+
+      const followPointer = state.pointerInside && !state.isMobile && !reduced
+      if (!followPointer || state.targetMouseX < 0) {
+        state.targetMouseX = step.centerX
+        state.targetMouseY = step.centerY
+      }
+      if (state.mouseX < 0) {
+        state.mouseX = state.targetMouseX
+        state.mouseY = state.targetMouseY
+      }
+      const pointerLerp = followPointer ? 0.06 : 0.02
       state.mouseX = lerp(state.mouseX, state.targetMouseX, pointerLerp)
       state.mouseY = lerp(state.mouseY, state.targetMouseY, pointerLerp)
-
-      if (!reducedMotionRef.current) {
-        const rawScroll = window.scrollY
-        const clampedScroll = Math.min(rawScroll, state.canvasHeight * 1.5)
-
-        state.lerpScroll = lerp(state.lerpScroll, clampedScroll, 0.15)
-        if (Math.abs(state.lerpScroll - clampedScroll) < 0.1) {
-          state.lerpScroll = clampedScroll
-        }
-
-        const targetTranslateY = state.lerpScroll * 1.5
-        const targetCssScale = 1 + state.lerpScroll * 0.0025
-
-        state.cssTranslateY = lerp(state.cssTranslateY, targetTranslateY, 0.2)
-        state.cssScale = lerp(state.cssScale, targetCssScale, 0.2)
-
-        canvas.style.transform = `translateY(${state.cssTranslateY}px) scale(${state.cssScale})`
-      }
 
       gl.viewport(0, 0, canvas.width, canvas.height)
       gl.clearColor(0, 0, 0, 0)
       gl.clear(gl.COLOR_BUFFER_BIT)
 
       gl.uniform1f(uniforms.uTime, state.time)
+      gl.uniform2f(uniforms.uViewport, state.canvasWidth, state.canvasHeight)
+      gl.uniform1f(uniforms.uDpr, state.dpr)
       gl.uniform2f(uniforms.uMouse, state.mouseX, state.mouseY)
-      gl.uniform2f(uniforms.uResolution, state.canvasWidth, state.canvasHeight)
       gl.uniform3f(uniforms.uColor, state.colorR, state.colorG, state.colorB)
       gl.uniform1f(uniforms.uScale, state.scale)
       gl.uniform1f(uniforms.uOpacity, state.opacity)
+      gl.uniform1f(uniforms.uDetail, state.isMobile ? 0.5 : 1)
+      gl.uniform2f(uniforms.uCenter, step.centerX, step.centerY)
+      gl.uniform1f(uniforms.uRadius, step.radius)
+      gl.uniform2f(uniforms.uHalfSize, step.halfWidth, step.halfHeight)
+      gl.uniform1f(uniforms.uCorner, step.cornerRadius)
+      gl.uniform1f(uniforms.uShape, step.shape)
 
       gl.bindVertexArray(vao)
       gl.drawArrays(gl.TRIANGLES, 0, 6)
       gl.bindVertexArray(null)
     }
 
-    raf = requestAnimationFrame(render)
+    // Scrolling back above the frame wakes the canvas; the render loop itself
+    // decides when it can go back to sleep.
+    const onScroll = () => {
+      if (awake) return
+      const settled = choreograph({
+        scrollY: window.scrollY,
+        viewportWidth: state.canvasWidth,
+        viewportHeight: window.innerHeight,
+        frame: state.frame,
+        scale: state.scale,
+      }).settled
+      if (!settled) wake()
+    }
+    const onResize = () => {
+      syncLayout()
+      wake()
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onResize)
+
+    wake()
 
     return () => {
-      cancelAnimationFrame(raf)
-      observer.disconnect()
+      sleep()
+      setReveal(null)
       resizeObserver.disconnect()
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onResize)
       window.removeEventListener('mousemove', onMouseMove)
       document.removeEventListener('mouseleave', onMouseLeave)
       document.removeEventListener('mouseenter', onMouseEnter)
-      window.removeEventListener('resize', onResize)
       disposePuddleWebGL(webgl)
     }
-  }, [syncCanvasMetrics])
+  }, [])
 
-  return (
+  // Client-only (HeroScene mounts it after hydration). Rendered into <body> so
+  // no transformed ancestor (page transitions) turns `fixed` into `absolute`.
+  return createPortal(
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 h-full w-full will-change-transform"
+      className="pointer-events-none fixed top-0 left-0 -z-10 h-lvh w-full"
       style={{ opacity: 0, transition: 'opacity 1.5s ease-out' }}
       aria-hidden="true"
-    />
+    />,
+    document.body
   )
 }

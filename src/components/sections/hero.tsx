@@ -76,21 +76,19 @@ export function Hero() {
     <section
       id="hero"
       ref={containerRef}
-      className="bg-background text-foreground relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden px-6 pt-20"
+      className="text-foreground relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden px-6 pt-20"
     >
       <noscript>
         <style>{`
           .char, .hero-cta { opacity: 1 !important; }
         `}</style>
       </noscript>
-      {/* 3D Background */}
-      <div className="absolute inset-0 z-0 select-none">
-        {showScene && (
-          <Suspense fallback={null}>
-            <HeroScene />
-          </Suspense>
-        )}
-      </div>
+      {/* Blob: fixed canvas behind the page, carried into the first scene on scroll */}
+      {showScene && (
+        <Suspense fallback={null}>
+          <HeroScene />
+        </Suspense>
+      )}
       {/* Content */}
       <div className="relative z-10 flex max-w-6xl flex-col items-center gap-8 text-center">
         <div ref={headerRef} className="relative inline-block">
@@ -131,7 +129,6 @@ export function Hero() {
           </Button>
         </div>
       </div>
-      <div className="to-background absolute right-0 bottom-0 left-0 h-32 bg-linear-to-b from-transparent" />
     </section>
   )
 }

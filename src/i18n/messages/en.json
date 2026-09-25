@@ -39,6 +39,14 @@
     "tagline": "Building high-performance digital products with a focus on visual polish and technical excellence.",
     "cta": "Explore My Work"
   },
+  "signature": {
+    "label": "Selected work",
+    "meta": "01 · Product · Websites for Podhale businesses",
+    "title": "stronypodhale.pl",
+    "description": "A product with public pricing: websites for local businesses, with domain, hosting and care included.",
+    "link": "Visit the site",
+    "alt": "stronypodhale.pl home page showing the Zakofy project preview"
+  },
   "about": {
     "title": "The Craft & Context",
     "figure_profile": "FIG. 1.0 — PROFILE",
@@ -208,7 +216,10 @@
           "title": "Development",
           "desc": "High-fidelity build and testing."
         },
-        "3": { "title": "Delivery", "desc": "Performance tuning and launch." }
+        "3": {
+          "title": "Delivery",
+          "desc": "Performance tuning and launch."
+        }
       }
     }
   },

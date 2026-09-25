@@ -11,17 +11,33 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
   precision highp float;
 
   uniform float uTime;
+  // Everything positional is in CSS pixels, viewport space, origin top-left.
+  uniform vec2 uViewport;
+  uniform float uDpr;
   uniform vec2 uMouse;
-  uniform vec2 uResolution;
   uniform vec3 uColor;
   uniform float uScale;
   uniform float uOpacity;
+  uniform float uDetail;
+
+  // Signature transition: metaball (uShape = 0) → rounded rectangle (uShape = 1).
+  uniform vec2 uCenter;
+  uniform float uRadius;
+  uniform vec2 uHalfSize;
+  uniform float uCorner;
+  uniform float uShape;
 
   in vec2 vUv;
   out vec4 fragColor;
 
   float sdCircle(vec2 p, float r) {
     return length(p) - r;
+  }
+
+  float sdRoundBox(vec2 p, vec2 b, float r) {
+    r = min(r, min(b.x, b.y));
+    vec2 q = abs(p) - b + r;
+    return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r;
   }
 
   float smin(float a, float b, float k) {
@@ -55,29 +71,39 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
   }
 
   void main() {
-    vec2 uv = vUv * 2.0 - 1.0;
-    uv.x *= uResolution.x / uResolution.y;
+    vec2 px = gl_FragCoord.xy / uDpr;
+    px.y = uViewport.y - px.y;
 
-    float breathe = sin(uTime * 0.3) * 0.03;
-    vec2 mainPos = vec2(0.0, 0.0);
+    // Blob unit = half the viewport height, as when the canvas filled the hero.
+    float unit = uViewport.y * 0.5;
+    vec2 uv = (px - uCenter) / unit;
 
-    mainPos.x += snoise(vec2(uTime * 0.1, 0.0)) * 0.15;
-    mainPos.y += snoise(vec2(0.0, uTime * 0.15)) * 0.15;
+    // The fluid parts (drift, breathing, cursor, surface noise) settle as the
+    // shape solidifies, so the rectangle lands still and crisp.
+    float fluid = 1.0 - uShape;
 
-    float d1 = sdCircle(uv - mainPos, (0.75 + breathe) * uScale);
+    float breathe = sin(uTime * 0.3) * 0.03 * fluid;
+    vec2 drift = vec2(
+      snoise(vec2(uTime * 0.1, 0.0)),
+      snoise(vec2(0.0, uTime * 0.15))
+    ) * 0.15 * fluid;
 
-    vec2 mouseUV = uMouse * 2.0 - 1.0;
-    mouseUV.x *= uResolution.x / uResolution.y;
+    float d1 = sdCircle(uv - drift, uRadius / unit + breathe * uScale);
 
+    vec2 mouseUV = (uMouse - uCenter) / unit;
     float d2 = sdCircle(uv - mouseUV, 0.25 * uScale);
+    float blob = mix(d1, smin(d1, d2, 0.6 * uScale), fluid);
 
-    float d = smin(d1, d2, 0.6 * uScale);
+    float box = sdRoundBox(uv, uHalfSize / unit, uCorner / unit);
+
+    float d = mix(blob, box, uShape);
 
     float noise = snoise(uv * 1.5 + uTime * 0.15);
-    d += noise * 0.04 * uScale;
+    d += noise * 0.04 * uScale * fluid * uDetail;
 
-    float alpha = smoothstep(0.04, -0.04, d);
-    float dither = snoise(uv * 200.0) * 0.025;
+    float aa = mix(0.04, 0.75 / unit, uShape);
+    float alpha = smoothstep(aa, -aa, d);
+    float dither = snoise(px * 0.5) * 0.025;
     float depthFactor = smoothstep(0.0, -0.5 * uScale, d + dither);
     vec3 finalColor = mix(uColor, uColor * 0.85, depthFactor);
     float opacity = alpha * uOpacity;

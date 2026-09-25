@@ -24,9 +24,5 @@ export function HeroScene() {
 
   if (!mounted) return null
 
-  return (
-    <div className="absolute inset-0 z-0 h-full w-full">
-      <ViscousPuddle />
-    </div>
-  )
+  return <ViscousPuddle />
 }

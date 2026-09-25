@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import dynamic from 'next/dynamic'
 
 import { Hero } from '@/components/sections/hero'
+import { SignatureScene } from '@/components/sections/signature-scene'
 import { getLocaleFromParams } from '@/i18n/locale'
 import { buildHomePageMetadata } from '@/lib/page-metadata'
 
@@ -39,6 +40,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
   return (
     <main id="main-content" className="flex min-h-screen flex-col items-center justify-between">
       <Hero />
+      <SignatureScene locale={locale} />
       <About />
       <Projects locale={locale} />
       <Services />
