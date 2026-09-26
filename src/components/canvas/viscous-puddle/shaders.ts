@@ -38,8 +38,15 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
   uniform float uHasImage;
   uniform vec4 uImageRect;
   uniform float uImageIn;
+  uniform float uImageRadius;
   // 0 = murky, rippling surface over the page; 1 = still, clear glass.
   uniform float uClarity;
+  // How much the matter is a sheet of water: long swells and a sheen over
+  // all of it (signature scene), 0 in the hero.
+  uniform float uSurface;
+  // Keeps the body's edge soft and moving after the matter has settled:
+  // the water sheet leaving with its section still has a liquid rim.
+  uniform float uLiquidEdge;
 
   // The soaking name (hero). uName: R glyph mask, G blurred mask (stroke
   // depth), B·256+A when the colour arrives (0–1). Drawn in uNameRect (xy
@@ -149,10 +156,11 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
     // Both die out as the matter sets, so it lands still and crisp.
     float settle = smoothstep(0.0, 0.25, uFluid);
     // The ball never sets, so its surface keeps moving.
-    float ripple = mix(uFluid + uFlow * 1.5 * settle, 1.0 + uFlow, ballness) * uDetail;
+    float bodyRipple = max(uFluid + uFlow * 1.5 * settle, uLiquidEdge * (0.6 + uFlow * 1.5));
+    float ripple = mix(bodyRipple, 1.0 + uFlow, ballness) * uDetail;
     d += snoise(uv * 1.5 + uTime * 0.15) * 0.04 * uScale * ripple;
 
-    float aa = mix(mix(0.75 / unit, 0.04, uFluid), 0.04, ballness);
+    float aa = mix(mix(0.75 / unit, 0.04, max(uFluid, uLiquidEdge)), 0.04, ballness);
     float alpha = smoothstep(aa, -aa, d);
 
     float dither = snoise(px * 0.5) * 0.025;
@@ -160,16 +168,16 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
     vec3 matter = mix(uColor, uTargetColor, uSolid);
     vec3 shaded = mix(matter, matter * 0.85, depthFactor * (1.0 - uSolid * 0.6));
 
-    // The page under the matter, seen through its surface: murky and bent by
-    // waves at first, then the water calms and clears until it is plain
-    // glass and the page shows exactly as it is. Scrolling stirs it again.
+    // The matter as a sheet of water over the whole frame: long, slow swells
+    // with a soft sheen, and the page rising from under it in its own spot,
+    // murky, bent and edgeless at first, then the water calms and clears
+    // until it is plain glass and the page shows exactly as it is.
+    // Scrolling stirs it again.
     vec3 bodyColor = shaded;
-    if (uHasImage > 0.5 && uImageIn > 0.0) {
-      vec2 imageUv = clamp((px - uImageRect.xy) / uImageRect.zw, 0.0, 1.0);
-      float unrest = (1.0 - uClarity) * (1.0 + uFlow * 2.0);
+    if (uSurface > 0.0) {
+      float unrest = (1.0 - uClarity) * (1.0 + uFlow * 2.0) * uSurface;
 
-      // Long, slow swells: a settling surface, not a choppy one.
-      vec2 q = (px - uImageRect.xy) / unit * 1.1;
+      vec2 q = px / unit * 1.1;
       float e = 0.05;
       vec2 t1 = vec2(uTime * 0.07, uTime * 0.05);
       vec2 t2 = vec2(-uTime * 0.09, uTime * 0.06);
@@ -178,21 +186,46 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
       float hy = snoise(q + vec2(0.0, e) + t1) + 0.3 * snoise((q + vec2(0.0, e)) * 1.9 + t2);
       vec2 slope = vec2(hx - h, hy - h) / e;
 
-      vec2 bent = clamp(imageUv + slope * 0.009 * unrest, 0.0, 1.0);
-      vec3 seen = texture(uImage, bent).rgb;
+      // Swells tint the water a little: crests lighter, troughs deeper.
+      vec3 water = shaded * (1.0 + h * 0.06 * unrest);
 
-      // A soft sheen rolling over the swells.
+      if (uHasImage > 0.5 && uImageIn > 0.0) {
+        vec2 bentPx = px + slope * uImageRect.z * 0.009 * unrest;
+        vec2 imageUv = clamp((bentPx - uImageRect.xy) / uImageRect.zw, 0.0, 1.0);
+        vec3 seen = texture(uImage, imageUv).rgb;
+        float murk = (1.0 - uClarity) * 0.7;
+        vec3 through = mix(seen, shaded, murk);
+
+        // The page has no edge while it is deep under murky water; its
+        // outline firms up as the surface clears, ending on the box exactly.
+        vec2 halfBox = uImageRect.zw * 0.5;
+        float boxD = sdRoundBox(bentPx - uImageRect.xy - halfBox, halfBox, uImageRadius);
+        float soft = mix(0.5, unit * 0.45, (1.0 - uClarity) * (1.0 - uClarity));
+        float inBox = smoothstep(soft, -soft, boxD) * uImageIn;
+        water = mix(water, through, inBox);
+      }
+
+      // A soft sheen rolling over the swells, everywhere.
       vec3 normal = normalize(vec3(-slope * 0.25 * unrest, 1.0));
       float sheen = pow(max(dot(normal, normalize(vec3(-0.35, -0.45, 1.0))), 0.0), 12.0);
-      float murk = (1.0 - uClarity) * 0.7;
-
-      vec3 through = mix(seen, shaded, murk) + (sheen - 0.55) * 0.12 * unrest;
-      bodyColor = mix(shaded, through, uImageIn);
+      water += (sheen - 0.55) * 0.12 * unrest;
+      bodyColor = mix(shaded, water, uSurface);
     }
 
     // The ball stays liquid: it keeps the blob's own green.
     vec3 ballColor = mix(uColor, uColor * 0.85, depthFactor);
     vec3 finalColor = mix(bodyColor, ballColor, ballness);
+
+    // On the water sheet the ball is the part that stays green: it sits in
+    // the surface while the sheet darkens around it (a soft, merged rim),
+    // and keeps its own crisp edge once it has come away.
+    if (uSurface > 0.0) {
+      float ballPx = length(px - uBall.xy) - uBall.z;
+      ballPx += snoise(uv * 1.5 + uTime * 0.15) * 0.04 * uScale * unit * (1.0 + uFlow) * uDetail;
+      float drop = smoothstep(1.0, -1.0, ballPx);
+      float rim = uBall.w > 0.5 ? smoothstep(uBall.w * 0.35, 0.0, ballPx) : 0.0;
+      finalColor = mix(finalColor, ballColor, max(drop, rim * 0.85) * uSurface);
+    }
 
     // Drained of its colour the blob is clear water: almost no fill, a faint
     // meniscus at the rim and a soft glint, still moving.
@@ -222,8 +255,14 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
         // Each letter takes up the colour as a whole, ink turning slowly to
         // the blob's green, starting at its own time (nearest the blob first).
         float start = soakArrival(nameUv);
-        float wet = smoothstep(start * 0.5, start * 0.5 + 0.5, uSoak);
-        vec3 soaked = mix(uColor, uColor * 0.85, smoothstep(0.35, 0.95, mask.g));
+        // The cursor ball is a second source of water: letters under it
+        // drink ahead of the scroll, and the green in them gathers towards
+        // it, denser and brighter, relaxing again once it moves away.
+        float near = smoothstep(uBall.z * 2.2, uBall.z * 0.2, length(px - uBall.xy));
+        float soakStarted = smoothstep(0.0, 0.06, min(uSoak, 1.0));
+        float wet = smoothstep(start * 0.5, start * 0.5 + 0.5, uSoak + near * 0.45 * soakStarted);
+        vec3 soaked = mix(uColor, uColor * 0.85, smoothstep(0.35, 0.95, mask.g) * (1.0 - near * 0.8));
+        soaked = mix(soaked, min(uColor * 1.15 + 0.03, vec3(1.0)), near * 0.5 * soakStarted);
         nameColor = mix(uInk, soaked, wet);
       }
       finalColor = mix(finalColor, nameColor, cover);

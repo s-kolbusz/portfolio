@@ -117,7 +117,7 @@ export function Hero() {
     const target = pinned ? '#work-formed' : '#work'
     const lenis = useScrollStore.getState().lenis
     if (lenis) {
-      lenis.scrollTo(target, { duration: pinned ? 4 : 1.2 })
+      lenis.scrollTo(target, { duration: pinned ? 5 : 1.2 })
     } else {
       document.querySelector(target)?.scrollIntoView({ behavior: 'smooth' })
     }
@@ -128,7 +128,7 @@ export function Hero() {
       id="hero"
       ref={containerRef}
       data-hero-track
-      className="text-foreground relative h-[200svh] w-full data-hero-static:h-auto motion-reduce:h-auto"
+      className="text-foreground relative h-[300svh] w-full data-hero-static:h-auto motion-reduce:h-auto"
     >
       <noscript>
         <style>{`
@@ -141,7 +141,7 @@ export function Hero() {
           <HeroScene />
         </Suspense>
       )}
-      {/* Pinned for one screen while the hero plays (static without motion or WebGL). */}
+      {/* Pinned for two screens while the hero plays (static without motion or WebGL). */}
       <div
         data-hero-stage
         className="sticky top-0 flex h-svh w-full flex-col items-center justify-center overflow-hidden px-6 pt-20 in-data-hero-static:static in-data-hero-static:h-auto in-data-hero-static:min-h-screen motion-reduce:static motion-reduce:h-auto motion-reduce:min-h-screen"

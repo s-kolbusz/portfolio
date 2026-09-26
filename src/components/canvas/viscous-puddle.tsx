@@ -115,6 +115,8 @@ interface PuddleState {
   hero: HeroLayout | null
   lastScrollY: number
   flow: number
+  /** The damped scroll position the story runs on (camera inertia); null until the first frame. */
+  timeY: number | null
 }
 
 function createInitialState(): PuddleState {
@@ -142,6 +144,7 @@ function createInitialState(): PuddleState {
     hero: null,
     lastScrollY: 0,
     flow: 0,
+    timeY: null,
   }
 }
 
@@ -199,12 +202,16 @@ function measureStage({ track, stage, frame }: SignatureElements): StageLayout {
   }
 }
 
+/** Camera inertia: time constant (s) of the story easing after the scroll. */
+const CAMERA_LAG = 0.3
+
 /**
  * Hero blob on a fixed, viewport-sized canvas behind the page. Across the
- * pinned signature scene it sets into the stronypodhale.pl page: it takes the
- * page's proportions and colour, the page surfaces inside it and solidifies
- * from the centre, and the final frame matches the DOM image pixel for pixel
- * before that image takes over. A droplet breaks off and stays liquid.
+ * pinned signature scene the matter filling the frame darkens to the
+ * stronypodhale.pl colour and becomes a sheet of water over the whole stage;
+ * the page surfaces from it and the water clears until the final frame
+ * matches the DOM image pixel for pixel and that image takes over. The sheet
+ * leaves with the section on a liquid edge; the cursor ball stays liquid.
  * Script: docs/design/2026-09-25-przejscie-sygnaturowe-scenariusz.md
  */
 export function ViscousPuddle() {
@@ -326,6 +333,7 @@ export function ViscousPuddle() {
     const currentStep = () =>
       choreograph({
         scrollY: window.scrollY,
+        timeY: state.timeY ?? window.scrollY,
         viewportWidth: state.canvasWidth,
         viewportHeight: window.innerHeight,
         hero: state.hero,
@@ -362,6 +370,21 @@ export function ViscousPuddle() {
       state.opacity = lerp(state.opacity, 1, 0.025)
       state.scale = lerp(state.scale, state.isMobile ? 0.6 : 1, 0.1)
 
+      // Camera inertia: the story eases after the scroll instead of jumping
+      // with it. A long jump (anchor, End, resize) lands at once, no chase.
+      const scrollTarget = window.scrollY
+      if (
+        reduced ||
+        state.timeY === null ||
+        Math.abs(scrollTarget - state.timeY) > window.innerHeight * 1.5
+      ) {
+        state.timeY = scrollTarget
+      } else {
+        state.timeY += (scrollTarget - state.timeY) * (1 - Math.exp(-delta / CAMERA_LAG))
+        if (Math.abs(scrollTarget - state.timeY) < 0.1) state.timeY = scrollTarget
+      }
+      const catchingUp = state.timeY !== scrollTarget
+
       const primary = getPrimaryRgb()
       state.colorR = lerp(state.colorR, primary[0], 0.05)
       state.colorG = lerp(state.colorG, primary[1], 0.05)
@@ -382,7 +405,7 @@ export function ViscousPuddle() {
       const targetFlow = reduced ? 0 : Math.min(speed / 2500, 1)
       state.flow = lerp(state.flow, targetFlow, targetFlow > state.flow ? 0.2 : 0.04)
 
-      if (!step.active) {
+      if (!step.active && !catchingUp) {
         sleep()
         return
       }
@@ -410,8 +433,8 @@ export function ViscousPuddle() {
       gl.clearColor(0, 0, 0, 0)
       gl.clear(gl.COLOR_BUFFER_BIT)
 
-      // Once the DOM image has taken over only the ball is left: draw
-      // just its neighbourhood.
+      // Once the water sheet has left the screen only the ball is left:
+      // draw just its neighbourhood.
       if (!step.body) {
         const pad = ball.radius * 1.6
         const x = (ballX - pad) * state.dpr
@@ -450,6 +473,9 @@ export function ViscousPuddle() {
       )
       gl.uniform1f(uniforms.uImageIn, step.imageIn)
       gl.uniform1f(uniforms.uClarity, step.clarity)
+      gl.uniform1f(uniforms.uSurface, step.surface)
+      gl.uniform1f(uniforms.uLiquidEdge, step.liquidEdge)
+      gl.uniform1f(uniforms.uImageRadius, step.boxRadius)
       gl.uniform4f(uniforms.uBall, ballX, ballY, ball.radius, ball.merge)
       const name = step.name
       gl.uniform1f(uniforms.uNameOn, name && nameTexture ? 1 : 0)

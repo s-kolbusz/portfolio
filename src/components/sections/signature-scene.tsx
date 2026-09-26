@@ -24,7 +24,7 @@ import { gsap } from '@/lib/gsap-core'
 
 // Right-hand readouts in the order they retire (leftmost first), so one
 // leaving never shifts the ones still showing.
-const READOUTS: ReadoutKey[] = ['target', 'aspect', 'viscosity', 'colour', 'clarity']
+const READOUTS: ReadoutKey[] = ['target', 'colour', 'viscosity', 'clarity']
 
 /**
  * First scene after the hero, where the hero blob sets into stronypodhale.pl.
@@ -45,6 +45,7 @@ export function SignatureScene() {
   const t = useTranslations('signature')
   const headerRef = useRef<HTMLDivElement>(null)
   const linkRef = useRef<HTMLDivElement>(null)
+  const stageRef = useRef<HTMLDivElement>(null)
   const readoutRefs = useRef<Partial<Record<ReadoutKey, HTMLSpanElement | null>>>({})
   const isMobile = useIsMobile()
 
@@ -97,11 +98,24 @@ export function SignatureScene() {
     }
   }, [])
 
+  // Once the matter behind the scene has darkened past halfway, the scene
+  // reads on the dark palette (a no-op on the dark theme).
+  useEffect(() => {
+    const stage = stageRef.current
+    if (!stage) return
+    const unsubscribe = subscribeSignature((frame) => {
+      stage.classList.toggle('dark', frame !== null && frame.step.solid > 0.5)
+    })
+    return () => {
+      unsubscribe()
+      stage.classList.remove('dark')
+    }
+  }, [])
+
   // Readouts are written straight to the DOM every frame, not through React.
   useEffect(() => {
     const labels: Record<Exclude<ReadoutKey, 'target'>, string> = {
       viscosity: t('readouts.viscosity'),
-      aspect: t('readouts.aspect'),
       colour: t('readouts.colour'),
       clarity: t('readouts.clarity'),
     }
@@ -123,7 +137,6 @@ export function SignatureScene() {
       const motion = readoutMotion(step.progress, isMobile)
       const values: Record<Exclude<ReadoutKey, 'target'>, string> = {
         viscosity: step.viscosity.toFixed(2),
-        aspect: `${step.aspect.toFixed(2)}:1`,
         colour: toHex(mixColour(startColour, targetColour, step.solid)),
         clarity: `${Math.round(step.clarity * 100)}%`,
       }
@@ -173,8 +186,9 @@ export function SignatureScene() {
         />
 
         <div
+          ref={stageRef}
           data-signature-stage
-          className="sticky top-0 flex h-svh w-full flex-col justify-center px-6 pt-20 pb-10 in-data-signature-static:static in-data-signature-static:h-auto in-data-signature-static:py-24 motion-reduce:static motion-reduce:h-auto motion-reduce:py-24 lg:px-24"
+          className="text-foreground sticky top-0 flex h-svh w-full flex-col justify-center px-6 pt-20 pb-10 in-data-signature-static:static in-data-signature-static:h-auto in-data-signature-static:py-24 motion-reduce:static motion-reduce:h-auto motion-reduce:py-24 lg:px-24"
         >
           <div className="mx-auto flex w-full max-w-[min(96rem,calc((100svh-22rem)*16/9))] flex-col gap-6 md:gap-8">
             <div className="relative">
@@ -187,12 +201,12 @@ export function SignatureScene() {
                   ref={(element) => {
                     readoutRefs.current.target = element
                   }}
-                  className="text-primary whitespace-nowrap"
+                  className="text-primary whitespace-nowrap transition-colors duration-700"
                   style={{ opacity: 0 }}
                 >
                   01 — {t('title')}
                 </span>
-                <span className="text-muted-foreground flex flex-col items-end gap-1 tabular-nums md:flex-row md:gap-0">
+                <span className="text-muted-foreground flex flex-col items-end gap-1 tabular-nums transition-colors duration-700 md:flex-row md:gap-0">
                   {READOUTS.filter((key) => key !== 'target').map((key) => (
                     <span
                       key={key}

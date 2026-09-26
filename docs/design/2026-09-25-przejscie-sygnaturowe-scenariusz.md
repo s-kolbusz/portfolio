@@ -2,18 +2,22 @@
 
 Data: 2026-09-25
 Zadanie: [SEB-63](https://linear.app/sklbsz/issue/SEB-63)
-Status: **zaakceptowany**, zmieniony po przeglądach wersji 3 i 4 (nagłówek w kadrze, kropla jako kulka kursora z hero, tafla zamiast frontu krzepnięcia).
+Status: **wersja 5 w prototypie**: blob się nie kurczy do ramki, tylko cały ekran ciemnieje w taflę, z której wyłania się projekt (grill 2026-09-26).
+Wcześniej: przeglądy wersji 3 i 4 (nagłówek w kadrze, kropla jako kulka kursora z hero, tafla zamiast frontu krzepnięcia).
 Źródło osi: [decyzje redesignu](./2026-09-24-redesign-decyzje.md) (Fluid → Solid, prawo ruchu, 4 plany).
 
 ## Co ma opowiedzieć
 
-Płynna materia z hero krzepnie w konkretną realizację. To ta sama materia,
-a nie podmiana: blob nie wpada w gotową ramkę, tylko sam staje się stroną
-stronypodhale.pl.
+Płynna materia z hero staje się tłem, na którym klaruje się konkretna
+realizacja. Blob się nie kurczy i nie wpada w ramkę: zieleń wypełniająca kadr
+ciemnieje do koloru stronypodhale.pl, a **cały ekran** (nie tylko obszar
+projektu) staje się falującą taflą wody, z której wyłaniają się szczegóły.
+Tafla się uspokaja i klaruje, aż projekt stoi ostro. To lepiej opowiada
+historię: materia nie znika, tylko niesie projekt.
 
-Dlaczego kolor ma znaczenie: tło stronypodhale.pl to ciemna zieleń. Blob,
-krzepnąc, ciemnieje dokładnie do koloru tej strony, więc zmiana koloru jest
-częścią przemiany, a nie ozdobnikiem.
+Dlaczego kolor ma znaczenie: tło stronypodhale.pl to ciemna zieleń. Blob
+ciemnieje dokładnie do koloru tej strony, więc zmiana koloru jest częścią
+przemiany, a nie ozdobnikiem.
 
 ## Czego unikamy (wnioski z prototypów 1 i 2)
 
@@ -25,6 +29,7 @@ częścią przemiany, a nie ozdobnikiem.
 - Nagłówek pod przypiętą sceną, przez co strona przesuwa się, zamiast pokazać całość w jednym kadrze.
 - Kropla ze skryptem (odrywanie po sznurku, sprężyna, sztuczne wydłużanie). Wystarczy kulka kursora z hero.
 - „Front krzepnięcia”, który wygląda jak rozchodzące się zdejmowanie filtra, a nie jak proces w naturze.
+- Kurczenia bloba do ramki (wersje 1–4): materia, która wypełniła kadr, nie cofa się.
 
 ## Budowa sceny
 
@@ -42,21 +47,34 @@ częścią przemiany, a nie ozdobnikiem.
 
 ## Klatki
 
-| P         | Etap            | Obraz                                                                                                                                                                                                                                        | Odczyty (mono, pierwszy plan)                       |
-| --------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| przed     | **Hero**        | Scroll hero według [osobnego scenariusza](./2026-09-25-scroll-hero-scenariusz.md): przeostrzenie, wchłonięcie imienia, zanurzenie. Kończy się kadrem wypełnionym materią.                                                                    | —                                                   |
-| 0.00–0.06 | **Wejście**     | Scena się przypina. Blob jeszcze płynny, kursor nadal działa.                                                                                                                                                                                | Pojawia się cel: `01 — stronypodhale.pl`            |
-| 0.06–0.36 | **Formowanie**  | Materia wypełniająca kadr cofa się, uspokaja i formuje w docelowe 16:9 na miejscu obrazu. Jeden kształt: rogi tylko maleją. Wpływ kursora gaśnie.                                                                                            | `lepkość 0.82 → 0.30`, `proporcje (ekran) → 1.78:1` |
-| 0.18–0.42 | **Kulka**       | Kulka kursora z hero (ten sam rozmiar i to samo lepkie łączenie) odrywa się sama, bo w miarę krzepnięcia łączenie z plamą słabnie. Z kursorem dalej za nim idzie, a bez niego (dotyk) spływa na miejsce przy obrazie.                        | —                                                   |
-| 0.34–0.58 | **Ciemnienie**  | Kolor schodzi do koloru strony. Rogi dochodzą do promienia docelowego.                                                                                                                                                                       | `lepkość 0.30 → 0.05`, kolor `#7EC58E → #314638`    |
-| 0.48–0.58 | **Dno**         | Przez mętną, falującą taflę zaczyna być widać stronę, mocno załamaną i zabarwioną.                                                                                                                                                           | —                                                   |
-| 0.52–0.82 | **Uspokojenie** | Tafla się uspokaja i robi się przejrzysta: długie fale słabną, załamanie maleje, zielone zmętnienie znika, łagodny połysk gaśnie. Wszędzie jednocześnie, bez frontu. Scroll znów ją mąci.                                                    | `przejrzystość 0 → 100%`                            |
-| 0.83–0.85 | **Spoczynek**   | Tafla jest jak szkło, a ostatnia klatka canvasa to piksel w piksel obraz DOM, więc zamiana jest niewidoczna. Odczyty gasną.                                                                                                                  | gasną                                               |
-| 0.88–1.00 | **Nagłówek**    | W miejsce odczytów wjeżdża nagłówek i link, tym samym ruchem co reveal w reszcie strony (y 100 → 0, 1 s, `power2.out`, stagger 0.1). Scena nadal stoi, więc całość czyta się jako jeden kadr. Wstecz nagłówek wycofuje się tym samym ruchem. | —                                                   |
-| po        | **Odpięcie**    | Cały kadr odjeżdża razem, scroll rusza dalej. Kulka zostaje żywa.                                                                                                                                                                            | —                                                   |
+| P         | Etap            | Obraz                                                                                                                                                                                                                         | Odczyty (mono, pierwszy plan)                    |
+| --------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| przed     | **Hero**        | Scroll hero według [osobnego scenariusza](./2026-09-25-scroll-hero-scenariusz.md). Kończy się kadrem wypełnionym zielenią.                                                                                                    | —                                                |
+| 0.00–0.06 | **Wejście**     | Scena się przypina. Cały kadr to płynna zieleń, kursor nadal działa.                                                                                                                                                          | Pojawia się cel: `01 — stronypodhale.pl`         |
+| 0.04–0.40 | **Ciemnienie**  | Cały ekran ciemnieje do koloru strony. Powierzchnia faluje: długie, wolne fale z połyskiem. Tekst sceny przechodzi na jasny.                                                                                                  | `lepkość 0.82 → 0.30`, kolor `#7EC58E → #314638` |
+| 0.10–0.35 | **Kulka**       | Kulka kursora (ten sam rozmiar i to samo łączenie co w hero) odrywa się od tafli i zostaje zieloną kroplą na ciemnym tle. Bez kursora spływa na miejsce przy obrazie.                                                         | —                                                |
+| 0.30–0.60 | **Wyłanianie**  | Spod mętnej tafli wyłaniają się szczegóły strony, na swoim miejscu 16:9: najpierw rozmyte, bez krawędzi, mocno załamane i zabarwione, potem coraz wyraźniej. Fale idą przez cały ekran, także poza obrazem.                   | `lepkość 0.30 → 0.05`                            |
+| 0.45–0.82 | **Uspokojenie** | Tafla się uspokaja i robi przejrzysta: fale słabną, załamanie maleje, zmętnienie znika, krawędź obrazu się wyostrza. Wszędzie jednocześnie, bez frontu. Scroll znów ją mąci.                                                  | `przejrzystość 0 → 100%`                         |
+| 0.83–0.85 | **Spoczynek**   | Obraz jest jak szkło, a ostatnia klatka canvasa to piksel w piksel obraz DOM, więc zamiana jest niewidoczna. Tło zostaje ciemną, spokojną taflą.                                                                              | gasną                                            |
+| 0.88–1.00 | **Nagłówek**    | W miejsce odczytów wjeżdża nagłówek i link, tym samym ruchem co reveal w reszcie strony. Scena nadal stoi, więc całość czyta się jako jeden kadr.                                                                             | —                                                |
+| po        | **Odpięcie**    | Kadr razem z ciemną taflą odjeżdża do góry. Dolna krawędź tafli jest płynna (miękka, falująca, jak brzeg bloba), a scroll ją mąci. Zielona kulka zostaje żywa i idzie za kursorem dalej: dusza strony nie znika razem z tłem. | —                                                |
 
-Czasy etapów stroimy w prototypie. Zakładki są celowe: kropla odrywa się
-w trakcie rozciągania, a dno zaczyna prześwitywać, zanim materia skończy ciemnieć.
+Czasy etapów stroimy w prototypie. Zakładki są celowe: kropla odrywa się,
+gdy materia ciemnieje, a szczegóły zaczynają prześwitywać, zanim skończy.
+
+## Po scenie: nawiązanie do bloba
+
+Blob to istota strony, więc nawet gdy tło odjedzie, coś z niego zostaje:
+
+- **Płynna krawędź:** ciemna tafla odjeżdża z miękką, falującą dolną krawędzią
+  (ten sam brzeg co blob), a nie prostą linią sekcji.
+- **Kulka:** zielona kropla zostaje nad resztą strony i idzie za kursorem.
+
+### Alternatywa (opcja 2, na później)
+
+Materia zostaje tłem całej sekcji „Praca”, a każdy kolejny projekt klaruje się
+z niej tak samo jak stronypodhale.pl (tafla ciemnieje do koloru danego projektu).
+Do rozważenia przy [SEB-67](https://linear.app/sklbsz/issue/SEB-67).
 
 ## Odczyty
 
@@ -64,15 +82,17 @@ w trakcie rozciągania, a dno zaczyna prześwitywać, zanim materia skończy cie
   i **jak daleko** jest proces.
 - Wartości są prawdziwe: to te same liczby, które sterują shaderem.
 - Styl: mono, `text-xs`, `tracking-widest`, kolor `muted-foreground`, cel w `primary`.
+  Na ciemniejącej tafli cała scena przechodzi na paletę ciemnego motywu.
   Pozycja: w miejscu nagłówka, cel po lewej, wartości po prawej (plan 3, ~1.2×).
   Wartości ustawione w kolejności gaśnięcia, więc znikająca nie przesuwa pozostałych.
 - `aria-hidden`, bo to dekoracja. Treść sceny jest w nagłówku DOM.
 
 ## Prawo ruchu w tej scenie
 
-- Scroll w trakcie formowania mąci powierzchnię (falowanie rośnie z prędkością scrolla).
-- Zatrzymanie scrolla w połowie: kształt zostaje w pół drogi, a powierzchnia
+- Scroll mąci powierzchnię (falowanie rośnie z prędkością scrolla), także po odpięciu.
+- Zatrzymanie scrolla w połowie: stan zostaje w pół drogi, a powierzchnia
   się uspokaja. Spoczynek = stałe.
+- Kamera z bezwładnością, jak w hero: przebieg podąża za scrollem z tłumieniem.
 
 ## Kolory
 
@@ -86,7 +106,7 @@ Kroplą jest kulka, która w hero idzie za kursorem i zlewa się z blobem. To ta
 część materii, która zostaje płynna. Nie ma osobnej animacji: ten sam kształt,
 rozmiar (0,25 jednostki bloba) i to samo lepkie łączenie (`smin` 0,6), co w hero.
 
-- W trakcie krzepnięcia (P 0.18–0.42) szerokość łączenia z plamą spada do zera,
+- W trakcie ciemnienia (P 0.10–0.35) szerokość łączenia z plamą spada do zera,
   więc kulka odrywa się tak samo, jak w hero, gdy kursor odjeżdża od bloba.
 - Z kursorem (`pointer: fine`) kulka dalej idzie za nim, z tą samą płynnością co w hero.
 - Bez kursora (dotyk) spływa na swoje miejsce: obok obrazu, gdy jest miejsce,
@@ -121,7 +141,7 @@ niezależnie od animacji. Canvas i odczyty mają `aria-hidden`.
 
 ## Wydajność
 
-- Canvas renderuje tylko wtedy, gdy scena jest w kadrze albo żyje kropla (wtedy tylko mały obszar).
+- Canvas renderuje tylko wtedy, gdy tafla jest w kadrze albo żyje kropla (wtedy tylko mały obszar).
 - Tekstura ładuje się w bezczynności po hero, a nie w krytycznej ścieżce.
 - Bez regresji względem obecnego stanu (Lighthouse, budżet w `lighthouse-budget.json`).
 

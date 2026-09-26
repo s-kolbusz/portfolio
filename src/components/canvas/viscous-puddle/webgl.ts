@@ -21,6 +21,9 @@ interface PuddleUniforms {
   uImageRect: WebGLUniformLocation | null
   uImageIn: WebGLUniformLocation | null
   uClarity: WebGLUniformLocation | null
+  uSurface: WebGLUniformLocation | null
+  uLiquidEdge: WebGLUniformLocation | null
+  uImageRadius: WebGLUniformLocation | null
   uBall: WebGLUniformLocation | null
   uInk: WebGLUniformLocation | null
   uName: WebGLUniformLocation | null
@@ -153,6 +156,9 @@ export function setupPuddleWebGL(canvas: HTMLCanvasElement): PuddleWebGLContext 
     uImageRect: gl.getUniformLocation(program, 'uImageRect'),
     uImageIn: gl.getUniformLocation(program, 'uImageIn'),
     uClarity: gl.getUniformLocation(program, 'uClarity'),
+    uSurface: gl.getUniformLocation(program, 'uSurface'),
+    uLiquidEdge: gl.getUniformLocation(program, 'uLiquidEdge'),
+    uImageRadius: gl.getUniformLocation(program, 'uImageRadius'),
     uBall: gl.getUniformLocation(program, 'uBall'),
     uInk: gl.getUniformLocation(program, 'uInk'),
     uName: gl.getUniformLocation(program, 'uName'),
