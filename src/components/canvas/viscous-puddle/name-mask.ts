@@ -1,41 +1,29 @@
 /**
- * The hero name as a mask for the shader, so the name can melt as matter.
+ * The hero name as a mask for the shader, so it can soak up the blob's colour.
  *
  * Each glyph is drawn with the element's own computed font at its measured
- * position, so the first melting frame lines up with the DOM text it
- * replaces. Two channels: R = the crisp glyphs, G = a blurred copy the
- * shader blends towards as the letters soften like warm wax.
- *
- * Drips start where the type is lowest: the bottom of each glyph (bowls,
- * feet, tails), found by scanning the mask itself.
+ * position, so the canvas copy lines up with the DOM text it replaces.
+ * Channels: R = the glyphs, G = a blurred copy (stroke depth, for shading),
+ * B·256 + A = when that letter starts to take up the colour (0 first … 1
+ * last). Each letter soaks as a whole, ink turning to green; the ones
+ * nearest the blob start first.
  */
 
-export interface DripOrigin {
-  /** Stage-space position of the drip's root, px. */
-  x: number
-  y: number
-  /** Stroke thickness at the root, px (sizes neck and head). */
-  stroke: number
-  /** Longest run, as a multiple of the glyph height. */
-  reach: number
-  /** Share of the melt before this drip starts to run (0–1). */
-  delay: number
-}
-
 export interface NameMask {
-  /** RGBA pixels: R crisp mask, G softened mask. */
+  /** RGBA pixels, see above. Upload without premultiplying alpha. */
   image: ImageData
   /** Stage-space box the mask covers, px. */
   left: number
   top: number
   width: number
   height: number
-  /** Blur radius of the soft channel, px. */
-  softRadius: number
-  drips: DripOrigin[]
+  /** Mask pixels per CSS px. */
+  scale: number
+  /** Inside the thickest stroke near the centre (stage px) and its width: the fly-in target. */
+  zoom: { x: number; y: number; stroke: number }
 }
 
-/** Deterministic 0–1 hash, so the name melts the same way every visit. */
+/** Deterministic 0–1 hash, so the name soaks the same way every visit. */
 function hash(n: number) {
   const x = Math.sin(n * 127.1 + 311.7) * 43758.5453
   return x - Math.floor(x)
@@ -53,7 +41,9 @@ interface Glyph {
 export function renderNameMask(
   chars: ReadonlyArray<HTMLElement>,
   stageTop: number,
-  pixelRatio: number
+  pixelRatio: number,
+  /** Where the blob touches first (stage px): its centre. */
+  contact: { x: number; y: number }
 ): NameMask | null {
   const glyphs: Glyph[] = chars
     .map((char) => {
@@ -71,7 +61,7 @@ export function renderNameMask(
   if (glyphs.length === 0) return null
 
   const glyphHeight = Math.max(...glyphs.map((glyph) => glyph.height))
-  const softRadius = glyphHeight * 0.06
+  const softRadius = glyphHeight * 0.05
   const pad = softRadius * 3
   const left = Math.min(...glyphs.map((g) => g.left)) - pad
   const top = Math.min(...glyphs.map((g) => g.top)) - pad
@@ -80,7 +70,7 @@ export function renderNameMask(
   const width = right - left
   const height = bottom - top
 
-  const scale = Math.min(pixelRatio, 2)
+  const scale = Math.min(pixelRatio, 1.5)
   const w = Math.ceil(width * scale)
   const h = Math.ceil(height * scale)
 
@@ -110,12 +100,17 @@ export function renderNameMask(
   const soft = draw(`blur(${softRadius.toFixed(2)}px)`)
   if (!crisp || !soft) return null
 
+  // Letter boxes touch (advance widths), so only a hair of padding: enough
+  // for anti-aliased edges, not enough to tint a neighbour.
+  const arrival = letterStarts(glyphs, w, h, left, top, scale, 1.5, contact)
+
   const image = new ImageData(w, h)
-  for (let i = 0; i < image.data.length; i += 4) {
+  for (let i = 0, p = 0; i < image.data.length; i += 4, p++) {
+    const time = Math.round(arrival[p] * 65535)
     image.data[i] = crisp.data[i + 3]
     image.data[i + 1] = soft.data[i + 3]
-    image.data[i + 2] = 0
-    image.data[i + 3] = 255
+    image.data[i + 2] = time >> 8
+    image.data[i + 3] = time & 255
   }
 
   return {
@@ -124,77 +119,100 @@ export function renderNameMask(
     top,
     width,
     height,
-    softRadius,
-    drips: findDripOrigins(crisp, glyphs, left, top, scale),
+    scale,
+    zoom: findZoomPoint(crisp, left, top, scale),
   }
 }
 
 /**
- * Per glyph, the runs of ink in the lowest band of its shape become drip
- * roots: one for most letters, two for wide ones. Each gets its own reach
- * and delay so the name does not melt in lockstep.
+ * When each letter starts to soak, normalised 0–1: by its distance from
+ * where the blob touches the name (the blob reaches along it), with a little
+ * variation so neighbours do not move in lockstep. Written over each glyph's
+ * box, barely padded so the anti-aliased edges share their letter's time.
  */
-function findDripOrigins(
-  mask: ImageData,
+function letterStarts(
   glyphs: ReadonlyArray<Glyph>,
+  width: number,
+  height: number,
   left: number,
   top: number,
-  scale: number
-): DripOrigin[] {
-  const { width: w, height: h, data } = mask
-  const ink = (x: number, y: number) => data[(y * w + x) * 4 + 3] > 127
-  const origins: DripOrigin[] = []
+  scale: number,
+  pad: number,
+  contact: { x: number; y: number }
+): Float32Array {
+  const distances = glyphs.map((glyph) =>
+    Math.hypot(
+      glyph.left + glyph.width / 2 - contact.x,
+      (glyph.top + glyph.height / 2 - contact.y) * 1.6
+    )
+  )
+  const nearest = Math.min(...distances)
+  const farthest = Math.max(...distances)
+  const span = Math.max(1, farthest - nearest)
+  const starts = distances.map((distance, index) =>
+    Math.min(1, ((distance - nearest) / span) * 0.85 + hash(index * 17 + 3) * 0.15)
+  )
 
-  glyphs.forEach((glyph, index) => {
-    const x0 = Math.max(0, Math.floor((glyph.left - left) * scale))
-    const x1 = Math.min(w - 1, Math.ceil((glyph.left + glyph.width - left) * scale))
-    const y0 = Math.max(0, Math.floor((glyph.top - top) * scale))
-    const y1 = Math.min(h - 1, Math.ceil((glyph.top + glyph.height - top) * scale))
-
-    // Lowest ink per column inside this glyph's box.
-    const lowest: number[] = []
-    for (let x = x0; x <= x1; x++) {
-      let found = -1
-      for (let y = y1; y >= y0; y--) {
-        if (ink(x, y)) {
-          found = y
-          break
-        }
-      }
-      lowest.push(found)
+  const field = new Float32Array(width * height).fill(1)
+  // Nearer letters last, so where padded boxes overlap the earlier one wins.
+  const order = glyphs.map((_, index) => index).sort((a, b) => starts[b] - starts[a])
+  for (const index of order) {
+    const glyph = glyphs[index]
+    const x0 = Math.max(0, Math.floor((glyph.left - pad - left) * scale))
+    const x1 = Math.min(width - 1, Math.ceil((glyph.left + glyph.width + pad - left) * scale))
+    const y0 = Math.max(0, Math.floor((glyph.top - pad - top) * scale))
+    const y1 = Math.min(height - 1, Math.ceil((glyph.top + glyph.height + pad - top) * scale))
+    for (let y = y0; y <= y1; y++) {
+      for (let x = x0; x <= x1; x++) field[y * width + x] = starts[index]
     }
-    const floor = Math.max(...lowest)
-    if (floor < 0) return
+  }
+  return field
+}
 
-    // Columns reaching the bottom band, grouped into contiguous runs.
-    const band = glyph.height * scale * 0.06
-    const runs: Array<{ from: number; to: number }> = []
-    lowest.forEach((y, i) => {
-      if (y >= floor - band) {
-        const last = runs.at(-1)
-        if (last && last.to === i - 1) last.to = i
-        else runs.push({ from: i, to: i })
-      }
-    })
-    runs.sort((a, b) => b.to - b.from - (a.to - a.from))
-
-    // At most one drip per letter, and some letters none: wax runs where it
-    // pools, not in a row.
-    const seed = index * 3
-    if (hash(seed + 5) < 0.3) return
-    const run = runs[Math.floor(hash(seed + 9) * Math.min(runs.length, 2))]
-    const column = Math.round((run.from + run.to) / 2)
-    const stroke = Math.max(run.to - run.from + 1, glyph.height * scale * 0.05) / scale
-    const length = hash(seed)
-    origins.push({
-      x: left + (x0 + column) / scale,
-      y: top + lowest[column] / scale,
-      stroke: Math.min(stroke, glyph.height * 0.14) * (0.8 + 0.5 * length),
-      // Mostly short runs, a few long ones.
-      reach: 0.35 + length * length * 2.9,
-      delay: hash(seed + 17) * 0.45,
-    })
-  })
-
-  return origins
+/**
+ * The fly-in target: the point deepest inside a stroke (largest inscribed
+ * circle, via a chamfer distance transform), with a slight pull towards the
+ * middle of the name. Returns it and the stroke's thickness there.
+ */
+function findZoomPoint(mask: ImageData, left: number, top: number, scale: number) {
+  const { width: w, height: h, data } = mask
+  const depth = new Float32Array(w * h)
+  for (let p = 0; p < w * h; p++) depth[p] = data[p * 4 + 3] > 127 ? 1e6 : 0
+  const at = (x: number, y: number) => (x < 0 || y < 0 || x >= w || y >= h ? 0 : depth[y * w + x])
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const p = y * w + x
+      if (depth[p] === 0) continue
+      depth[p] = Math.min(
+        depth[p],
+        at(x - 1, y) + 1,
+        at(x, y - 1) + 1,
+        at(x - 1, y - 1) + 1.414,
+        at(x + 1, y - 1) + 1.414
+      )
+    }
+  }
+  for (let y = h - 1; y >= 0; y--) {
+    for (let x = w - 1; x >= 0; x--) {
+      const p = y * w + x
+      if (depth[p] === 0) continue
+      depth[p] = Math.min(
+        depth[p],
+        at(x + 1, y) + 1,
+        at(x, y + 1) + 1,
+        at(x + 1, y + 1) + 1.414,
+        at(x - 1, y + 1) + 1.414
+      )
+    }
+  }
+  let best = { x: w / 2, y: h / 2, depth: 1, score: -Infinity }
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const d = depth[y * w + x]
+      if (d === 0) continue
+      const score = d - Math.hypot(x - w / 2, y - h / 2) * 0.02
+      if (score > best.score) best = { x, y, depth: d, score }
+    }
+  }
+  return { x: left + best.x / scale, y: top + best.y / scale, stroke: (best.depth * 2) / scale }
 }

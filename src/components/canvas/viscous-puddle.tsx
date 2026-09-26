@@ -8,7 +8,6 @@ import { gsap } from '@/lib/gsap-core'
 
 import { choreograph, type HeroLayout, type StageLayout } from './viscous-puddle/choreography'
 import { renderNameMask, type NameMask } from './viscous-puddle/name-mask'
-import { MAX_DRIPS } from './viscous-puddle/shaders'
 import {
   HERO_CHAR_SELECTOR,
   HERO_NAME_SELECTOR,
@@ -163,18 +162,11 @@ function measureHero(pixelRatio: number): { layout: HeroLayout; mask: NameMask }
   const name = stage?.querySelector<HTMLElement>(HERO_NAME_SELECTOR)
   if (!track || !stage || !name) return null
 
-  const saved = [name.style.transform, name.style.filter]
-  name.style.transform = 'none'
-  name.style.filter = 'none'
-
-  const stageTop = stage.getBoundingClientRect().top
-  const nameRect = name.getBoundingClientRect()
+  const stageRect = stage.getBoundingClientRect()
   const chars = Array.from(name.querySelectorAll<HTMLElement>(HERO_CHAR_SELECTOR))
-  const mask = renderNameMask(chars, stageTop, pixelRatio)
-  const glyphHeight = Math.max(0, ...chars.map((char) => char.getBoundingClientRect().height))
-
-  name.style.transform = saved[0]
-  name.style.filter = saved[1]
+  // The blob rests mid-stage; that is where it first touches the name.
+  const contact = { x: stageRect.left + stageRect.width / 2, y: stageRect.height / 2 }
+  const mask = renderNameMask(chars, stageRect.top, pixelRatio, contact)
   if (!mask) return null
 
   return {
@@ -182,11 +174,10 @@ function measureHero(pixelRatio: number): { layout: HeroLayout; mask: NameMask }
     layout: {
       trackDocTop: track.getBoundingClientRect().top + window.scrollY,
       pinDistance: Math.max(1, track.offsetHeight - stage.offsetHeight),
-      nameCenterX: nameRect.left + nameRect.width / 2,
-      nameCenterY: nameRect.top + nameRect.height / 2 - stageTop,
       nameBox: { left: mask.left, top: mask.top, width: mask.width, height: mask.height },
-      glyphHeight,
-      drips: mask.drips.slice(0, MAX_DRIPS),
+      zoomX: mask.zoom.x,
+      zoomY: mask.zoom.y,
+      zoomStroke: mask.zoom.stroke,
     },
   }
 }
@@ -243,11 +234,10 @@ export function ViscousPuddle() {
     }
 
     const { gl, vao, uniforms } = webgl
-    const drips = new Float32Array(MAX_DRIPS * 4)
-    const dripNecks = new Float32Array(MAX_DRIPS)
     gl.uniform1i(uniforms.uImage, 0)
     gl.uniform1i(uniforms.uName, 1)
     let nameTexture: WebGLTexture | null = null
+    let nameScale = 1
 
     const syncLayout = () => {
       const rect = canvas.getBoundingClientRect()
@@ -266,6 +256,7 @@ export function ViscousPuddle() {
       state.hero = hero?.layout ?? null
       if (nameTexture) gl.deleteTexture(nameTexture)
       nameTexture = hero ? createNameTexture(gl, hero.mask.image) : null
+      nameScale = hero?.mask.scale ?? 1
     }
 
     syncLayout()
@@ -462,21 +453,12 @@ export function ViscousPuddle() {
       gl.uniform4f(uniforms.uBall, ballX, ballY, ball.radius, ball.merge)
       const name = step.name
       gl.uniform1f(uniforms.uNameOn, name && nameTexture ? 1 : 0)
+      gl.uniform1f(uniforms.uDrain, step.drain)
       if (name) {
         gl.uniform4f(uniforms.uNameRect, name.left, name.top, name.width, name.height)
-        gl.uniform1f(uniforms.uNameSag, name.sag)
-        gl.uniform1f(uniforms.uNameSoften, name.soften)
-        gl.uniform1f(uniforms.uNameSoftRadius, name.softRadius)
-        gl.uniform1f(uniforms.uNameTint, name.tint)
-        gl.uniform1f(uniforms.uNameFade, name.fade)
-        const dripCount = Math.min(name.drips.length, MAX_DRIPS)
-        name.drips.slice(0, dripCount).forEach((drip, index) => {
-          drips.set([drip.x, drip.y, drip.length, drip.head], index * 4)
-          dripNecks[index] = drip.neck
-        })
-        gl.uniform4fv(uniforms.uDrips, drips)
-        gl.uniform1fv(uniforms.uDripNecks, dripNecks)
-        gl.uniform1i(uniforms.uDripCount, dripCount)
+        gl.uniform1f(uniforms.uNameZoom, name.zoom)
+        gl.uniform1f(uniforms.uNameScale, nameScale)
+        gl.uniform1f(uniforms.uSoak, name.soak)
       }
       gl.uniform3f(uniforms.uInk, ...getInkRgb())
 

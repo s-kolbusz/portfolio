@@ -1,7 +1,8 @@
 /**
- * The opening sequence as one piece of matter: the hero (focus pull, the name
- * melting into the blob, the dive under its surface), then the signature
- * transition where it sets into the stronypodhale.pl page.
+ * The opening sequence as one piece of matter: the hero (the name soaks up
+ * the blob's colour like blotting paper, the camera flies into a soaked
+ * stroke), then the signature transition where that matter sets into the
+ * stronypodhale.pl page.
  * Scripts: docs/design/2026-09-25-scroll-hero-scenariusz.md
  *          docs/design/2026-09-25-przejscie-sygnaturowe-scenariusz.md
  *
@@ -9,8 +10,6 @@
  * layout, so fast or slow scrolling, reversing and stopping half-way all land
  * on the same picture. All positions are CSS pixels in viewport space.
  */
-
-import type { DripOrigin } from './name-mask'
 
 /** Pinned stage measurements, taken on resize. */
 export interface StageLayout {
@@ -28,19 +27,16 @@ export interface StageLayout {
   }
 }
 
-/** Pinned hero measurements, taken on resize with the hero's own motion reset. */
+/** Pinned hero measurements, taken on resize. */
 export interface HeroLayout {
   trackDocTop: number
   pinDistance: number
-  /** Name centre, relative to the pinned hero stage (the focus pull scales around it). */
-  nameCenterX: number
-  nameCenterY: number
-  /** Box of the name mask, relative to the stage (see `renderNameMask`). */
+  /** Box of the name mask, relative to the pinned stage (see `renderNameMask`). */
   nameBox: { left: number; top: number; width: number; height: number }
-  /** Tallest glyph box, px: the unit for drip lengths and the sag. */
-  glyphHeight: number
-  /** Where drips start, relative to the stage. */
-  drips: ReadonlyArray<DripOrigin>
+  /** The fly-in target inside the deepest stroke near the centre (stage px) and its thickness. */
+  zoomX: number
+  zoomY: number
+  zoomStroke: number
 }
 
 export interface ChoreographyInput {
@@ -80,51 +76,26 @@ export interface Ball {
   restY: number
 }
 
-/** One drip running off the melting name, viewport px. */
-export interface Drip {
-  x: number
-  /** Root, where it leaves the glyph. */
-  y: number
-  length: number
-  /** Radius at the root and at the heavier head. */
-  neck: number
-  head: number
-}
-
-/** The melting name as the shader draws it. */
+/** The name as the shader draws it while it soaks and the camera flies in. */
 export interface NameFrame {
-  /** Viewport box the mask is drawn in (focus scale applied, sag not). */
+  /** Viewport box the mask is drawn in (camera zoom applied). */
   left: number
   top: number
   width: number
   height: number
-  /** How far the whole name has sunk, px. */
-  sag: number
-  /** 0 crisp type → 1 edges softened like warm wax. */
-  soften: number
-  /** Blur radius of the soft mask channel at this scale, px. */
-  softRadius: number
-  /** How much of the matter's colour it has taken on, 0–1. */
-  tint: number
-  /** 0 there → 1 dissolved into the blob. */
-  fade: number
-  drips: Drip[]
+  /** Camera zoom on the name (1 = as laid out). */
+  zoom: number
+  /** Soak progress 0–1 (2 once complete): letters turn from ink to the blob's green. */
+  soak: number
 }
 
 export interface HeroFrame {
   /** Hero pin progress H, 0–1. */
   progress: number
-  /** Focus pull, 0 (on the name) → 1 (on the matter). */
-  focus: number
-  nameScale: number
-  /** Melt progress, 0–1. While 0 the DOM name shows; after, the canvas draws it. */
-  melt: number
-  /** Role / offer / CTA: drift (px), opacity, how far under the surface (0–1). */
-  contentShift: number
+  /** Once true the canvas draws the name and the DOM copy steps aside. */
+  nameInCanvas: boolean
+  /** Role / offer / CTA opacity. */
   contentOpacity: number
-  underwater: number
-  /** The surface passing the camera, 0–1 (peaks mid-dive): drives the refraction. */
-  refraction: number
 }
 
 export interface ChoreographyFrame {
@@ -132,8 +103,14 @@ export interface ChoreographyFrame {
   progress: number
   /** The hero's state while it plays, otherwise null. */
   hero: HeroFrame | null
-  /** The melting name (hero only, once the melt has started). */
+  /** The soaking name (hero only, once the canvas has it). */
   name: NameFrame | null
+  /** How much colour the blob has given up: 0 green, 1 clear water (hero only). */
+  drain: number
+  /** Camera zoom around (zoomX, zoomY) applied to the body and ball (hero fly-in). */
+  bodyZoom: number
+  zoomX: number
+  zoomY: number
   /** Proportions of the visible shape (clipped to the viewport), for the readout. */
   aspect: number
   /** Readout value: 0.82 liquid → 0 set. */
@@ -178,9 +155,11 @@ export const BEATS = {
 
 /** Beat boundaries on the hero pin progress H (see the hero script). */
 export const HERO_BEATS = {
-  focus: [0, 0.3],
-  melt: [0.28, 0.75],
-  dive: [0.6, 1],
+  quiet: [0, 0.15],
+  cling: [0.1, 0.3],
+  soak: [0.15, 0.6],
+  drain: [0.2, 0.62],
+  fly: [0.6, 1],
 } as const
 
 /** Pin progress at which the heading enters the frame; the rest of the pin lets it be read. */
@@ -293,79 +272,81 @@ function heroFrame(
   const pinned = Math.min(Math.max(scrollY - hero.trackDocTop, 0), hero.pinDistance)
   const stageTop = hero.trackDocTop - scrollY + pinned
 
-  const focus = easeInOutCubic(linear(...HERO_BEATS.focus, progress))
-  const dive = easeInOutCubic(linear(...HERO_BEATS.dive, progress))
-  const centerX = viewportWidth / 2
-  const centerY = stageTop + viewportHeight / 2
-  const nameScale = 1 + 0.06 * focus
+  // Cling: drawn in by the paper, the blob flattens along the name until it
+  // touches every letter.
+  const cling = easeInOutCubic(linear(...HERO_BEATS.cling, progress))
+  const nameCenterX = hero.nameBox.left + hero.nameBox.width / 2
+  const nameCenterY = stageTop + hero.nameBox.top + hero.nameBox.height / 2
+  const restX = viewportWidth / 2
+  const restY = stageTop + viewportHeight / 2
+  const clingHalfWidth = hero.nameBox.width * 0.5
+  const clingHalfHeight = hero.nameBox.height * 0.62
+  let centerX = mix(restX, nameCenterX, cling)
+  let centerY = mix(restY, nameCenterY, cling)
+  let halfWidth = mix(baseRadius, clingHalfWidth, cling)
+  let halfHeight = mix(baseRadius, clingHalfHeight, cling)
+  let cornerRadius = mix(baseRadius, Math.min(clingHalfWidth, clingHalfHeight), cling)
 
-  // The name melts like wax (see the hero script): edges soften, drips run
-  // from the lowest points of the glyphs with growing speed, then the whole
-  // name sinks, takes on the green and dissolves into the blob.
-  const melt = linear(...HERO_BEATS.melt, progress)
-  const scaleAround = (x: number, y: number) => ({
-    x: hero.nameCenterX + (x - hero.nameCenterX) * nameScale,
-    y: stageTop + hero.nameCenterY + (y - hero.nameCenterY) * nameScale,
-  })
-  const glyph = hero.glyphHeight * nameScale
-  const sag = glyph * 0.9 * Math.pow(smoothstep(0.55, 1, melt), 1.5)
-  const boxCorner = scaleAround(hero.nameBox.left, hero.nameBox.top)
-  const name: NameFrame | null =
-    melt > 0
-      ? {
-          left: boxCorner.x,
-          top: boxCorner.y,
-          width: hero.nameBox.width * nameScale,
-          height: hero.nameBox.height * nameScale,
-          sag,
-          soften: 0.85 * smoothstep(0.05, 0.5, melt),
-          softRadius: hero.glyphHeight * 0.06 * nameScale,
-          tint: smoothstep(0.35, 0.9, melt),
-          fade: smoothstep(0.82, 1, melt),
-          drips: hero.drips.map((origin) => {
-            const root = scaleAround(origin.x, origin.y)
-            const run = linear(origin.delay, 1, melt)
-            const stroke = origin.stroke * nameScale
-            return {
-              x: root.x,
-              y: root.y + sag,
-              // Gravity: slow to start, then running.
-              length: origin.reach * glyph * run * run,
-              neck: stroke * 0.3 * smoothstep(0, 0.1, run),
-              head: stroke * (0.4 + 0.35 * smoothstep(0, 0.4, run)) * smoothstep(0, 0.12, run),
-            }
-          }),
-        }
-      : null
+  // Soak: each letter takes up the colour as a whole, ink turning to green,
+  // the ones nearest the blob first. Past the beat everything is soaked.
+  const soakTime = linear(...HERO_BEATS.soak, progress)
+  const soak = soakTime >= 1 ? 2 : soakTime
+  const drain = smoothstep(...HERO_BEATS.drain, progress)
 
-  const nameArea = hero.nameBox.width * hero.nameBox.height * 0.2
-  const grown = Math.sqrt(
-    (baseRadius * (1 + 0.12 * focus)) ** 2 + nameArea * smoothstep(0.6, 1, melt)
-  )
-  const radius = mix(grown, coverRadius(viewportWidth, viewportHeight), dive)
+  // Fly-in: the camera pushes towards a point deep in a soaked stroke, at a
+  // steady perceived speed (exponential zoom), until that stroke's green
+  // fills the frame. The words part and grow by perspective alone; the
+  // drained blob sits further back, so it grows less.
+  const fly = linear(...HERO_BEATS.fly, progress)
+  const zoomX = hero.zoomX
+  const zoomY = stageTop + hero.zoomY
+  const diagonal = Math.hypot(viewportWidth, viewportHeight)
+  const zoomMax = (diagonal * 1.3) / Math.max(hero.zoomStroke, 1)
+  // Full cover a little before the end of the pin, then a last slow push,
+  // so the handover frame is solid green.
+  const approach = Math.min(1, fly / 0.85)
+  const zoom =
+    Math.exp(Math.log(zoomMax) * Math.pow(approach, 1.8)) * (1 + 0.25 * smoothstep(0.85, 1, fly))
+  // Keep the target drifting to the centre of the frame as we approach it.
+  const aim = smoothstep(0, 0.6, fly)
+  const shiftX = (viewportWidth / 2 - zoomX) * aim
+  const shiftY = (viewportHeight / 2 - zoomY) * aim
+  const bodyZoom = 1 + (zoom - 1) * 0.35
+  centerX = zoomX + shiftX + (centerX - zoomX) * bodyZoom
+  centerY = zoomY + shiftY + (centerY - zoomY) * bodyZoom
+  halfWidth *= bodyZoom
+  halfHeight *= bodyZoom
+  cornerRadius *= bodyZoom
 
-  const contentShift = -0.12 * viewportHeight * progress
+  const nameInCanvas = progress >= HERO_BEATS.cling[0]
+  const name: NameFrame | null = nameInCanvas
+    ? {
+        left: zoomX + shiftX + (hero.nameBox.left - zoomX) * zoom,
+        top: zoomY + shiftY + (stageTop + hero.nameBox.top - zoomY) * zoom,
+        width: hero.nameBox.width * zoom,
+        height: hero.nameBox.height * zoom,
+        zoom,
+        soak,
+      }
+    : null
+
   const metrics = ballMetrics(viewportHeight, scale)
 
   return {
     progress: 0,
     hero: {
       progress,
-      focus,
-      nameScale,
-      melt,
-      contentShift,
-      // The role and offer leave while focus pulls away, so the melt has the
-      // frame to itself.
-      contentOpacity: 1 - smoothstep(0.05, 0.3, progress),
-      // The text already sits over the blob; what the dive changes is the
-      // camera going under the surface: the surface passes (bending the text
-      // most mid-way) and from then on the text is seen through the water.
-      underwater: smoothstep(0.2, 0.8, dive),
-      refraction: Math.sin(Math.PI * dive),
+      nameInCanvas,
+      contentOpacity: 1 - smoothstep(...HERO_BEATS.quiet, progress),
     },
     name,
-    aspect: visibleAspect(radius, radius, viewportWidth, viewportHeight),
+    drain,
+    bodyZoom,
+    zoomX: zoomX + shiftX,
+    zoomY: zoomY + shiftY,
+    // At the end the soaked stroke fills the frame, as the matter the
+    // signature scene starts from.
+    aspect: fly >= 1 ? viewportWidth / viewportHeight : halfWidth / halfHeight,
     viscosity: VISCOSITY_START,
     fluid: 1,
     solid: 0,
@@ -375,11 +356,17 @@ function heroFrame(
     body: true,
     centerX,
     centerY,
-    halfWidth: radius,
-    halfHeight: radius,
-    cornerRadius: radius,
+    halfWidth,
+    halfHeight,
+    cornerRadius,
     box: { left: 0, top: 0, width: 0, height: 0 },
-    ball: { ...metrics, detach: 0, restX: centerX, restY: centerY },
+    ball: {
+      ...metrics,
+      radius: metrics.radius * bodyZoom,
+      detach: 0,
+      restX: centerX,
+      restY: centerY,
+    },
     active: stageTop + viewportHeight > 0,
   }
 }
@@ -404,6 +391,10 @@ export function choreograph({
       progress: 0,
       hero: null,
       name: null,
+      drain: 0,
+      bodyZoom: 1,
+      zoomX: 0,
+      zoomY: 0,
       aspect: 1,
       viscosity: VISCOSITY_START,
       fluid: 1,
@@ -454,6 +445,10 @@ export function choreograph({
     progress,
     hero: null,
     name: null,
+    drain: 0,
+    bodyZoom: 1,
+    zoomX: 0,
+    zoomY: 0,
     aspect: visibleAspect(body.halfWidth, body.halfHeight, viewportWidth, viewportHeight),
     viscosity,
     fluid: viscosity / VISCOSITY_START,

@@ -213,6 +213,13 @@ Docelowa odpowiedź AI na pytanie „kim jest Sebastian Kolbusz”: *Creative De
 i full-stack engineer z Zakopanego, autor payload-plugin-aspect-preview, twórca
 stronypodhale.pl, wcześniej ready2order.*
 
+## Poprzeczka jakości (2026-09-26)
+
+- Wzorzec: [Lusion](https://lusion.co/) (Awwwards Site of the Day 2023, studio
+  z tytułami Site of the Year). Do niego kalibrujemy jakość ruchu i detalu.
+- Bez brutalizmu (np. [cydstumpel.nl](https://cydstumpel.nl/) jest dla nas za surowe).
+- Materiał bloba zostaje płaską, rozmytą plamą. Oświetlona „kropla żelu” odrzucona.
+
 ## Sposób realizacji
 
 - **Zero makiet poza kodem.** Prototypy powstają na gałęziach w prawdziwym repo, z prawdziwym blobem, tokenami i fontami.

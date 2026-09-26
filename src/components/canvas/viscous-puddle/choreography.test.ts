@@ -182,14 +182,10 @@ describe('hero scroll choreography', () => {
   const hero: HeroLayout = {
     trackDocTop: 0,
     pinDistance: 900,
-    nameCenterX: 720,
-    nameCenterY: 250,
     nameBox: { left: 200, top: 180, width: 1040, height: 150 },
-    glyphHeight: 115,
-    drips: [
-      { x: 300, y: 300, stroke: 12, reach: 2.5, delay: 0 },
-      { x: 700, y: 300, stroke: 10, reach: 0.6, delay: 0.3 },
-    ],
+    zoomX: 700,
+    zoomY: 255,
+    zoomStroke: 20,
   }
   const signature: StageLayout = { ...stage, trackDocTop: 900 }
 
@@ -197,58 +193,58 @@ describe('hero scroll choreography', () => {
     return choreograph({ ...viewport, scrollY, hero, stage: signature, scale: 1 })
   }
 
-  it('starts as the resting hero: the DOM name shows, nothing melts', () => {
+  it('starts as the resting hero: the DOM name shows, the blob is green', () => {
     const step = heroAt(0)
-    expect(step.hero?.focus).toBe(0)
-    expect(step.hero?.melt).toBe(0)
+    expect(step.hero?.nameInCanvas).toBe(false)
     expect(step.name).toBeNull()
+    expect(step.drain).toBe(0)
     expect(step.progress).toBe(0)
   })
 
-  it('pulls focus onto the matter and clears the role and offer first', () => {
-    const step = heroAt(270)
-    expect(step.hero?.focus).toBe(1)
-    expect(step.hero?.contentOpacity).toBe(0)
-    expect(step.halfWidth).toBeGreaterThan(heroAt(0).halfWidth)
+  it('clears the role and offer, then hands the name to the canvas unsoaked', () => {
+    expect(heroAt(900 * 0.15).hero?.contentOpacity).toBe(0)
+    const step = heroAt(900 * 0.12)
+    expect(step.hero?.nameInCanvas).toBe(true)
+    expect(step.name?.soak).toBe(0)
+    expect(step.name?.zoom).toBe(1)
   })
 
-  it('hands the name to the canvas crisp and in place when the melt starts', () => {
-    const step = heroAt(900 * 0.2801)
-    expect(step.name).not.toBeNull()
-    expect(step.name!.soften).toBe(0)
-    expect(step.name!.sag).toBe(0)
-    expect(step.name!.tint).toBe(0)
-    expect(step.name!.drips.every((drip) => drip.length < 1)).toBe(true)
+  it('clings: the blob flattens along the name', () => {
+    const clung = heroAt(900 * 0.3)
+    expect(clung.halfWidth).toBeCloseTo(520)
+    expect(clung.halfHeight).toBeCloseTo(150 * 0.62)
+    expect(clung.centerY).toBeCloseTo(255)
   })
 
-  it('runs the drips with gravity: slow to start, then long, each on its own delay', () => {
-    const early = heroAt(900 * 0.4).name!.drips
-    const late = heroAt(900 * 0.7).name!.drips
-    expect(late[0].length).toBeGreaterThan(early[0].length * 2)
-    expect(early[1].length).toBeLessThan(early[0].length)
-    expect(late[0].head).toBeGreaterThan(late[0].neck)
+  it('soaks the letters steadily while the blob pales to clear water', () => {
+    let previous = -1
+    for (let p = 0.15; p < 0.6; p += 0.05) {
+      const soak = heroAt(900 * p).name!.soak
+      expect(soak).toBeGreaterThanOrEqual(previous)
+      previous = soak
+    }
+    expect(heroAt(900 * 0.61).name!.soak).toBe(2)
+    expect(heroAt(900 * 0.62).drain).toBe(1)
   })
 
-  it('softens, sinks, turns green and dissolves the name by the end of the melt', () => {
-    const end = heroAt(900 * 0.75).name!
-    expect(end.soften).toBeCloseTo(0.85)
-    expect(end.sag).toBeGreaterThan(100)
-    expect(end.tint).toBe(1)
-    expect(end.fade).toBe(1)
+  it('flies into the soaked stroke until it fills the frame', () => {
+    const start = heroAt(900 * 0.6).name!
+    const end = heroAt(899.9).name!
+    expect(start.zoom).toBe(1)
+    // The stroke (20 px) outgrows the viewport diagonal.
+    expect(end.zoom * 20).toBeGreaterThan(Math.hypot(1440, 900))
+    // The target ends up in the middle of the frame.
+    const targetX = end.left + (700 - 200) * end.zoom
+    const targetY = end.top + (255 - 180) * end.zoom
+    expect(targetX).toBeCloseTo(720, 0)
+    expect(targetY).toBeCloseTo(450, 0)
   })
 
-  it('dives: the matter fills the whole frame when the hero ends', () => {
-    const step = heroAt(899.9)
-    expect(step.halfWidth).toBeCloseTo(coverRadius(1440, 900), 0)
-    expect(step.aspect).toBeCloseTo(1440 / 900, 2)
-  })
-
-  it('hands the same matter to the signature scene without a jump', () => {
-    const last = heroAt(899.99)
+  it('hands over to the signature scene, which starts from full-frame matter', () => {
     const first = heroAt(900)
     expect(first.hero).toBeNull()
-    expect(first.halfWidth).toBeCloseTo(last.halfWidth, 0)
-    expect(first.centerX).toBeCloseTo(last.centerX, 0)
-    expect(first.centerY).toBeCloseTo(last.centerY, 0)
+    expect(first.name).toBeNull()
+    expect(first.halfWidth).toBeCloseTo(coverRadius(1440, 900), 0)
+    expect(first.drain).toBe(0)
   })
 })

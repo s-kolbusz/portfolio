@@ -1,7 +1,7 @@
 # Scroll hero: scenariusz
 
 Data: 2026-09-25, wersja 2: 2026-09-26
-Status: **choreografia zaakceptowana w rozmowie, prototyp w klatkach przed wdrożeniem.**
+Status: **wdrożone na gałąź do oceny na żywo** (po klatkach i poprawkach 2026-09-26).
 Łączy się z: [przejście sygnaturowe](./2026-09-25-przejscie-sygnaturowe-scenariusz.md).
 
 ## Co ma opowiedzieć
@@ -37,14 +37,14 @@ nasycone. Rozlatywanie się słów i powiększanie to jeden ruch kamery
 
 ## Klatki
 
-| H         | Etap            | Obraz                                                                                                                                                                                                                                                                                                                                                           |
-| --------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0         | **Spoczynek**   | Hero jak dziś: imię, rola, zdanie oferty, CTA, żywy blob, kulka kursora.                                                                                                                                                                                                                                                                                        |
-| 0.00–0.15 | **Uwaga**       | Rola, zdanie i CTA gasną, zostaje imię i blob.                                                                                                                                                                                                                                                                                                                  |
-| 0.10–0.30 | **Przywarcie**  | Blob, wciągany kapilarnie, przywiera do imienia: spłaszcza się i wydłuża wzdłuż niego, aż dotknie wszystkich liter (na telefonie obu linii).                                                                                                                                                                                                                    |
-| 0.15–0.55 | **Wsiąkanie**   | Tam, gdzie blob dotyka liter, kolor wchodzi w kreski i rozchodzi się po nich jak w bibule: nierównym, włóknistym czołem, najpierw szybko, potem coraz wolniej, z miękkim przejściem tusz → zieleń. Kolejność wynika z odległości od miejsca styku. Blob w tym samym tempie blednie do przezroczystej, lekko załamującej wody: ubywa mu koloru, a nie objętości. |
-| 0.55–1.00 | **Wjazd**       | Kamera najeżdża na najgrubszą nasiąkniętą kreskę przy środku imienia. Słowa rozjeżdżają się na boki i rosną z perspektywy, a woda po blobie zostaje za nimi i wychodzi z kadru. Na końcu zieleń tej kreski wypełnia cały ekran.                                                                                                                                 |
-| → P 0     | **Przekazanie** | Pełny kadr materii cofa się i formuje w 16:9. Dalej scena sygnaturowa bez zmian: ciemnienie, tafla, nagłówek, kulka.                                                                                                                                                                                                                                            |
+| H         | Etap            | Obraz                                                                                                                                                                                                                                              |
+| --------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0         | **Spoczynek**   | Hero jak dziś: imię, rola, zdanie oferty, CTA, żywy blob, kulka kursora.                                                                                                                                                                           |
+| 0.00–0.15 | **Uwaga**       | Rola, zdanie i CTA gasną, zostaje imię i blob.                                                                                                                                                                                                     |
+| 0.10–0.30 | **Przywarcie**  | Blob, wciągany kapilarnie, przywiera do imienia: spłaszcza się i wydłuża wzdłuż niego, aż dotknie wszystkich liter (na telefonie obu linii).                                                                                                       |
+| 0.15–0.60 | **Wsiąkanie**   | Każda litera zasysa kolor w całości: powoli przechodzi od czerni w zieleń bloba, bez plam i bez czoła. Litery ruszają falą od tych najbliższych blobowi. Blob w tym samym tempie blednie do przezroczystej wody: ubywa mu koloru, a nie objętości. |
+| 0.60–1.00 | **Wjazd**       | Kamera najeżdża na najgrubszą nasiąkniętą kreskę przy środku imienia. Słowa rozjeżdżają się na boki i rosną z perspektywy, a woda po blobie zostaje za nimi i wychodzi z kadru. Na końcu zieleń tej kreski wypełnia cały ekran.                    |
+| → P 0     | **Przekazanie** | Pełny kadr materii cofa się i formuje w 16:9. Dalej scena sygnaturowa bez zmian: ciemnienie, tafla, nagłówek, kulka.                                                                                                                               |
 
 Czasy etapów stroimy w prototypie.
 
@@ -52,8 +52,7 @@ Czasy etapów stroimy w prototypie.
 
 - Tusz = kolor tekstu z motywu (ciemny w jasnym, jasny w ciemnym).
 - Zieleń w literach = `uColor` bloba, czyli dokładnie ten sam kolor.
-- Czoło: gradient tusz → zieleń na krótkim odcinku z szumem włókien.
-  Za czołem jest pełna zieleń.
+- Przejście: cała litera naraz, płynnie od tuszu do zieleni (bez plam i czoła).
 - Blob: nasycenie i krycie spadają do przezroczystej wody (delikatne załamanie
   i odblask, bez koloru).
 
@@ -86,7 +85,11 @@ Bez przypięcia i bez wsiąkania. Hero wygląda i przewija się jak dziś.
 4. **CTA hero:** przewija przez całą sekwencję (ok. 4 s).
 5. **Telefon:** te same długości co desktop.
 
-2026-09-26: 6. **Blob** blednie do czystej wody (ubywa koloru, nie objętości). 7. **Kontakt:** blob przywiera do imienia i dotyka wszystkich liter. 8. **Czoło nasiąkania:** włóknisty gradient, najpierw szybko, potem wolniej. 9. **Cel wjazdu:** najgrubsza kreska przy środku, dobierana z kształtu imienia.
+2026-09-26: 6. **Blob** blednie do czystej wody (ubywa koloru, nie objętości). 7. **Kontakt:** blob przywiera do imienia i dotyka wszystkich liter. 8. ~~**Czoło nasiąkania:** włóknisty gradient.~~ Zmienione po klatkach: plamy
+rozchodzące się po kreskach wyglądały jak atrament kapiący na bibułę.
+Litery zasysają kolor w całości i płynnie przechodzą od czerni w zieleń. 9. **Cel wjazdu:** najgłębszy punkt kreski przy środku (największe koło wpisane),
+dobierany z kształtu imienia. 10. **Materiał bloba:** zostaje płaska, rozmyta plama. Test „kropli żelu”
+(światło, odblask, cień) odrzucony.
 
 ## Gotowe gdy
 

@@ -26,14 +26,10 @@ interface PuddleUniforms {
   uName: WebGLUniformLocation | null
   uNameOn: WebGLUniformLocation | null
   uNameRect: WebGLUniformLocation | null
-  uNameSag: WebGLUniformLocation | null
-  uNameSoften: WebGLUniformLocation | null
-  uNameSoftRadius: WebGLUniformLocation | null
-  uNameTint: WebGLUniformLocation | null
-  uNameFade: WebGLUniformLocation | null
-  uDrips: WebGLUniformLocation | null
-  uDripNecks: WebGLUniformLocation | null
-  uDripCount: WebGLUniformLocation | null
+  uNameZoom: WebGLUniformLocation | null
+  uNameScale: WebGLUniformLocation | null
+  uSoak: WebGLUniformLocation | null
+  uDrain: WebGLUniformLocation | null
 }
 
 interface PuddleWebGLContext {
@@ -162,14 +158,10 @@ export function setupPuddleWebGL(canvas: HTMLCanvasElement): PuddleWebGLContext 
     uName: gl.getUniformLocation(program, 'uName'),
     uNameOn: gl.getUniformLocation(program, 'uNameOn'),
     uNameRect: gl.getUniformLocation(program, 'uNameRect'),
-    uNameSag: gl.getUniformLocation(program, 'uNameSag'),
-    uNameSoften: gl.getUniformLocation(program, 'uNameSoften'),
-    uNameSoftRadius: gl.getUniformLocation(program, 'uNameSoftRadius'),
-    uNameTint: gl.getUniformLocation(program, 'uNameTint'),
-    uNameFade: gl.getUniformLocation(program, 'uNameFade'),
-    uDrips: gl.getUniformLocation(program, 'uDrips'),
-    uDripNecks: gl.getUniformLocation(program, 'uDripNecks'),
-    uDripCount: gl.getUniformLocation(program, 'uDripCount'),
+    uNameZoom: gl.getUniformLocation(program, 'uNameZoom'),
+    uNameScale: gl.getUniformLocation(program, 'uNameScale'),
+    uSoak: gl.getUniformLocation(program, 'uSoak'),
+    uDrain: gl.getUniformLocation(program, 'uDrain'),
   }
 
   gl.enable(gl.BLEND)

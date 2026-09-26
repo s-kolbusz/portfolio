@@ -13,7 +13,7 @@ import {
 } from '@/components/canvas/viscous-puddle/signature-bus'
 import { Button } from '@/components/ui/button'
 import { useHeroAnimation } from '@/hooks/use-hero-animation'
-import { useIsMobile, usePrefersReducedMotion } from '@/hooks/use-media'
+import { usePrefersReducedMotion } from '@/hooks/use-media'
 import { useScrollStore } from '@/lib/stores'
 
 const HeroScene = lazy(() =>
@@ -28,9 +28,7 @@ export function Hero() {
   const ctaIconRef = useRef<SVGSVGElement>(null)
   const caretRef = useRef<HTMLSpanElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
-  const displacementRef = useRef<SVGFEDisplacementMapElement>(null)
   const prefersReducedMotion = usePrefersReducedMotion()
-  const isMobile = useIsMobile()
 
   // Delay the loading of the heavy 3D scene to free up main thread during hydration
   const [showScene, setShowScene] = useState(false)
@@ -51,23 +49,18 @@ export function Hero() {
   })
 
   // The hero scroll (docs/design/2026-09-25-scroll-hero-scenariusz.md): the
-  // blob canvas reports each frame; the DOM side of it is written here. Focus
-  // leaves the name, which then melts in the canvas, and the text below
-  // drifts, then goes under the surface as the blob swells over it.
+  // blob canvas reports each frame and draws the name once it starts to soak
+  // up the blob's colour; the DOM side is written here. The role and offer
+  // leave first, and the DOM name steps aside the moment the canvas has it.
   useEffect(() => {
     const name = headerRef.current
     const content = contentRef.current
     const caret = caretRef.current
-    const displacement = displacementRef.current
-    if (!name || !content || !caret || !displacement) return
+    if (!name || !content || !caret) return
 
     const reset = () => {
-      for (const element of [name, content]) {
-        element.style.transform = ''
-        element.style.filter = ''
-        element.style.opacity = ''
-        element.style.mixBlendMode = ''
-      }
+      name.style.opacity = ''
+      content.style.opacity = ''
       caret.style.visibility = ''
     }
 
@@ -77,39 +70,18 @@ export function Hero() {
         return
       }
       const hero = frame.step.hero
-      if (!hero) {
-        // Past the hero: the name is in the matter and the text under it.
-        name.style.opacity = '0'
-        content.style.opacity = '0'
-        caret.style.visibility = 'hidden'
-        return
-      }
-
-      name.style.transform = `scale(${hero.nameScale.toFixed(4)})`
-      // Once the melt starts the canvas draws the name (same glyphs, same
-      // place), so the DOM copy steps aside in that same frame.
-      name.style.opacity = hero.melt > 0 ? '0' : ''
-      caret.style.visibility = hero.focus > 0.3 ? 'hidden' : ''
-
-      const under = hero.underwater
-      content.style.transform = `translateY(${hero.contentShift.toFixed(1)}px)`
-      content.style.opacity = (hero.contentOpacity * (1 - 0.45 * under)).toFixed(3)
-      // Under the surface the text takes the matter's colour (multiplied over
-      // the green) and softens; the edge bends it as it passes.
-      content.style.mixBlendMode = under > 0.01 ? 'multiply' : ''
-      if (isMobile || (under < 0.01 && hero.refraction < 0.01)) {
-        content.style.filter = ''
-      } else {
-        displacement.setAttribute('scale', (hero.refraction * 26).toFixed(1))
-        content.style.filter = `url(#hero-water) blur(${(under * 1.6).toFixed(2)}px)`
-      }
+      // Past the hero the name is the matter the scene is made of.
+      const inCanvas = !hero || hero.nameInCanvas
+      name.style.opacity = inCanvas ? '0' : ''
+      caret.style.visibility = inCanvas ? 'hidden' : ''
+      content.style.opacity = hero ? hero.contentOpacity.toFixed(3) : '0'
     })
 
     return () => {
       unsubscribe()
       reset()
     }
-  }, [isMobile])
+  }, [])
 
   const name = t('name')
   const splitName = useMemo(() => {
@@ -169,19 +141,6 @@ export function Hero() {
           <HeroScene />
         </Suspense>
       )}
-      {/* Refraction for text crossed by the blob's edge (scale driven per frame). */}
-      <svg aria-hidden="true" className="pointer-events-none absolute h-0 w-0">
-        <filter id="hero-water" x="-10%" y="-20%" width="120%" height="140%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.012 0.028" numOctaves="2" seed="7" />
-          <feDisplacementMap
-            ref={displacementRef}
-            in="SourceGraphic"
-            scale="0"
-            xChannelSelector="R"
-            yChannelSelector="G"
-          />
-        </filter>
-      </svg>
       {/* Pinned for one screen while the hero plays (static without motion or WebGL). */}
       <div
         data-hero-stage
