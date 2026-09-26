@@ -152,27 +152,35 @@ export interface ChoreographyFrame {
 
 export const VISCOSITY_START = 0.82
 
-/** Beat boundaries on the pin progress P (see the script's frame table). */
+/*
+ * One rhythm for the whole sequence (hero 2 screens + scene 2 screens): each
+ * beat takes about half a screen of scroll and eases the same way, the next
+ * one starting as the last settles. Only the fly-in, the one big camera
+ * move, gets a full screen. So one scrolling speed reads the whole story.
+ */
+
+/** Beat boundaries on the pin progress P (2 screens; 0.25 = half a screen). */
 export const BEATS = {
-  enter: [0, 0.06],
-  darken: [0.04, 0.4],
+  enter: [0, 0.05],
+  darken: [0, 0.28],
   detach: [0.1, 0.35],
-  image: [0.3, 0.6],
-  clear: [0.45, 0.82],
-  swap: [0.83, 0.85],
+  image: [0.25, 0.53],
+  clear: [0.45, 0.73],
+  swap: [0.73, 0.75],
+  heading: [0.76, 0.96],
 } as const
 
-/** Beat boundaries on the hero pin progress H (see the hero script). */
+/** Beat boundaries on the hero pin progress H (2 screens; 0.25 = half a screen). */
 export const HERO_BEATS = {
-  quiet: [0, 0.1],
-  cling: [0.06, 0.34],
-  soak: [0.2, 0.6],
-  drain: [0.24, 0.62],
-  fly: [0.58, 1],
+  quiet: [0, 0.14],
+  cling: [0.06, 0.32],
+  soak: [0.24, 0.52],
+  drain: [0.26, 0.52],
+  fly: [0.5, 1],
 } as const
 
-/** Pin progress at which the heading enters the frame; the rest of the pin lets it be read. */
-export const HEADING_AT = 0.88
+/** Pin progress at which the heading starts to enter the frame. */
+export const HEADING_AT = BEATS.heading[0]
 
 export function clamp01(value: number) {
   return Math.min(1, Math.max(0, value))
@@ -266,7 +274,7 @@ function heroFrame(
 
   // Cling: drawn in by the paper, the blob flattens along the name until it
   // touches every letter.
-  const cling = easeInOutCubic(linear(...HERO_BEATS.cling, progress))
+  const cling = smoothstep(...HERO_BEATS.cling, progress)
   const nameCenterX = hero.nameBox.left + hero.nameBox.width / 2
   const nameCenterY = stageTop + hero.nameBox.top + hero.nameBox.height / 2
   const restX = viewportWidth / 2
@@ -294,11 +302,10 @@ function heroFrame(
   const zoomY = stageTop + hero.zoomY
   const diagonal = Math.hypot(viewportWidth, viewportHeight)
   const zoomMax = (diagonal * 1.3) / Math.max(hero.zoomStroke, 1)
-  // Full cover a little before the end of the pin, then a last slow push,
-  // so the handover frame is solid green.
-  const approach = Math.min(1, fly / 0.85)
-  const zoom =
-    Math.exp(Math.log(zoomMax) * Math.pow(approach, 1.8)) * (1 + 0.25 * smoothstep(0.85, 1, fly))
+  // Past full cover at the end (1.3 × the diagonal), so the handover frame is solid green.
+  // Eased in and out in log space, like every other beat: the push starts
+  // and lands gently, with no burst of speed at the end.
+  const zoom = Math.exp(Math.log(zoomMax) * smoothstep(0, 1, fly))
   // Keep the target drifting to the centre of the frame as we approach it.
   const aim = smoothstep(0, 0.6, fly)
   const shiftX = (viewportWidth / 2 - zoomX) * aim
@@ -427,8 +434,10 @@ export function choreograph({
   // Without a hero it grows out of the resting blob instead.
   const margin = 0.3 * unit
   const sheetHalfWidth = viewportWidth / 2 + margin
-  const sheetHalfHeight = viewportHeight
-  const grow = hero ? 1 : easeInOutCubic(linear(...BEATS.darken, progress))
+  // Its bottom sits a little below the stage, so its rippling edge stays
+  // out of sight while pinned and only shows as it leaves.
+  const sheetHalfHeight = viewportHeight + margin / 2
+  const grow = hero ? 1 : smoothstep(...BEATS.darken, progress)
   const metrics = ballMetrics(viewportHeight, scale)
   const detach = smoothstep(...BEATS.detach, progress)
   const rest = ballRest(box, metrics.radius, viewportWidth)
@@ -447,15 +456,15 @@ export function choreograph({
     zoomY: 0,
     viscosity,
     fluid: viscosity / VISCOSITY_START,
-    solid: easeInOutCubic(linear(...BEATS.darken, progress)),
+    solid: smoothstep(...BEATS.darken, progress),
     imageIn: smoothstep(...BEATS.image, progress),
-    clarity: easeInOutCubic(linear(...BEATS.clear, progress)),
+    clarity: smoothstep(...BEATS.clear, progress),
     surface: hero ? smoothstep(0, 0.12, progress) : grow,
     liquidEdge: 1,
     reveal,
     body: sheetOnScreen,
     centerX: viewportWidth / 2,
-    centerY: mix(Math.min(viewportHeight / 2, middleY), stageTop, grow),
+    centerY: mix(Math.min(viewportHeight / 2, middleY), stageTop + margin / 2, grow),
     halfWidth: mix(radius, sheetHalfWidth, grow),
     halfHeight: mix(radius, sheetHalfHeight, grow),
     cornerRadius: mix(radius, unit * 0.6, grow),
@@ -483,8 +492,8 @@ const READOUT_WINDOWS: Record<ReadoutKey, [number, number]> = {
   // All give way to the heading, which enters in their place.
   target: [0, HEADING_AT - READOUT_FADE],
   colour: [BEATS.darken[0], BEATS.darken[1]],
-  viscosity: [BEATS.darken[0] + 0.04, BEATS.image[1]],
-  clarity: [BEATS.clear[0], BEATS.clear[1]],
+  viscosity: [BEATS.darken[0] + 0.05, BEATS.image[1]],
+  clarity: [BEATS.clear[0], HEADING_AT - READOUT_FADE],
 }
 
 export interface ReadoutMotion {
@@ -546,4 +555,17 @@ export function mixColour(
   t: number
 ): [number, number, number] {
   return [mix(from[0], to[0], t), mix(from[1], to[1], t), mix(from[2], to[2], t)]
+}
+
+/**
+ * The heading's entrance, scrubbed by the scroll: the site's reveal (rise
+ * 100 px and fade in, staggered) laid over the heading beat instead of
+ * played on a timer. Returns 0 → 1 for the item at `index` of `count`.
+ */
+export function headingMotion(progress: number, index: number, count: number) {
+  const [from, until] = BEATS.heading
+  const stagger = 0.03
+  const length = until - from - stagger * (count - 1)
+  const start = from + index * stagger
+  return linear(start, start + length, progress)
 }

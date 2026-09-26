@@ -203,7 +203,7 @@ function measureStage({ track, stage, frame }: SignatureElements): StageLayout {
 }
 
 /** Camera inertia: time constant (s) of the story easing after the scroll. */
-const CAMERA_LAG = 0.3
+const CAMERA_LAG = 0.2
 
 /**
  * Hero blob on a fixed, viewport-sized canvas behind the page. Across the

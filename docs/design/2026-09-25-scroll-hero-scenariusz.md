@@ -35,7 +35,7 @@ nasycone. Rozlatywanie się słów i powiększanie to jeden ruch kamery
 - Wszystko jest funkcją pozycji scrolla: szybko, wolno, wstecz i po przerwaniu
   wygląda tak samo.
 - **Kamera z bezwładnością:** stan sceny nie skacze za scrollem, tylko podąża
-  za nim z tłumieniem (stała czasowa ok. 0,3 s, na wierzchu wygładzenia Lenisa).
+  za nim z tłumieniem (stała czasowa ok. 0,2 s, na wierzchu wygładzenia Lenisa).
   Zatrzymanie scrolla dociąga ruch do końca miękko. Pozycje elementów DOM
   zostają przypięte do prawdziwego scrolla, opóźnia się tylko przebieg.
   Duży skok (kotwica, End, resize) ustawia stan od razu, bez doganiania.
@@ -44,15 +44,20 @@ nasycone. Rozlatywanie się słów i powiększanie to jeden ruch kamery
 
 ## Klatki
 
-| H                                  | Etap            | Obraz                                                                                                                                                                                              |
-| ---------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0                                  | **Spoczynek**   | Hero jak dziś: imię, rola, zdanie oferty, CTA, żywy blob, kulka kursora.                                                                                                                           |
-| 0.00–0.10                          | **Uwaga**       | Rola, zdanie i CTA gasną, zostaje imię i blob.                                                                                                                                                     |
-| 0.06–0.34                          | **Przywarcie**  | Blob powoli, z ciężarem, przesuwa się pod imię i rozlewa wzdłuż niego, aż dotknie wszystkich liter (na telefonie obu linii).                                                                       |
-| 0.20–0.60                          | **Wsiąkanie**   | Każda litera zasysa kolor w całości: powoli przechodzi od czerni w zieleń bloba, bez plam i bez czoła, falą od liter najbliższych blobowi. Blob w tym samym tempie blednie do przezroczystej wody. |
-| 0.58–1.00                          | **Wjazd**       | Kamera powoli najeżdża na najgrubszą nasiąkniętą kreskę przy środku imienia. Słowa rozjeżdżają się na boki i rosną z perspektywy. Na końcu zieleń tej kreski wypełnia cały ekran.                  |
-| → P 0                              | **Przekazanie** | Pełny kadr materii zostaje pełnym kadrem: ciemnieje i staje się taflą (scena sygnaturowa).                                                                                                         |
-| Czasy etapów stroimy w prototypie. |
+| H                                                                                   | Etap            | Obraz                                                                                                                                                                                              |
+| ----------------------------------------------------------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0                                                                                   | **Spoczynek**   | Hero jak dziś: imię, rola, zdanie oferty, CTA, żywy blob, kulka kursora.                                                                                                                           |
+| 0.00–0.14                                                                           | **Uwaga**       | Rola, zdanie i CTA gasną, zostaje imię i blob.                                                                                                                                                     |
+| 0.06–0.32                                                                           | **Przywarcie**  | Blob powoli, z ciężarem, przesuwa się pod imię i rozlewa wzdłuż niego, aż dotknie wszystkich liter (na telefonie obu linii).                                                                       |
+| 0.24–0.52                                                                           | **Wsiąkanie**   | Każda litera zasysa kolor w całości: powoli przechodzi od czerni w zieleń bloba, bez plam i bez czoła, falą od liter najbliższych blobowi. Blob w tym samym tempie blednie do przezroczystej wody. |
+| 0.50–1.00                                                                           | **Wjazd**       | Kamera powoli najeżdża na najgrubszą nasiąkniętą kreskę przy środku imienia. Słowa rozjeżdżają się na boki i rosną z perspektywy. Na końcu zieleń tej kreski wypełnia cały ekran.                  |
+| → P 0                                                                               | **Przekazanie** | Pełny kadr materii zostaje pełnym kadrem: ciemnieje i staje się taflą (scena sygnaturowa).                                                                                                         |
+| **Jeden rytm** (wersja 4, po ocenie na żywo: „wszystko w innym tempie”):            |
+| każdy etap hero i sceny trwa ok. pół ekranu scrolla i ma tę samą łagodną krzywą     |
+| (`smoothstep`), a następny rusza, gdy poprzedni dogasa. Wyjątkiem jest wjazd,       |
+| jedyny duży ruch kamery: pełny ekran, też łagodny na starcie i na końcu (bez        |
+| przyspieszania pod koniec). Dzięki temu jedna prędkość scrolla czyta całą historię. |
+| Wszystko jest związane ze scrollem (scroll-bound), nic nie odpala się na czas.      |
 
 ## Kolor
 
@@ -110,6 +115,7 @@ dobierany z kształtu imienia. 10. **Materiał bloba:** zostaje płaska, rozmyta
 
 11. **Kursor:** litery reagują na kulkę na dwa sposoby: źródło (szybsze wsiąkanie) i przyciąganie (gęstsza, jaśniejsza zieleń).
 12. **Tempo:** kinowe. Hero wydłużone do 2 ekranów, przywarcie i wjazd wolniejsze, kamera z bezwładnością.
+13. **Jeden rytm i tylko scroll-bound** (wersja 4): etapy po ok. pół ekranu, ta sama krzywa, wjazd bez przyspieszenia.
 
 ## Gotowe gdy
 

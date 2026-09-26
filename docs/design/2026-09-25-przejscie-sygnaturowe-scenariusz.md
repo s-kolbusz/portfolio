@@ -50,16 +50,16 @@ przemiany, a nie ozdobnikiem.
 | P         | Etap            | Obraz                                                                                                                                                                                                                         | Odczyty (mono, pierwszy plan)                    |
 | --------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
 | przed     | **Hero**        | Scroll hero według [osobnego scenariusza](./2026-09-25-scroll-hero-scenariusz.md). Kończy się kadrem wypełnionym zielenią.                                                                                                    | —                                                |
-| 0.00–0.06 | **Wejście**     | Scena się przypina. Cały kadr to płynna zieleń, kursor nadal działa.                                                                                                                                                          | Pojawia się cel: `01 — stronypodhale.pl`         |
-| 0.04–0.40 | **Ciemnienie**  | Cały ekran ciemnieje do koloru strony. Powierzchnia faluje: długie, wolne fale z połyskiem. Tekst sceny przechodzi na jasny.                                                                                                  | `lepkość 0.82 → 0.30`, kolor `#7EC58E → #314638` |
+| 0.00–0.05 | **Wejście**     | Scena się przypina. Cały kadr to płynna zieleń, kursor nadal działa.                                                                                                                                                          | Pojawia się cel: `01 — stronypodhale.pl`         |
+| 0.00–0.28 | **Ciemnienie**  | Cały ekran ciemnieje do koloru strony. Powierzchnia faluje: długie, wolne fale z połyskiem. Tekst sceny jaśnieje razem z tłem.                                                                                                | `lepkość 0.82 → 0.30`, kolor `#7EC58E → #314638` |
 | 0.10–0.35 | **Kulka**       | Kulka kursora (ten sam rozmiar i to samo łączenie co w hero) odrywa się od tafli i zostaje zieloną kroplą na ciemnym tle. Bez kursora spływa na miejsce przy obrazie.                                                         | —                                                |
-| 0.30–0.60 | **Wyłanianie**  | Spod mętnej tafli wyłaniają się szczegóły strony, na swoim miejscu 16:9: najpierw rozmyte, bez krawędzi, mocno załamane i zabarwione, potem coraz wyraźniej. Fale idą przez cały ekran, także poza obrazem.                   | `lepkość 0.30 → 0.05`                            |
-| 0.45–0.82 | **Uspokojenie** | Tafla się uspokaja i robi przejrzysta: fale słabną, załamanie maleje, zmętnienie znika, krawędź obrazu się wyostrza. Wszędzie jednocześnie, bez frontu. Scroll znów ją mąci.                                                  | `przejrzystość 0 → 100%`                         |
-| 0.83–0.85 | **Spoczynek**   | Obraz jest jak szkło, a ostatnia klatka canvasa to piksel w piksel obraz DOM, więc zamiana jest niewidoczna. Tło zostaje ciemną, spokojną taflą.                                                                              | gasną                                            |
-| 0.88–1.00 | **Nagłówek**    | W miejsce odczytów wjeżdża nagłówek i link, tym samym ruchem co reveal w reszcie strony. Scena nadal stoi, więc całość czyta się jako jeden kadr.                                                                             | —                                                |
+| 0.25–0.53 | **Wyłanianie**  | Spod mętnej tafli wyłaniają się szczegóły strony, na swoim miejscu 16:9: najpierw rozmyte, bez krawędzi, mocno załamane i zabarwione, potem coraz wyraźniej. Fale idą przez cały ekran, także poza obrazem.                   | `lepkość 0.30 → 0.05`                            |
+| 0.45–0.73 | **Uspokojenie** | Tafla się uspokaja i robi przejrzysta: fale słabną, załamanie maleje, zmętnienie znika, krawędź obrazu się wyostrza. Wszędzie jednocześnie, bez frontu. Scroll znów ją mąci.                                                  | `przejrzystość 0 → 100%`                         |
+| 0.73–0.75 | **Spoczynek**   | Obraz jest jak szkło, a ostatnia klatka canvasa to piksel w piksel obraz DOM, więc zamiana jest niewidoczna. Tło zostaje ciemną, spokojną taflą.                                                                              | gasną                                            |
+| 0.76–0.96 | **Nagłówek**    | W miejsce odczytów wjeżdża nagłówek i link: ruch revealu z reszty strony, ale przewijany scrollem, nie odpalany na czas. Scena nadal stoi, więc całość czyta się jako jeden kadr.                                             | —                                                |
 | po        | **Odpięcie**    | Kadr razem z ciemną taflą odjeżdża do góry. Dolna krawędź tafli jest płynna (miękka, falująca, jak brzeg bloba), a scroll ją mąci. Zielona kulka zostaje żywa i idzie za kursorem dalej: dusza strony nie znika razem z tłem. | —                                                |
 
-Czasy etapów stroimy w prototypie. Zakładki są celowe: kropla odrywa się,
+Rytm jak w hero: każdy etap ok. pół ekranu (0.25 P), ta sama krzywa, wszystko scroll-bound. Zakładki są celowe: kropla odrywa się,
 gdy materia ciemnieje, a szczegóły zaczynają prześwitywać, zanim skończy.
 
 ## Po scenie: nawiązanie do bloba
@@ -86,6 +86,13 @@ Do rozważenia przy [SEB-67](https://linear.app/sklbsz/issue/SEB-67).
   Pozycja: w miejscu nagłówka, cel po lewej, wartości po prawej (plan 3, ~1.2×).
   Wartości ustawione w kolejności gaśnięcia, więc znikająca nie przesuwa pozostałych.
 - `aria-hidden`, bo to dekoracja. Treść sceny jest w nagłówku DOM.
+
+## Tafla
+
+Organiczna, nie „z kafli”: trzy oktawy szumu, każda obrócona i dryfująca
+w inną stronę, na wolno wykrzywianej domenie (domain warping), a wysokość fal
+zmienia się po tafli (spokojne i niespokojne płaty). Połysk szeroki i miękki,
+bez ostrych linii kaustyk.
 
 ## Prawo ruchu w tej scenie
 

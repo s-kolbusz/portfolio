@@ -128,6 +128,25 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
     return 130.0 * dot(m, g);
   }
 
+  // The water's height: three octaves of noise, each turned and drifting
+  // its own way, over a domain that is itself slowly warped, with the swell
+  // height varying across the sheet. No two stretches of it look alike, so
+  // it never reads as a repeating tile.
+  const mat2 TURN = mat2(0.8, 0.6, -0.6, 0.8);
+  float swell(vec2 p, vec2 warp, float t) {
+    p += warp;
+    float h = 0.0;
+    float amp = 0.6;
+    vec2 drift = vec2(0.03, 0.018);
+    for (int i = 0; i < 3; i++) {
+      h += amp * snoise(p + drift * t);
+      p = TURN * p * 1.7 + 3.1;
+      drift = TURN * drift * 1.3;
+      amp *= 0.4;
+    }
+    return h;
+  }
+
   void main() {
     vec2 px = gl_FragCoord.xy / uDpr;
     px.y = uViewport.y - px.y;
@@ -156,7 +175,7 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
     // Both die out as the matter sets, so it lands still and crisp.
     float settle = smoothstep(0.0, 0.25, uFluid);
     // The ball never sets, so its surface keeps moving.
-    float bodyRipple = max(uFluid + uFlow * 1.5 * settle, uLiquidEdge * (0.6 + uFlow * 1.5));
+    float bodyRipple = max(uFluid + uFlow * 1.5 * settle, uLiquidEdge * (1.6 + uFlow * 1.5));
     float ripple = mix(bodyRipple, 1.0 + uFlow, ballness) * uDetail;
     d += snoise(uv * 1.5 + uTime * 0.15) * 0.04 * uScale * ripple;
 
@@ -177,13 +196,17 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
     if (uSurface > 0.0) {
       float unrest = (1.0 - uClarity) * (1.0 + uFlow * 2.0) * uSurface;
 
-      vec2 q = px / unit * 1.1;
+      vec2 q = px / unit * 0.8;
+      vec2 warp = vec2(
+        snoise(q * 0.3 + vec2(uTime * 0.012, 0.0)),
+        snoise(q * 0.3 + vec2(4.7, 1.9) - vec2(0.0, uTime * 0.015))
+      ) * 1.1;
+      // Calm and choppy patches drift across the sheet.
+      float chop = 0.55 + 0.45 * snoise(q * 0.18 + vec2(-uTime * 0.01, 2.3));
       float e = 0.05;
-      vec2 t1 = vec2(uTime * 0.07, uTime * 0.05);
-      vec2 t2 = vec2(-uTime * 0.09, uTime * 0.06);
-      float h = snoise(q + t1) + 0.3 * snoise(q * 1.9 + t2);
-      float hx = snoise(q + vec2(e, 0.0) + t1) + 0.3 * snoise((q + vec2(e, 0.0)) * 1.9 + t2);
-      float hy = snoise(q + vec2(0.0, e) + t1) + 0.3 * snoise((q + vec2(0.0, e)) * 1.9 + t2);
+      float h = swell(q, warp, uTime) * chop;
+      float hx = swell(q + vec2(e, 0.0), warp, uTime) * chop;
+      float hy = swell(q + vec2(0.0, e), warp, uTime) * chop;
       vec2 slope = vec2(hx - h, hy - h) / e;
 
       // Swells tint the water a little: crests lighter, troughs deeper.
@@ -205,10 +228,12 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
         water = mix(water, through, inBox);
       }
 
-      // A soft sheen rolling over the swells, everywhere.
-      vec3 normal = normalize(vec3(-slope * 0.25 * unrest, 1.0));
-      float sheen = pow(max(dot(normal, normalize(vec3(-0.35, -0.45, 1.0))), 0.0), 12.0);
-      water += (sheen - 0.55) * 0.12 * unrest;
+      // A broad, soft sheen rolling over the swells, everywhere: light
+      // catching the slopes that face it, with no hard caustic lines.
+      vec3 normal = normalize(vec3(-slope * 0.18 * unrest, 1.0));
+      float facing = dot(normal, normalize(vec3(-0.35, -0.45, 1.0)));
+      float sheen = smoothstep(0.8, 1.0, facing);
+      water += (sheen - 0.6) * 0.08 * unrest;
       bodyColor = mix(shaded, water, uSurface);
     }
 

@@ -8,7 +8,7 @@ import Image from 'next/image'
 import { ArrowUpRightIcon } from '@phosphor-icons/react'
 
 import {
-  HEADING_AT,
+  headingMotion,
   mixColour,
   readoutMotion,
   smoothstep,
@@ -20,11 +20,14 @@ import { Button } from '@/components/ui/button'
 import { EditorialHeader } from '@/components/ui/editorial-header'
 import { REVEAL } from '@/hooks/timeline/reveal-engine'
 import { useIsMobile } from '@/hooks/use-media'
-import { gsap } from '@/lib/gsap-core'
 
 // Right-hand readouts in the order they retire (leftmost first), so one
 // leaving never shifts the ones still showing.
 const READOUTS: ReadoutKey[] = ['target', 'colour', 'viscosity', 'clarity']
+
+// Muted text that lightens with the matter behind it (--scene-dark 0–1).
+const SCENE_MUTED =
+  'color-mix(in oklab, var(--muted-foreground), rgb(255 255 255 / 0.72) calc(var(--scene-dark, 0) * 100%))'
 
 /**
  * First scene after the hero, where the hero blob sets into stronypodhale.pl.
@@ -34,7 +37,7 @@ const READOUTS: ReadoutKey[] = ['target', 'colour', 'viscosity', 'clarity']
  * canvas (`ViscousPuddle`) plays the transformation and reports its state for
  * the mono readouts. Heading, image and link are one frame: once the page
  * has formed, the readouts give way and the heading enters in their place
- * with the site's usual reveal, still inside the pin.
+ * with the site's reveal motion, scrubbed by the scroll, still inside the pin.
  *
  * The image stays fully visible unless the canvas drives
  * `--signature-reveal`, and the heading is visible unless the canvas is
@@ -50,65 +53,47 @@ export function SignatureScene() {
   const isMobile = useIsMobile()
 
   // The heading's entrance: the same motion as every section reveal on the
-  // site (y 100 → 0, fade, stagger), but started when the pin reaches the
-  // heading beat instead of on a scroll position, and undone when scrolling back.
+  // site (rise, fade, stagger), scrubbed by the scroll across the heading
+  // beat, so it moves with everything else and reverses with it. The scene
+  // switches to the dark palette as the matter behind it darkens: readouts
+  // blend towards light as it goes, the rest (hidden until the heading
+  // beat) flips once the darkening is complete.
   useEffect(() => {
     const header = headerRef.current
     const link = linkRef.current
-    if (!header || !link) return
+    const stage = stageRef.current
+    if (!header || !link || !stage) return
 
-    const targets = [...Array.from(header.children), link]
-    const hidden = { y: REVEAL.y, opacity: 0 }
-    const visible = { y: 0, opacity: 1 }
-    // Until the canvas reports in, the heading stays visible: reduced motion
-    // and no-WebGL visitors never get a frame and must still see it.
-    let shown: boolean | null = null
+    const targets = [...Array.from(header.children), link] as HTMLElement[]
+    const reset = () => {
+      for (const target of targets) {
+        target.style.opacity = ''
+        target.style.transform = ''
+      }
+      stage.classList.remove('dark')
+      stage.style.removeProperty('--scene-dark')
+    }
 
     const unsubscribe = subscribeSignature((frame) => {
+      // Until the canvas reports in (reduced motion, no WebGL) the scene is
+      // a plain, visible section.
       if (!frame) {
-        // The canvas went away (unmount, no WebGL): show the heading, and let
-        // the next canvas frame, if any, set the state again from scratch.
-        gsap.set(targets, { ...visible, overwrite: true })
-        shown = null
+        reset()
         return
       }
-      const show = frame.step.progress >= HEADING_AT
-      if (show === shown) return
-      if (shown === null) {
-        // First frame: jump straight to the right state instead of animating.
-        gsap.set(targets, { ...(show ? visible : hidden), overwrite: true })
-      } else {
-        // Tween to the target state from wherever it is, so reversing
-        // half-way through the entrance is smooth.
-        gsap.to(targets, {
-          ...(show ? visible : hidden),
-          duration: REVEAL.duration,
-          ease: REVEAL.ease,
-          stagger: show ? REVEAL.stagger : -REVEAL.stagger,
-          overwrite: true,
-        })
-      }
-      shown = show
+      const { progress, solid } = frame.step
+      targets.forEach((target, index) => {
+        const enter = smoothstep(0, 1, headingMotion(progress, index, targets.length))
+        target.style.opacity = enter.toFixed(3)
+        target.style.transform = `translateY(${((1 - enter) * REVEAL.y).toFixed(1)}px)`
+      })
+      stage.style.setProperty('--scene-dark', solid.toFixed(3))
+      stage.classList.toggle('dark', solid >= 0.999)
     })
 
     return () => {
       unsubscribe()
-      gsap.killTweensOf(targets)
-      gsap.set(targets, { clearProps: 'transform,opacity' })
-    }
-  }, [])
-
-  // Once the matter behind the scene has darkened past halfway, the scene
-  // reads on the dark palette (a no-op on the dark theme).
-  useEffect(() => {
-    const stage = stageRef.current
-    if (!stage) return
-    const unsubscribe = subscribeSignature((frame) => {
-      stage.classList.toggle('dark', frame !== null && frame.step.solid > 0.5)
-    })
-    return () => {
-      unsubscribe()
-      stage.classList.remove('dark')
+      reset()
     }
   }, [])
 
@@ -201,12 +186,15 @@ export function SignatureScene() {
                   ref={(element) => {
                     readoutRefs.current.target = element
                   }}
-                  className="text-primary whitespace-nowrap transition-colors duration-700"
+                  className="text-primary whitespace-nowrap"
                   style={{ opacity: 0 }}
                 >
                   01 — {t('title')}
                 </span>
-                <span className="text-muted-foreground flex flex-col items-end gap-1 tabular-nums transition-colors duration-700 md:flex-row md:gap-0">
+                <span
+                  className="flex flex-col items-end gap-1 tabular-nums md:flex-row md:gap-0"
+                  style={{ color: SCENE_MUTED }}
+                >
                   {READOUTS.filter((key) => key !== 'target').map((key) => (
                     <span
                       key={key}

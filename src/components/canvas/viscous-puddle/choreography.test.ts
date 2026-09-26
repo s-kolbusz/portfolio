@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  BEATS,
   boxRect,
   choreograph,
   HEADING_AT,
@@ -52,13 +53,21 @@ describe('signature transition choreography', () => {
   })
 
   it('follows the beats of the script', () => {
-    expect(atProgress(0.03).solid).toBe(0)
-    expect(atProgress(0.4).solid).toBe(1)
-    expect(atProgress(0.3).imageIn).toBe(0)
-    expect(atProgress(0.6).imageIn).toBe(1)
+    expect(atProgress(0).solid).toBe(0)
+    expect(atProgress(0.28).solid).toBe(1)
+    expect(atProgress(0.25).imageIn).toBe(0)
+    expect(atProgress(0.53).imageIn).toBe(1)
     expect(atProgress(0.45).clarity).toBe(0)
-    expect(atProgress(0.82).clarity).toBe(1)
-    expect(atProgress(0.82).fluid).toBe(0)
+    expect(atProgress(0.73).clarity).toBe(1)
+    expect(atProgress(0.73).fluid).toBe(0)
+  })
+
+  it('keeps one rhythm: every beat takes about half a screen of the 2-screen pin', () => {
+    for (const [from, until] of Object.values(BEATS)) {
+      if (until - from < 0.1) continue // swaps and fades, not beats
+      expect(until - from).toBeGreaterThanOrEqual(0.19)
+      expect(until - from).toBeLessThanOrEqual(0.3)
+    }
   })
 
   it('clears the surface gradually, the same everywhere (no spreading front)', () => {
@@ -72,9 +81,9 @@ describe('signature transition choreography', () => {
 
   it('reads out viscosity 0.82 → 0.30 → 0.05 → 0', () => {
     expect(viscosityAt(0)).toBe(0.82)
-    expect(viscosityAt(0.4)).toBeCloseTo(0.3)
-    expect(viscosityAt(0.6)).toBeCloseTo(0.05)
-    expect(viscosityAt(0.82)).toBe(0)
+    expect(viscosityAt(0.28)).toBeCloseTo(0.3)
+    expect(viscosityAt(0.53)).toBeCloseTo(0.05)
+    expect(viscosityAt(0.73)).toBe(0)
     let previous = Infinity
     for (let p = 0; p <= 1; p += 0.01) {
       expect(viscosityAt(p)).toBeLessThanOrEqual(previous)
@@ -88,12 +97,14 @@ describe('signature transition choreography', () => {
     expect(step.body).toBe(true)
     expect(step.clarity).toBe(1)
     expect(step.boxRadius).toBe(16)
-    expect(atProgress(0.82).reveal).toBe(0)
+    expect(atProgress(0.73).reveal).toBe(0)
   })
 
   it('leaves with the section on a liquid edge, then sleeps once only the ball is gone', () => {
     const leaving = at(pinEnd + 450)
-    expect(leaving.centerY + leaving.halfHeight).toBeCloseTo(900 - 450)
+    // Its bottom edge sits just below the stage's (out of sight while pinned).
+    expect(leaving.centerY + leaving.halfHeight).toBeGreaterThan(900 - 450)
+    expect(leaving.centerY + leaving.halfHeight).toBeLessThan(900 - 450 + 150)
     expect(leaving.liquidEdge).toBe(1)
     expect(leaving.body).toBe(true)
     expect(at(pinEnd + 1200).body).toBe(false)
@@ -164,9 +175,9 @@ describe('signature transition choreography', () => {
     expect(readoutOpacity(0.02, false).target).toBeGreaterThan(0)
     expect(readoutOpacity(0.02, false).target).toBeLessThan(1)
     expect(readoutOpacity(0.05, false).target).toBe(1)
-    expect(readoutOpacity(0.3, false).viscosity).toBe(1)
-    expect(readoutOpacity(0.3, false).colour).toBe(1)
-    expect(readoutOpacity(0.5, false).colour).toBe(0)
+    expect(readoutOpacity(0.2, false).viscosity).toBe(1)
+    expect(readoutOpacity(0.2, false).colour).toBe(1)
+    expect(readoutOpacity(0.4, false).colour).toBe(0)
     for (const value of Object.values(readoutOpacity(HEADING_AT, false))) {
       expect(value).toBe(0)
     }
@@ -210,15 +221,15 @@ describe('hero scroll choreography', () => {
   })
 
   it('clears the role and offer, then hands the name to the canvas unsoaked', () => {
-    expect(heroAt(H(0.1)).hero?.contentOpacity).toBe(0)
-    const step = heroAt(H(0.08))
+    expect(heroAt(H(0.14)).hero?.contentOpacity).toBe(0)
+    const step = heroAt(H(0.07))
     expect(step.hero?.nameInCanvas).toBe(true)
     expect(step.name?.soak).toBe(0)
     expect(step.name?.zoom).toBe(1)
   })
 
   it('clings: the blob flattens along the name', () => {
-    const clung = heroAt(H(0.34))
+    const clung = heroAt(H(0.32))
     expect(clung.halfWidth).toBeCloseTo(520)
     expect(clung.halfHeight).toBeCloseTo(150 * 0.62)
     expect(clung.centerY).toBeCloseTo(255)
@@ -226,17 +237,17 @@ describe('hero scroll choreography', () => {
 
   it('soaks the letters steadily while the blob pales to clear water', () => {
     let previous = -1
-    for (let p = 0.2; p < 0.6; p += 0.05) {
+    for (let p = 0.2; p < 0.55; p += 0.05) {
       const soak = heroAt(900 * p).name!.soak
       expect(soak).toBeGreaterThanOrEqual(previous)
       previous = soak
     }
-    expect(heroAt(H(0.61)).name!.soak).toBe(2)
-    expect(heroAt(H(0.62)).drain).toBe(1)
+    expect(heroAt(H(0.53)).name!.soak).toBe(2)
+    expect(heroAt(H(0.53)).drain).toBe(1)
   })
 
   it('flies into the soaked stroke until it fills the frame', () => {
-    const start = heroAt(H(0.58)).name!
+    const start = heroAt(H(0.5)).name!
     const end = heroAt(1799.9).name!
     expect(start.zoom).toBe(1)
     // The stroke (20 px) outgrows the viewport diagonal.
