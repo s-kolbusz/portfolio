@@ -1,109 +1,95 @@
 # Scroll hero: scenariusz
 
-Data: 2026-09-25
-Status: **zaakceptowany** (niewiadome rozstrzygnięte 2026-09-25, patrz „Decyzje”). Kod powstaje według tego dokumentu.
+Data: 2026-09-25, wersja 2: 2026-09-26
+Status: **choreografia zaakceptowana w rozmowie, prototyp w klatkach przed wdrożeniem.**
 Łączy się z: [przejście sygnaturowe](./2026-09-25-przejscie-sygnaturowe-scenariusz.md).
-Kierunek: mieszanka trzech pomysłów, czyli przeostrzenia (C), wchłonięcia imienia (B)
-i zanurzenia (A), w tej kolejności.
 
 ## Co ma opowiedzieć
 
-Osoba → materia → realizacja. Uwaga przechodzi z imienia na materię,
-imię dosłownie staje się materią, kamera w nią wchodzi, a z niej wyłania się
-pierwsza realizacja. Jeden ciągły ruch od pierwszej klatki do stronypodhale.pl.
+Osoba → materia → realizacja, jednym ruchem:
+**imię wypija kolor z bloba jak bibuła, blob zostaje czystą wodą, a kamera
+wjeżdża w nasiąkniętą literę, prosto w materię, z której formuje się realizacja.**
+
+Litery zostają nietknięte jako kształty. Zmienia się tylko to, czym są
+nasycone. Rozlatywanie się słów i powiększanie to jeden ruch kamery
+(najazd z perspektywą), a nie dwa efekty.
+
+## Czego unikamy (wnioski z odrzuconych wersji)
+
+- **Niszczenia typografii:** szczerbienia imienia literami, tuszu rozlewającego
+  się plamami, topnienia (filtr SVG i shader). Imię w dobrym kroju to najlepszy
+  element hero, a każda z tych wersji je rozbijała.
+- **Napełniania szklanki:** liniowego wypełniania liter od dołu razem
+  z kurczącym się blobem. Gąbka pije barwnik, a nie objętość.
+- **Koloru „prawie jak blob”.** Zieleń w literach jest tą samą zielenią, rysowaną
+  w tym samym shaderze z tego samego `uColor`, więc zgodność wynika z konstrukcji.
+- **Odzyskiwania bloba na siłę.** Kadr pełen materii bierze się z wnętrza
+  nasiąkniętej litery, a scena sygnaturowa już startuje od pełnego kadru.
 
 ## Budowa
 
-- Hero też się przypina: 1 ekran scrolla (`H` = postęp 0–1). Potem od razu
-  zaczyna się przypięcie sceny sygnaturowej (`P`, 2 ekrany). Razem 3 ekrany
-  do uformowanej realizacji, na desktopie i na telefonie.
-- Wszystko jest funkcją pozycji scrolla, jak w scenie sygnaturowej: szybko,
-  wolno, wstecz i po przerwaniu wygląda tak samo.
-- Cztery plany głębi z decyzji redesignu: tło (~0.3×), treść (1×),
-  pierwszy plan (~1.2–1.4×), blob i kursor (fizyka).
+- Hero przypięte na 1 ekran scrolla (`H` 0–1), potem scena sygnaturowa
+  (`P`, 2 ekrany). Razem 3 ekrany, na desktopie i na telefonie.
+- Wszystko jest funkcją pozycji scrolla: szybko, wolno, wstecz i po przerwaniu
+  wygląda tak samo.
+- Od początku wsiąkania imię rysuje canvas (maska z tym samym fontem i
+  pozycjami co DOM, więc podmiana jest zgodna co do piksela, zmierzone).
 
 ## Klatki
 
-| H         | Etap              | Obraz                                                                                                                                                                                                                                                                                                                                                                                                               |
-| --------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0         | **Spoczynek**     | Hero jak dziś: imię, rola, zdanie oferty, CTA, żywy blob, kulka kursora.                                                                                                                                                                                                                                                                                                                                            |
-| 0.00–0.30 | **Przeostrzenie** | Ostrość przechodzi z imienia na materię. Imię (pierwszy plan) lekko rośnie (1 → 1.06) i się rozmywa (0 → 8 px). Blob wychodzi do przodu (1 → 1.12) i ma ostrzejszą krawędź. Rola, zdanie i CTA (plan treści) odpływają w górę w tempie scrolla i gasną.                                                                                                                                                             |
-| 0.28–0.75 | **Topnienie**     | Imię topnieje jak wosk, jako jeden kształt (w canvasie, podmiana z DOM niewidoczna). Krawędzie liter miękną, z najniższych punktów glifów (brzuszki, stopki, ogonki) ruszają zacieki z cienką szyjką i cięższą główką, najpierw wolno, potem z przyspieszeniem. Nie z każdej litery i nie równo. Na końcu imię osiada, przejmuje zieleń (zacieki pierwsze) i rozpuszcza się w blobie, który rośnie o jego objętość. |
-| 0.60–1.00 | **Zanurzenie**    | Blob puchnie, aż wypełni kadr, a kamera wchodzi pod powierzchnię. W chwili przejścia przez taflę tekst roli i oferty najmocniej się załamuje, a potem jest już „pod wodą”: zabarwiony zielenią (mnożenie), miękki i przygaszony. Na końcu cały kadr jest zieloną, lekko falującą taflą.                                                                                                                             |
-| → P 0     | **Przekazanie**   | Scena sygnaturowa zaczyna się od kadru wypełnionego materią. Materia cofa się i formuje w 16:9 (zamiast rosnąć z koła). Dalej bez zmian: ciemnienie, tafla, nagłówek, kulka.                                                                                                                                                                                                                                        |
+| H         | Etap            | Obraz                                                                                                                                                                                                                                                                                                                                                           |
+| --------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0         | **Spoczynek**   | Hero jak dziś: imię, rola, zdanie oferty, CTA, żywy blob, kulka kursora.                                                                                                                                                                                                                                                                                        |
+| 0.00–0.15 | **Uwaga**       | Rola, zdanie i CTA gasną, zostaje imię i blob.                                                                                                                                                                                                                                                                                                                  |
+| 0.10–0.30 | **Przywarcie**  | Blob, wciągany kapilarnie, przywiera do imienia: spłaszcza się i wydłuża wzdłuż niego, aż dotknie wszystkich liter (na telefonie obu linii).                                                                                                                                                                                                                    |
+| 0.15–0.55 | **Wsiąkanie**   | Tam, gdzie blob dotyka liter, kolor wchodzi w kreski i rozchodzi się po nich jak w bibule: nierównym, włóknistym czołem, najpierw szybko, potem coraz wolniej, z miękkim przejściem tusz → zieleń. Kolejność wynika z odległości od miejsca styku. Blob w tym samym tempie blednie do przezroczystej, lekko załamującej wody: ubywa mu koloru, a nie objętości. |
+| 0.55–1.00 | **Wjazd**       | Kamera najeżdża na najgrubszą nasiąkniętą kreskę przy środku imienia. Słowa rozjeżdżają się na boki i rosną z perspektywy, a woda po blobie zostaje za nimi i wychodzi z kadru. Na końcu zieleń tej kreski wypełnia cały ekran.                                                                                                                                 |
+| → P 0     | **Przekazanie** | Pełny kadr materii cofa się i formuje w 16:9. Dalej scena sygnaturowa bez zmian: ciemnienie, tafla, nagłówek, kulka.                                                                                                                                                                                                                                            |
 
-Czasy etapów stroimy w prototypie. Zakładki są celowe: wchłanianie zaczyna się,
-zanim imię całkiem straci ostrość, a zanurzenie, zanim ostatnie litery spłyną.
+Czasy etapów stroimy w prototypie.
 
-## Zmiany przy implementacji
+## Kolor
 
-- **Topnienie zamiast tuszu (2026-09-26).** Tusz z pojedynczych liter szczerbił
-  imię i dawał bezkształtne plamy. Filtr SVG tylko rozciągał piksele. Topnienie
-  jest więc w shaderze: maska imienia (ten sam font i pozycje co w DOM, więc
-  podmiana jest zgodna co do piksela) plus zacieki jako kształty (zwężająca się
-  kapsuła z główką), połączone lepkim `smin`. Rola i oferta gasną wcześniej
-  (H 0.05–0.3), żeby topnienie miało kadr dla siebie.
-
-- **Tusz zamiast zielonych kulek.** Imię leży na blobie, więc kulki w kolorze
-  materii znikały w nim od razu. Krople w kolorze tekstu widać wszędzie, a ich
-  rozpuszczanie się w zieleni opowiada wchłonięcie lepiej. W ciemnym motywie
-  tusz jest jasny (jak mleko w wodzie).
-- **„Pod wodą” zależy od zanurzenia, a nie od promienia bloba.** Tekst leży na
-  blobie od początku, więc liczenie z promienia przyciemniało go w spoczynku.
-  Teraz to kamera schodzi pod taflę: załamanie jest najsilniejsze w połowie
-  zanurzenia, a zabarwienie i zmiękczenie narastają od jego 20% do 80%.
+- Tusz = kolor tekstu z motywu (ciemny w jasnym, jasny w ciemnym).
+- Zieleń w literach = `uColor` bloba, czyli dokładnie ten sam kolor.
+- Czoło: gradient tusz → zieleń na krótkim odcinku z szumem włókien.
+  Za czołem jest pełna zieleń.
+- Blob: nasycenie i krycie spadają do przezroczystej wody (delikatne załamanie
+  i odblask, bez koloru).
 
 ## Kulka kursora
 
-W hero działa jak dziś. W trakcie zanurzenia znika pod powierzchnią razem
-z resztą materii i wynurza się dopiero przy krzepnięciu w scenie sygnaturowej
-(tak jak teraz się odrywa). Materia jest jedna od początku do końca.
-
-## Prawo ruchu
-
-- Scroll mąci powierzchnię bloba, a później tafli (jak w scenie sygnaturowej).
-- Kulki liter płyną z opóźnieniem względem scrolla. Po zatrzymaniu dopływają i
-  uspokajają się, ale ich pozycja docelowa zależy tylko od `H`.
+W hero działa jak dziś, a w trakcie wsiąkania blednie razem z blobem (to ta sama
+woda). W scenie sygnaturowej odrywa się od nowej materii, zielona, jak teraz.
 
 ## Telefon
 
-Te same etapy i te same długości co na desktopie (hero 1 ekran, scena 2).
-Imię na telefonie ma dwie linie, a kolejność wchłaniania wynika z odległości
-od bloba, więc działa bez zmian. Rozmycie zastępuje samo wygaszanie, bo
-`filter: blur` na telefonie kosztuje.
+Te same etapy i długości. Imię ma dwie linie, więc blob przywiera do obu.
+Cel wjazdu jest dobierany z kształtu imienia, więc działa bez zmian.
 
 ## Reduced motion i brak WebGL
 
-Bez przypięcia hero i bez wchłaniania. Hero wygląda i przewija się jak dziś.
+Bez przypięcia i bez wsiąkania. Hero wygląda i przewija się jak dziś.
 
 ## SEO i dostępność
 
-- `h1` z imieniem zostaje w DOM przez cały czas (`aria-label` jak dziś).
-  Litery tylko wizualnie gasną, a kulki są w canvasie (`aria-hidden`).
-- LCP bez zmian: imię jest widoczne od pierwszego renderu, a ruch zaczyna się
-  dopiero od scrolla.
+- `h1` z imieniem zostaje w DOM przez cały czas, a canvas ma `aria-hidden`.
+- LCP bez zmian: ruch zaczyna się dopiero od scrolla.
 
-## Wydajność
+## Decyzje
 
-- Kulki liter to tablica w shaderze (maks. 24), bez dodatkowego canvasa.
-- Załamanie tekstu (filtr SVG) działa tylko wtedy, gdy krawędź bloba przechodzi po tekście.
-- Rozmycie imienia tylko na desktopie.
+2026-09-25 (nadal obowiązują):
 
-## Decyzje (2026-09-25)
+1. **Tło (plan 1):** nie w hero, wejdzie w kroku 2 roadmapy dla całej strony.
+2. **Długość:** hero 1 ekran i scena sygnaturowa 2 ekrany, razem 3.
+3. **Przekazanie:** scena sygnaturowa startuje z pełnego kadru materii.
+4. **CTA hero:** przewija przez całą sekwencję (ok. 4 s).
+5. **Telefon:** te same długości co desktop.
 
-1. **Tło (plan 1):** nie w hero. Rozmyte kadry wchodzą w kroku 2 roadmapy
-   (prawo ruchu i plany parallaxy) dla całej strony, a nie jako wyjątek w hero.
-2. **Długość:** hero 1 ekran i scena sygnaturowa 2 ekrany (zamiast 2,5), razem 3.
-   Część pracy sceny (materia wypełnia kadr) przejmuje zanurzenie.
-3. **Przekazanie:** scena sygnaturowa startuje z pełnego kadru materii, która cofa się
-   do 16:9. Odczyt proporcji zaczyna od proporcji ekranu.
-4. **CTA hero:** przewija przez całą sekwencję (ok. 4 s) i kończy na uformowanej realizacji.
-5. **Kolejność liter:** najbliższe blobowi pierwsze. Fala wchłaniania rozchodzi się od bloba.
-6. **Telefon:** te same długości co desktop.
+2026-09-26: 6. **Blob** blednie do czystej wody (ubywa koloru, nie objętości). 7. **Kontakt:** blob przywiera do imienia i dotyka wszystkich liter. 8. **Czoło nasiąkania:** włóknisty gradient, najpierw szybko, potem wolniej. 9. **Cel wjazdu:** najgrubsza kreska przy środku, dobierana z kształtu imienia.
 
 ## Gotowe gdy
 
 - 5 widoków (390×844 → 3440×1440), szybki i wolny scroll, obie strony, przerwanie.
-- PL i EN (różna długość imienia nie gra roli, ale rola i zdanie oferty tak), oba motywy.
-- Dotyk, klawiatura, reduced motion.
+- PL i EN, oba motywy, dotyk, klawiatura, reduced motion.
 - Właściciel zaakceptował w przeglądarce.
