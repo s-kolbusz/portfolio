@@ -7,12 +7,12 @@ export const VERTEX_SRC = /* glsl */ `#version 300 es
   }
 `
 
-/** Most letters of the name the shader can carry into the blob at once. */
-export const MAX_DROPS = 24
+/** Most drips the melting name can run at once. */
+export const MAX_DRIPS = 32
 
 export const FRAGMENT_SRC = /* glsl */ `#version 300 es
   precision highp float;
-  #define MAX_DROPS ${MAX_DROPS}
+  #define MAX_DRIPS ${MAX_DRIPS}
 
   uniform float uTime;
   // Everything positional is in CSS pixels, viewport space, origin top-left.
@@ -45,13 +45,24 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
   // 0 = murky, rippling surface over the page; 1 = still, clear glass.
   uniform float uClarity;
 
-  // Letters of the name turned to drops of ink, flowing into the blob:
-  // xy position, z radius (px), w ink left (1 = letter colour, 0 = dissolved).
-  // Only the first uDropCount are live.
-  uniform vec4 uDrops[MAX_DROPS];
-  uniform int uDropCount;
-  // The text colour the ink starts as.
+  // The melting name (hero). uName: R crisp glyph mask, G softened mask,
+  // drawn in uNameRect (xy top-left, zw size, px), lowered by uNameSag.
+  uniform sampler2D uName;
+  uniform float uNameOn;
+  uniform vec4 uNameRect;
+  uniform float uNameSag;
+  // 0 crisp type → 1 edges softened like warm wax; blur radius of G, px.
+  uniform float uNameSoften;
+  uniform float uNameSoftRadius;
+  // Colour: the text colour (uInk) taking on the matter's (uNameTint), and
+  // how far it has dissolved into the blob (uNameFade).
   uniform vec3 uInk;
+  uniform float uNameTint;
+  uniform float uNameFade;
+  // Drips: xy root, z length, w head radius (px); neck radius per drip in uDripNecks.
+  uniform vec4 uDrips[MAX_DRIPS];
+  uniform float uDripNecks[MAX_DRIPS];
+  uniform int uDripCount;
 
   // The hero's cursor ball, the part that stays liquid: xy position,
   // z radius, w smooth-union width with the body (all px).
@@ -68,6 +79,18 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
     r = min(r, min(b.x, b.y));
     vec2 q = abs(p) - b + r;
     return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r;
+  }
+
+  // A tapering capsule hanging down from the origin: r1 at the root, r2 at
+  // the end h below (y grows downwards). Inigo Quilez's uneven capsule.
+  float sdDrip(vec2 p, float r1, float r2, float h) {
+    p.x = abs(p.x);
+    float b = (r1 - r2) / h;
+    float a = sqrt(max(1.0 - b * b, 0.0));
+    float k = dot(p, vec2(-b, a));
+    if (k < 0.0) return length(p) - r1;
+    if (k > a * h) return length(p - vec2(0.0, h)) - r2;
+    return dot(p, vec2(a, b)) - r1;
   }
 
   float smin(float a, float b, float k) {
@@ -120,18 +143,31 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
       body = sdRoundBox(uv - drift, halfSize, uCorner / unit + breathe * uScale);
     }
 
-    // Ink drops join the body as liquid and colour it where they are, softly,
-    // fading as they dissolve.
-    float ink = 0.0;
-    for (int i = 0; i < MAX_DROPS; i++) {
-      if (i >= uDropCount) break;
-      vec4 letter = uDrops[i];
-      float edge = length(px - letter.xy) - letter.z;
-      body = smin(body, edge / unit, letter.z * 3.0 / unit);
-      // Ink, not a ball: a ragged, soft-edged cloud that spreads as it thins.
-      float wisp = snoise((px - letter.xy) / max(letter.z, 1.0) * 0.55 + uTime * 0.3 + float(i) * 7.1);
-      float cloud = 1.0 - smoothstep(-letter.z * 0.8, letter.z * (0.7 + 0.5 * wisp), edge);
-      ink = max(ink, cloud * letter.w);
+    // The melting name: its glyphs (crisp, then softened like warm wax) and
+    // the drips running off them, one liquid shape, in px.
+    float name = 1e5;
+    if (uNameOn > 0.5) {
+      vec2 nameUv = (px - uNameRect.xy - vec2(0.0, uNameSag)) / uNameRect.zw;
+      if (all(greaterThanEqual(nameUv, vec2(0.0))) && all(lessThanEqual(nameUv, vec2(1.0)))) {
+        vec2 mask = texture(uName, nameUv).rg;
+        float density = mix(mask.r, mask.g, uNameSoften);
+        // Density → distance: 0.5 is the edge. The ramp is kept well above the
+        // anti-aliasing width, so empty mask reads as fully outside (no halo);
+        // it widens with the blur, which keeps the softened edge smooth.
+        float ramp = mix(3.0, uNameSoftRadius * 1.6, uNameSoften);
+        name = (0.5 - density) * ramp;
+      }
+      for (int i = 0; i < MAX_DRIPS; i++) {
+        if (i >= uDripCount) break;
+        vec4 drip = uDrips[i];
+        float neck = uDripNecks[i];
+        if (drip.w <= 0.0) continue;
+        float h = max(drip.z, abs(neck - drip.w) + 0.5);
+        // A slight sway, so the runs are not ruled lines.
+        vec2 q = px - drip.xy;
+        q.x += sin(q.y * 0.045 + float(i) * 1.7) * min(q.y, 40.0) * 0.06;
+        name = smin(name, sdDrip(q, neck, drip.w, h), max(neck, 1.0) * 2.5);
+      }
     }
 
     float ball = sdCircle((px - uBall.xy) / unit, uBall.z / unit);
@@ -183,11 +219,22 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
       bodyColor = mix(shaded, through, uImageIn);
     }
 
-    bodyColor = mix(bodyColor, uInk, ink * 0.8);
-
     // The ball stays liquid: it keeps the blob's own green.
     vec3 ballColor = mix(uColor, uColor * 0.85, depthFactor);
     vec3 finalColor = mix(bodyColor, ballColor, ballness);
+
+    // The name is drawn over the blob in its own colour, turning green as it
+    // melts (the runs first), and finally dissolving into the body.
+    if (uNameOn > 0.5) {
+      float cover = smoothstep(0.7, -0.7, name) * (1.0 - uNameFade);
+      float below = clamp((px.y - (uNameRect.y + uNameSag + uNameRect.w * 0.8)) / uNameRect.w, 0.0, 1.0);
+      vec3 nameColor = mix(uInk, matter * 0.8, clamp(uNameTint + below * 0.6, 0.0, 1.0));
+      finalColor = mix(finalColor, nameColor, cover);
+      // The name replaces solid DOM text, so it skips the canvas's fade-in.
+      float opacity = max(alpha * uOpacity, cover);
+      fragColor = vec4(finalColor * opacity, opacity);
+      return;
+    }
 
     float opacity = alpha * uOpacity;
     fragColor = vec4(finalColor * opacity, opacity);

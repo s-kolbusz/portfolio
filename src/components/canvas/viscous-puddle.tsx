@@ -7,7 +7,8 @@ import { usePrefersReducedMotion } from '@/hooks/use-media'
 import { gsap } from '@/lib/gsap-core'
 
 import { choreograph, type HeroLayout, type StageLayout } from './viscous-puddle/choreography'
-import { MAX_DROPS } from './viscous-puddle/shaders'
+import { renderNameMask, type NameMask } from './viscous-puddle/name-mask'
+import { MAX_DRIPS } from './viscous-puddle/shaders'
 import {
   HERO_CHAR_SELECTOR,
   HERO_NAME_SELECTOR,
@@ -24,6 +25,7 @@ import {
 import {
   averageColour,
   createImageTexture,
+  createNameTexture,
   disposePuddleWebGL,
   lerp,
   setupPuddleWebGL,
@@ -155,7 +157,7 @@ function findSignatureElements(): SignatureElements | null {
  * The hero at rest: the hero scales and blurs its name while it plays, so
  * that is lifted for the instant of measuring the letters.
  */
-function measureHero(): HeroLayout | null {
+function measureHero(pixelRatio: number): { layout: HeroLayout; mask: NameMask } | null {
   const track = document.querySelector<HTMLElement>(HERO_TRACK_SELECTOR)
   const stage = track?.querySelector<HTMLElement>(HERO_STAGE_SELECTOR)
   const name = stage?.querySelector<HTMLElement>(HERO_NAME_SELECTOR)
@@ -167,24 +169,25 @@ function measureHero(): HeroLayout | null {
 
   const stageTop = stage.getBoundingClientRect().top
   const nameRect = name.getBoundingClientRect()
-  const letters = Array.from(name.querySelectorAll<HTMLElement>(HERO_CHAR_SELECTOR)).map((char) => {
-    const rect = char.getBoundingClientRect()
-    return {
-      x: rect.left + rect.width / 2,
-      y: rect.top + rect.height / 2 - stageTop,
-      size: rect.height,
-    }
-  })
+  const chars = Array.from(name.querySelectorAll<HTMLElement>(HERO_CHAR_SELECTOR))
+  const mask = renderNameMask(chars, stageTop, pixelRatio)
+  const glyphHeight = Math.max(0, ...chars.map((char) => char.getBoundingClientRect().height))
 
   name.style.transform = saved[0]
   name.style.filter = saved[1]
+  if (!mask) return null
 
   return {
-    trackDocTop: track.getBoundingClientRect().top + window.scrollY,
-    pinDistance: Math.max(1, track.offsetHeight - stage.offsetHeight),
-    nameCenterX: nameRect.left + nameRect.width / 2,
-    nameCenterY: nameRect.top + nameRect.height / 2 - stageTop,
-    letters: letters.slice(0, MAX_DROPS),
+    mask,
+    layout: {
+      trackDocTop: track.getBoundingClientRect().top + window.scrollY,
+      pinDistance: Math.max(1, track.offsetHeight - stage.offsetHeight),
+      nameCenterX: nameRect.left + nameRect.width / 2,
+      nameCenterY: nameRect.top + nameRect.height / 2 - stageTop,
+      nameBox: { left: mask.left, top: mask.top, width: mask.width, height: mask.height },
+      glyphHeight,
+      drips: mask.drips.slice(0, MAX_DRIPS),
+    },
   }
 }
 
@@ -240,8 +243,11 @@ export function ViscousPuddle() {
     }
 
     const { gl, vao, uniforms } = webgl
-    const drops = new Float32Array(MAX_DROPS * 4)
+    const drips = new Float32Array(MAX_DRIPS * 4)
+    const dripNecks = new Float32Array(MAX_DRIPS)
     gl.uniform1i(uniforms.uImage, 0)
+    gl.uniform1i(uniforms.uName, 1)
+    let nameTexture: WebGLTexture | null = null
 
     const syncLayout = () => {
       const rect = canvas.getBoundingClientRect()
@@ -256,10 +262,17 @@ export function ViscousPuddle() {
 
       state.elements = findSignatureElements()
       state.stage = state.elements ? measureStage(state.elements) : null
-      state.hero = measureHero()
+      const hero = measureHero(state.dpr)
+      state.hero = hero?.layout ?? null
+      if (nameTexture) gl.deleteTexture(nameTexture)
+      nameTexture = hero ? createNameTexture(gl, hero.mask.image) : null
     }
 
     syncLayout()
+    // The name mask needs the real font; draw it again once fonts are in.
+    void document.fonts.ready.then(() => {
+      if (!disposed) syncLayout()
+    })
     requestAnimationFrame(() => {
       canvas.style.opacity = '1'
     })
@@ -447,12 +460,24 @@ export function ViscousPuddle() {
       gl.uniform1f(uniforms.uImageIn, step.imageIn)
       gl.uniform1f(uniforms.uClarity, step.clarity)
       gl.uniform4f(uniforms.uBall, ballX, ballY, ball.radius, ball.merge)
-      const dropCount = Math.min(step.drops.length, MAX_DROPS)
-      step.drops.slice(0, dropCount).forEach((drop, index) => {
-        drops.set([drop.x, drop.y, drop.radius, drop.ink], index * 4)
-      })
-      gl.uniform4fv(uniforms.uDrops, drops)
-      gl.uniform1i(uniforms.uDropCount, dropCount)
+      const name = step.name
+      gl.uniform1f(uniforms.uNameOn, name && nameTexture ? 1 : 0)
+      if (name) {
+        gl.uniform4f(uniforms.uNameRect, name.left, name.top, name.width, name.height)
+        gl.uniform1f(uniforms.uNameSag, name.sag)
+        gl.uniform1f(uniforms.uNameSoften, name.soften)
+        gl.uniform1f(uniforms.uNameSoftRadius, name.softRadius)
+        gl.uniform1f(uniforms.uNameTint, name.tint)
+        gl.uniform1f(uniforms.uNameFade, name.fade)
+        const dripCount = Math.min(name.drips.length, MAX_DRIPS)
+        name.drips.slice(0, dripCount).forEach((drip, index) => {
+          drips.set([drip.x, drip.y, drip.length, drip.head], index * 4)
+          dripNecks[index] = drip.neck
+        })
+        gl.uniform4fv(uniforms.uDrips, drips)
+        gl.uniform1fv(uniforms.uDripNecks, dripNecks)
+        gl.uniform1i(uniforms.uDripCount, dripCount)
+      }
       gl.uniform3f(uniforms.uInk, ...getInkRgb())
 
       gl.bindVertexArray(vao)
@@ -489,6 +514,7 @@ export function ViscousPuddle() {
       document.removeEventListener('mouseleave', onMouseLeave)
       document.removeEventListener('mouseenter', onMouseEnter)
       if (texture) gl.deleteTexture(texture)
+      if (nameTexture) gl.deleteTexture(nameTexture)
       disposePuddleWebGL(webgl)
     }
   }, [])

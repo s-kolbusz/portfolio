@@ -52,15 +52,14 @@ export function Hero() {
 
   // The hero scroll (docs/design/2026-09-25-scroll-hero-scenariusz.md): the
   // blob canvas reports each frame; the DOM side of it is written here. Focus
-  // leaves the name, its letters give way to drops of matter, and the text
-  // below drifts, then goes under the surface as the blob swells over it.
+  // leaves the name, which then melts in the canvas, and the text below
+  // drifts, then goes under the surface as the blob swells over it.
   useEffect(() => {
     const name = headerRef.current
     const content = contentRef.current
     const caret = caretRef.current
     const displacement = displacementRef.current
     if (!name || !content || !caret || !displacement) return
-    const letters = Array.from(name.querySelectorAll<HTMLElement>('[data-hero-char]'))
 
     const reset = () => {
       for (const element of [name, content]) {
@@ -69,7 +68,6 @@ export function Hero() {
         element.style.opacity = ''
         element.style.mixBlendMode = ''
       }
-      for (const letter of letters) letter.style.opacity = ''
       caret.style.visibility = ''
     }
 
@@ -81,20 +79,16 @@ export function Hero() {
       const hero = frame.step.hero
       if (!hero) {
         // Past the hero: the name is in the matter and the text under it.
-        for (const letter of letters) letter.style.opacity = '0'
+        name.style.opacity = '0'
         content.style.opacity = '0'
         caret.style.visibility = 'hidden'
         return
       }
 
       name.style.transform = `scale(${hero.nameScale.toFixed(4)})`
-      // Blur is costly on phones; there the letters simply fade.
-      name.style.filter =
-        !isMobile && hero.nameBlur > 0.05 ? `blur(${hero.nameBlur.toFixed(2)}px)` : ''
-      hero.letters.forEach((opacity, index) => {
-        const letter = letters[index]
-        if (letter) letter.style.opacity = opacity.toFixed(3)
-      })
+      // Once the melt starts the canvas draws the name (same glyphs, same
+      // place), so the DOM copy steps aside in that same frame.
+      name.style.opacity = hero.melt > 0 ? '0' : ''
       caret.style.visibility = hero.focus > 0.3 ? 'hidden' : ''
 
       const under = hero.underwater
@@ -126,7 +120,7 @@ export function Hero() {
           // invisible and excludes it from LCP. At 0.01 the element is technically
           // visible to LCP measurement but imperceptible to users until GSAP animates it.
           <span key={charIndex} className="char inline-block" style={{ opacity: 0.01 }}>
-            {/* Inner span: typing animates the outer one, absorption this one. */}
+            {/* Inner span: typing animates the outer one; the melt measures this one. */}
             <span data-hero-char className="inline-block">
               {char}
             </span>

@@ -22,9 +22,18 @@ interface PuddleUniforms {
   uImageIn: WebGLUniformLocation | null
   uClarity: WebGLUniformLocation | null
   uBall: WebGLUniformLocation | null
-  uDrops: WebGLUniformLocation | null
-  uDropCount: WebGLUniformLocation | null
   uInk: WebGLUniformLocation | null
+  uName: WebGLUniformLocation | null
+  uNameOn: WebGLUniformLocation | null
+  uNameRect: WebGLUniformLocation | null
+  uNameSag: WebGLUniformLocation | null
+  uNameSoften: WebGLUniformLocation | null
+  uNameSoftRadius: WebGLUniformLocation | null
+  uNameTint: WebGLUniformLocation | null
+  uNameFade: WebGLUniformLocation | null
+  uDrips: WebGLUniformLocation | null
+  uDripNecks: WebGLUniformLocation | null
+  uDripCount: WebGLUniformLocation | null
 }
 
 interface PuddleWebGLContext {
@@ -149,9 +158,18 @@ export function setupPuddleWebGL(canvas: HTMLCanvasElement): PuddleWebGLContext 
     uImageIn: gl.getUniformLocation(program, 'uImageIn'),
     uClarity: gl.getUniformLocation(program, 'uClarity'),
     uBall: gl.getUniformLocation(program, 'uBall'),
-    uDrops: gl.getUniformLocation(program, 'uDrops'),
-    uDropCount: gl.getUniformLocation(program, 'uDropCount'),
     uInk: gl.getUniformLocation(program, 'uInk'),
+    uName: gl.getUniformLocation(program, 'uName'),
+    uNameOn: gl.getUniformLocation(program, 'uNameOn'),
+    uNameRect: gl.getUniformLocation(program, 'uNameRect'),
+    uNameSag: gl.getUniformLocation(program, 'uNameSag'),
+    uNameSoften: gl.getUniformLocation(program, 'uNameSoften'),
+    uNameSoftRadius: gl.getUniformLocation(program, 'uNameSoftRadius'),
+    uNameTint: gl.getUniformLocation(program, 'uNameTint'),
+    uNameFade: gl.getUniformLocation(program, 'uNameFade'),
+    uDrips: gl.getUniformLocation(program, 'uDrips'),
+    uDripNecks: gl.getUniformLocation(program, 'uDripNecks'),
+    uDripCount: gl.getUniformLocation(program, 'uDripCount'),
   }
 
   gl.enable(gl.BLEND)
@@ -164,6 +182,23 @@ export function setupPuddleWebGL(canvas: HTMLCanvasElement): PuddleWebGLContext 
     vbo,
     uniforms,
   }
+}
+
+/** Uploads the melting name's mask (unit 1). No mipmaps: it is drawn near 1:1. */
+export function createNameTexture(gl: WebGL2RenderingContext, image: ImageData) {
+  const texture = gl.createTexture()
+  if (!texture) return null
+  gl.activeTexture(gl.TEXTURE1)
+  gl.bindTexture(gl.TEXTURE_2D, texture)
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false)
+  gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false)
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+  gl.activeTexture(gl.TEXTURE0)
+  return texture
 }
 
 /** Uploads a decoded image as the texture the matter turns into (unit 0). */
