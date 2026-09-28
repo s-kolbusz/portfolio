@@ -128,7 +128,7 @@ export interface ChoreographyFrame {
   clarity: number
   /** How much the matter is a sheet of water (waves and sheen), 0–1 (signature scene). */
   surface: number
-  /** 1 for the water sheet (signature scene): unshaded, with a liquid edge as it leaves. */
+  /** 1 for the water sheet (signature scene): drawn flat, the ball drawn on it. */
   liquidEdge: number
   /** Opacity of the DOM image (swapped in once the canvas matches it). */
   reveal: number
@@ -435,12 +435,11 @@ export function choreograph({
   // Without a hero it grows out of the resting blob instead.
   const margin = 0.3 * unit
   const sheetHalfWidth = viewportWidth / 2 + margin
-  // Its bottom sits a little below the stage, so its rippling edge stays
-  // out of sight while pinned. As the stage leaves, the water draws back up
-  // off the next section (whose own background would hide it) and its soft,
-  // moving rim comes into view.
-  const leave = linear(0, viewportHeight * 0.45, scrollY - (stage.trackDocTop + stage.pinDistance))
-  const sheetBottomOffset = margin / 2 - glide(0, 1, leave) * margin * 1.6
+  // While it is still liquid its rippling bottom sits a little below the
+  // stage, out of sight; once it has settled (clear, before the swap) the
+  // edge is still and crisp and meets the stage's bottom exactly, so the
+  // sheet leaves as the section's own background, with no ragged rim.
+  const sheetBottomOffset = (margin / 2) * (1 - linear(BEATS.clear[1], BEATS.swap[1], progress))
   const sheetHalfHeight = viewportHeight + sheetBottomOffset / 2
   const grow = hero ? 1 : glide(...BEATS.darken, progress)
   const metrics = ballMetrics(viewportHeight, scale)
@@ -472,7 +471,8 @@ export function choreograph({
     centerY: mix(Math.min(viewportHeight / 2, middleY), stageTop + sheetBottomOffset / 2, grow),
     halfWidth: mix(radius, sheetHalfWidth, grow),
     halfHeight: mix(radius, sheetHalfHeight, grow),
-    cornerRadius: mix(radius, unit * 0.6, grow),
+    // Corners stay beyond the sides (the margin), so the bottom edge is straight across.
+    cornerRadius: mix(radius, margin * 0.5, grow),
     box,
     boxRadius: stage.box.radius,
     ball: {

@@ -45,14 +45,11 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
   // all of it (signature scene), 0 in the hero.
   uniform float uSurface;
   // 1 for the water sheet (signature scene): one flat colour, so it meets
-  // the hero's last frame and the page exactly, and its edge stays soft and
-  // moving after the matter has settled (a liquid rim as it leaves).
+  // the hero's last frame and the page exactly.
   uniform float uLiquidEdge;
-  // The wave field the floating blob makes in the sheet (see wave-sim.ts):
-  // a height map over the pinned stage, whose top is at uWaveTop (px).
-  uniform sampler2D uWave;
-  uniform float uWaveOn;
-  uniform float uWaveTop;
+  // The cursor ball's velocity (px/s, smoothed): moving through the sheet's
+  // swell it pushes and drags the water around it.
+  uniform vec2 uBallVelocity;
 
   // How much colour the blob has given up: 0 green → 1 clear water.
   uniform float uDrain;
@@ -151,11 +148,11 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
     // Both die out as the matter sets, so it lands still and crisp.
     float settle = smoothstep(0.0, 0.25, uFluid);
     // The ball never sets, so its surface keeps moving.
-    float bodyRipple = max(uFluid + uFlow * 1.5 * settle, uLiquidEdge * (1.6 + uFlow * 1.5));
+    float bodyRipple = uFluid + uFlow * 1.5 * settle;
     float ripple = mix(bodyRipple, 1.0 + uFlow, ballness) * uDetail;
     d += snoise(uv * 1.5 + uTime * 0.15) * 0.04 * uScale * ripple;
 
-    float aa = mix(mix(0.75 / unit, 0.04, max(uFluid, uLiquidEdge)), 0.04, ballness);
+    float aa = mix(mix(0.75 / unit, 0.04, uFluid), 0.04, ballness);
     float alpha = smoothstep(aa, -aa, d);
 
     float dither = snoise(px * 0.5) * 0.025;
@@ -173,6 +170,13 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
       float unrest = (1.0 - uClarity) * (1.0 + uFlow * 2.0) * uSurface;
 
       vec2 q = px / unit * 0.8;
+      // The ball in the water: the swell parts around it and is dragged
+      // along as it moves. Only visible while the water is still moving.
+      vec2 fromBall = (px - uBall.xy) / unit;
+      float ballReach = max(uBall.z / unit, 1e-3) * 2.4;
+      float nearBall = exp(-dot(fromBall, fromBall) / (ballReach * ballReach));
+      q -= fromBall / max(length(fromBall), 1e-3) * nearBall * uBall.z / unit * 0.5;
+      q -= uBallVelocity / unit * 0.18 * nearBall;
       vec2 warp = vec2(
         snoise(q * 0.3 + vec2(uTime * 0.012, 0.0)),
         snoise(q * 0.3 + vec2(4.7, 1.9) - vec2(0.0, uTime * 0.015))
@@ -184,18 +188,6 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
       float hx = swell(q + vec2(e, 0.0), warp, uTime) * chop;
       float hy = swell(q + vec2(0.0, e), warp, uTime) * chop;
       vec2 slope = vec2(hx - h, hy - h) / e * unrest;
-
-      // The blob's own waves: the water it pushes as it floats and moves.
-      // They move the surface whether it is murky or clear.
-      if (uWaveOn > 0.5) {
-        vec2 waveUv = vec2(px.x, px.y - uWaveTop) / uViewport;
-        vec2 waveTexel = 1.0 / vec2(textureSize(uWave, 0));
-        float wl = texture(uWave, waveUv - vec2(waveTexel.x, 0.0)).r;
-        float wr = texture(uWave, waveUv + vec2(waveTexel.x, 0.0)).r;
-        float wd = texture(uWave, waveUv - vec2(0.0, waveTexel.y)).r;
-        float wu = texture(uWave, waveUv + vec2(0.0, waveTexel.y)).r;
-        slope += vec2(wr - wl, wu - wd) * 2.2;
-      }
 
       // Swells tint the water a little: crests lighter, troughs deeper.
       vec3 water = shaded * (1.0 + h * 0.06 * unrest);
@@ -229,30 +221,18 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
     vec3 ballColor = mix(uColor, uColor * 0.85, depthFactor);
     vec3 finalColor = mix(bodyColor, ballColor, ballness);
 
-    // On the water sheet the ball is the hero's blob floating in it: the
-    // same soft green body, sitting in the water rather than on top. The
-    // surface around it bends its outline, and a little of its green
-    // seeps into the water close by.
+    // Inside the water sheet the body's union would swallow the ball, so it
+    // is drawn on its own there, with exactly the hero's ball formula:
+    // same circle, same noise field around the frame's middle, same ripple,
+    // edge and shading.
     if (uLiquidEdge > 0.5 && uBall.z > 0.0) {
-      vec2 wobble = vec2(0.0);
-      if (uWaveOn > 0.5) {
-        vec2 waveUv = vec2(px.x, px.y - uWaveTop) / uViewport;
-        vec2 waveTexel = 1.0 / vec2(textureSize(uWave, 0));
-        wobble = vec2(
-          texture(uWave, waveUv + vec2(waveTexel.x, 0.0)).r - texture(uWave, waveUv - vec2(waveTexel.x, 0.0)).r,
-          texture(uWave, waveUv + vec2(0.0, waveTexel.y)).r - texture(uWave, waveUv - vec2(0.0, waveTexel.y)).r
-        ) * unit * 0.04;
-      }
-      vec2 ballUv = (px + wobble - uBall.xy) / unit;
-      float blob = length(ballUv) - uBall.z / unit;
-      blob += snoise(ballUv * 1.5 + uTime * 0.15) * 0.04 * uScale * (1.0 + uFlow) * uDetail;
-      float blobAlpha = smoothstep(0.04, -0.04, blob);
-      float blobDepth = smoothstep(0.0, -0.5 * uScale, blob + dither);
-      vec3 blobColor = mix(uColor, uColor * 0.85, blobDepth);
-      float seep = exp(-max(blob, 0.0) * 9.0) * 0.18 * (1.0 - blobAlpha);
-      finalColor = mix(finalColor, uColor, seep * alpha);
-      finalColor = mix(finalColor, blobColor, blobAlpha);
-      alpha = max(alpha, blobAlpha);
+      vec2 heroUv = (px - uViewport * 0.5) / unit;
+      float ballD = sdCircle((px - uBall.xy) / unit, uBall.z / unit);
+      ballD += snoise(heroUv * 1.5 + uTime * 0.15) * 0.04 * uScale * (1.0 + uFlow) * uDetail;
+      float ballAlpha = smoothstep(0.04, -0.04, ballD);
+      float ballDepth = smoothstep(0.0, -0.5 * uScale, ballD + dither);
+      finalColor = mix(finalColor, mix(uColor, uColor * 0.85, ballDepth), ballAlpha);
+      alpha = max(alpha, ballAlpha);
     }
 
     // Drained of its colour the blob is clear water: almost no fill, a faint

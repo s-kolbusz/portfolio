@@ -47,17 +47,17 @@ przemiany, a nie ozdobnikiem.
 
 ## Klatki
 
-| P         | Etap            | Obraz                                                                                                                                                                                                                         | Odczyty (mono, pierwszy plan)                    |
-| --------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| przed     | **Hero**        | Scroll hero według [osobnego scenariusza](./2026-09-25-scroll-hero-scenariusz.md). Kończy się kadrem wypełnionym zielenią.                                                                                                    | —                                                |
-| 0.00–0.05 | **Wejście**     | Scena się przypina. Cały kadr to płynna zieleń, kursor nadal działa.                                                                                                                                                          | Pojawia się cel: `01 — stronypodhale.pl`         |
-| 0.02–0.40 | **Ciemnienie**  | Cały ekran ciemnieje do koloru strony. Powierzchnia faluje: długie, wolne fale z połyskiem. Tekst sceny jaśnieje razem z tłem.                                                                                                | `lepkość 0.82 → 0.30`, kolor `#7EC58E → #314638` |
-| 0.10–0.35 | **Kulka**       | Kulka kursora (ten sam rozmiar i to samo łączenie co w hero) odrywa się od tafli i zostaje zieloną kroplą na ciemnym tle. Bez kursora spływa na miejsce przy obrazie.                                                         | —                                                |
-| 0.30–0.58 | **Wyłanianie**  | Spod mętnej tafli wyłaniają się szczegóły strony, na swoim miejscu 16:9: najpierw rozmyte, bez krawędzi, mocno załamane i zabarwione, potem coraz wyraźniej. Fale idą przez cały ekran, także poza obrazem.                   | `lepkość 0.30 → 0.05`                            |
-| 0.50–0.78 | **Uspokojenie** | Tafla się uspokaja i robi przejrzysta: fale słabną, załamanie maleje, zmętnienie znika, krawędź obrazu się wyostrza. Wszędzie jednocześnie, bez frontu. Scroll znów ją mąci.                                                  | `przejrzystość 0 → 100%`                         |
-| 0.78–0.80 | **Spoczynek**   | Obraz jest jak szkło, a ostatnia klatka canvasa to piksel w piksel obraz DOM, więc zamiana jest niewidoczna. Tło zostaje ciemną, spokojną taflą.                                                                              | gasną                                            |
-| 0.80–0.97 | **Nagłówek**    | W miejsce odczytów wjeżdża nagłówek i link: ruch revealu z reszty strony, ale przewijany scrollem, nie odpalany na czas. Scena nadal stoi, więc całość czyta się jako jeden kadr.                                             | —                                                |
-| po        | **Odpięcie**    | Kadr razem z ciemną taflą odjeżdża do góry. Dolna krawędź tafli jest płynna (miękka, falująca, jak brzeg bloba), a scroll ją mąci. Zielona kulka zostaje żywa i idzie za kursorem dalej: dusza strony nie znika razem z tłem. | —                                                |
+| P         | Etap            | Obraz                                                                                                                                                                                                       | Odczyty (mono, pierwszy plan)                    |
+| --------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| przed     | **Hero**        | Scroll hero według [osobnego scenariusza](./2026-09-25-scroll-hero-scenariusz.md). Kończy się kadrem wypełnionym zielenią.                                                                                  | —                                                |
+| 0.00–0.05 | **Wejście**     | Scena się przypina. Cały kadr to płynna zieleń, kursor nadal działa.                                                                                                                                        | Pojawia się cel: `01 — stronypodhale.pl`         |
+| 0.02–0.40 | **Ciemnienie**  | Cały ekran ciemnieje do koloru strony. Powierzchnia faluje: długie, wolne fale z połyskiem. Tekst sceny jaśnieje razem z tłem.                                                                              | `lepkość 0.82 → 0.30`, kolor `#7EC58E → #314638` |
+| 0.10–0.35 | **Kulka**       | Kulka kursora (ten sam rozmiar i to samo łączenie co w hero) odrywa się od tafli i zostaje zieloną kroplą na ciemnym tle. Bez kursora spływa na miejsce przy obrazie.                                       | —                                                |
+| 0.30–0.58 | **Wyłanianie**  | Spod mętnej tafli wyłaniają się szczegóły strony, na swoim miejscu 16:9: najpierw rozmyte, bez krawędzi, mocno załamane i zabarwione, potem coraz wyraźniej. Fale idą przez cały ekran, także poza obrazem. | `lepkość 0.30 → 0.05`                            |
+| 0.50–0.78 | **Uspokojenie** | Tafla się uspokaja i robi przejrzysta: fale słabną, załamanie maleje, zmętnienie znika, krawędź obrazu się wyostrza. Wszędzie jednocześnie, bez frontu. Scroll znów ją mąci.                                | `przejrzystość 0 → 100%`                         |
+| 0.78–0.80 | **Spoczynek**   | Obraz jest jak szkło, a ostatnia klatka canvasa to piksel w piksel obraz DOM, więc zamiana jest niewidoczna. Tło zostaje ciemną, spokojną taflą.                                                            | gasną                                            |
+| 0.80–0.97 | **Nagłówek**    | W miejsce odczytów wjeżdża nagłówek i link: ruch revealu z reszty strony, ale przewijany scrollem, nie odpalany na czas. Scena nadal stoi, więc całość czyta się jako jeden kadr.                           | —                                                |
+| po        | **Odpięcie**    | Kadr razem z ciemną taflą odjeżdża do góry. Uspokojona tafla kończy się prosto na dole sekcji. Zielona kulka zostaje żywa i idzie za kursorem dalej: dusza strony nie znika razem z tłem.                   | —                                                |
 
 Rytm jak w hero: każdy etap ok. pół ekranu (0.25 P), ta sama krzywa, wszystko scroll-bound. Zakładki są celowe: kropla odrywa się,
 gdy materia ciemnieje, a szczegóły zaczynają prześwitywać, zanim skończy.
@@ -66,10 +66,9 @@ gdy materia ciemnieje, a szczegóły zaczynają prześwitywać, zanim skończy.
 
 Blob to istota strony, więc nawet gdy tło odjedzie, coś z niego zostaje:
 
-- **Płynna krawędź:** ciemna tafla odjeżdża z miękką, falującą dolną krawędzią
-  (ten sam brzeg co blob), a nie prostą linią sekcji.
-  Przy odjeździe woda cofa się nieco w górę, żeby brzeg nie chował się pod
-  tłem kolejnej sekcji.
+- ~~**Płynna krawędź**~~ (odrzucona w wersji 7: przycięta przez kolejną sekcję
+  wyglądała źle). Uspokojona tafla kończy się prosto, dokładnie na dole sekcji,
+  i odjeżdża jak jej tło.
 - **Kulka:** zielona kropla zostaje nad resztą strony i idzie za kursorem.
 
 ### Alternatywa (opcja 2, na później)
@@ -112,19 +111,15 @@ bez ostrych linii kaustyk.
 
 ## Kropla (kulka kursora)
 
-**Wersja 6 (po ocenie wersji 5):** kulka to cały czas zielony blob z hero
-(ten sam rozmiar, miękka, rozmyta krawędź, ten sam kolor), który **pływa w tafli**.
-Wersja 5 chowała go pod zielenią i pokazywała tylko idealnie okrągłe kręgi
-światła. To była droga na skróty, bo nie ruszała samej wody.
+**Wersja 7 (po ocenie wersji 6):** na tafli pływa **dokładnie ten sam** mniejszy
+blob co w hero: ten sam wzór w shaderze (koło, pole szumu, falowanie krawędzi,
+miękka krawędź, cieniowanie) i to samo śledzenie myszy (0,27 s). Bez
+zniekształceń od fal i bez „przenikania” zieleni.
 
-- Tafla ma prawdziwe pole fal: mapa wysokości liczona równaniem falowym na GPU.
-  Blob w ruchu wypycha wodę: z przodu fala dziobowa, z tyłu dolina (kilwater).
-  Fale rozchodzą się, nakładają, odbijają i gasną, i dodają się do falowania
-  tafli. Ruszają powierzchnię (załamanie obrazu, połysk), a nie tylko światło.
-- Fale wokół lekko wyginają obrys bloba, a odrobina jego zieleni przenika do
-  wody tuż obok. Blob siedzi w wodzie, a nie leży na niej.
-- W wodzie blob ma większy opór: idzie za kursorem wolniej niż w hero (0,5 s
-  zamiast 0,27 s). Wszystkie wygładzenia są liczone w czasie, nie w klatkach.
+- Bez osobnej symulacji fal (wersja 6 dokładała nową warstwę abstrakcji).
+  Blob zaburza **istniejące falowanie tafli** w stanie przejściowym: fale
+  rozstępują się wokół niego i są ciągnięte za nim, gdy się porusza. Gdy tafla
+  się uspokoi, nie ma czego zaburzać, więc efekt znika razem z falowaniem.
 
 Kroplą jest kulka, która w hero idzie za kursorem i zlewa się z blobem. To ta
 część materii, która zostaje płynna. Nie ma osobnej animacji: ten sam kształt,

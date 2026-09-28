@@ -23,9 +23,7 @@ interface PuddleUniforms {
   uClarity: WebGLUniformLocation | null
   uSurface: WebGLUniformLocation | null
   uLiquidEdge: WebGLUniformLocation | null
-  uWave: WebGLUniformLocation | null
-  uWaveOn: WebGLUniformLocation | null
-  uWaveTop: WebGLUniformLocation | null
+  uBallVelocity: WebGLUniformLocation | null
   uImageRadius: WebGLUniformLocation | null
   uBall: WebGLUniformLocation | null
   uDrain: WebGLUniformLocation | null
@@ -154,9 +152,7 @@ export function setupPuddleWebGL(canvas: HTMLCanvasElement): PuddleWebGLContext 
     uClarity: gl.getUniformLocation(program, 'uClarity'),
     uSurface: gl.getUniformLocation(program, 'uSurface'),
     uLiquidEdge: gl.getUniformLocation(program, 'uLiquidEdge'),
-    uWave: gl.getUniformLocation(program, 'uWave'),
-    uWaveOn: gl.getUniformLocation(program, 'uWaveOn'),
-    uWaveTop: gl.getUniformLocation(program, 'uWaveTop'),
+    uBallVelocity: gl.getUniformLocation(program, 'uBallVelocity'),
     uImageRadius: gl.getUniformLocation(program, 'uImageRadius'),
     uBall: gl.getUniformLocation(program, 'uBall'),
     uDrain: gl.getUniformLocation(program, 'uDrain'),

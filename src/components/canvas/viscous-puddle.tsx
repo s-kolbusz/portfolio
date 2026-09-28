@@ -21,7 +21,6 @@ import {
   SIGNATURE_STATIC_ATTR,
   SIGNATURE_TRACK_SELECTOR,
 } from './viscous-puddle/signature-bus'
-import { createWaveSim } from './viscous-puddle/wave-sim'
 import {
   createImageTexture,
   disposePuddleWebGL,
@@ -94,6 +93,8 @@ interface PuddleState {
   flow: number
   lastBallX: number
   lastBallY: number
+  ballVX: number
+  ballVY: number
 }
 
 function createInitialState(): PuddleState {
@@ -123,6 +124,8 @@ function createInitialState(): PuddleState {
     flow: 0,
     lastBallX: 0,
     lastBallY: 0,
+    ballVX: 0,
+    ballVY: 0,
   }
 }
 
@@ -218,10 +221,6 @@ export function ViscousPuddle() {
 
     const { gl, vao, uniforms, program } = webgl
     gl.uniform1i(uniforms.uImage, 0)
-    gl.uniform1i(uniforms.uWave, 2)
-    // The water sheet's wave field, which the floating blob stirs.
-    const waves = createWaveSim(gl, window.innerWidth < 768 ? 160 : 288)
-    let wavesLive = false
 
     const syncLayout = () => {
       const rect = canvas.getBoundingClientRect()
@@ -237,7 +236,6 @@ export function ViscousPuddle() {
       state.elements = findSignatureElements()
       state.stage = state.elements ? measureStage(state.elements) : null
       state.hero = measureHero()
-      waves?.resize(rect.width, window.innerHeight)
     }
 
     syncLayout()
@@ -384,37 +382,25 @@ export function ViscousPuddle() {
         state.ballRelY = targetY
       }
       // In the water the blob floats: it follows with more drag than in the hero.
-      // Time constants matching the hero's feel at 60 fps (0.27 s), with more
-      // drag while it floats in the water sheet (0.5 s).
-      const ballLerp = ease(
-        followPointer ? mix(0.27, 0.5, step.liquidEdge) : mix(0.8, 0.27, ball.detach)
-      )
+      // The same follow as in the hero everywhere (0.27 s, i.e. 0.06 a
+      // frame at 60 fps), so it is one and the same ball.
+      const ballLerp = ease(followPointer ? 0.27 : mix(0.8, 0.27, ball.detach))
       state.ballRelX = lerp(state.ballRelX, targetX, ballLerp)
       state.ballRelY = lerp(state.ballRelY, targetY, ballLerp)
       const ballX = state.ballRelX + step.box.left
       const ballY = state.ballRelY + step.box.top
 
-      // The blob floating in the water sheet pushes it as it moves.
-      // Velocity in the stage's frame, so scrolling the sheet away is not a push.
+      // The ball's velocity in the stage's frame (so scrolling the sheet
+      // away is not movement), smoothed: it parts and drags the swell.
       const stageTop = step.box.top - (state.stage?.box.offsetTop ?? 0)
-      const ballVX = ballX - state.lastBallX
-      const ballVY = ballY - stageTop - state.lastBallY
+      if (delta > 0) {
+        const vx = (ballX - state.lastBallX) / delta
+        const vy = (ballY - stageTop - state.lastBallY) / delta
+        state.ballVX = lerp(state.ballVX, vx, ease(0.15))
+        state.ballVY = lerp(state.ballVY, vy, ease(0.15))
+      }
       state.lastBallX = ballX
       state.lastBallY = ballY - stageTop
-      const onSheet = step.liquidEdge > 0 && step.body
-      if (waves && onSheet) {
-        // Two half-steps a frame: waves travel at a watery pace.
-        for (let i = 0; i < 2; i++) {
-          waves.step(
-            { x: ballX, y: ballY, radius: ball.radius, vx: ballVX / 2, vy: ballVY / 2 },
-            stageTop
-          )
-        }
-        wavesLive = true
-      } else if (wavesLive) {
-        waves?.clear()
-        wavesLive = false
-      }
 
       publishSignature({
         step,
@@ -472,13 +458,7 @@ export function ViscousPuddle() {
       gl.uniform1f(uniforms.uSurface, step.surface)
       gl.uniform1f(uniforms.uLiquidEdge, step.liquidEdge)
       gl.uniform1f(uniforms.uImageRadius, step.boxRadius)
-      gl.uniform1f(uniforms.uWaveOn, waves && onSheet ? 1 : 0)
-      gl.uniform1f(uniforms.uWaveTop, stageTop)
-      if (waves && onSheet) {
-        gl.activeTexture(gl.TEXTURE2)
-        gl.bindTexture(gl.TEXTURE_2D, waves.texture())
-        gl.activeTexture(gl.TEXTURE0)
-      }
+      gl.uniform2f(uniforms.uBallVelocity, state.ballVX, state.ballVY)
       gl.uniform4f(uniforms.uBall, ballX, ballY, ball.radius, ball.merge)
       gl.uniform1f(uniforms.uDrain, step.drain)
 
@@ -516,7 +496,6 @@ export function ViscousPuddle() {
       document.removeEventListener('mouseleave', onMouseLeave)
       document.removeEventListener('mouseenter', onMouseEnter)
       if (texture) gl.deleteTexture(texture)
-      waves?.dispose()
       disposePuddleWebGL(webgl)
     }
   }, [])

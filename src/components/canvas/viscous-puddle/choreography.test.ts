@@ -100,15 +100,14 @@ describe('signature transition choreography', () => {
     expect(atProgress(0.78).reveal).toBe(0)
   })
 
-  it('leaves with the section on a liquid edge, then sleeps once only the ball is gone', () => {
-    const leaving = at(pinEnd + 450)
-    // Out of sight below the stage while pinned; drawn back above the
-    // stage's bottom as it leaves, so the rim shows above the next section.
+  it('leaves with the section, its settled edge exactly on the stage bottom', () => {
+    const liquid = atProgress(0.3)
+    expect(liquid.centerY + liquid.halfHeight).toBeGreaterThan(900)
     const pinned = at(pinEnd)
-    expect(pinned.centerY + pinned.halfHeight).toBeGreaterThan(900)
-    expect(leaving.centerY + leaving.halfHeight).toBeLessThan(900 - 450)
-    expect(leaving.centerY + leaving.halfHeight).toBeGreaterThan(900 - 450 - 250)
-    expect(leaving.liquidEdge).toBe(1)
+    expect(pinned.centerY + pinned.halfHeight).toBeCloseTo(900)
+    const leaving = at(pinEnd + 450)
+    expect(leaving.centerY + leaving.halfHeight).toBeCloseTo(900 - 450)
+    expect(leaving.fluid).toBe(0)
     expect(leaving.body).toBe(true)
     expect(at(pinEnd + 1200).body).toBe(false)
   })
