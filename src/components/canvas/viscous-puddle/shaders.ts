@@ -50,11 +50,8 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
   // The cursor ball's velocity (px/s, smoothed): moving through the sheet's
   // swell it pushes and drags the water around it.
   uniform vec2 uBallVelocity;
-  // The scene's text blocks (xy top-left, zw size, px) and their opacity:
-  // the ball sinks beneath them so light text stays legible over it.
-  uniform vec4 uTextRects[8];
-  uniform float uTextAlphas[8];
-  uniform int uTextCount;
+  // How far the ball has faded back into the water under the scene's text.
+  uniform float uBallSink;
 
   // How much colour the blob has given up: 0 green → 1 clear water.
   uniform float uDrain;
@@ -146,8 +143,11 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
     }
 
     float ball = sdCircle((px - uBall.xy) / unit, uBall.z / unit);
-    float d = uBall.w > 0.5 ? smin(body, ball, uBall.w / unit) : min(body, ball);
-    float ballness = smoothstep(-0.02, 0.02, body - ball);
+    // On the water sheet the ball is drawn as its own layer (below), so the
+    // sheet's edge never reaches for it: no union, no shared ripple.
+    float sheet = step(0.5, uLiquidEdge);
+    float d = sheet > 0.5 ? body : uBall.w > 0.5 ? smin(body, ball, uBall.w / unit) : min(body, ball);
+    float ballness = smoothstep(-0.02, 0.02, body - ball) * (1.0 - sheet);
 
     // Surface ripple: there while liquid, plus whatever the scroll stirs up.
     // Both die out as the matter sets, so it lands still and crisp.
@@ -235,17 +235,8 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
       float ballD = sdCircle((px - uBall.xy) / unit, uBall.z / unit);
       ballD += snoise(heroUv * 1.5 + uTime * 0.15) * 0.04 * uScale * (1.0 + uFlow) * uDetail;
       float ballAlpha = smoothstep(0.04, -0.04, ballD);
-      // Beneath text the ball sinks into the water: it fades to the sheet's
-      // colour over the block (softly past its edges), so text keeps its contrast.
-      float under = 0.0;
-      for (int i = 0; i < 8; i++) {
-        if (i >= uTextCount) break;
-        vec4 textRect = uTextRects[i];
-        vec2 halfText = textRect.zw * 0.5;
-        float textD = sdRoundBox(px - textRect.xy - halfText, halfText, 6.0);
-        under = max(under, smoothstep(18.0, -4.0, textD) * uTextAlphas[i]);
-      }
-      ballAlpha *= 1.0 - 0.85 * under;
+      // Over text the ball fades back into the water as a whole.
+      ballAlpha *= 1.0 - 0.8 * uBallSink;
       float ballDepth = smoothstep(0.0, -0.5 * uScale, ballD + dither);
       finalColor = mix(finalColor, mix(uColor, uColor * 0.85, ballDepth), ballAlpha);
       alpha = max(alpha, ballAlpha);

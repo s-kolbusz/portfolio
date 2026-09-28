@@ -141,8 +141,13 @@ Dalsza droga kulki (kolejne sceny, kontakt) należy do kroków 2 i 5 roadmapy.
 - **Zrzut strony na środku:** dopóki jest jedynym elementem w kadrze, stoi
   wyśrodkowany w pionie (odczyty jadą tuż nad nim). Na swoje miejsce w układzie
   przesuwa się razem z wejściem nagłówka, sterowany scrollem.
-- **Czytelność:** pod jasnym tekstem sceny (nagłówek, odczyty, link) blob
-  „zanurza się”, czyli blednie do koloru tafli w obrysie tekstu (miękko).
+- **Czytelność:** gdy blob nachodzi na jasny tekst sceny (nagłówek, odczyty,
+  link), cały przygasa i wraca w wodę. Odległość liczona od linii tekstu, nie od
+  bloków. Wersja z wycinaniem prostokątów pod tekstem była odrzucona: tworzyła
+  niedopasowane tła o różnych marginesach.
+- **Krawędź tafli nie łączy się z kulką:** na tafli kulka jest osobną warstwą,
+  więc dolna krawędź zostaje ostra i nieruchoma. Wcześniej stare łączenie
+  bloba z kulką „rozpuszczało” krawędź przy kulce, jakby dwie mechaniki walczyły ze sobą.
 - **Bezwładność:** Lenis prowadzi też przewijanie dotykiem (`syncTouch`), więc
   rzut palcem ma tę samą wagę co kółko, a w przypiętych scenach (hero i ta
   scena) scroll jest cięższy (×0,6), żeby łatwo nie przelecieć dalej.

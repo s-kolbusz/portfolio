@@ -69,10 +69,13 @@ interface SignatureElements {
   texts: HTMLElement[]
 }
 
-/** How many text blocks the shader keeps the ball beneath. */
-const MAX_TEXT_RECTS = 8
-const textRects = new Float32Array(MAX_TEXT_RECTS * 4)
-const textAlphas = new Float32Array(MAX_TEXT_RECTS)
+/** Reused to measure the scene text's line boxes each frame. */
+const textRange = typeof document !== 'undefined' ? document.createRange() : null!
+
+function smoothstepJs(edge0: number, edge1: number, value: number) {
+  const t = Math.min(1, Math.max(0, (value - edge0) / (edge1 - edge0)))
+  return t * t * (3 - 2 * t)
+}
 
 interface PuddleState {
   /** Cursor ball, stored relative to the box so it rides along with scrolling. */
@@ -103,6 +106,8 @@ interface PuddleState {
   lastBallY: number
   ballVX: number
   ballVY: number
+  /** How far the ball has faded back under the scene's text, 0–1. */
+  ballSink: number
 }
 
 function createInitialState(): PuddleState {
@@ -134,6 +139,7 @@ function createInitialState(): PuddleState {
     lastBallY: 0,
     ballVX: 0,
     ballVY: 0,
+    ballSink: 0,
   }
 }
 
@@ -473,23 +479,29 @@ export function ViscousPuddle() {
       gl.uniform1f(uniforms.uLiquidEdge, step.liquidEdge)
       gl.uniform1f(uniforms.uImageRadius, step.boxRadius)
       gl.uniform2f(uniforms.uBallVelocity, state.ballVX, state.ballVY)
-      // The scene's text, so the ball can sink beneath it and keep it legible.
-      const texts = step.liquidEdge > 0 ? (state.elements?.texts ?? []) : []
-      textRects.fill(0)
-      let textCount = 0
-      for (const text of texts) {
-        if (textCount >= MAX_TEXT_RECTS) break
-        const opacity = parseFloat(text.style.opacity || '1')
-        if (!(opacity > 0.01)) continue
-        const rect = text.getBoundingClientRect()
-        if (rect.width === 0 || rect.bottom < 0 || rect.top > state.canvasHeight) continue
-        textRects.set([rect.left, rect.top, rect.width, rect.height], textCount * 4)
-        textAlphas[textCount] = Math.min(1, opacity)
-        textCount++
+      // Over the scene's text the whole ball fades back into the water, so
+      // the text stays legible: judged from the letters' own line boxes,
+      // not from the blocks around them.
+      let sink = 0
+      if (step.liquidEdge > 0) {
+        for (const text of state.elements?.texts ?? []) {
+          const opacity = parseFloat(text.style.opacity || '1')
+          if (!(opacity > 0.01)) continue
+          textRange.selectNodeContents(text)
+          for (const line of textRange.getClientRects()) {
+            if (line.width === 0) continue
+            const dx = Math.max(line.left - ballX, 0, ballX - line.right)
+            const dy = Math.max(line.top - ballY, 0, ballY - line.bottom)
+            const distance = Math.hypot(dx, dy)
+            sink = Math.max(
+              sink,
+              Math.min(1, opacity) * smoothstepJs(ball.radius * 1.05, ball.radius * 0.35, distance)
+            )
+          }
+        }
       }
-      gl.uniform4fv(uniforms.uTextRects, textRects)
-      gl.uniform1fv(uniforms.uTextAlphas, textAlphas)
-      gl.uniform1i(uniforms.uTextCount, textCount)
+      state.ballSink = lerp(state.ballSink, sink, ease(0.18))
+      gl.uniform1f(uniforms.uBallSink, state.ballSink)
       gl.uniform4f(uniforms.uBall, ballX, ballY, ball.radius, ball.merge)
       gl.uniform1f(uniforms.uDrain, step.drain)
 
