@@ -129,6 +129,9 @@ export function SignatureScene() {
     // from a fixed element at the top edge, so a hairline strip is pinned
     // there (theme-color still covers other browsers). Bottom: the page's
     // background, which shows in the strips around the page on phones.
+    // Safari does not follow every change (it re-reads the colour when such
+    // an element appears), so the colour switches between two states only,
+    // page or settled sheet, and the strip is re-inserted on each switch.
     const themeMetas = Array.from(
       document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')
     )
@@ -155,6 +158,8 @@ export function SignatureScene() {
           meta.content = top ?? themeDefaults[index]
         })
         topStrip.style.backgroundColor = top ?? 'var(--background)'
+        topStrip.remove()
+        document.body.appendChild(topStrip)
       }
       if (bottom !== bottomColour) {
         bottomColour = bottom
@@ -178,10 +183,9 @@ export function SignatureScene() {
         return
       }
       const sheetBottom = step.centerY + step.halfHeight
-      const [r, g, b] = mixColour(frame.startColour, frame.targetColour, step.solid).map((c) =>
-        Math.round(c * 255)
-      )
-      const sheetColour = `rgb(${r}, ${g}, ${b})`
+      // The settled sheet's colour, once it has darkened past halfway.
+      const [r, g, b] = frame.targetColour.map((c) => Math.round(c * 255))
+      const sheetColour = step.solid >= 0.5 ? `rgb(${r}, ${g}, ${b})` : null
       const sheetTop = step.centerY - step.halfHeight
       setChromeColour(
         sheetTop <= 0 && sheetBottom > 2 ? sheetColour : null,

@@ -160,6 +160,11 @@ Dalsza droga kulki (kolejne sceny, kontakt) należy do kroków 2 i 5 roadmapy.
   Dlatego u góry jest przypięty pasek o wysokości 2 px w kolorze tafli, gdy tafla
   sięga góry (plus `theme-color` dla innych przeglądarek). Na dole kolor tafli
   przyjmuje tło strony, gdy tafla sięga dołu.
+- **Dwa stany zamiast przejścia** (po teście na iPhonie): Safari nie śledzi
+  każdej zmiany koloru, więc płynne przejście zostawiało w pasku przypadkową
+  jasną zieleń. Kolor paska przełącza się tylko między kolorem strony a kolorem
+  uspokojonej tafli (od połowy ciemnienia), a pasek u góry jest przy każdym
+  przełączeniu wstawiany na nowo, żeby Safari odczytał kolor ponownie.
 
 ## Kursor i docki nad taflą
 
