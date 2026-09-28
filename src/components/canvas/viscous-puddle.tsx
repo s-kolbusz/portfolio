@@ -6,7 +6,7 @@ import { createPortal } from 'react-dom'
 import { usePrefersReducedMotion } from '@/hooks/use-media'
 import { gsap } from '@/lib/gsap-core'
 
-import { choreograph, type HeroLayout, type StageLayout } from './viscous-puddle/choreography'
+import { choreograph, mix, type HeroLayout, type StageLayout } from './viscous-puddle/choreography'
 import { measureName } from './viscous-puddle/name-mask'
 import {
   HERO_CHAR_SELECTOR,
@@ -21,6 +21,7 @@ import {
   SIGNATURE_STATIC_ATTR,
   SIGNATURE_TRACK_SELECTOR,
 } from './viscous-puddle/signature-bus'
+import { createWaveSim } from './viscous-puddle/wave-sim'
 import {
   createImageTexture,
   disposePuddleWebGL,
@@ -91,8 +92,6 @@ interface PuddleState {
   hero: HeroLayout | null
   lastScrollY: number
   flow: number
-  /** How hard the cursor is stirring the water, 0–1. */
-  stir: number
   lastBallX: number
   lastBallY: number
 }
@@ -122,7 +121,6 @@ function createInitialState(): PuddleState {
     hero: null,
     lastScrollY: 0,
     flow: 0,
-    stir: 0,
     lastBallX: 0,
     lastBallY: 0,
   }
@@ -218,8 +216,12 @@ export function ViscousPuddle() {
       return
     }
 
-    const { gl, vao, uniforms } = webgl
+    const { gl, vao, uniforms, program } = webgl
     gl.uniform1i(uniforms.uImage, 0)
+    gl.uniform1i(uniforms.uWave, 2)
+    // The water sheet's wave field, which the floating blob stirs.
+    const waves = createWaveSim(gl, window.innerWidth < 768 ? 160 : 288)
+    let wavesLive = false
 
     const syncLayout = () => {
       const rect = canvas.getBoundingClientRect()
@@ -235,6 +237,7 @@ export function ViscousPuddle() {
       state.elements = findSignatureElements()
       state.stage = state.elements ? measureStage(state.elements) : null
       state.hero = measureHero()
+      waves?.resize(rect.width, window.innerHeight)
     }
 
     syncLayout()
@@ -337,13 +340,15 @@ export function ViscousPuddle() {
       const reduced = reducedMotionRef.current
       if (!reduced) state.time += delta
 
-      state.opacity = lerp(state.opacity, 1, 0.025)
-      state.scale = lerp(state.scale, state.isMobile ? 0.6 : 1, 0.1)
+      // Eased by time, not frames, so a slow device fades in at the same pace.
+      const ease = (seconds: number) => 1 - Math.exp(-delta / seconds)
+      state.opacity = lerp(state.opacity, 1, ease(0.6))
+      state.scale = lerp(state.scale, state.isMobile ? 0.6 : 1, ease(0.15))
 
       const primary = getPrimaryRgb()
-      state.colorR = lerp(state.colorR, primary[0], 0.05)
-      state.colorG = lerp(state.colorG, primary[1], 0.05)
-      state.colorB = lerp(state.colorB, primary[2], 0.05)
+      state.colorR = lerp(state.colorR, primary[0], ease(0.3))
+      state.colorG = lerp(state.colorG, primary[1], ease(0.3))
+      state.colorB = lerp(state.colorB, primary[2], ease(0.3))
 
       const step = currentStep()
       setReveal(step.reveal)
@@ -378,19 +383,38 @@ export function ViscousPuddle() {
         state.ballRelX = targetX
         state.ballRelY = targetY
       }
-      const ballLerp = followPointer ? 0.06 : 0.02 + 0.04 * ball.detach
+      // In the water the blob floats: it follows with more drag than in the hero.
+      // Time constants matching the hero's feel at 60 fps (0.27 s), with more
+      // drag while it floats in the water sheet (0.5 s).
+      const ballLerp = ease(
+        followPointer ? mix(0.27, 0.5, step.liquidEdge) : mix(0.8, 0.27, ball.detach)
+      )
       state.ballRelX = lerp(state.ballRelX, targetX, ballLerp)
       state.ballRelY = lerp(state.ballRelY, targetY, ballLerp)
       const ballX = state.ballRelX + step.box.left
       const ballY = state.ballRelY + step.box.top
 
-      // A moving cursor stirs the water sheet; the rings settle when it stops.
-      const ballSpeed =
-        delta > 0 ? Math.hypot(ballX - state.lastBallX, ballY - state.lastBallY) / delta : 0
+      // The blob floating in the water sheet pushes it as it moves.
+      // Velocity in the stage's frame, so scrolling the sheet away is not a push.
+      const stageTop = step.box.top - (state.stage?.box.offsetTop ?? 0)
+      const ballVX = ballX - state.lastBallX
+      const ballVY = ballY - stageTop - state.lastBallY
       state.lastBallX = ballX
-      state.lastBallY = ballY
-      const targetStir = followPointer ? Math.min(ballSpeed / 900, 1) : 0
-      state.stir = lerp(state.stir, targetStir, targetStir > state.stir ? 0.08 : 0.02)
+      state.lastBallY = ballY - stageTop
+      const onSheet = step.liquidEdge > 0 && step.body
+      if (waves && onSheet) {
+        // Two half-steps a frame: waves travel at a watery pace.
+        for (let i = 0; i < 2; i++) {
+          waves.step(
+            { x: ballX, y: ballY, radius: ball.radius, vx: ballVX / 2, vy: ballVY / 2 },
+            stageTop
+          )
+        }
+        wavesLive = true
+      } else if (wavesLive) {
+        waves?.clear()
+        wavesLive = false
+      }
 
       publishSignature({
         step,
@@ -399,6 +423,7 @@ export function ViscousPuddle() {
         ball: { x: ballX, y: ballY, radius: ball.radius },
       })
 
+      gl.useProgram(program)
       gl.viewport(0, 0, canvas.width, canvas.height)
       gl.disable(gl.SCISSOR_TEST)
       gl.clearColor(0, 0, 0, 0)
@@ -447,7 +472,13 @@ export function ViscousPuddle() {
       gl.uniform1f(uniforms.uSurface, step.surface)
       gl.uniform1f(uniforms.uLiquidEdge, step.liquidEdge)
       gl.uniform1f(uniforms.uImageRadius, step.boxRadius)
-      gl.uniform3f(uniforms.uStir, ballX, ballY, step.liquidEdge * state.stir)
+      gl.uniform1f(uniforms.uWaveOn, waves && onSheet ? 1 : 0)
+      gl.uniform1f(uniforms.uWaveTop, stageTop)
+      if (waves && onSheet) {
+        gl.activeTexture(gl.TEXTURE2)
+        gl.bindTexture(gl.TEXTURE_2D, waves.texture())
+        gl.activeTexture(gl.TEXTURE0)
+      }
       gl.uniform4f(uniforms.uBall, ballX, ballY, ball.radius, ball.merge)
       gl.uniform1f(uniforms.uDrain, step.drain)
 
@@ -485,6 +516,7 @@ export function ViscousPuddle() {
       document.removeEventListener('mouseleave', onMouseLeave)
       document.removeEventListener('mouseenter', onMouseEnter)
       if (texture) gl.deleteTexture(texture)
+      waves?.dispose()
       disposePuddleWebGL(webgl)
     }
   }, [])

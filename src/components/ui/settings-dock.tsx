@@ -27,7 +27,10 @@ export function SettingsDock() {
   }
 
   return (
-    <div className="settings-dock glass fixed top-6 right-6 z-50 flex items-center gap-1 p-1.5">
+    <div
+      data-adapt-theme
+      className="settings-dock glass fixed top-6 right-6 z-50 flex items-center gap-1 p-1.5"
+    >
       {/* Theme Toggle */}
       <Button variant="glass" size="icon" onClick={toggleTheme} aria-label={t('toggle_theme')}>
         {resolvedTheme === 'dark' ? (

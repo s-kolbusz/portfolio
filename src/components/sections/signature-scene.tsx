@@ -15,7 +15,10 @@ import {
   toHex,
   type ReadoutKey,
 } from '@/components/canvas/viscous-puddle/choreography'
-import { subscribeSignature } from '@/components/canvas/viscous-puddle/signature-bus'
+import {
+  ADAPT_THEME_SELECTOR,
+  subscribeSignature,
+} from '@/components/canvas/viscous-puddle/signature-bus'
 import { Button } from '@/components/ui/button'
 import { EditorialHeader } from '@/components/ui/editorial-header'
 import { REVEAL } from '@/hooks/timeline/reveal-engine'
@@ -94,6 +97,46 @@ export function SignatureScene() {
     return () => {
       unsubscribe()
       reset()
+    }
+  }, [])
+
+  // The fixed chrome (docks, cursor) reads on whatever is under it: over
+  // the darkened water sheet it takes the dark palette, so icons and the
+  // cursor stay visible (a no-op on the dark theme).
+  useEffect(() => {
+    let pointerY = -1
+    const onPointerMove = (event: PointerEvent) => {
+      pointerY = event.clientY
+    }
+    window.addEventListener('pointermove', onPointerMove, { passive: true })
+    const clear = () => {
+      for (const element of document.querySelectorAll<HTMLElement>(ADAPT_THEME_SELECTOR)) {
+        element.classList.remove('dark')
+      }
+    }
+
+    const unsubscribe = subscribeSignature((frame) => {
+      const step = frame?.step
+      const sheetDark = step && step.liquidEdge > 0 && step.body && step.solid >= 0.5
+      if (!sheetDark) {
+        clear()
+        return
+      }
+      const sheetBottom = step.centerY + step.halfHeight
+      for (const element of document.querySelectorAll<HTMLElement>(ADAPT_THEME_SELECTOR)) {
+        let y = pointerY
+        if (element.dataset.adaptTheme !== 'pointer') {
+          const rect = element.getBoundingClientRect()
+          y = rect.top + rect.height / 2
+        }
+        element.classList.toggle('dark', y >= 0 && y < sheetBottom)
+      }
+    })
+
+    return () => {
+      unsubscribe()
+      window.removeEventListener('pointermove', onPointerMove)
+      clear()
     }
   }, [])
 

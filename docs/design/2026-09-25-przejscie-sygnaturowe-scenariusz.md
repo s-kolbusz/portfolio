@@ -112,10 +112,19 @@ bez ostrych linii kaustyk.
 
 ## Kropla (kulka kursora)
 
-**Wersja 5:** na tafli kulka nie unosi się nad wodą. Jest jej częścią: kursor
-w ruchu puszcza rozchodzące się kręgi fal, które gasną, gdy się zatrzyma.
-Poza taflą (gdy ta odjeżdża) kulka wygląda i zachowuje się dokładnie jak w hero:
-miękka, rozmyta krawędź, to samo łączenie.
+**Wersja 6 (po ocenie wersji 5):** kulka to cały czas zielony blob z hero
+(ten sam rozmiar, miękka, rozmyta krawędź, ten sam kolor), który **pływa w tafli**.
+Wersja 5 chowała go pod zielenią i pokazywała tylko idealnie okrągłe kręgi
+światła. To była droga na skróty, bo nie ruszała samej wody.
+
+- Tafla ma prawdziwe pole fal: mapa wysokości liczona równaniem falowym na GPU.
+  Blob w ruchu wypycha wodę: z przodu fala dziobowa, z tyłu dolina (kilwater).
+  Fale rozchodzą się, nakładają, odbijają i gasną, i dodają się do falowania
+  tafli. Ruszają powierzchnię (załamanie obrazu, połysk), a nie tylko światło.
+- Fale wokół lekko wyginają obrys bloba, a odrobina jego zieleni przenika do
+  wody tuż obok. Blob siedzi w wodzie, a nie leży na niej.
+- W wodzie blob ma większy opór: idzie za kursorem wolniej niż w hero (0,5 s
+  zamiast 0,27 s). Wszystkie wygładzenia są liczone w czasie, nie w klatkach.
 
 Kroplą jest kulka, która w hero idzie za kursorem i zlewa się z blobem. To ta
 część materii, która zostaje płynna. Nie ma osobnej animacji: ten sam kształt,
@@ -131,6 +140,13 @@ rozmiar (0,25 jednostki bloba) i to samo lepkie łączenie (`smin` 0,6), co w he
   Canvas śpi, gdy kadr zniknie z ekranu.
 
 Dalsza droga kulki (kolejne sceny, kontakt) należy do kroków 2 i 5 roadmapy.
+
+## Kursor i docki nad taflą
+
+Stały interfejs (docki, kursor) przyjmuje paletę tego, co jest pod nim: nad
+ciemną taflą przechodzi na tokeny ciemnego motywu, więc ikony i kursor są
+czytelne. Kursor ma kolor tekstu (ciemny na jasnym, jasny na ciemnym) i nie
+używa już `mix-blend-difference`, który na zieleni dawał przypadkowe kolory.
 
 ## Nawigacja i skoki
 

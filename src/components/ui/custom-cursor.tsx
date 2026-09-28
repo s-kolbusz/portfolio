@@ -265,16 +265,17 @@ export function CustomCursor() {
   return (
     <div
       data-testid="custom-cursor"
-      className="pointer-events-none fixed inset-0 z-9998 overflow-hidden mix-blend-difference print:hidden"
+      data-adapt-theme="pointer"
+      className="pointer-events-none fixed inset-0 z-9998 overflow-hidden print:hidden"
     >
       <div
         ref={cursorRef}
-        className="bg-cursor pointer-events-none fixed top-0 left-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0 will-change-transform"
+        className="bg-foreground pointer-events-none fixed top-0 left-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0 will-change-transform"
       />
 
       <div
         ref={ringRef}
-        className="border-cursor pointer-events-none fixed top-0 left-0 h-11 w-11 -translate-x-1/2 -translate-y-1/2 rounded-full border opacity-0 transition-colors will-change-transform"
+        className="border-foreground/70 pointer-events-none fixed top-0 left-0 h-11 w-11 -translate-x-1/2 -translate-y-1/2 rounded-full border opacity-0 transition-colors will-change-transform"
       />
     </div>
   )

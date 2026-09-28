@@ -41,3 +41,9 @@ export const HERO_NAME_SELECTOR = '[data-hero-name]'
 export const HERO_CHAR_SELECTOR = '[data-hero-char]'
 /** Set on the hero track when the canvas cannot run: the hero is not pinned. */
 export const HERO_STATIC_ATTR = 'data-hero-static'
+/**
+ * Fixed chrome (docks, cursor) that takes the palette of what is under it:
+ * over the dark water sheet it switches to the dark theme's tokens. The
+ * value "pointer" means: judge by the pointer's position, not the element's.
+ */
+export const ADAPT_THEME_SELECTOR = '[data-adapt-theme]'
