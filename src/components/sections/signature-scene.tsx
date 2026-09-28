@@ -37,7 +37,8 @@ const SCENE_MUTED =
  * First scene after the hero, where the hero blob sets into stronypodhale.pl.
  * Script: docs/design/2026-09-25-przejscie-sygnaturowe-scenariusz.md
  *
- * A tall track pins the stage for 2 screens while the blob
+ * A tall track pins the stage for 2.5 screens (2 of story, then half a
+ * screen where the finished frame holds and the scroll is braked) while the blob
  * canvas (`ViscousPuddle`) plays the transformation and reports its state for
  * the mono readouts. Heading, image and link are one frame: once the page
  * has formed, the readouts give way and the heading enters in their place
@@ -123,28 +124,50 @@ export function SignatureScene() {
       pointerY = event.clientY
     }
     window.addEventListener('pointermove', onPointerMove, { passive: true })
-    // The browser's own chrome (toolbars, the strips around the page on
-    // phones) takes the sheet's colour while it covers the screen.
+    // The browser's own chrome takes the sheet's colour where the sheet
+    // meets it. Top: iOS 26 Safari ignores theme-color and tints its top bar
+    // from a fixed element at the top edge, so a hairline strip is pinned
+    // there (theme-color still covers other browsers). Bottom: the page's
+    // background, which shows in the strips around the page on phones.
     const themeMetas = Array.from(
       document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')
     )
     const themeDefaults = themeMetas.map((meta) => meta.content)
-    let chromeColour: string | null = null
-    const setChromeColour = (colour: string | null) => {
-      if (colour === chromeColour) return
-      chromeColour = colour
-      themeMetas.forEach((meta, index) => {
-        meta.content = colour ?? themeDefaults[index]
-      })
-      // On body, not html: the body's background then paints the whole
-      // viewport (behind the blob canvas, which sits at z -10).
-      document.body.style.backgroundColor = colour ?? ''
+    const topStrip = document.createElement('div')
+    topStrip.setAttribute('aria-hidden', 'true')
+    Object.assign(topStrip.style, {
+      position: 'fixed',
+      top: '0',
+      left: '0',
+      right: '0',
+      height: '2px',
+      pointerEvents: 'none',
+      zIndex: '1',
+      backgroundColor: 'var(--background)',
+    })
+    document.body.appendChild(topStrip)
+    let topColour: string | null = null
+    let bottomColour: string | null = null
+    const setChromeColour = (top: string | null, bottom: string | null) => {
+      if (top !== topColour) {
+        topColour = top
+        themeMetas.forEach((meta, index) => {
+          meta.content = top ?? themeDefaults[index]
+        })
+        topStrip.style.backgroundColor = top ?? 'var(--background)'
+      }
+      if (bottom !== bottomColour) {
+        bottomColour = bottom
+        // On body, not html: the body's background then paints the whole
+        // viewport (behind the blob canvas, which sits at z -10).
+        document.body.style.backgroundColor = bottom ?? ''
+      }
     }
     const clear = () => {
       for (const element of document.querySelectorAll<HTMLElement>(ADAPT_THEME_SELECTOR)) {
         element.classList.remove('dark')
       }
-      setChromeColour(null)
+      setChromeColour(null, null)
     }
 
     const unsubscribe = subscribeSignature((frame) => {
@@ -155,16 +178,15 @@ export function SignatureScene() {
         return
       }
       const sheetBottom = step.centerY + step.halfHeight
-      // Only while the sheet fills the screen: once it leaves, the page
-      // below shows and the chrome goes back to the page's colour.
-      if (sheetBottom >= window.innerHeight - 1 && step.centerY - step.halfHeight <= 0) {
-        const [r, g, b] = mixColour(frame.startColour, frame.targetColour, step.solid).map((c) =>
-          Math.round(c * 255)
-        )
-        setChromeColour(`rgb(${r}, ${g}, ${b})`)
-      } else {
-        setChromeColour(null)
-      }
+      const [r, g, b] = mixColour(frame.startColour, frame.targetColour, step.solid).map((c) =>
+        Math.round(c * 255)
+      )
+      const sheetColour = `rgb(${r}, ${g}, ${b})`
+      const sheetTop = step.centerY - step.halfHeight
+      setChromeColour(
+        sheetTop <= 0 && sheetBottom > 2 ? sheetColour : null,
+        sheetBottom >= window.innerHeight - 1 ? sheetColour : null
+      )
       const sheetDark = step.solid >= 0.5
       for (const element of document.querySelectorAll<HTMLElement>(ADAPT_THEME_SELECTOR)) {
         let y = pointerY
@@ -180,6 +202,7 @@ export function SignatureScene() {
       unsubscribe()
       window.removeEventListener('pointermove', onPointerMove)
       clear()
+      topStrip.remove()
     }
   }, [])
 
@@ -247,8 +270,17 @@ export function SignatureScene() {
       <div
         data-signature-track
         data-scroll-heavy
-        className="relative -mt-[100svh] h-[300svh] data-signature-static:mt-0 data-signature-static:h-auto motion-reduce:mt-0 motion-reduce:h-auto"
+        className="relative -mt-[100svh] h-[350svh] data-signature-static:mt-0 data-signature-static:h-auto motion-reduce:mt-0 motion-reduce:h-auto"
       >
+        {/* The hold: the finished frame stands still here and the scroll is
+            braked (STORY_END in the choreography: the last fifth of the pin). */}
+        <div
+          aria-hidden="true"
+          data-scroll-heavy="0.3"
+          data-scroll-range="box"
+          className="pointer-events-none absolute left-0 w-px"
+          style={{ top: '200svh', height: '50svh' }}
+        />
         {/* Where the pin ends: the hero CTA scrolls here so the whole transformation plays. */}
         <div
           id="work-formed"

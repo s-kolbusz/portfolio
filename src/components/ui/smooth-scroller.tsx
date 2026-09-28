@@ -11,7 +11,12 @@ import { useScrollStore } from '@/lib/stores'
 
 import '../../app/deferred.css'
 
-/** Pinned scenes where the scroll is heavier (see below). */
+/**
+ * Where the scroll is heavier (see below). The attribute's value is the
+ * scroll factor (default 0.6). On a pinned track it applies while the track
+ * is pinned; with `data-scroll-range="box"` while the scroll position is
+ * within the element's own box (a hold marker inside a track).
+ */
 const HEAVY_SCROLL_SELECTOR = '[data-scroll-heavy]'
 const HEAVY_SCROLL_FACTOR = 0.6
 
@@ -42,21 +47,27 @@ export function SmoothScroller() {
     // Synchronize Lenis scroll with GSAP ScrollTrigger
     lenis.on('scroll', ScrollTrigger.update)
 
-    // Scroll is heavier inside the pinned, scroll-driven scenes, so a fling
-    // does not carry past the part worth watching.
-    let heavy = false
+    // Scroll is heavier inside the pinned, scroll-driven scenes, and braked
+    // hard where a finished scene holds, so a fling does not carry past the
+    // part worth watching.
+    let factor = 1
     lenis.on('scroll', () => {
       const y = window.scrollY
-      const inside = Array.from(document.querySelectorAll<HTMLElement>(HEAVY_SCROLL_SELECTOR)).some(
-        (element) => {
-          const top = element.getBoundingClientRect().top + y
-          return y >= top - 1 && y < top + element.offsetHeight - window.innerHeight
+      let next = 1
+      for (const element of document.querySelectorAll<HTMLElement>(HEAVY_SCROLL_SELECTOR)) {
+        const top = element.getBoundingClientRect().top + y
+        const end =
+          element.dataset.scrollRange === 'box'
+            ? top + element.offsetHeight
+            : top + element.offsetHeight - window.innerHeight
+        if (y >= top - 1 && y < end) {
+          next = Math.min(next, Number(element.dataset.scrollHeavy) || HEAVY_SCROLL_FACTOR)
         }
-      )
-      if (inside === heavy) return
-      heavy = inside
-      lenis.options.wheelMultiplier = inside ? HEAVY_SCROLL_FACTOR : 1
-      lenis.options.touchMultiplier = inside ? HEAVY_SCROLL_FACTOR : 1
+      }
+      if (next === factor) return
+      factor = next
+      lenis.options.wheelMultiplier = next
+      lenis.options.touchMultiplier = next
     })
 
     // Add Lenis's requestAnimationFrame call to GSAP's ticker

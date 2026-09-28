@@ -185,6 +185,13 @@ export const HERO_BEATS = {
   fly: [0.52, 1],
 } as const
 
+/**
+ * The story plays over the first part of the pin; the rest is a hold: the
+ * finished frame stands still (and the scroll is braked there, see the
+ * smooth scroller), so there is time to look and read before it leaves.
+ */
+export const STORY_END = 0.8
+
 /** Pin progress at which the heading starts to enter the frame. */
 export const HEADING_AT = BEATS.heading[0]
 
@@ -215,8 +222,9 @@ export function mix(a: number, b: number, t: number) {
   return a + (b - a) * t
 }
 
+/** Story progress P over the pin (1 from the start of the hold on). */
 export function pinProgress(scrollY: number, stage: StageLayout) {
-  return linear(stage.trackDocTop, stage.trackDocTop + stage.pinDistance, scrollY)
+  return linear(stage.trackDocTop, stage.trackDocTop + stage.pinDistance * STORY_END, scrollY)
 }
 
 /** Readout: 0.82 → 0.30 while darkening, → 0.05 as the page surfaces, → 0 once the surface is still. */

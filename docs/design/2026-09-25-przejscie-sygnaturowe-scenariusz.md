@@ -149,6 +149,18 @@ Dalsza droga kulki (kolejne sceny, kontakt) należy do kroków 2 i 5 roadmapy.
 - **Kolor przeglądarki:** gdy tafla wypełnia ekran, `theme-color` i tło strony
   (widoczne w paskach wokół niej na telefonie) przyjmują kolor tafli.
 
+## Wersja 9: przytrzymanie i kolory przeglądarki
+
+- **Hamulec po scenie:** przypięcie ma 2,5 ekranu. Historia (P 0–1) gra przez
+  pierwsze 2 ekrany (`STORY_END` = 0,8), a przez ostatnie pół ekranu gotowy kadr
+  stoi. Scroll jest tam mocno przyhamowany (×0,3, w reszcie scen ×0,6), więc jest
+  czas, żeby obejrzeć i przeczytać, zanim sekcja odjedzie.
+- **Kolory przeglądarki osobno dla góry i dołu:** iOS 26 Safari ignoruje
+  `theme-color` i barwi górny pasek od elementu przypiętego do górnej krawędzi.
+  Dlatego u góry jest przypięty pasek o wysokości 2 px w kolorze tafli, gdy tafla
+  sięga góry (plus `theme-color` dla innych przeglądarek). Na dole kolor tafli
+  przyjmuje tło strony, gdy tafla sięga dołu.
+
 ## Kursor i docki nad taflą
 
 Stały interfejs (docki, kursor) przyjmuje paletę tego, co jest pod nim: nad

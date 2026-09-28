@@ -7,6 +7,7 @@ import {
   HEADING_AT,
   mixColour,
   readoutOpacity,
+  STORY_END,
   toHex,
   viscosityAt,
   type HeroLayout,
@@ -27,7 +28,7 @@ function at(scrollY: number) {
 }
 
 function atProgress(progress: number) {
-  return at(stage.trackDocTop + stage.pinDistance * progress)
+  return at(stage.trackDocTop + stage.pinDistance * STORY_END * progress)
 }
 
 describe('signature transition choreography', () => {
@@ -110,6 +111,17 @@ describe('signature transition choreography', () => {
     expect(leaving.fluid).toBe(0)
     expect(leaving.body).toBe(true)
     expect(at(pinEnd + 1200).body).toBe(false)
+  })
+
+  it('holds the finished frame still for the rest of the pin', () => {
+    const finished = atProgress(1)
+    const held = at(pinEnd - 1)
+    expect(held.progress).toBe(1)
+    expect(held.box).toEqual(finished.box)
+    expect(held.boxShift).toBe(0)
+    expect(held.reveal).toBe(1)
+    // A good stretch of scroll: at least 0.4 of a screen.
+    expect(stage.pinDistance * (1 - STORY_END)).toBeGreaterThanOrEqual(0.4 * 900)
   })
 
   it('depends only on the scroll position, so reversing retraces the same path', () => {
