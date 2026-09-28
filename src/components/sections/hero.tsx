@@ -224,6 +224,7 @@ export function Hero() {
       id="hero"
       ref={containerRef}
       data-hero-track
+      data-scroll-heavy
       className="text-foreground relative h-[300svh] w-full data-hero-static:h-auto motion-reduce:h-auto"
     >
       <noscript>

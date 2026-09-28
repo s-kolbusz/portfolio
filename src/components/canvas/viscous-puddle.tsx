@@ -19,6 +19,7 @@ import {
   SIGNATURE_REVEAL_VAR,
   SIGNATURE_STAGE_SELECTOR,
   SIGNATURE_STATIC_ATTR,
+  SIGNATURE_TEXT_SELECTOR,
   SIGNATURE_TRACK_SELECTOR,
 } from './viscous-puddle/signature-bus'
 import {
@@ -64,7 +65,14 @@ interface SignatureElements {
   track: HTMLElement
   stage: HTMLElement
   frame: HTMLElement
+  /** The scene's text blocks (heading, readouts, link). */
+  texts: HTMLElement[]
 }
+
+/** How many text blocks the shader keeps the ball beneath. */
+const MAX_TEXT_RECTS = 8
+const textRects = new Float32Array(MAX_TEXT_RECTS * 4)
+const textAlphas = new Float32Array(MAX_TEXT_RECTS)
 
 interface PuddleState {
   /** Cursor ball, stored relative to the box so it rides along with scrolling. */
@@ -133,7 +141,9 @@ function findSignatureElements(): SignatureElements | null {
   const track = document.querySelector<HTMLElement>(SIGNATURE_TRACK_SELECTOR)
   const stage = track?.querySelector<HTMLElement>(SIGNATURE_STAGE_SELECTOR)
   const frame = stage?.querySelector<HTMLElement>(SIGNATURE_FRAME_SELECTOR)
-  return track && stage && frame ? { track, stage, frame } : null
+  if (!track || !stage || !frame) return null
+  const texts = Array.from(stage.querySelectorAll<HTMLElement>(SIGNATURE_TEXT_SELECTOR))
+  return { track, stage, frame, texts }
 }
 
 /**
@@ -168,9 +178,13 @@ function measureHero(): HeroLayout | null {
 }
 
 function measureStage({ track, stage, frame }: SignatureElements): StageLayout {
+  // The scene moves the frame while it plays; measure its place in the layout.
+  const transform = frame.style.transform
+  frame.style.transform = ''
   const trackRect = track.getBoundingClientRect()
   const stageRect = stage.getBoundingClientRect()
   const frameRect = frame.getBoundingClientRect()
+  frame.style.transform = transform
   return {
     trackDocTop: trackRect.top + window.scrollY,
     pinDistance: Math.max(1, track.offsetHeight - stage.offsetHeight),
@@ -392,7 +406,7 @@ export function ViscousPuddle() {
 
       // The ball's velocity in the stage's frame (so scrolling the sheet
       // away is not movement), smoothed: it parts and drags the swell.
-      const stageTop = step.box.top - (state.stage?.box.offsetTop ?? 0)
+      const stageTop = step.box.top - step.boxShift - (state.stage?.box.offsetTop ?? 0)
       if (delta > 0) {
         const vx = (ballX - state.lastBallX) / delta
         const vy = (ballY - stageTop - state.lastBallY) / delta
@@ -459,6 +473,23 @@ export function ViscousPuddle() {
       gl.uniform1f(uniforms.uLiquidEdge, step.liquidEdge)
       gl.uniform1f(uniforms.uImageRadius, step.boxRadius)
       gl.uniform2f(uniforms.uBallVelocity, state.ballVX, state.ballVY)
+      // The scene's text, so the ball can sink beneath it and keep it legible.
+      const texts = step.liquidEdge > 0 ? (state.elements?.texts ?? []) : []
+      textRects.fill(0)
+      let textCount = 0
+      for (const text of texts) {
+        if (textCount >= MAX_TEXT_RECTS) break
+        const opacity = parseFloat(text.style.opacity || '1')
+        if (!(opacity > 0.01)) continue
+        const rect = text.getBoundingClientRect()
+        if (rect.width === 0 || rect.bottom < 0 || rect.top > state.canvasHeight) continue
+        textRects.set([rect.left, rect.top, rect.width, rect.height], textCount * 4)
+        textAlphas[textCount] = Math.min(1, opacity)
+        textCount++
+      }
+      gl.uniform4fv(uniforms.uTextRects, textRects)
+      gl.uniform1fv(uniforms.uTextAlphas, textAlphas)
+      gl.uniform1i(uniforms.uTextCount, textCount)
       gl.uniform4f(uniforms.uBall, ballX, ballY, ball.radius, ball.merge)
       gl.uniform1f(uniforms.uDrain, step.drain)
 

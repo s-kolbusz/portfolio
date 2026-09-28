@@ -11,6 +11,10 @@ import { useScrollStore } from '@/lib/stores'
 
 import '../../app/deferred.css'
 
+/** Pinned scenes where the scroll is heavier (see below). */
+const HEAVY_SCROLL_SELECTOR = '[data-scroll-heavy]'
+const HEAVY_SCROLL_FACTOR = 0.6
+
 export function SmoothScroller() {
   const setLenis = useScrollStore((state) => state.setLenis)
   const prefersReducedMotion = usePrefersReducedMotion()
@@ -24,7 +28,11 @@ export function SmoothScroller() {
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
-      touchMultiplier: 2,
+      // Touch runs through Lenis too, so a flick has the same weight as the
+      // wheel and the pinned scenes below can slow it (see HEAVY_SCROLL).
+      syncTouch: true,
+      syncTouchLerp: 0.06,
+      touchMultiplier: 1,
       // Same-page #hash links go through Lenis. Without this the Next router
       // swallows the click and refuses to re-scroll when the URL already
       // carries that hash, so every repeat click is a no-op.
@@ -33,6 +41,23 @@ export function SmoothScroller() {
 
     // Synchronize Lenis scroll with GSAP ScrollTrigger
     lenis.on('scroll', ScrollTrigger.update)
+
+    // Scroll is heavier inside the pinned, scroll-driven scenes, so a fling
+    // does not carry past the part worth watching.
+    let heavy = false
+    lenis.on('scroll', () => {
+      const y = window.scrollY
+      const inside = Array.from(document.querySelectorAll<HTMLElement>(HEAVY_SCROLL_SELECTOR)).some(
+        (element) => {
+          const top = element.getBoundingClientRect().top + y
+          return y >= top - 1 && y < top + element.offsetHeight - window.innerHeight
+        }
+      )
+      if (inside === heavy) return
+      heavy = inside
+      lenis.options.wheelMultiplier = inside ? HEAVY_SCROLL_FACTOR : 1
+      lenis.options.touchMultiplier = inside ? HEAVY_SCROLL_FACTOR : 1
+    })
 
     // Add Lenis's requestAnimationFrame call to GSAP's ticker
     // This ensures they stay perfectly in sync

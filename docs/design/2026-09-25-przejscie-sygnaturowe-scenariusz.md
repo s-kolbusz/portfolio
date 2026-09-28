@@ -136,6 +136,19 @@ rozmiar (0,25 jednostki bloba) i to samo lepkie łączenie (`smin` 0,6), co w he
 
 Dalsza droga kulki (kolejne sceny, kontakt) należy do kroków 2 i 5 roadmapy.
 
+## Wersja 8 (po teście na telefonie)
+
+- **Zrzut strony na środku:** dopóki jest jedynym elementem w kadrze, stoi
+  wyśrodkowany w pionie (odczyty jadą tuż nad nim). Na swoje miejsce w układzie
+  przesuwa się razem z wejściem nagłówka, sterowany scrollem.
+- **Czytelność:** pod jasnym tekstem sceny (nagłówek, odczyty, link) blob
+  „zanurza się”, czyli blednie do koloru tafli w obrysie tekstu (miękko).
+- **Bezwładność:** Lenis prowadzi też przewijanie dotykiem (`syncTouch`), więc
+  rzut palcem ma tę samą wagę co kółko, a w przypiętych scenach (hero i ta
+  scena) scroll jest cięższy (×0,6), żeby łatwo nie przelecieć dalej.
+- **Kolor przeglądarki:** gdy tafla wypełnia ekran, `theme-color` i tło strony
+  (widoczne w paskach wokół niej na telefonie) przyjmują kolor tafli.
+
 ## Kursor i docki nad taflą
 
 Stały interfejs (docki, kursor) przyjmuje paletę tego, co jest pod nim: nad

@@ -29,6 +29,8 @@ export function subscribeSignature(listener: Listener) {
 export const SIGNATURE_TRACK_SELECTOR = '[data-signature-track]'
 export const SIGNATURE_STAGE_SELECTOR = '[data-signature-stage]'
 export const SIGNATURE_FRAME_SELECTOR = '[data-signature-frame]'
+/** Text blocks in the scene the cursor ball sinks beneath, to keep them legible. */
+export const SIGNATURE_TEXT_SELECTOR = '[data-signature-text]'
 /** CSS custom property on the frame: opacity of its real image, 0–1. */
 export const SIGNATURE_REVEAL_VAR = '--signature-reveal'
 /** Set on the track when the canvas cannot run: the pin collapses to a plain section. */

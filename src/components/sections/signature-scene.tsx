@@ -17,6 +17,7 @@ import {
 } from '@/components/canvas/viscous-puddle/choreography'
 import {
   ADAPT_THEME_SELECTOR,
+  SIGNATURE_FRAME_SELECTOR,
   subscribeSignature,
 } from '@/components/canvas/viscous-puddle/signature-bus'
 import { Button } from '@/components/ui/button'
@@ -52,6 +53,7 @@ export function SignatureScene() {
   const headerRef = useRef<HTMLDivElement>(null)
   const linkRef = useRef<HTMLDivElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
+  const readoutsRef = useRef<HTMLDivElement>(null)
   const readoutRefs = useRef<Partial<Record<ReadoutKey, HTMLSpanElement | null>>>({})
   const isMobile = useIsMobile()
 
@@ -68,11 +70,16 @@ export function SignatureScene() {
     if (!header || !link || !stage) return
 
     const targets = [...Array.from(header.children), link] as HTMLElement[]
+    // The cursor ball sinks beneath these (see the blob shader).
+    for (const target of targets) target.setAttribute('data-signature-text', '')
+    const frameElement = stage.querySelector<HTMLElement>(SIGNATURE_FRAME_SELECTOR)
     const reset = () => {
       for (const target of targets) {
         target.style.opacity = ''
         target.style.transform = ''
       }
+      if (frameElement) frameElement.style.transform = ''
+      if (readoutsRef.current) readoutsRef.current.style.transform = ''
       stage.classList.remove('dark')
       stage.style.removeProperty('--scene-dark')
     }
@@ -90,6 +97,13 @@ export function SignatureScene() {
         target.style.opacity = enter.toFixed(3)
         target.style.transform = `translateY(${((1 - enter) * REVEAL.y).toFixed(1)}px)`
       })
+      // While the page is alone in the frame it sits in the middle; it
+      // moves up to its place as the heading enters.
+      // The readouts ride just above it.
+      const shift = frame.step.boxShift
+      const moved = shift ? `translateY(${shift.toFixed(2)}px)` : ''
+      if (frameElement) frameElement.style.transform = moved
+      if (readoutsRef.current) readoutsRef.current.style.transform = moved
       stage.style.setProperty('--scene-dark', solid.toFixed(3))
       stage.classList.toggle('dark', solid >= 0.999)
     })
@@ -109,27 +123,56 @@ export function SignatureScene() {
       pointerY = event.clientY
     }
     window.addEventListener('pointermove', onPointerMove, { passive: true })
+    // The browser's own chrome (toolbars, the strips around the page on
+    // phones) takes the sheet's colour while it covers the screen.
+    const themeMetas = Array.from(
+      document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')
+    )
+    const themeDefaults = themeMetas.map((meta) => meta.content)
+    let chromeColour: string | null = null
+    const setChromeColour = (colour: string | null) => {
+      if (colour === chromeColour) return
+      chromeColour = colour
+      themeMetas.forEach((meta, index) => {
+        meta.content = colour ?? themeDefaults[index]
+      })
+      // On body, not html: the body's background then paints the whole
+      // viewport (behind the blob canvas, which sits at z -10).
+      document.body.style.backgroundColor = colour ?? ''
+    }
     const clear = () => {
       for (const element of document.querySelectorAll<HTMLElement>(ADAPT_THEME_SELECTOR)) {
         element.classList.remove('dark')
       }
+      setChromeColour(null)
     }
 
     const unsubscribe = subscribeSignature((frame) => {
       const step = frame?.step
-      const sheetDark = step && step.liquidEdge > 0 && step.body && step.solid >= 0.5
-      if (!sheetDark) {
+      const onSheet = frame && step && step.liquidEdge > 0 && step.body
+      if (!onSheet) {
         clear()
         return
       }
       const sheetBottom = step.centerY + step.halfHeight
+      // Only while the sheet fills the screen: once it leaves, the page
+      // below shows and the chrome goes back to the page's colour.
+      if (sheetBottom >= window.innerHeight - 1 && step.centerY - step.halfHeight <= 0) {
+        const [r, g, b] = mixColour(frame.startColour, frame.targetColour, step.solid).map((c) =>
+          Math.round(c * 255)
+        )
+        setChromeColour(`rgb(${r}, ${g}, ${b})`)
+      } else {
+        setChromeColour(null)
+      }
+      const sheetDark = step.solid >= 0.5
       for (const element of document.querySelectorAll<HTMLElement>(ADAPT_THEME_SELECTOR)) {
         let y = pointerY
         if (element.dataset.adaptTheme !== 'pointer') {
           const rect = element.getBoundingClientRect()
           y = rect.top + rect.height / 2
         }
-        element.classList.toggle('dark', y >= 0 && y < sheetBottom)
+        element.classList.toggle('dark', sheetDark && y >= 0 && y < sheetBottom)
       }
     })
 
@@ -203,6 +246,7 @@ export function SignatureScene() {
           hero's ends and the matter that filled the frame carries straight on. */}
       <div
         data-signature-track
+        data-scroll-heavy
         className="relative -mt-[100svh] h-[300svh] data-signature-static:mt-0 data-signature-static:h-auto motion-reduce:mt-0 motion-reduce:h-auto"
       >
         {/* Where the pin ends: the hero CTA scrolls here so the whole transformation plays. */}
@@ -222,6 +266,7 @@ export function SignatureScene() {
             <div className="relative">
               {/* Readouts narrate the forming in the spot the heading will take. */}
               <div
+                ref={readoutsRef}
                 aria-hidden="true"
                 className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-6 font-mono text-xs tracking-widest uppercase"
               >
@@ -229,6 +274,7 @@ export function SignatureScene() {
                   ref={(element) => {
                     readoutRefs.current.target = element
                   }}
+                  data-signature-text
                   className="text-primary whitespace-nowrap"
                   style={{ opacity: 0 }}
                 >
@@ -244,6 +290,7 @@ export function SignatureScene() {
                       ref={(element) => {
                         readoutRefs.current[key] = element
                       }}
+                      data-signature-text
                       className="overflow-hidden whitespace-nowrap will-change-transform"
                       style={{ opacity: 0, display: 'none' }}
                     />

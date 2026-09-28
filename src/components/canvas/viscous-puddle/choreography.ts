@@ -141,6 +141,12 @@ export interface ChoreographyFrame {
   cornerRadius: number
   /** Where the box currently is in the viewport (it scrolls away after the pin). */
   box: Rect
+  /**
+   * Vertical offset of the box from its place in the layout: while the page
+   * is the only thing in the frame it sits in the middle, then moves up to
+   * its place as the heading enters. The DOM frame is moved by the same.
+   */
+  boxShift: number
   /** Corner radius of the box (the image surfaces with it). */
   boxRadius: number
   /** The cursor ball (see `Ball`). */
@@ -360,6 +366,7 @@ function heroFrame(
     halfHeight,
     cornerRadius,
     box: { left: 0, top: 0, width: 0, height: 0 },
+    boxShift: 0,
     boxRadius: 0,
     ball: {
       ...metrics,
@@ -411,6 +418,7 @@ export function choreograph({
       halfHeight: radius,
       cornerRadius: radius,
       box: { left: 0, top: 0, width: 0, height: 0 },
+      boxShift: 0,
       boxRadius: 0,
       ball: {
         ...ballMetrics(viewportHeight, scale),
@@ -423,10 +431,13 @@ export function choreograph({
   }
 
   const progress = pinProgress(scrollY, stage)
-  const box = boxRect(scrollY, stage)
+  const centred = (viewportHeight - stage.box.height) / 2
+  const boxShift = (centred - stage.box.offsetTop) * (1 - glide(...BEATS.heading, progress))
+  const laidOut = boxRect(scrollY, stage)
+  const box = { ...laidOut, top: laidOut.top + boxShift }
   const viscosity = viscosityAt(progress)
   const reveal = smoothstep(...BEATS.swap, progress)
-  const stageTop = box.top - stage.box.offsetTop
+  const stageTop = laidOut.top - stage.box.offsetTop
   const unit = viewportHeight / 2
 
   // The matter that filled the frame stays: it is the whole stage, a sheet
@@ -474,6 +485,7 @@ export function choreograph({
     // Corners stay beyond the sides (the margin), so the bottom edge is straight across.
     cornerRadius: mix(radius, margin * 0.5, grow),
     box,
+    boxShift,
     boxRadius: stage.box.radius,
     ball: {
       radius: metrics.radius,
