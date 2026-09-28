@@ -146,8 +146,7 @@ Dalsza droga kulki (kolejne sceny, kontakt) należy do kroków 2 i 5 roadmapy.
 - **Bezwładność:** Lenis prowadzi też przewijanie dotykiem (`syncTouch`), więc
   rzut palcem ma tę samą wagę co kółko, a w przypiętych scenach (hero i ta
   scena) scroll jest cięższy (×0,6), żeby łatwo nie przelecieć dalej.
-- **Kolor przeglądarki:** gdy tafla wypełnia ekran, `theme-color` i tło strony
-  (widoczne w paskach wokół niej na telefonie) przyjmują kolor tafli.
+- ~~**Kolor przeglądarki**~~ (odpuszczony w wersji 9, patrz niżej).
 
 ## Wersja 9: przytrzymanie i kolory przeglądarki
 
@@ -155,16 +154,10 @@ Dalsza droga kulki (kolejne sceny, kontakt) należy do kroków 2 i 5 roadmapy.
   pierwsze 2 ekrany (`STORY_END` = 0,8), a przez ostatnie pół ekranu gotowy kadr
   stoi. Scroll jest tam mocno przyhamowany (×0,3, w reszcie scen ×0,6), więc jest
   czas, żeby obejrzeć i przeczytać, zanim sekcja odjedzie.
-- **Kolory przeglądarki osobno dla góry i dołu:** iOS 26 Safari ignoruje
-  `theme-color` i barwi górny pasek od elementu przypiętego do górnej krawędzi.
-  Dlatego u góry jest przypięty pasek o wysokości 2 px w kolorze tafli, gdy tafla
-  sięga góry (plus `theme-color` dla innych przeglądarek). Na dole kolor tafli
-  przyjmuje tło strony, gdy tafla sięga dołu.
-- **Dwa stany zamiast przejścia** (po teście na iPhonie): Safari nie śledzi
-  każdej zmiany koloru, więc płynne przejście zostawiało w pasku przypadkową
-  jasną zieleń. Kolor paska przełącza się tylko między kolorem strony a kolorem
-  uspokojonej tafli (od połowy ciemnienia), a pasek u góry jest przy każdym
-  przełączeniu wstawiany na nowo, żeby Safari odczytał kolor ponownie.
+- ~~**Kolory przeglądarki**~~ (odpuszczone po testach na iPhonie): iOS 26
+  Safari ignoruje `theme-color` i odczytuje kolor pasków po swojemu, w
+  nieudokumentowanych momentach. Próby z tłem strony i paskiem przypiętym u góry
+  zostawiały przypadkowe kolory, więc strona nie steruje już kolorem przeglądarki.
 
 ## Kursor i docki nad taflą
 

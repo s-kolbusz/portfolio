@@ -124,55 +124,10 @@ export function SignatureScene() {
       pointerY = event.clientY
     }
     window.addEventListener('pointermove', onPointerMove, { passive: true })
-    // The browser's own chrome takes the sheet's colour where the sheet
-    // meets it. Top: iOS 26 Safari ignores theme-color and tints its top bar
-    // from a fixed element at the top edge, so a hairline strip is pinned
-    // there (theme-color still covers other browsers). Bottom: the page's
-    // background, which shows in the strips around the page on phones.
-    // Safari does not follow every change (it re-reads the colour when such
-    // an element appears), so the colour switches between two states only,
-    // page or settled sheet, and the strip is re-inserted on each switch.
-    const themeMetas = Array.from(
-      document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')
-    )
-    const themeDefaults = themeMetas.map((meta) => meta.content)
-    const topStrip = document.createElement('div')
-    topStrip.setAttribute('aria-hidden', 'true')
-    Object.assign(topStrip.style, {
-      position: 'fixed',
-      top: '0',
-      left: '0',
-      right: '0',
-      height: '2px',
-      pointerEvents: 'none',
-      zIndex: '1',
-      backgroundColor: 'var(--background)',
-    })
-    document.body.appendChild(topStrip)
-    let topColour: string | null = null
-    let bottomColour: string | null = null
-    const setChromeColour = (top: string | null, bottom: string | null) => {
-      if (top !== topColour) {
-        topColour = top
-        themeMetas.forEach((meta, index) => {
-          meta.content = top ?? themeDefaults[index]
-        })
-        topStrip.style.backgroundColor = top ?? 'var(--background)'
-        topStrip.remove()
-        document.body.appendChild(topStrip)
-      }
-      if (bottom !== bottomColour) {
-        bottomColour = bottom
-        // On body, not html: the body's background then paints the whole
-        // viewport (behind the blob canvas, which sits at z -10).
-        document.body.style.backgroundColor = bottom ?? ''
-      }
-    }
     const clear = () => {
       for (const element of document.querySelectorAll<HTMLElement>(ADAPT_THEME_SELECTOR)) {
         element.classList.remove('dark')
       }
-      setChromeColour(null, null)
     }
 
     const unsubscribe = subscribeSignature((frame) => {
@@ -183,14 +138,6 @@ export function SignatureScene() {
         return
       }
       const sheetBottom = step.centerY + step.halfHeight
-      // The settled sheet's colour, once it has darkened past halfway.
-      const [r, g, b] = frame.targetColour.map((c) => Math.round(c * 255))
-      const sheetColour = step.solid >= 0.5 ? `rgb(${r}, ${g}, ${b})` : null
-      const sheetTop = step.centerY - step.halfHeight
-      setChromeColour(
-        sheetTop <= 0 && sheetBottom > 2 ? sheetColour : null,
-        sheetBottom >= window.innerHeight - 1 ? sheetColour : null
-      )
       const sheetDark = step.solid >= 0.5
       for (const element of document.querySelectorAll<HTMLElement>(ADAPT_THEME_SELECTOR)) {
         let y = pointerY
@@ -206,7 +153,6 @@ export function SignatureScene() {
       unsubscribe()
       window.removeEventListener('pointermove', onPointerMove)
       clear()
-      topStrip.remove()
     }
   }, [])
 
