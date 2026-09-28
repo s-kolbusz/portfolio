@@ -54,10 +54,10 @@ dwie wersje językowe (PL, EN).
 Oś główna to **produkt kontra projekt autorski**. Rola (kierunek/inżynieria kontra
 wykonanie/infrastruktura) jest osią pomocniczą, a typ klienta decyduje dopiero w ostateczności.
 
-| | kolbusz.xyz | stronypodhale.pl |
-|---|---|---|
-| Czym jest | projekt autorski, kierunek, ruch/WebGL, full-stack, agencje, etat | produkt w progach, jawny cennik, hosting i opieka |
-| Frazy SEO | creative developer, animowane strony, WebGL/GSAP, Next.js, Payload, frontend dla agencji (PL + EN) | wszystkie frazy lokalne i produktowe |
+|           | kolbusz.xyz                                                                                        | stronypodhale.pl                                  |
+| --------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| Czym jest | projekt autorski, kierunek, ruch/WebGL, full-stack, agencje, etat                                  | produkt w progach, jawny cennik, hosting i opieka |
+| Frazy SEO | creative developer, animowane strony, WebGL/GSAP, Next.js, Payload, frontend dla agencji (PL + EN) | wszystkie frazy lokalne i produktowe              |
 
 - Piczura: kierunek kreatywny robi kolbusz, infrastrukturę stronypodhale.
 - Zdanie „małym firmom robię taniej pod osobną marką” znika. Zamiast niego:
@@ -122,6 +122,7 @@ Indeks typograficzny w miejsce książki.
 ## Case study
 
 Wspólny szkielet:
+
 1. Hero przejęte z katalogu lub strony głównej, metadane mono (rola, rok, typ, stack).
 2. 2–3 decyzje: obraz lub interakcja naprzemiennie z 1–3 zdaniami.
 3. Dowód: link na żywo, sprawdzalne dane, cytat klienta. Bez niezweryfikowanych liczb.
@@ -129,6 +130,7 @@ Wspólny szkielet:
 5. Zakończenie: zaproszenie do kontaktu (ścieżka wypełniona automatycznie), a potem następny projekt.
 
 Moment sygnaturowy, po jednym na case:
+
 - **aspect-preview:** działające demo na stronie (punkt ostrości i kadry w 6 proporcjach, na żywo).
 - **stronypodhale:** wizualizacja pipeline'u (bramy jakości), strona krzepnie w realizację.
 - **ready2order:** do ustalenia po sprawdzeniu, co można pokazać (NDA).
@@ -148,13 +150,14 @@ Bez pakietów. Trzy linie, każda z progiem „od”. Kwoty netto. Każda wersja
 wprost, do jakiego rynku jest kierowana (PL: „dla klientów w Polsce, ceny w PLN”,
 EN: „for international clients, prices in EUR”).
 
-| Linia | PL | EN |
-|---|---|---|
-| Współpraca z agencją | od 1 000 zł / dzień | od €600 / dzień |
-| Projekt autorski | od 15 000 zł | od €6 000 |
-| Produkty i Payload | od 20 000 zł lub po rozmowie | od €8 000 lub on request |
+| Linia                | PL                           | EN                       |
+| -------------------- | ---------------------------- | ------------------------ |
+| Współpraca z agencją | od 1 000 zł / dzień          | od €600 / dzień          |
+| Projekt autorski     | od 15 000 zł                 | od €6 000                |
+| Produkty i Payload   | od 20 000 zł lub po rozmowie | od €8 000 lub on request |
 
 Podstawy (wrzesień 2026):
+
 - fullstack mid B2B w PL to ~18–22,7 tys. zł/mies., czyli ~850–1100 zł/dzień;
 - software house bierze za dedykowaną stronę 15–40 tys. zł netto;
 - Europa Zachodnia płaci fullstackom €75–120/h, a za dzień mid–senior €600–960.
@@ -190,6 +193,7 @@ terytorium SEO.
 ## /lab
 
 Galeria eksperymentów z najmocniejszym ruchem i luźniejszym layoutem.
+
 - Na start: interaktywny blob (suwaki lepkości, koloru i siły kursora) oraz druk 3D.
 - **Druk 3D to realna usługa.** Kalkulator zostaje, a zapytanie idzie przez
   formularz kontaktu ze ścieżką „wydruk 3D”.
@@ -209,9 +213,9 @@ Galeria eksperymentów z najmocniejszym ruchem i luźniejszym layoutem.
 5. Tytuł i opis strony głównej przestają celować w „strony internetowe Zakopane”.
 6. `llms.txt` aktualizowany razem z treścią.
 
-Docelowa odpowiedź AI na pytanie „kim jest Sebastian Kolbusz”: *Creative Developer
+Docelowa odpowiedź AI na pytanie „kim jest Sebastian Kolbusz”: _Creative Developer
 i full-stack engineer z Zakopanego, autor payload-plugin-aspect-preview, twórca
-stronypodhale.pl, wcześniej ready2order.*
+stronypodhale.pl, wcześniej ready2order._
 
 ## Poprzeczka jakości (2026-09-26)
 
@@ -234,6 +238,7 @@ stronypodhale.pl, wcześniej ready2order.*
 - Snapshoty wizualne generujemy na Linuksie (workflow w GitHub Actions).
 
 Kolejność:
+
 1. przejście sygnaturowe,
 2. prawo ruchu i plany parallaxy,
 3. dock,
