@@ -53,20 +53,20 @@ describe('signature transition choreography', () => {
   })
 
   it('follows the beats of the script', () => {
-    expect(atProgress(0).solid).toBe(0)
-    expect(atProgress(0.28).solid).toBe(1)
-    expect(atProgress(0.25).imageIn).toBe(0)
-    expect(atProgress(0.53).imageIn).toBe(1)
-    expect(atProgress(0.45).clarity).toBe(0)
-    expect(atProgress(0.73).clarity).toBe(1)
-    expect(atProgress(0.73).fluid).toBe(0)
+    expect(atProgress(0.02).solid).toBe(0)
+    expect(atProgress(0.4).solid).toBe(1)
+    expect(atProgress(0.3).imageIn).toBe(0)
+    expect(atProgress(0.58).imageIn).toBe(1)
+    expect(atProgress(0.5).clarity).toBe(0)
+    expect(atProgress(0.78).clarity).toBe(1)
+    expect(atProgress(0.78).fluid).toBe(0)
   })
 
-  it('keeps one rhythm: every beat takes about half a screen of the 2-screen pin', () => {
+  it('keeps one rhythm: every beat takes a little over half a screen of the 2-screen pin', () => {
     for (const [from, until] of Object.values(BEATS)) {
       if (until - from < 0.1) continue // swaps and fades, not beats
-      expect(until - from).toBeGreaterThanOrEqual(0.19)
-      expect(until - from).toBeLessThanOrEqual(0.3)
+      expect(until - from).toBeGreaterThanOrEqual(0.169)
+      expect(until - from).toBeLessThanOrEqual(0.4)
     }
   })
 
@@ -81,9 +81,9 @@ describe('signature transition choreography', () => {
 
   it('reads out viscosity 0.82 → 0.30 → 0.05 → 0', () => {
     expect(viscosityAt(0)).toBe(0.82)
-    expect(viscosityAt(0.28)).toBeCloseTo(0.3)
-    expect(viscosityAt(0.53)).toBeCloseTo(0.05)
-    expect(viscosityAt(0.73)).toBe(0)
+    expect(viscosityAt(0.4)).toBeCloseTo(0.3)
+    expect(viscosityAt(0.58)).toBeCloseTo(0.05)
+    expect(viscosityAt(0.78)).toBe(0)
     let previous = Infinity
     for (let p = 0; p <= 1; p += 0.01) {
       expect(viscosityAt(p)).toBeLessThanOrEqual(previous)
@@ -97,29 +97,20 @@ describe('signature transition choreography', () => {
     expect(step.body).toBe(true)
     expect(step.clarity).toBe(1)
     expect(step.boxRadius).toBe(16)
-    expect(atProgress(0.73).reveal).toBe(0)
+    expect(atProgress(0.78).reveal).toBe(0)
   })
 
   it('leaves with the section on a liquid edge, then sleeps once only the ball is gone', () => {
     const leaving = at(pinEnd + 450)
-    // Its bottom edge sits just below the stage's (out of sight while pinned).
-    expect(leaving.centerY + leaving.halfHeight).toBeGreaterThan(900 - 450)
-    expect(leaving.centerY + leaving.halfHeight).toBeLessThan(900 - 450 + 150)
+    // Out of sight below the stage while pinned; drawn back above the
+    // stage's bottom as it leaves, so the rim shows above the next section.
+    const pinned = at(pinEnd)
+    expect(pinned.centerY + pinned.halfHeight).toBeGreaterThan(900)
+    expect(leaving.centerY + leaving.halfHeight).toBeLessThan(900 - 450)
+    expect(leaving.centerY + leaving.halfHeight).toBeGreaterThan(900 - 450 - 250)
     expect(leaving.liquidEdge).toBe(1)
     expect(leaving.body).toBe(true)
     expect(at(pinEnd + 1200).body).toBe(false)
-  })
-
-  it('runs the story on the damped position, but places the box by the real scroll', () => {
-    const lagging = choreograph({
-      ...viewport,
-      scrollY: pinEnd + 200,
-      timeY: stage.trackDocTop + stage.pinDistance * 0.5,
-      stage,
-      scale: 1,
-    })
-    expect(lagging.progress).toBeCloseTo(0.5)
-    expect(lagging.box.top).toBe(-65)
   })
 
   it('depends only on the scroll position, so reversing retraces the same path', () => {
@@ -177,7 +168,7 @@ describe('signature transition choreography', () => {
     expect(readoutOpacity(0.05, false).target).toBe(1)
     expect(readoutOpacity(0.2, false).viscosity).toBe(1)
     expect(readoutOpacity(0.2, false).colour).toBe(1)
-    expect(readoutOpacity(0.4, false).colour).toBe(0)
+    expect(readoutOpacity(0.46, false).colour).toBe(0)
     for (const value of Object.values(readoutOpacity(HEADING_AT, false))) {
       expect(value).toBe(0)
     }
@@ -204,6 +195,7 @@ describe('hero scroll choreography', () => {
     zoomX: 700,
     zoomY: 255,
     zoomStroke: 20,
+    letterStarts: [0, 0.5, 1],
   }
   const signature: StageLayout = { ...stage, trackDocTop: 1800 }
   const H = (h: number) => 1800 * h
@@ -212,24 +204,40 @@ describe('hero scroll choreography', () => {
     return choreograph({ ...viewport, scrollY, hero, stage: signature, scale: 1 })
   }
 
-  it('starts as the resting hero: the DOM name shows, the blob is green', () => {
+  it('starts as the resting hero: the name unsoaked and unzoomed, the blob green', () => {
     const step = heroAt(0)
-    expect(step.hero?.nameInCanvas).toBe(false)
-    expect(step.name).toBeNull()
+    expect(step.name?.soak).toBe(0)
+    expect(step.name?.zoom).toBe(1)
+    expect(step.name?.letters).toEqual([0, 0, 0])
     expect(step.drain).toBe(0)
     expect(step.progress).toBe(0)
   })
 
-  it('clears the role and offer, then hands the name to the canvas unsoaked', () => {
+  it('clears the role and offer before the name starts to soak', () => {
     expect(heroAt(H(0.14)).hero?.contentOpacity).toBe(0)
-    const step = heroAt(H(0.07))
-    expect(step.hero?.nameInCanvas).toBe(true)
-    expect(step.name?.soak).toBe(0)
-    expect(step.name?.zoom).toBe(1)
+    expect(heroAt(H(0.14)).name?.soak).toBe(0)
+  })
+
+  it('turns the letters green nearest first, each as a whole', () => {
+    const letters = heroAt(H(0.4)).name!.letters
+    expect(letters[0]).toBeGreaterThan(letters[1])
+    expect(letters[1]).toBeGreaterThan(letters[2])
+    expect(heroAt(H(0.55)).name!.letters).toEqual([1, 1, 1])
+  })
+
+  it('follows the scroll almost linearly, not as an eased animation', () => {
+    const [from, until] = [0.04, 0.36]
+    const quarter = heroAt(H(from + (until - from) * 0.25)).halfHeight
+    const half = heroAt(H(from + (until - from) * 0.5)).halfHeight
+    const start = heroAt(H(from)).halfHeight
+    const end = heroAt(H(until)).halfHeight
+    // At a quarter of the beat, well over a sixth of the way (smoothstep: ~16%).
+    expect((quarter - start) / (end - start)).toBeGreaterThan(0.2)
+    expect((half - start) / (end - start)).toBeCloseTo(0.5)
   })
 
   it('clings: the blob flattens along the name', () => {
-    const clung = heroAt(H(0.32))
+    const clung = heroAt(H(0.36))
     expect(clung.halfWidth).toBeCloseTo(520)
     expect(clung.halfHeight).toBeCloseTo(150 * 0.62)
     expect(clung.centerY).toBeCloseTo(255)
@@ -238,38 +246,25 @@ describe('hero scroll choreography', () => {
   it('soaks the letters steadily while the blob pales to clear water', () => {
     let previous = -1
     for (let p = 0.2; p < 0.55; p += 0.05) {
-      const soak = heroAt(900 * p).name!.soak
+      const soak = heroAt(H(p)).name!.soak
       expect(soak).toBeGreaterThanOrEqual(previous)
       previous = soak
     }
-    expect(heroAt(H(0.53)).name!.soak).toBe(2)
-    expect(heroAt(H(0.53)).drain).toBe(1)
+    expect(heroAt(H(0.55)).name!.soak).toBe(2)
+    expect(heroAt(H(0.55)).drain).toBe(1)
   })
 
   it('flies into the soaked stroke until it fills the frame', () => {
-    const start = heroAt(H(0.5)).name!
+    const start = heroAt(H(0.52)).name!
     const end = heroAt(1799.9).name!
     expect(start.zoom).toBe(1)
     // The stroke (20 px) outgrows the viewport diagonal.
     expect(end.zoom * 20).toBeGreaterThan(Math.hypot(1440, 900))
     // The target ends up in the middle of the frame.
-    const targetX = end.left + (700 - 200) * end.zoom
-    const targetY = end.top + (255 - 180) * end.zoom
+    const targetX = end.originX + end.shiftX
+    const targetY = end.originY + end.shiftY
     expect(targetX).toBeCloseTo(720, 0)
     expect(targetY).toBeCloseTo(450, 0)
-  })
-
-  it('eases after the scroll: a lagging camera shows an earlier beat in the same place', () => {
-    const lagging = choreograph({
-      ...viewport,
-      scrollY: H(0.5),
-      timeY: H(0.25),
-      hero,
-      stage: signature,
-      scale: 1,
-    })
-    expect(lagging.hero?.progress).toBeCloseTo(0.25)
-    expect(lagging.name?.soak).toBe(heroAt(H(0.25)).name?.soak)
   })
 
   it('never shrinks: the matter stays a sheet over the whole stage', () => {

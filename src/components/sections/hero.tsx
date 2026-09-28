@@ -6,7 +6,10 @@ import { useTranslations } from 'next-intl'
 
 import { ArrowDownIcon } from '@phosphor-icons/react'
 
+import { smoothstep } from '@/components/canvas/viscous-puddle/choreography'
 import {
+  HERO_CHAR_SELECTOR,
+  HERO_STAGE_SELECTOR,
   SIGNATURE_STATIC_ATTR,
   SIGNATURE_TRACK_SELECTOR,
   subscribeSignature,
@@ -19,6 +22,19 @@ import { useScrollStore } from '@/lib/stores'
 const HeroScene = lazy(() =>
   import('@/components/canvas/hero-scene').then((mod) => ({ default: mod.HeroScene }))
 )
+
+/** Layout offset of an element within an ancestor (ignores transforms). */
+function offsetWithin(element: HTMLElement, ancestor: HTMLElement) {
+  let left = 0
+  let top = 0
+  let current: HTMLElement | null = element
+  while (current && current !== ancestor) {
+    left += current.offsetLeft
+    top += current.offsetTop
+    current = current.offsetParent as HTMLElement | null
+  }
+  return { left, top }
+}
 
 export function Hero() {
   const t = useTranslations('hero')
@@ -49,19 +65,49 @@ export function Hero() {
   })
 
   // The hero scroll (docs/design/2026-09-25-scroll-hero-scenariusz.md): the
-  // blob canvas reports each frame and draws the name once it starts to soak
-  // up the blob's colour; the DOM side is written here. The role and offer
-  // leave first, and the DOM name steps aside the moment the canvas has it.
+  // blob canvas reports each frame and the DOM side is written here. The
+  // name stays real text throughout, as crisp as the rest of the page at any
+  // zoom: each letter turns from ink to the blob's green, the cursor ball
+  // pulls the green towards it, and the camera's fly-in is a CSS transform.
   useEffect(() => {
     const name = headerRef.current
     const content = contentRef.current
     const caret = caretRef.current
-    if (!name || !content || !caret) return
+    const stage = name?.closest<HTMLElement>(HERO_STAGE_SELECTOR)
+    if (!name || !content || !caret || !stage) return
+    const chars = Array.from(name.querySelectorAll<HTMLElement>(HERO_CHAR_SELECTOR))
 
+    // Layout positions (stage px) are unaffected by transforms, so they can
+    // be read at any time; refreshed when the layout changes.
+    let nameRest = { left: 0, top: 0 }
+    let charRest: Array<{ left: number; top: number; width: number; height: number }> = []
+    const measure = () => {
+      nameRest = offsetWithin(name, stage)
+      charRest = chars.map((char) => ({
+        ...offsetWithin(char, stage),
+        width: char.offsetWidth,
+        height: char.offsetHeight,
+      }))
+    }
+    measure()
+    const resizeObserver = new ResizeObserver(measure)
+    resizeObserver.observe(stage)
+
+    const clearLetters = () => {
+      for (const char of chars) {
+        char.style.color = ''
+        char.style.backgroundImage = ''
+        char.style.backgroundClip = ''
+        char.style.webkitBackgroundClip = ''
+      }
+    }
     const reset = () => {
       name.style.opacity = ''
+      name.style.transform = ''
+      name.style.transformOrigin = ''
       content.style.opacity = ''
       caret.style.visibility = ''
+      clearLetters()
     }
 
     const unsubscribe = subscribeSignature((frame) => {
@@ -69,16 +115,66 @@ export function Hero() {
         reset()
         return
       }
-      const hero = frame.step.hero
-      // Past the hero the name is the matter the scene is made of.
-      const inCanvas = !hero || hero.nameInCanvas
-      name.style.opacity = inCanvas ? '0' : ''
-      caret.style.visibility = inCanvas ? 'hidden' : ''
+      const { hero, name: soaking } = frame.step
+      // Past the hero the stroke that filled the frame is the water sheet.
+      name.style.opacity = hero ? '' : '0'
       content.style.opacity = hero ? hero.contentOpacity.toFixed(3) : '0'
+      caret.style.visibility = hero && hero.progress < 0.04 ? '' : 'hidden'
+      if (!hero || !soaking) return
+
+      const { originX, originY, shiftX, shiftY, zoom, soak, letters } = soaking
+      name.style.transformOrigin = `${(originX - nameRest.left).toFixed(2)}px ${(originY - nameRest.top).toFixed(2)}px`
+      name.style.transform =
+        zoom === 1 && shiftX === 0 && shiftY === 0
+          ? ''
+          : `translate(${shiftX.toFixed(2)}px, ${shiftY.toFixed(2)}px) scale(${zoom.toFixed(5)})`
+
+      const started = smoothstep(0, 0.06, Math.min(soak, 1))
+      if (started === 0) {
+        clearLetters()
+        return
+      }
+
+      // The ball in stage px, and in the name's own (unzoomed) space.
+      const stageTop = stage.getBoundingClientRect().top
+      const ballX = frame.ball.x
+      const ballY = frame.ball.y - stageTop
+      const localX = originX + (ballX - shiftX - originX) / zoom
+      const localY = originY + (ballY - shiftY - originY) / zoom
+      const reach = frame.ball.radius * 2.2
+      const [r, g, b] = frame.startColour
+      const green = `rgb(${r * 255} ${g * 255} ${b * 255})`
+      const glow = (a: number) =>
+        `rgb(${Math.min(255, r * 293 + 8)} ${Math.min(255, g * 293 + 8)} ${Math.min(255, b * 293 + 8)} / ${a.toFixed(3)})`
+
+      chars.forEach((char, index) => {
+        const rest = charRest[index]
+        if (!rest) return
+        // The ball is a second source of water: letters near it drink ahead
+        // of the scroll…
+        const centreX = originX + shiftX + (rest.left + rest.width / 2 - originX) * zoom
+        const centreY = originY + shiftY + (rest.top + rest.height / 2 - originY) * zoom
+        const near = smoothstep(
+          reach,
+          frame.ball.radius * 0.2,
+          Math.hypot(ballX - centreX, ballY - centreY)
+        )
+        const wet = Math.min(1, (letters[index] ?? 0) + near * 0.45 * started)
+        const colour = `color-mix(in srgb, ${green} ${(wet * 100).toFixed(1)}%, var(--foreground))`
+        // …and the green in them gathers towards it, denser and brighter.
+        const radius = (reach / zoom).toFixed(1)
+        const x = (localX - rest.left).toFixed(1)
+        const y = (localY - rest.top).toFixed(1)
+        char.style.backgroundImage = `radial-gradient(circle ${radius}px at ${x}px ${y}px, ${glow(0.55 * started * wet)}, transparent), linear-gradient(${colour}, ${colour})`
+        char.style.backgroundClip = 'text'
+        char.style.webkitBackgroundClip = 'text'
+        char.style.color = 'transparent'
+      })
     })
 
     return () => {
       unsubscribe()
+      resizeObserver.disconnect()
       reset()
     }
   }, [])
@@ -92,7 +188,7 @@ export function Hero() {
           // invisible and excludes it from LCP. At 0.01 the element is technically
           // visible to LCP measurement but imperceptible to users until GSAP animates it.
           <span key={charIndex} className="char inline-block" style={{ opacity: 0.01 }}>
-            {/* Inner span: typing animates the outer one; the melt measures this one. */}
+            {/* Inner span: typing animates the outer one; the soak colours this one. */}
             <span data-hero-char className="inline-block">
               {char}
             </span>

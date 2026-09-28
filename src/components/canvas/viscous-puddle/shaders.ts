@@ -44,23 +44,14 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
   // How much the matter is a sheet of water: long swells and a sheen over
   // all of it (signature scene), 0 in the hero.
   uniform float uSurface;
-  // Keeps the body's edge soft and moving after the matter has settled:
-  // the water sheet leaving with its section still has a liquid rim.
+  // 1 for the water sheet (signature scene): one flat colour, so it meets
+  // the hero's last frame and the page exactly, and its edge stays soft and
+  // moving after the matter has settled (a liquid rim as it leaves).
   uniform float uLiquidEdge;
+  // The cursor stirring the sheet: xy position (px), z strength 0–1.
+  // Rings spread from it; it is part of the water, not a drop above it.
+  uniform vec3 uStir;
 
-  // The soaking name (hero). uName: R glyph mask, G blurred mask (stroke
-  // depth), B·256+A when the colour arrives (0–1). Drawn in uNameRect (xy
-  // top-left, zw size, px); uNameZoom is the camera's zoom on it.
-  uniform sampler2D uName;
-  uniform float uNameOn;
-  uniform vec4 uNameRect;
-  uniform float uNameZoom;
-  // Mask pixels per CSS px (before zoom), for anti-aliasing at any zoom.
-  uniform float uNameScale;
-  // Soak progress, 0–1 (2 = all done): letters turn from ink to green.
-  uniform float uSoak;
-  // The text colour the letters start as.
-  uniform vec3 uInk;
   // How much colour the blob has given up: 0 green → 1 clear water.
   uniform float uDrain;
 
@@ -79,23 +70,6 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
     r = min(r, min(b.x, b.y));
     vec2 q = abs(p) - b + r;
     return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r;
-  }
-
-  // A letter's start time is packed in two bytes (B high, A low), which
-  // linear filtering would scramble; decode the four nearest texels, then blend.
-  float arrivalAt(ivec2 texel, ivec2 size) {
-    vec4 t = texelFetch(uName, clamp(texel, ivec2(0), size - 1), 0);
-    return (t.b * 255.0 * 256.0 + t.a * 255.0) / 65535.0;
-  }
-
-  float soakArrival(vec2 uv) {
-    ivec2 size = textureSize(uName, 0);
-    vec2 p = uv * vec2(size) - 0.5;
-    ivec2 i = ivec2(floor(p));
-    vec2 f = fract(p);
-    float a = mix(arrivalAt(i, size), arrivalAt(i + ivec2(1, 0), size), f.x);
-    float b = mix(arrivalAt(i + ivec2(0, 1), size), arrivalAt(i + ivec2(1, 1), size), f.x);
-    return mix(a, b, f.y);
   }
 
   float smin(float a, float b, float k) {
@@ -185,7 +159,7 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
     float dither = snoise(px * 0.5) * 0.025;
     float depthFactor = smoothstep(0.0, -0.5 * uScale, d + dither);
     vec3 matter = mix(uColor, uTargetColor, uSolid);
-    vec3 shaded = mix(matter, matter * 0.85, depthFactor * (1.0 - uSolid * 0.6));
+    vec3 shaded = mix(matter, matter * 0.85, depthFactor * (1.0 - uLiquidEdge));
 
     // The matter as a sheet of water over the whole frame: long, slow swells
     // with a soft sheen, and the page rising from under it in its own spot,
@@ -207,13 +181,22 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
       float h = swell(q, warp, uTime) * chop;
       float hx = swell(q + vec2(e, 0.0), warp, uTime) * chop;
       float hy = swell(q + vec2(0.0, e), warp, uTime) * chop;
-      vec2 slope = vec2(hx - h, hy - h) / e;
+      vec2 slope = vec2(hx - h, hy - h) / e * unrest;
+
+      // Rings spreading from the cursor, fading with distance. They stir
+      // the water whether it is murky or clear.
+      if (uStir.z > 0.001) {
+        vec2 toStir = (px - uStir.xy) / unit;
+        float r = length(toStir) + 1e-4;
+        float ring = cos(r * 22.0 - uTime * 3.2) * exp(-r * 2.2) * smoothstep(0.0, 0.08, r);
+        slope += toStir / r * ring * 0.9 * uStir.z;
+      }
 
       // Swells tint the water a little: crests lighter, troughs deeper.
       vec3 water = shaded * (1.0 + h * 0.06 * unrest);
 
       if (uHasImage > 0.5 && uImageIn > 0.0) {
-        vec2 bentPx = px + slope * uImageRect.z * 0.009 * unrest;
+        vec2 bentPx = px + slope * uImageRect.z * 0.009;
         vec2 imageUv = clamp((bentPx - uImageRect.xy) / uImageRect.zw, 0.0, 1.0);
         vec3 seen = texture(uImage, imageUv).rgb;
         float murk = (1.0 - uClarity) * 0.7;
@@ -230,27 +213,16 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
 
       // A broad, soft sheen rolling over the swells, everywhere: light
       // catching the slopes that face it, with no hard caustic lines.
-      vec3 normal = normalize(vec3(-slope * 0.18 * unrest, 1.0));
+      vec3 normal = normalize(vec3(-slope * 0.18, 1.0));
       float facing = dot(normal, normalize(vec3(-0.35, -0.45, 1.0)));
       float sheen = smoothstep(0.8, 1.0, facing);
-      water += (sheen - 0.6) * 0.08 * unrest;
+      water += (sheen - 0.6) * 0.08 * min(1.0, length(slope) * 4.0 + unrest);
       bodyColor = mix(shaded, water, uSurface);
     }
 
     // The ball stays liquid: it keeps the blob's own green.
     vec3 ballColor = mix(uColor, uColor * 0.85, depthFactor);
     vec3 finalColor = mix(bodyColor, ballColor, ballness);
-
-    // On the water sheet the ball is the part that stays green: it sits in
-    // the surface while the sheet darkens around it (a soft, merged rim),
-    // and keeps its own crisp edge once it has come away.
-    if (uSurface > 0.0) {
-      float ballPx = length(px - uBall.xy) - uBall.z;
-      ballPx += snoise(uv * 1.5 + uTime * 0.15) * 0.04 * uScale * unit * (1.0 + uFlow) * uDetail;
-      float drop = smoothstep(1.0, -1.0, ballPx);
-      float rim = uBall.w > 0.5 ? smoothstep(uBall.w * 0.35, 0.0, ballPx) : 0.0;
-      finalColor = mix(finalColor, ballColor, max(drop, rim * 0.85) * uSurface);
-    }
 
     // Drained of its colour the blob is clear water: almost no fill, a faint
     // meniscus at the rim and a soft glint, still moving.
@@ -261,40 +233,6 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
       vec3 water = uColor * 1.1 + glint * 0.1;
       finalColor = mix(finalColor, water, uDrain);
       alpha = mix(alpha, alpha * 0.05 + rim * 0.16, uDrain);
-    }
-
-    // The name, drawn over everything: the text colour, and behind the
-    // soaking front the blob's very green, shaded by stroke depth the way
-    // the blob is by its own (so a filled frame matches the matter exactly).
-    if (uNameOn > 0.5) {
-      vec2 nameUv = (px - uNameRect.xy) / uNameRect.zw;
-      float cover = 0.0;
-      vec3 nameColor = uInk;
-      if (all(greaterThanEqual(nameUv, vec2(0.0))) && all(lessThanEqual(nameUv, vec2(1.0)))) {
-        vec4 mask = texture(uName, nameUv);
-        // Edge width in mask density: about one screen pixel at any zoom.
-        float texelsPerPx = uNameScale / uNameZoom;
-        float k = clamp(0.55 * texelsPerPx, 0.015, 0.5);
-        cover = smoothstep(0.5 - k, 0.5 + k, mask.r);
-
-        // Each letter takes up the colour as a whole, ink turning slowly to
-        // the blob's green, starting at its own time (nearest the blob first).
-        float start = soakArrival(nameUv);
-        // The cursor ball is a second source of water: letters under it
-        // drink ahead of the scroll, and the green in them gathers towards
-        // it, denser and brighter, relaxing again once it moves away.
-        float near = smoothstep(uBall.z * 2.2, uBall.z * 0.2, length(px - uBall.xy));
-        float soakStarted = smoothstep(0.0, 0.06, min(uSoak, 1.0));
-        float wet = smoothstep(start * 0.5, start * 0.5 + 0.5, uSoak + near * 0.45 * soakStarted);
-        vec3 soaked = mix(uColor, uColor * 0.85, smoothstep(0.35, 0.95, mask.g) * (1.0 - near * 0.8));
-        soaked = mix(soaked, min(uColor * 1.15 + 0.03, vec3(1.0)), near * 0.5 * soakStarted);
-        nameColor = mix(uInk, soaked, wet);
-      }
-      finalColor = mix(finalColor, nameColor, cover);
-      // The name replaces solid DOM text, so it skips the canvas's fade-in.
-      float opacity = max(alpha * uOpacity, cover);
-      fragColor = vec4(finalColor * opacity, opacity);
-      return;
     }
 
     float opacity = alpha * uOpacity;

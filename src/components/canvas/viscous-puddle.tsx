@@ -7,7 +7,7 @@ import { usePrefersReducedMotion } from '@/hooks/use-media'
 import { gsap } from '@/lib/gsap-core'
 
 import { choreograph, type HeroLayout, type StageLayout } from './viscous-puddle/choreography'
-import { renderNameMask, type NameMask } from './viscous-puddle/name-mask'
+import { measureName } from './viscous-puddle/name-mask'
 import {
   HERO_CHAR_SELECTOR,
   HERO_NAME_SELECTOR,
@@ -22,11 +22,10 @@ import {
   SIGNATURE_TRACK_SELECTOR,
 } from './viscous-puddle/signature-bus'
 import {
-  averageColour,
   createImageTexture,
-  createNameTexture,
   disposePuddleWebGL,
   lerp,
+  pageColour,
   setupPuddleWebGL,
 } from './viscous-puddle/webgl'
 
@@ -38,28 +37,6 @@ function readPrimaryRgb(): [number, number, number] {
     return parts as [number, number, number]
   }
   return [0.494, 0.773, 0.557]
-}
-
-/**
- * The page's text colour as sRGB floats: the ink the name's letters turn
- * into. Resolved through a 2D canvas so any CSS colour syntax (oklch) works.
- */
-function readInkRgb(): [number, number, number] {
-  const context = document.createElement('canvas').getContext('2d')
-  if (!context) return [0.1, 0.1, 0.1]
-  context.fillStyle = getComputedStyle(document.body).color
-  context.fillRect(0, 0, 1, 1)
-  const [r, g, b] = context.getImageData(0, 0, 1, 1).data
-  return [r / 255, g / 255, b / 255]
-}
-
-let cachedInkRgb: [number, number, number] | null = null
-
-function getInkRgb(): [number, number, number] {
-  if (!cachedInkRgb) {
-    cachedInkRgb = readInkRgb()
-  }
-  return cachedInkRgb
 }
 
 // Cached color value — recomputed only when the theme class on <html> changes,
@@ -79,7 +56,6 @@ let themeObserver: MutationObserver | null = null
 if (typeof document !== 'undefined' && !themeObserver) {
   themeObserver = new MutationObserver(() => {
     cachedPrimaryRgb = null
-    cachedInkRgb = null
   })
   themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
 }
@@ -115,8 +91,10 @@ interface PuddleState {
   hero: HeroLayout | null
   lastScrollY: number
   flow: number
-  /** The damped scroll position the story runs on (camera inertia); null until the first frame. */
-  timeY: number | null
+  /** How hard the cursor is stirring the water, 0–1. */
+  stir: number
+  lastBallX: number
+  lastBallY: number
 }
 
 function createInitialState(): PuddleState {
@@ -144,7 +122,9 @@ function createInitialState(): PuddleState {
     hero: null,
     lastScrollY: 0,
     flow: 0,
-    timeY: null,
+    stir: 0,
+    lastBallX: 0,
+    lastBallY: 0,
   }
 }
 
@@ -156,32 +136,33 @@ function findSignatureElements(): SignatureElements | null {
 }
 
 /**
- * The hero at rest: the hero scales and blurs its name while it plays, so
- * that is lifted for the instant of measuring the letters.
+ * The hero at rest: the fly-in zooms the name with a CSS transform, so that
+ * is lifted for the instant of measuring the letters.
  */
-function measureHero(pixelRatio: number): { layout: HeroLayout; mask: NameMask } | null {
+function measureHero(): HeroLayout | null {
   const track = document.querySelector<HTMLElement>(HERO_TRACK_SELECTOR)
   const stage = track?.querySelector<HTMLElement>(HERO_STAGE_SELECTOR)
   const name = stage?.querySelector<HTMLElement>(HERO_NAME_SELECTOR)
   if (!track || !stage || !name) return null
 
+  const transform = name.style.transform
+  name.style.transform = ''
   const stageRect = stage.getBoundingClientRect()
   const chars = Array.from(name.querySelectorAll<HTMLElement>(HERO_CHAR_SELECTOR))
   // The blob rests mid-stage; that is where it first touches the name.
   const contact = { x: stageRect.left + stageRect.width / 2, y: stageRect.height / 2 }
-  const mask = renderNameMask(chars, stageRect.top, pixelRatio, contact)
-  if (!mask) return null
+  const measure = measureName(chars, stageRect.top, contact)
+  name.style.transform = transform
+  if (!measure) return null
 
   return {
-    mask,
-    layout: {
-      trackDocTop: track.getBoundingClientRect().top + window.scrollY,
-      pinDistance: Math.max(1, track.offsetHeight - stage.offsetHeight),
-      nameBox: { left: mask.left, top: mask.top, width: mask.width, height: mask.height },
-      zoomX: mask.zoom.x,
-      zoomY: mask.zoom.y,
-      zoomStroke: mask.zoom.stroke,
-    },
+    trackDocTop: track.getBoundingClientRect().top + window.scrollY,
+    pinDistance: Math.max(1, track.offsetHeight - stage.offsetHeight),
+    nameBox: measure.box,
+    letterStarts: measure.starts,
+    zoomX: measure.zoom.x,
+    zoomY: measure.zoom.y,
+    zoomStroke: measure.zoom.stroke,
   }
 }
 
@@ -201,9 +182,6 @@ function measureStage({ track, stage, frame }: SignatureElements): StageLayout {
     },
   }
 }
-
-/** Camera inertia: time constant (s) of the story easing after the scroll. */
-const CAMERA_LAG = 0.2
 
 /**
  * Hero blob on a fixed, viewport-sized canvas behind the page. Across the
@@ -242,9 +220,6 @@ export function ViscousPuddle() {
 
     const { gl, vao, uniforms } = webgl
     gl.uniform1i(uniforms.uImage, 0)
-    gl.uniform1i(uniforms.uName, 1)
-    let nameTexture: WebGLTexture | null = null
-    let nameScale = 1
 
     const syncLayout = () => {
       const rect = canvas.getBoundingClientRect()
@@ -259,15 +234,11 @@ export function ViscousPuddle() {
 
       state.elements = findSignatureElements()
       state.stage = state.elements ? measureStage(state.elements) : null
-      const hero = measureHero(state.dpr)
-      state.hero = hero?.layout ?? null
-      if (nameTexture) gl.deleteTexture(nameTexture)
-      nameTexture = hero ? createNameTexture(gl, hero.mask.image) : null
-      nameScale = hero?.mask.scale ?? 1
+      state.hero = measureHero()
     }
 
     syncLayout()
-    // The name mask needs the real font; draw it again once fonts are in.
+    // The letters need the real font; measure them again once fonts are in.
     void document.fonts.ready.then(() => {
       if (!disposed) syncLayout()
     })
@@ -291,7 +262,7 @@ export function ViscousPuddle() {
       }
       if (disposed) return
       texture = createImageTexture(gl, image)
-      state.targetColour = averageColour(image) ?? state.targetColour
+      state.targetColour = pageColour(image) ?? state.targetColour
       state.hasImage = texture !== null
     }
     // Safari has no requestIdleCallback.
@@ -333,7 +304,6 @@ export function ViscousPuddle() {
     const currentStep = () =>
       choreograph({
         scrollY: window.scrollY,
-        timeY: state.timeY ?? window.scrollY,
         viewportWidth: state.canvasWidth,
         viewportHeight: window.innerHeight,
         hero: state.hero,
@@ -370,21 +340,6 @@ export function ViscousPuddle() {
       state.opacity = lerp(state.opacity, 1, 0.025)
       state.scale = lerp(state.scale, state.isMobile ? 0.6 : 1, 0.1)
 
-      // Camera inertia: the story eases after the scroll instead of jumping
-      // with it. A long jump (anchor, End, resize) lands at once, no chase.
-      const scrollTarget = window.scrollY
-      if (
-        reduced ||
-        state.timeY === null ||
-        Math.abs(scrollTarget - state.timeY) > window.innerHeight * 1.5
-      ) {
-        state.timeY = scrollTarget
-      } else {
-        state.timeY += (scrollTarget - state.timeY) * (1 - Math.exp(-delta / CAMERA_LAG))
-        if (Math.abs(scrollTarget - state.timeY) < 0.1) state.timeY = scrollTarget
-      }
-      const catchingUp = state.timeY !== scrollTarget
-
       const primary = getPrimaryRgb()
       state.colorR = lerp(state.colorR, primary[0], 0.05)
       state.colorG = lerp(state.colorG, primary[1], 0.05)
@@ -392,11 +347,6 @@ export function ViscousPuddle() {
 
       const step = currentStep()
       setReveal(step.reveal)
-      publishSignature({
-        step,
-        startColour: [state.colorR, state.colorG, state.colorB],
-        targetColour: state.targetColour,
-      })
 
       // Scroll speed stirs the surface (0–1), then eases off when it stops.
       const scrollY = window.scrollY
@@ -405,7 +355,13 @@ export function ViscousPuddle() {
       const targetFlow = reduced ? 0 : Math.min(speed / 2500, 1)
       state.flow = lerp(state.flow, targetFlow, targetFlow > state.flow ? 0.2 : 0.04)
 
-      if (!step.active && !catchingUp) {
+      if (!step.active) {
+        publishSignature({
+          step,
+          startColour: [state.colorR, state.colorG, state.colorB],
+          targetColour: state.targetColour,
+          ball: { x: -1e4, y: -1e4, radius: 0 },
+        })
         sleep()
         return
       }
@@ -427,6 +383,21 @@ export function ViscousPuddle() {
       state.ballRelY = lerp(state.ballRelY, targetY, ballLerp)
       const ballX = state.ballRelX + step.box.left
       const ballY = state.ballRelY + step.box.top
+
+      // A moving cursor stirs the water sheet; the rings settle when it stops.
+      const ballSpeed =
+        delta > 0 ? Math.hypot(ballX - state.lastBallX, ballY - state.lastBallY) / delta : 0
+      state.lastBallX = ballX
+      state.lastBallY = ballY
+      const targetStir = followPointer ? Math.min(ballSpeed / 900, 1) : 0
+      state.stir = lerp(state.stir, targetStir, targetStir > state.stir ? 0.08 : 0.02)
+
+      publishSignature({
+        step,
+        startColour: [state.colorR, state.colorG, state.colorB],
+        targetColour: state.targetColour,
+        ball: { x: ballX, y: ballY, radius: ball.radius },
+      })
 
       gl.viewport(0, 0, canvas.width, canvas.height)
       gl.disable(gl.SCISSOR_TEST)
@@ -476,17 +447,9 @@ export function ViscousPuddle() {
       gl.uniform1f(uniforms.uSurface, step.surface)
       gl.uniform1f(uniforms.uLiquidEdge, step.liquidEdge)
       gl.uniform1f(uniforms.uImageRadius, step.boxRadius)
+      gl.uniform3f(uniforms.uStir, ballX, ballY, step.liquidEdge * state.stir)
       gl.uniform4f(uniforms.uBall, ballX, ballY, ball.radius, ball.merge)
-      const name = step.name
-      gl.uniform1f(uniforms.uNameOn, name && nameTexture ? 1 : 0)
       gl.uniform1f(uniforms.uDrain, step.drain)
-      if (name) {
-        gl.uniform4f(uniforms.uNameRect, name.left, name.top, name.width, name.height)
-        gl.uniform1f(uniforms.uNameZoom, name.zoom)
-        gl.uniform1f(uniforms.uNameScale, nameScale)
-        gl.uniform1f(uniforms.uSoak, name.soak)
-      }
-      gl.uniform3f(uniforms.uInk, ...getInkRgb())
 
       gl.bindVertexArray(vao)
       gl.drawArrays(gl.TRIANGLES, 0, 6)
@@ -522,7 +485,6 @@ export function ViscousPuddle() {
       document.removeEventListener('mouseleave', onMouseLeave)
       document.removeEventListener('mouseenter', onMouseEnter)
       if (texture) gl.deleteTexture(texture)
-      if (nameTexture) gl.deleteTexture(nameTexture)
       disposePuddleWebGL(webgl)
     }
   }, [])

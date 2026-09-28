@@ -5,6 +5,8 @@ export interface SignatureFrame {
   step: ChoreographyFrame
   startColour: readonly [number, number, number]
   targetColour: readonly [number, number, number]
+  /** The cursor ball in viewport px (the hero's letters answer to it). */
+  ball: { x: number; y: number; radius: number }
 }
 
 type Listener = (frame: SignatureFrame | null) => void

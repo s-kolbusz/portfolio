@@ -23,15 +23,9 @@ interface PuddleUniforms {
   uClarity: WebGLUniformLocation | null
   uSurface: WebGLUniformLocation | null
   uLiquidEdge: WebGLUniformLocation | null
+  uStir: WebGLUniformLocation | null
   uImageRadius: WebGLUniformLocation | null
   uBall: WebGLUniformLocation | null
-  uInk: WebGLUniformLocation | null
-  uName: WebGLUniformLocation | null
-  uNameOn: WebGLUniformLocation | null
-  uNameRect: WebGLUniformLocation | null
-  uNameZoom: WebGLUniformLocation | null
-  uNameScale: WebGLUniformLocation | null
-  uSoak: WebGLUniformLocation | null
   uDrain: WebGLUniformLocation | null
 }
 
@@ -158,15 +152,9 @@ export function setupPuddleWebGL(canvas: HTMLCanvasElement): PuddleWebGLContext 
     uClarity: gl.getUniformLocation(program, 'uClarity'),
     uSurface: gl.getUniformLocation(program, 'uSurface'),
     uLiquidEdge: gl.getUniformLocation(program, 'uLiquidEdge'),
+    uStir: gl.getUniformLocation(program, 'uStir'),
     uImageRadius: gl.getUniformLocation(program, 'uImageRadius'),
     uBall: gl.getUniformLocation(program, 'uBall'),
-    uInk: gl.getUniformLocation(program, 'uInk'),
-    uName: gl.getUniformLocation(program, 'uName'),
-    uNameOn: gl.getUniformLocation(program, 'uNameOn'),
-    uNameRect: gl.getUniformLocation(program, 'uNameRect'),
-    uNameZoom: gl.getUniformLocation(program, 'uNameZoom'),
-    uNameScale: gl.getUniformLocation(program, 'uNameScale'),
-    uSoak: gl.getUniformLocation(program, 'uSoak'),
     uDrain: gl.getUniformLocation(program, 'uDrain'),
   }
 
@@ -180,23 +168,6 @@ export function setupPuddleWebGL(canvas: HTMLCanvasElement): PuddleWebGLContext 
     vbo,
     uniforms,
   }
-}
-
-/** Uploads the melting name's mask (unit 1). No mipmaps: it is drawn near 1:1. */
-export function createNameTexture(gl: WebGL2RenderingContext, image: ImageData) {
-  const texture = gl.createTexture()
-  if (!texture) return null
-  gl.activeTexture(gl.TEXTURE1)
-  gl.bindTexture(gl.TEXTURE_2D, texture)
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false)
-  gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false)
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-  gl.activeTexture(gl.TEXTURE0)
-  return texture
 }
 
 /** Uploads a decoded image as the texture the matter turns into (unit 0). */
@@ -217,25 +188,33 @@ export function createImageTexture(gl: WebGL2RenderingContext, image: TexImageSo
   return texture
 }
 
-/** Mean sRGB colour of an image (0–1 floats), sampled on a tiny 2D canvas. */
-export function averageColour(image: CanvasImageSource): [number, number, number] | null {
+/**
+ * The page's own background colour: the median of the pixels along the
+ * image's left, right and bottom edges (where a page shows its background),
+ * rather than an average that the content would tint.
+ */
+export function pageColour(image: CanvasImageSource): [number, number, number] | null {
   const canvas = document.createElement('canvas')
-  canvas.width = 32
-  canvas.height = 18
+  canvas.width = 64
+  canvas.height = 36
   const context = canvas.getContext('2d', { willReadFrequently: true })
   if (!context) return null
   context.drawImage(image, 0, 0, canvas.width, canvas.height)
   const { data } = context.getImageData(0, 0, canvas.width, canvas.height)
-  let r = 0
-  let g = 0
-  let b = 0
-  for (let i = 0; i < data.length; i += 4) {
-    r += data[i]
-    g += data[i + 1]
-    b += data[i + 2]
+  const channels: [number[], number[], number[]] = [[], [], []]
+  const take = (x: number, y: number) => {
+    const i = (y * canvas.width + x) * 4
+    for (let c = 0; c < 3; c++) channels[c].push(data[i + c])
   }
-  const count = (data.length / 4) * 255
-  return [r / count, g / count, b / count]
+  for (let y = 0; y < canvas.height; y++) {
+    for (const x of [1, 2, canvas.width - 3, canvas.width - 2]) take(x, y)
+  }
+  for (let x = 0; x < canvas.width; x++) take(x, canvas.height - 2)
+  const median = (values: number[]) => {
+    const sorted = [...values].sort((a, b) => a - b)
+    return sorted[Math.floor(sorted.length / 2)] / 255
+  }
+  return [median(channels[0]), median(channels[1]), median(channels[2])]
 }
 
 export function disposePuddleWebGL({ gl, program, vao, vbo }: PuddleWebGLContext) {

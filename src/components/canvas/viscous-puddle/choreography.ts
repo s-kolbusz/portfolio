@@ -9,10 +9,6 @@
  * Everything here is a pure function of the scroll position and measured
  * layout, so fast or slow scrolling, reversing and stopping half-way all land
  * on the same picture. All positions are CSS pixels in viewport space.
- *
- * The camera has inertia: the story runs on `timeY`, a damped copy of the
- * scroll position, while everything pinned to the DOM is placed by the real
- * `scrollY`, so nothing drifts off its element.
  */
 
 /** Pinned stage measurements, taken on resize. */
@@ -35,8 +31,10 @@ export interface StageLayout {
 export interface HeroLayout {
   trackDocTop: number
   pinDistance: number
-  /** Box of the name mask, relative to the pinned stage (see `renderNameMask`). */
+  /** Box of the name's glyphs, relative to the pinned stage (see `measureName`). */
   nameBox: { left: number; top: number; width: number; height: number }
+  /** Per letter: when it starts to soak, 0 first … 1 last. */
+  letterStarts: readonly number[]
   /** The fly-in target inside the deepest stroke near the centre (stage px) and its thickness. */
   zoomX: number
   zoomY: number
@@ -45,8 +43,6 @@ export interface HeroLayout {
 
 export interface ChoreographyInput {
   scrollY: number
-  /** Damped scroll position the story runs on (defaults to scrollY). */
-  timeY?: number
   viewportWidth: number
   viewportHeight: number
   /** The pinned hero, or null on pages without one. */
@@ -82,24 +78,27 @@ export interface Ball {
   restY: number
 }
 
-/** The name as the shader draws it while it soaks and the camera flies in. */
+/**
+ * The name while it soaks and the camera flies in. It stays DOM text: the
+ * camera is a CSS transform, scaling by `zoom` about the target (origin,
+ * stage px) and then moving by `shift`.
+ */
 export interface NameFrame {
-  /** Viewport box the mask is drawn in (camera zoom applied). */
-  left: number
-  top: number
-  width: number
-  height: number
+  originX: number
+  originY: number
+  shiftX: number
+  shiftY: number
   /** Camera zoom on the name (1 = as laid out). */
   zoom: number
   /** Soak progress 0–1 (2 once complete): letters turn from ink to the blob's green. */
   soak: number
+  /** Per letter, how far it has turned from ink to green (0–1). */
+  letters: number[]
 }
 
 export interface HeroFrame {
   /** Hero pin progress H, 0–1. */
   progress: number
-  /** Once true the canvas draws the name and the DOM copy steps aside. */
-  nameInCanvas: boolean
   /** Role / offer / CTA opacity. */
   contentOpacity: number
 }
@@ -109,7 +108,7 @@ export interface ChoreographyFrame {
   progress: number
   /** The hero's state while it plays, otherwise null. */
   hero: HeroFrame | null
-  /** The soaking name (hero only, once the canvas has it). */
+  /** The soaking name (hero only). */
   name: NameFrame | null
   /** How much colour the blob has given up: 0 green, 1 clear water (hero only). */
   drain: number
@@ -129,7 +128,7 @@ export interface ChoreographyFrame {
   clarity: number
   /** How much the matter is a sheet of water (waves and sheen), 0–1 (signature scene). */
   surface: number
-  /** Whether the body's edge stays liquid (the water sheet leaving with its section). */
+  /** 1 for the water sheet (signature scene): unshaded, with a liquid edge as it leaves. */
   liquidEdge: number
   /** Opacity of the DOM image (swapped in once the canvas matches it). */
   reveal: number
@@ -154,29 +153,30 @@ export const VISCOSITY_START = 0.82
 
 /*
  * One rhythm for the whole sequence (hero 2 screens + scene 2 screens): each
- * beat takes about half a screen of scroll and eases the same way, the next
- * one starting as the last settles. Only the fly-in, the one big camera
- * move, gets a full screen. So one scrolling speed reads the whole story.
+ * beat takes a little over half a screen of scroll and follows it almost
+ * linearly (`glide`: only the ends are softened), so it reads as a response
+ * to the scroll, not as an animation it sets off. Only the fly-in, the one
+ * big camera move, gets a full screen. One scrolling speed reads the story.
  */
 
 /** Beat boundaries on the pin progress P (2 screens; 0.25 = half a screen). */
 export const BEATS = {
   enter: [0, 0.05],
-  darken: [0, 0.28],
+  darken: [0.02, 0.4],
   detach: [0.1, 0.35],
-  image: [0.25, 0.53],
-  clear: [0.45, 0.73],
-  swap: [0.73, 0.75],
-  heading: [0.76, 0.96],
+  image: [0.3, 0.58],
+  clear: [0.5, 0.78],
+  swap: [0.78, 0.8],
+  heading: [0.8, 0.97],
 } as const
 
 /** Beat boundaries on the hero pin progress H (2 screens; 0.25 = half a screen). */
 export const HERO_BEATS = {
   quiet: [0, 0.14],
-  cling: [0.06, 0.32],
-  soak: [0.24, 0.52],
-  drain: [0.26, 0.52],
-  fly: [0.5, 1],
+  cling: [0.04, 0.36],
+  soak: [0.24, 0.54],
+  drain: [0.26, 0.54],
+  fly: [0.52, 1],
 } as const
 
 /** Pin progress at which the heading starts to enter the frame. */
@@ -193,6 +193,12 @@ export function linear(edge0: number, edge1: number, value: number) {
 export function smoothstep(edge0: number, edge1: number, value: number) {
   const t = linear(edge0, edge1, value)
   return t * t * (3 - 2 * t)
+}
+
+/** Scroll response for a beat: linear, with just the start and end softened. */
+export function glide(edge0: number, edge1: number, value: number) {
+  const t = linear(edge0, edge1, value)
+  return mix(t, t * t * (3 - 2 * t), 0.4)
 }
 
 export function easeInOutCubic(t: number) {
@@ -260,7 +266,6 @@ export function heroProgress(scrollY: number, hero: HeroLayout) {
 
 function heroFrame(
   scrollY: number,
-  timeY: number,
   viewportWidth: number,
   viewportHeight: number,
   hero: HeroLayout,
@@ -268,13 +273,13 @@ function heroFrame(
 ): ChoreographyFrame {
   const unit = viewportHeight / 2
   const baseRadius = 0.75 * unit * scale
-  const progress = heroProgress(timeY, hero)
+  const progress = heroProgress(scrollY, hero)
   const pinned = Math.min(Math.max(scrollY - hero.trackDocTop, 0), hero.pinDistance)
   const stageTop = hero.trackDocTop - scrollY + pinned
 
   // Cling: drawn in by the paper, the blob flattens along the name until it
   // touches every letter.
-  const cling = smoothstep(...HERO_BEATS.cling, progress)
+  const cling = glide(...HERO_BEATS.cling, progress)
   const nameCenterX = hero.nameBox.left + hero.nameBox.width / 2
   const nameCenterY = stageTop + hero.nameBox.top + hero.nameBox.height / 2
   const restX = viewportWidth / 2
@@ -291,7 +296,7 @@ function heroFrame(
   // the ones nearest the blob first. Past the beat everything is soaked.
   const soakTime = linear(...HERO_BEATS.soak, progress)
   const soak = soakTime >= 1 ? 2 : soakTime
-  const drain = smoothstep(...HERO_BEATS.drain, progress)
+  const drain = glide(...HERO_BEATS.drain, progress)
 
   // Fly-in: the camera pushes towards a point deep in a soaked stroke, at a
   // steady perceived speed (exponential zoom), until that stroke's green
@@ -305,7 +310,7 @@ function heroFrame(
   // Past full cover at the end (1.3 × the diagonal), so the handover frame is solid green.
   // Eased in and out in log space, like every other beat: the push starts
   // and lands gently, with no burst of speed at the end.
-  const zoom = Math.exp(Math.log(zoomMax) * smoothstep(0, 1, fly))
+  const zoom = Math.exp(Math.log(zoomMax) * glide(0, 1, fly))
   // Keep the target drifting to the centre of the frame as we approach it.
   const aim = smoothstep(0, 0.6, fly)
   const shiftX = (viewportWidth / 2 - zoomX) * aim
@@ -317,17 +322,15 @@ function heroFrame(
   halfHeight *= bodyZoom
   cornerRadius *= bodyZoom
 
-  const nameInCanvas = progress >= HERO_BEATS.cling[0]
-  const name: NameFrame | null = nameInCanvas
-    ? {
-        left: zoomX + shiftX + (hero.nameBox.left - zoomX) * zoom,
-        top: zoomY + shiftY + (stageTop + hero.nameBox.top - zoomY) * zoom,
-        width: hero.nameBox.width * zoom,
-        height: hero.nameBox.height * zoom,
-        zoom,
-        soak,
-      }
-    : null
+  const name: NameFrame = {
+    originX: hero.zoomX,
+    originY: hero.zoomY,
+    shiftX,
+    shiftY,
+    zoom,
+    soak,
+    letters: hero.letterStarts.map((start) => smoothstep(start * 0.5, start * 0.5 + 0.5, soak)),
+  }
 
   const metrics = ballMetrics(viewportHeight, scale)
 
@@ -335,8 +338,7 @@ function heroFrame(
     progress: 0,
     hero: {
       progress,
-      nameInCanvas,
-      contentOpacity: 1 - smoothstep(...HERO_BEATS.quiet, progress),
+      contentOpacity: 1 - glide(...HERO_BEATS.quiet, progress),
     },
     name,
     drain,
@@ -372,7 +374,6 @@ function heroFrame(
 
 export function choreograph({
   scrollY,
-  timeY = scrollY,
   viewportWidth,
   viewportHeight,
   hero = null,
@@ -382,8 +383,8 @@ export function choreograph({
   const radius = 0.75 * (viewportHeight / 2) * scale
 
   // The hero plays until the signature pin takes over the same matter.
-  if (hero && (!stage || timeY < stage.trackDocTop)) {
-    return heroFrame(scrollY, timeY, viewportWidth, viewportHeight, hero, scale)
+  if (hero && (!stage || scrollY < stage.trackDocTop)) {
+    return heroFrame(scrollY, viewportWidth, viewportHeight, hero, scale)
   }
 
   if (!stage) {
@@ -421,7 +422,7 @@ export function choreograph({
     }
   }
 
-  const progress = pinProgress(timeY, stage)
+  const progress = pinProgress(scrollY, stage)
   const box = boxRect(scrollY, stage)
   const viscosity = viscosityAt(progress)
   const reveal = smoothstep(...BEATS.swap, progress)
@@ -435,14 +436,18 @@ export function choreograph({
   const margin = 0.3 * unit
   const sheetHalfWidth = viewportWidth / 2 + margin
   // Its bottom sits a little below the stage, so its rippling edge stays
-  // out of sight while pinned and only shows as it leaves.
-  const sheetHalfHeight = viewportHeight + margin / 2
-  const grow = hero ? 1 : smoothstep(...BEATS.darken, progress)
+  // out of sight while pinned. As the stage leaves, the water draws back up
+  // off the next section (whose own background would hide it) and its soft,
+  // moving rim comes into view.
+  const leave = linear(0, viewportHeight * 0.45, scrollY - (stage.trackDocTop + stage.pinDistance))
+  const sheetBottomOffset = margin / 2 - glide(0, 1, leave) * margin * 1.6
+  const sheetHalfHeight = viewportHeight + sheetBottomOffset / 2
+  const grow = hero ? 1 : glide(...BEATS.darken, progress)
   const metrics = ballMetrics(viewportHeight, scale)
-  const detach = smoothstep(...BEATS.detach, progress)
+  const detach = glide(...BEATS.detach, progress)
   const rest = ballRest(box, metrics.radius, viewportWidth)
   const middleY = stageTop + viewportHeight / 2
-  const sheetBottom = stageTop + viewportHeight
+  const sheetBottom = stageTop + viewportHeight + sheetBottomOffset
   const sheetOnScreen = sheetBottom + margin > 0 && stageTop < viewportHeight
   const sceneOnScreen = box.top + box.height + metrics.radius * 3 > 0 && box.top < viewportHeight
 
@@ -456,15 +461,15 @@ export function choreograph({
     zoomY: 0,
     viscosity,
     fluid: viscosity / VISCOSITY_START,
-    solid: smoothstep(...BEATS.darken, progress),
-    imageIn: smoothstep(...BEATS.image, progress),
-    clarity: smoothstep(...BEATS.clear, progress),
+    solid: glide(...BEATS.darken, progress),
+    imageIn: glide(...BEATS.image, progress),
+    clarity: glide(...BEATS.clear, progress),
     surface: hero ? smoothstep(0, 0.12, progress) : grow,
     liquidEdge: 1,
     reveal,
     body: sheetOnScreen,
     centerX: viewportWidth / 2,
-    centerY: mix(Math.min(viewportHeight / 2, middleY), stageTop + margin / 2, grow),
+    centerY: mix(Math.min(viewportHeight / 2, middleY), stageTop + sheetBottomOffset / 2, grow),
     halfWidth: mix(radius, sheetHalfWidth, grow),
     halfHeight: mix(radius, sheetHalfHeight, grow),
     cornerRadius: mix(radius, unit * 0.6, grow),

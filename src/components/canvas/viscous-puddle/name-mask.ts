@@ -1,26 +1,19 @@
 /**
- * The hero name as a mask for the shader, so it can soak up the blob's colour.
- *
- * Each glyph is drawn with the element's own computed font at its measured
- * position, so the canvas copy lines up with the DOM text it replaces.
- * Channels: R = the glyphs, G = a blurred copy (stroke depth, for shading),
- * B·256 + A = when that letter starts to take up the colour (0 first … 1
- * last). Each letter soaks as a whole, ink turning to green; the ones
- * nearest the blob start first.
+ * Measures the hero name for its choreography. The name itself stays real
+ * DOM text throughout (coloured and zoomed with CSS), so it is exactly as
+ * crisp as the rest of the page at any zoom; this only works out:
+ * - when each letter starts to take up the blob's colour (nearest first),
+ * - the fly-in target, deep inside the thickest stroke near the centre.
+ * For the latter the glyphs are rasterised once with their computed font.
  */
 
-export interface NameMask {
-  /** RGBA pixels, see above. Upload without premultiplying alpha. */
-  image: ImageData
-  /** Stage-space box the mask covers, px. */
-  left: number
-  top: number
-  width: number
-  height: number
-  /** Mask pixels per CSS px. */
-  scale: number
+export interface NameMeasure {
+  /** Per letter (same order as the elements passed in): soak start 0 first … 1 last. */
+  starts: number[]
   /** Inside the thickest stroke near the centre (stage px) and its width: the fly-in target. */
   zoom: { x: number; y: number; stroke: number }
+  /** Bounds of the glyphs (stage px). */
+  box: { left: number; top: number; width: number; height: number }
 }
 
 /** Deterministic 0–1 hash, so the name soaks the same way every visit. */
@@ -38,135 +31,81 @@ interface Glyph {
   height: number
 }
 
-export function renderNameMask(
+export function measureName(
   chars: ReadonlyArray<HTMLElement>,
   stageTop: number,
-  pixelRatio: number,
   /** Where the blob touches first (stage px): its centre. */
   contact: { x: number; y: number }
-): NameMask | null {
-  const glyphs: Glyph[] = chars
-    .map((char) => {
-      const rect = char.getBoundingClientRect()
-      return {
-        text: char.textContent ?? '',
-        font: getComputedStyle(char).font,
-        left: rect.left,
-        top: rect.top - stageTop,
-        width: rect.width,
-        height: rect.height,
-      }
-    })
-    .filter((glyph) => glyph.text.trim() !== '' && glyph.width > 0)
+): NameMeasure | null {
+  const all: Glyph[] = chars.map((char) => {
+    const rect = char.getBoundingClientRect()
+    return {
+      text: char.textContent ?? '',
+      font: getComputedStyle(char).font,
+      left: rect.left,
+      top: rect.top - stageTop,
+      width: rect.width,
+      height: rect.height,
+    }
+  })
+  const glyphs = all.filter((glyph) => glyph.text.trim() !== '' && glyph.width > 0)
   if (glyphs.length === 0) return null
 
-  const glyphHeight = Math.max(...glyphs.map((glyph) => glyph.height))
-  const softRadius = glyphHeight * 0.05
-  const pad = softRadius * 3
-  const left = Math.min(...glyphs.map((g) => g.left)) - pad
-  const top = Math.min(...glyphs.map((g) => g.top)) - pad
-  const right = Math.max(...glyphs.map((g) => g.left + g.width)) + pad
-  const bottom = Math.max(...glyphs.map((g) => g.top + g.height)) + pad
-  const width = right - left
-  const height = bottom - top
+  const left = Math.min(...glyphs.map((g) => g.left))
+  const top = Math.min(...glyphs.map((g) => g.top))
+  const width = Math.max(...glyphs.map((g) => g.left + g.width)) - left
+  const height = Math.max(...glyphs.map((g) => g.top + g.height)) - top
 
-  const scale = Math.min(pixelRatio, 1.5)
-  const w = Math.ceil(width * scale)
-  const h = Math.ceil(height * scale)
-
-  const draw = (filter: string) => {
-    const canvas = document.createElement('canvas')
-    canvas.width = w
-    canvas.height = h
-    const context = canvas.getContext('2d', { willReadFrequently: true })
-    if (!context) return null
-    context.scale(scale, scale)
-    context.filter = filter
-    context.fillStyle = '#fff'
-    context.textBaseline = 'alphabetic'
-    for (const glyph of glyphs) {
-      context.font = glyph.font
-      const metrics = context.measureText(glyph.text)
-      const ascent = metrics.fontBoundingBoxAscent
-      const descent = metrics.fontBoundingBoxDescent
-      // CSS places the glyph's content box in the middle of its line box.
-      const baseline = glyph.top + (glyph.height - (ascent + descent)) / 2 + ascent
-      context.fillText(glyph.text, glyph.left - left, baseline - top)
-    }
-    return context.getImageData(0, 0, w, h)
+  // A modest raster is enough to find the deepest point of a stroke.
+  const scale = Math.min(1, 1200 / width)
+  const w = Math.max(1, Math.ceil(width * scale))
+  const h = Math.max(1, Math.ceil(height * scale))
+  const canvas = document.createElement('canvas')
+  canvas.width = w
+  canvas.height = h
+  const context = canvas.getContext('2d', { willReadFrequently: true })
+  if (!context) return null
+  context.scale(scale, scale)
+  context.fillStyle = '#fff'
+  context.textBaseline = 'alphabetic'
+  for (const glyph of glyphs) {
+    context.font = glyph.font
+    const metrics = context.measureText(glyph.text)
+    const ascent = metrics.fontBoundingBoxAscent
+    const descent = metrics.fontBoundingBoxDescent
+    // CSS places the glyph's content box in the middle of its line box.
+    const baseline = glyph.top + (glyph.height - (ascent + descent)) / 2 + ascent
+    context.fillText(glyph.text, glyph.left - left, baseline - top)
   }
-
-  const crisp = draw('none')
-  const soft = draw(`blur(${softRadius.toFixed(2)}px)`)
-  if (!crisp || !soft) return null
-
-  // Letter boxes touch (advance widths), so only a hair of padding: enough
-  // for anti-aliased edges, not enough to tint a neighbour.
-  const arrival = letterStarts(glyphs, w, h, left, top, scale, 1.5, contact)
-
-  const image = new ImageData(w, h)
-  for (let i = 0, p = 0; i < image.data.length; i += 4, p++) {
-    const time = Math.round(arrival[p] * 65535)
-    image.data[i] = crisp.data[i + 3]
-    image.data[i + 1] = soft.data[i + 3]
-    image.data[i + 2] = time >> 8
-    image.data[i + 3] = time & 255
-  }
+  const mask = context.getImageData(0, 0, w, h)
 
   return {
-    image,
-    left,
-    top,
-    width,
-    height,
-    scale,
-    zoom: findZoomPoint(crisp, left, top, scale),
+    starts: letterStarts(all, contact),
+    zoom: findZoomPoint(mask, left, top, scale),
+    box: { left, top, width, height },
   }
 }
 
 /**
  * When each letter starts to soak, normalised 0–1: by its distance from
  * where the blob touches the name (the blob reaches along it), with a little
- * variation so neighbours do not move in lockstep. Written over each glyph's
- * box, barely padded so the anti-aliased edges share their letter's time.
+ * variation so neighbours do not move in lockstep. Blank ones get 1.
  */
-function letterStarts(
-  glyphs: ReadonlyArray<Glyph>,
-  width: number,
-  height: number,
-  left: number,
-  top: number,
-  scale: number,
-  pad: number,
-  contact: { x: number; y: number }
-): Float32Array {
+function letterStarts(glyphs: ReadonlyArray<Glyph>, contact: { x: number; y: number }) {
   const distances = glyphs.map((glyph) =>
     Math.hypot(
       glyph.left + glyph.width / 2 - contact.x,
       (glyph.top + glyph.height / 2 - contact.y) * 1.6
     )
   )
-  const nearest = Math.min(...distances)
-  const farthest = Math.max(...distances)
-  const span = Math.max(1, farthest - nearest)
-  const starts = distances.map((distance, index) =>
-    Math.min(1, ((distance - nearest) / span) * 0.85 + hash(index * 17 + 3) * 0.15)
+  const real = distances.filter((_, index) => glyphs[index].text.trim() !== '')
+  const nearest = Math.min(...real)
+  const span = Math.max(1, Math.max(...real) - nearest)
+  return distances.map((distance, index) =>
+    glyphs[index].text.trim() === ''
+      ? 1
+      : Math.min(1, ((distance - nearest) / span) * 0.85 + hash(index * 17 + 3) * 0.15)
   )
-
-  const field = new Float32Array(width * height).fill(1)
-  // Nearer letters last, so where padded boxes overlap the earlier one wins.
-  const order = glyphs.map((_, index) => index).sort((a, b) => starts[b] - starts[a])
-  for (const index of order) {
-    const glyph = glyphs[index]
-    const x0 = Math.max(0, Math.floor((glyph.left - pad - left) * scale))
-    const x1 = Math.min(width - 1, Math.ceil((glyph.left + glyph.width + pad - left) * scale))
-    const y0 = Math.max(0, Math.floor((glyph.top - pad - top) * scale))
-    const y1 = Math.min(height - 1, Math.ceil((glyph.top + glyph.height + pad - top) * scale))
-    for (let y = y0; y <= y1; y++) {
-      for (let x = x0; x <= x1; x++) field[y * width + x] = starts[index]
-    }
-  }
-  return field
 }
 
 /**
