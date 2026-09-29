@@ -80,31 +80,48 @@ export function SignatureScene() {
     const frameElement = stage.querySelector<HTMLElement>(SIGNATURE_FRAME_SELECTOR)
 
     const move = { placed: 0 }
-    const act = gsap.timeline({ paused: true })
-    act.to(move, {
-      placed: 1,
-      duration: REVEAL.duration,
-      ease: REVEAL.ease,
-      onUpdate: () => {
-        signatureAct.placed = move.placed
-      },
-    })
-    act.fromTo(
-      targets,
-      { y: REVEAL.y, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        duration: REVEAL.duration,
-        ease: REVEAL.ease,
-        stagger: REVEAL.stagger,
-      },
-      ANIMATION.delay.medium
-    )
+    const syncMove = () => {
+      signatureAct.placed = move.placed
+    }
+    const tween = { duration: REVEAL.duration, ease: REVEAL.ease }
+    let act: gsap.core.Timeline | null = null
+
+    // In: the page moves to its place, then the heading rises in over it.
+    // Out: the mirror, the heading sinks back behind the page first, then
+    // the page returns to the middle. Each starts from wherever the other
+    // was interrupted.
+    const play = (show: boolean) => {
+      act?.kill()
+      act = gsap.timeline()
+      if (show) {
+        act.to(move, { ...tween, placed: 1, onUpdate: syncMove })
+        act.to(
+          targets,
+          { ...tween, y: 0, opacity: 1, stagger: REVEAL.stagger },
+          ANIMATION.delay.medium
+        )
+      } else {
+        act.to(targets, {
+          ...tween,
+          y: REVEAL.y,
+          opacity: 0,
+          stagger: { each: REVEAL.stagger, from: 'end' },
+        })
+        act.to(move, { ...tween, placed: 0, onUpdate: syncMove }, ANIMATION.delay.medium)
+      }
+    }
+    const land = (show: boolean) => {
+      act?.kill()
+      act = null
+      move.placed = show ? 1 : 0
+      gsap.set(targets, show ? { y: 0, opacity: 1 } : { y: REVEAL.y, opacity: 0 })
+      syncMove()
+    }
     let shown: boolean | null = null
 
     const reset = () => {
-      act.pause()
+      act?.kill()
+      act = null
       gsap.set(targets, { clearProps: 'transform,opacity' })
       signatureAct.placed = null
       shown = null
@@ -124,21 +141,10 @@ export function SignatureScene() {
       const { progress, solid } = frame.step
       const show = progress >= HEADING_AT
       if (show !== shown) {
-        if (shown === null) {
-          // First frame: land on the right state without playing.
-          // Jump through the end first, so the start state is rendered
-          // again even after a reset cleared the inline styles.
-          act
-            .progress(1, true)
-            .progress(show ? 1 : 0, true)
-            .pause()
-        } else if (show) {
-          act.play()
-        } else {
-          act.reverse()
-        }
+        // First frame: land on the right state without playing.
+        if (shown === null) land(show)
+        else play(show)
         shown = show
-        signatureAct.placed = move.placed
       }
       // While the page is alone in the frame it sits in the middle; the act
       // moves it to its place. The readouts ride just above it.
@@ -152,7 +158,6 @@ export function SignatureScene() {
 
     return () => {
       unsubscribe()
-      act.kill()
       reset()
     }
   }, [])

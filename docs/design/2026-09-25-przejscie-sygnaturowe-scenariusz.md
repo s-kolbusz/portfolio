@@ -177,6 +177,9 @@ strony, a przy scrollu w górę odtwarza się wstecz:
   na miejscu, więc nie nachodzi na niego (bez maski: wersja z wycinaniem linii
   wyglądała za ostro, bo znikało płynne pojawianie się);
 - wyłanianie się i klarowanie zrzutu z tafli (część przewijana) na `power2.out`.
+- **Wyjście to lustro wejścia:** najpierw tekst zjeżdża i gaśnie, chowając się
+  za zrzutem (stagger od ostatniego elementu), a od 0,6 s zrzut wraca na środek.
+  Każda sekwencja startuje z bieżącego stanu, więc przerwanie w połowie nie skacze.
 
 ## Kursor i docki nad taflą
 
