@@ -148,9 +148,10 @@ Dalsza droga kulki (kolejne sceny, kontakt) należy do kroków 2 i 5 roadmapy.
 - **Krawędź tafli nie łączy się z kulką:** na tafli kulka jest osobną warstwą,
   więc dolna krawędź zostaje ostra i nieruchoma. Wcześniej stare łączenie
   bloba z kulką „rozpuszczało” krawędź przy kulce, jakby dwie mechaniki walczyły ze sobą.
-- **Bezwładność:** Lenis prowadzi też przewijanie dotykiem (`syncTouch`), więc
-  rzut palcem ma tę samą wagę co kółko, a w przypiętych scenach (hero i ta
-  scena) scroll jest cięższy (×0,6), żeby łatwo nie przelecieć dalej.
+- **Bezwładność:** w przypiętych scenach scroll kółkiem jest cięższy (×0,6), a w
+  przytrzymaniu mocno przyhamowany (×0,3). Dotyk zostaje natywny: na iPhonie
+  prowadzenie palca przez Lenis (`syncTouch`) i spowalnianie go odklejało stronę
+  od palca, więc tam czas na obejrzenie daje samo przytrzymanie kadru.
 - ~~**Kolor przeglądarki**~~ (odpuszczony w wersji 9, patrz niżej).
 
 ## Wersja 9: przytrzymanie i kolory przeglądarki

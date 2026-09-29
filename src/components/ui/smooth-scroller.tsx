@@ -33,11 +33,10 @@ export function SmoothScroller() {
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
-      // Touch runs through Lenis too, so a flick has the same weight as the
-      // wheel and the pinned scenes below can slow it (see HEAVY_SCROLL).
-      syncTouch: true,
-      syncTouchLerp: 0.06,
-      touchMultiplier: 1,
+      // Touch stays native: on phones the page must follow the finger 1:1
+      // with the system's own momentum (running touch through Lenis, and
+      // braking it, made swipes feel detached). The brake below is wheel-only.
+      touchMultiplier: 2,
       // Same-page #hash links go through Lenis. Without this the Next router
       // swallows the click and refuses to re-scroll when the URL already
       // carries that hash, so every repeat click is a no-op.
@@ -67,7 +66,6 @@ export function SmoothScroller() {
       if (next === factor) return
       factor = next
       lenis.options.wheelMultiplier = next
-      lenis.options.touchMultiplier = next
     })
 
     // Add Lenis's requestAnimationFrame call to GSAP's ticker
