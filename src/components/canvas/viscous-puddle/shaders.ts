@@ -236,7 +236,7 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
       ballD += snoise(heroUv * 1.5 + uTime * 0.15) * 0.04 * uScale * (1.0 + uFlow) * uDetail;
       float ballAlpha = smoothstep(0.04, -0.04, ballD);
       // Over text the ball fades back into the water as a whole.
-      ballAlpha *= 1.0 - 0.8 * uBallSink;
+      ballAlpha *= 1.0 - 0.9 * uBallSink;
       float ballDepth = smoothstep(0.0, -0.5 * uScale, ballD + dither);
       finalColor = mix(finalColor, mix(uColor, uColor * 0.85, ballDepth), ballAlpha);
       alpha = max(alpha, ballAlpha);

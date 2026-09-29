@@ -531,6 +531,17 @@ export function ViscousPuddle() {
             )
           }
         }
+        // The page screenshot too: the ball slips under it, fading back into
+        // the water as it nears the edge instead of being cut off by it.
+        if (step.imageIn > 0) {
+          const { left, top, width, height } = step.box
+          const dx = Math.max(left - ballX, 0, ballX - (left + width))
+          const dy = Math.max(top - ballY, 0, ballY - (top + height))
+          sink = Math.max(
+            sink,
+            step.imageIn * smoothstepJs(ball.radius * 1.05, ball.radius * 0.1, Math.hypot(dx, dy))
+          )
+        }
       }
       state.ballSink = lerp(state.ballSink, sink, ease(0.18))
       gl.uniform1f(uniforms.uBallSink, state.ballSink)
