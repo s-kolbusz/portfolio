@@ -30,7 +30,14 @@ export interface StageLayout {
 /** Pinned hero measurements, taken on resize. */
 export interface HeroLayout {
   trackDocTop: number
+  /** Scroll distance the hero's story plays over (up to the signature pin). */
   pinDistance: number
+  /**
+   * How long the hero stage actually stays pinned (defaults to pinDistance).
+   * A little longer than the story, so the smoothed story can catch up at
+   * the handover without the stage sliding away first.
+   */
+  stickDistance?: number
   /** Box of the name's glyphs, relative to the pinned stage (see `measureName`). */
   nameBox: { left: number; top: number; width: number; height: number }
   /** Per letter: when it starts to soak, 0 first … 1 last. */
@@ -43,6 +50,12 @@ export interface HeroLayout {
 
 export interface ChoreographyInput {
   scrollY: number
+  /**
+   * The scroll position the story runs on: a smoothed copy of scrollY, so
+   * the scenes ease in and out like the rest of the page under Lenis.
+   * Anything placed against the DOM still uses the real scrollY.
+   */
+  timeY?: number
   viewportWidth: number
   viewportHeight: number
   /** The pinned hero, or null on pages without one. */
@@ -280,6 +293,7 @@ export function heroProgress(scrollY: number, hero: HeroLayout) {
 
 function heroFrame(
   scrollY: number,
+  timeY: number,
   viewportWidth: number,
   viewportHeight: number,
   hero: HeroLayout,
@@ -287,8 +301,9 @@ function heroFrame(
 ): ChoreographyFrame {
   const unit = viewportHeight / 2
   const baseRadius = 0.75 * unit * scale
-  const progress = heroProgress(scrollY, hero)
-  const pinned = Math.min(Math.max(scrollY - hero.trackDocTop, 0), hero.pinDistance)
+  const progress = heroProgress(timeY, hero)
+  const stick = hero.stickDistance ?? hero.pinDistance
+  const pinned = Math.min(Math.max(scrollY - hero.trackDocTop, 0), stick)
   const stageTop = hero.trackDocTop - scrollY + pinned
 
   // Cling: drawn in by the paper, the blob flattens along the name until it
@@ -389,6 +404,7 @@ function heroFrame(
 
 export function choreograph({
   scrollY,
+  timeY = scrollY,
   viewportWidth,
   viewportHeight,
   hero = null,
@@ -398,8 +414,8 @@ export function choreograph({
   const radius = 0.75 * (viewportHeight / 2) * scale
 
   // The hero plays until the signature pin takes over the same matter.
-  if (hero && (!stage || scrollY < stage.trackDocTop)) {
-    return heroFrame(scrollY, viewportWidth, viewportHeight, hero, scale)
+  if (hero && (!stage || timeY < stage.trackDocTop)) {
+    return heroFrame(scrollY, timeY, viewportWidth, viewportHeight, hero, scale)
   }
 
   if (!stage) {
@@ -438,7 +454,7 @@ export function choreograph({
     }
   }
 
-  const progress = pinProgress(scrollY, stage)
+  const progress = pinProgress(timeY, stage)
   const centred = (viewportHeight - stage.box.height) / 2
   const boxShift = (centred - stage.box.offsetTop) * (1 - glide(...BEATS.heading, progress))
   const laidOut = boxRect(scrollY, stage)

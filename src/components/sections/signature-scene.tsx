@@ -215,12 +215,13 @@ export function SignatureScene() {
 
   return (
     <section id="work" className="w-full">
-      {/* Overlaps the hero's last screen, so this pin starts the moment the
-          hero's ends and the matter that filled the frame carries straight on. */}
+      {/* Overlaps the hero's last screen (plus the hero's short extra hold),
+          so this pin starts the moment the hero's story ends and the matter
+          that filled the frame carries straight on. */}
       <div
         data-signature-track
         data-scroll-heavy
-        className="relative -mt-[100svh] h-[350svh] data-signature-static:mt-0 data-signature-static:h-auto motion-reduce:mt-0 motion-reduce:h-auto"
+        className="relative -mt-[130svh] h-[350svh] data-signature-static:mt-0 data-signature-static:h-auto motion-reduce:mt-0 motion-reduce:h-auto"
       >
         {/* The hold: the finished frame stands still here and the scroll is
             braked (STORY_END in the choreography: the last fifth of the pin). */}

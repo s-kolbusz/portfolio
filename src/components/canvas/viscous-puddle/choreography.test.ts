@@ -124,6 +124,18 @@ describe('signature transition choreography', () => {
     expect(stage.pinDistance * (1 - STORY_END)).toBeGreaterThanOrEqual(0.4 * 900)
   })
 
+  it('runs the story on the smoothed position but places the box by the real scroll', () => {
+    const lagging = choreograph({
+      ...viewport,
+      scrollY: pinEnd + 200,
+      timeY: stage.trackDocTop + stage.pinDistance * STORY_END * 0.5,
+      stage,
+      scale: 1,
+    })
+    expect(lagging.progress).toBeCloseTo(0.5)
+    expect(lagging.box.top - lagging.boxShift).toBe(-65)
+  })
+
   it('depends only on the scroll position, so reversing retraces the same path', () => {
     const ys = [0, 900, 1500, 2200, 2800, pinEnd, pinEnd + 400]
     const forward = ys.map(at)
@@ -286,6 +298,21 @@ describe('hero scroll choreography', () => {
       expect(step.centerX - step.halfWidth).toBeLessThan(0)
       expect(step.centerX + step.halfWidth).toBeGreaterThan(1440)
     }
+  })
+
+  it('keeps the hero stage pinned while the smoothed story catches up at the handover', () => {
+    const held: HeroLayout = { ...hero, stickDistance: 1800 + 270 }
+    const step = choreograph({
+      ...viewport,
+      scrollY: 1800 + 100,
+      timeY: 1800 - 50,
+      hero: held,
+      stage: signature,
+      scale: 1,
+    })
+    expect(step.hero).not.toBeNull()
+    // The stage has not moved: the fly-in target is still in the middle.
+    expect(step.name!.originY + step.name!.shiftY).toBeGreaterThan(400)
   })
 
   it('hands over to the signature scene, which starts from full-frame matter', () => {

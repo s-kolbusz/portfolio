@@ -34,8 +34,13 @@ nasycone. Rozlatywanie się słów i powiększanie to jeden ruch kamery
   strony.
 - Wszystko jest funkcją pozycji scrolla: szybko, wolno, wstecz i po przerwaniu
   wygląda tak samo.
-- **Bez dodatkowego opóźnienia:** bezwładność daje sam Lenis. Opóźnienie kamery
-  (wersja 3) sprawiało, że ruch wyglądał jak animacja, a nie reakcja na scroll.
+- **Wygładzenie jak w Lenisie** (wersja 6, po ocenie na żywo): przebieg scen
+  podąża za scrollem z krótkim, czasowym wygładzeniem (stała 0,12 s, na wierzchu
+  Lenisa), więc start i zatrzymanie mają tę samą miękkość co reszta strony.
+  Pozycje elementów w DOM zostają przy prawdziwym scrollu. Hero jest przypięte
+  0,3 ekranu dłużej niż trwa jego historia, żeby przy szybkim scrollu przekazanie
+  do sceny nie odsłaniało szczeliny. (W wersji 5 dodatkowe opóźnienie 0,2 s
+  razem z krzywą `smoothstep` dawało wrażenie animacji zamiast reakcji na scroll.)
 - **Krzywa:** każdy etap idzie za scrollem prawie liniowo, zmiękczone są tylko
   początek i koniec (`glide`). `smoothstep` z wersji 4 dawał wrażenie krótkiej
   animacji ease-in-out.

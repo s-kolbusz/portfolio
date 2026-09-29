@@ -69,6 +69,9 @@ interface SignatureElements {
   texts: HTMLElement[]
 }
 
+/** Time constant (s) of the story's glide after the scroll, on top of Lenis. */
+const STORY_SMOOTHING = 0.12
+
 /** Reused to measure the scene text's line boxes each frame. */
 const textRange = typeof document !== 'undefined' ? document.createRange() : null!
 
@@ -108,6 +111,8 @@ interface PuddleState {
   ballVY: number
   /** How far the ball has faded back under the scene's text, 0–1. */
   ballSink: number
+  /** The smoothed scroll position the story runs on; null until the first frame. */
+  timeY: number | null
 }
 
 function createInitialState(): PuddleState {
@@ -140,6 +145,7 @@ function createInitialState(): PuddleState {
     ballVX: 0,
     ballVY: 0,
     ballSink: 0,
+    timeY: null,
   }
 }
 
@@ -172,9 +178,19 @@ function measureHero(): HeroLayout | null {
   name.style.transform = transform
   if (!measure) return null
 
+  const trackDocTop = track.getBoundingClientRect().top + window.scrollY
+  const stickDistance = Math.max(1, track.offsetHeight - stage.offsetHeight)
+  // The story ends where the signature pin starts; the stage stays pinned a
+  // little past that (see HeroLayout.stickDistance).
+  const signature = document.querySelector<HTMLElement>(SIGNATURE_TRACK_SELECTOR)
+  const signatureTop = signature ? signature.getBoundingClientRect().top + window.scrollY : null
   return {
-    trackDocTop: track.getBoundingClientRect().top + window.scrollY,
-    pinDistance: Math.max(1, track.offsetHeight - stage.offsetHeight),
+    trackDocTop,
+    pinDistance:
+      signatureTop !== null
+        ? Math.max(1, Math.min(stickDistance, signatureTop - trackDocTop))
+        : stickDistance,
+    stickDistance,
     nameBox: measure.box,
     letterStarts: measure.starts,
     zoomX: measure.zoom.x,
@@ -325,6 +341,7 @@ export function ViscousPuddle() {
     const currentStep = () =>
       choreograph({
         scrollY: window.scrollY,
+        timeY: state.timeY ?? window.scrollY,
         viewportWidth: state.canvasWidth,
         viewportHeight: window.innerHeight,
         hero: state.hero,
@@ -363,6 +380,21 @@ export function ViscousPuddle() {
       state.opacity = lerp(state.opacity, 1, ease(0.6))
       state.scale = lerp(state.scale, state.isMobile ? 0.6 : 1, ease(0.15))
 
+      // The story eases after the scroll, like everything Lenis moves: a
+      // short glide on start and stop. A long jump (anchor, resize) lands at once.
+      const scrollNow = window.scrollY
+      if (
+        reduced ||
+        state.timeY === null ||
+        Math.abs(scrollNow - state.timeY) > window.innerHeight * 1.5
+      ) {
+        state.timeY = scrollNow
+      } else {
+        state.timeY = lerp(state.timeY, scrollNow, ease(STORY_SMOOTHING))
+        if (Math.abs(scrollNow - state.timeY) < 0.1) state.timeY = scrollNow
+      }
+      const catchingUp = state.timeY !== scrollNow
+
       const primary = getPrimaryRgb()
       state.colorR = lerp(state.colorR, primary[0], ease(0.3))
       state.colorG = lerp(state.colorG, primary[1], ease(0.3))
@@ -378,7 +410,7 @@ export function ViscousPuddle() {
       const targetFlow = reduced ? 0 : Math.min(speed / 2500, 1)
       state.flow = lerp(state.flow, targetFlow, targetFlow > state.flow ? 0.2 : 0.04)
 
-      if (!step.active) {
+      if (!step.active && !catchingUp) {
         publishSignature({
           step,
           startColour: [state.colorR, state.colorG, state.colorB],
