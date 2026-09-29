@@ -8,7 +8,7 @@ import Image from 'next/image'
 import { ArrowUpRightIcon } from '@phosphor-icons/react'
 
 import {
-  headingMotion,
+  HEADING_AT,
   mixColour,
   readoutMotion,
   smoothstep,
@@ -18,12 +18,15 @@ import {
 import {
   ADAPT_THEME_SELECTOR,
   SIGNATURE_FRAME_SELECTOR,
+  signatureAct,
   subscribeSignature,
 } from '@/components/canvas/viscous-puddle/signature-bus'
 import { Button } from '@/components/ui/button'
 import { EditorialHeader } from '@/components/ui/editorial-header'
 import { REVEAL } from '@/hooks/timeline/reveal-engine'
 import { useIsMobile } from '@/hooks/use-media'
+import { ANIMATION } from '@/lib/constants/animations'
+import { gsap } from '@/lib/gsap-core'
 
 // Right-hand readouts in the order they retire (leftmost first), so one
 // leaving never shifts the ones still showing.
@@ -58,12 +61,13 @@ export function SignatureScene() {
   const readoutRefs = useRef<Partial<Record<ReadoutKey, HTMLSpanElement | null>>>({})
   const isMobile = useIsMobile()
 
-  // The heading's entrance: the same motion as every section reveal on the
-  // site (rise, fade, stagger), scrubbed by the scroll across the heading
-  // beat, so it moves with everything else and reverses with it. The scene
-  // switches to the dark palette as the matter behind it darkens: readouts
-  // blend towards light as it goes, the rest (hidden until the heading
-  // beat) flips once the darkening is complete.
+  // The final act, triggered by the scroll and then played in time like
+  // every reveal on the site: the page moves from the middle of the frame to
+  // its place (1 s, power2.out), and as it settles the heading and link rise
+  // in (same ease and duration, 0.1 s stagger). Scrolling back above the
+  // trigger plays it in reverse. The scene also switches to the dark palette
+  // as the matter behind it darkens: readouts blend towards light as it
+  // goes, the rest (hidden until the act) flips once the darkening is done.
   useEffect(() => {
     const header = headerRef.current
     const link = linkRef.current
@@ -74,12 +78,36 @@ export function SignatureScene() {
     // The cursor ball sinks beneath these (see the blob shader).
     for (const target of targets) target.setAttribute('data-signature-text', '')
     const frameElement = stage.querySelector<HTMLElement>(SIGNATURE_FRAME_SELECTOR)
+
+    const move = { placed: 0 }
+    const act = gsap.timeline({ paused: true })
+    act.to(move, {
+      placed: 1,
+      duration: REVEAL.duration,
+      ease: REVEAL.ease,
+      onUpdate: () => {
+        signatureAct.placed = move.placed
+      },
+    })
+    act.fromTo(
+      targets,
+      { y: REVEAL.y, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: REVEAL.duration,
+        ease: REVEAL.ease,
+        stagger: REVEAL.stagger,
+      },
+      ANIMATION.delay.medium
+    )
+    let shown: boolean | null = null
+
     const reset = () => {
-      for (const target of targets) {
-        target.style.opacity = ''
-        target.style.transform = ''
-        target.style.clipPath = ''
-      }
+      act.pause()
+      gsap.set(targets, { clearProps: 'transform,opacity' })
+      signatureAct.placed = null
+      shown = null
       if (frameElement) frameElement.style.transform = ''
       if (readoutsRef.current) readoutsRef.current.style.transform = ''
       stage.classList.remove('dark')
@@ -94,18 +122,26 @@ export function SignatureScene() {
         return
       }
       const { progress, solid } = frame.step
-      targets.forEach((target, index) => {
-        const enter = headingMotion(progress, index)
-        const offset = (1 - enter) * REVEAL.y
-        target.style.opacity = enter.toFixed(3)
-        target.style.transform = offset ? `translateY(${offset.toFixed(1)}px)` : ''
-        // Masked to its own box, so each line rises out of its place instead
-        // of sliding over the page screenshot right below the heading.
-        target.style.clipPath = offset > 0.5 ? `inset(0 0 ${offset.toFixed(1)}px 0)` : ''
-      })
-      // While the page is alone in the frame it sits in the middle; it
-      // moves up to its place as the heading enters.
-      // The readouts ride just above it.
+      const show = progress >= HEADING_AT
+      if (show !== shown) {
+        if (shown === null) {
+          // First frame: land on the right state without playing.
+          // Jump through the end first, so the start state is rendered
+          // again even after a reset cleared the inline styles.
+          act
+            .progress(1, true)
+            .progress(show ? 1 : 0, true)
+            .pause()
+        } else if (show) {
+          act.play()
+        } else {
+          act.reverse()
+        }
+        shown = show
+        signatureAct.placed = move.placed
+      }
+      // While the page is alone in the frame it sits in the middle; the act
+      // moves it to its place. The readouts ride just above it.
       const shift = frame.step.boxShift
       const moved = shift ? `translateY(${shift.toFixed(2)}px)` : ''
       if (frameElement) frameElement.style.transform = moved
@@ -116,6 +152,7 @@ export function SignatureScene() {
 
     return () => {
       unsubscribe()
+      act.kill()
       reset()
     }
   }, [])

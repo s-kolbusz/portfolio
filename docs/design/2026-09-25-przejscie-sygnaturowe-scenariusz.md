@@ -167,15 +167,16 @@ Dalsza droga kulki (kolejne sceny, kontakt) należy do kroków 2 i 5 roadmapy.
 
 ## Wersja 10: wyreżyserowany akt końcowy
 
-Wyłanianie się zrzutu, jego przesunięcie na miejsce i wejście tekstu mają te
-same parametry co reveal na reszcie strony: easing `power2.out`, czas 1 s,
-stagger 0,1 s. Są rozpisane w sekundach i przewijane scrollem przez etap
-nagłówka (`FINAL_ACT` w choreografii):
+Ostatni etap jest **odpalany scrollem, a nie przewijany**: gdy przebieg dojdzie
+do progu nagłówka, sekwencja odtwarza się w czasie z parametrami revealu z reszty
+strony, a przy scrollu w górę odtwarza się wstecz:
 
-- 0,0–1,0 s: zrzut przesuwa się ze środka kadru na swoje miejsce;
-- od 0,2 s: etykieta, tytuł, opis, link, każdy 1 s, co 0,1 s (koniec po 1,5 s);
-- każda linia wyłania się z własnego obrysu (maska), więc nie wjeżdża na zrzut;
-- wyłanianie się i klarowanie zrzutu z tafli też na `power2.out`.
+- 0,0–1,0 s: zrzut przesuwa się ze środka kadru na swoje miejsce (`power2.out`);
+- od 0,6 s: etykieta, tytuł, opis i link wjeżdżają (y 100 → 0) i pojawiają się
+  (opacity 0 → 1), każdy 1 s, co 0,1 s. Tekst rusza, gdy zrzut jest już prawie
+  na miejscu, więc nie nachodzi na niego (bez maski: wersja z wycinaniem linii
+  wyglądała za ostro, bo znikało płynne pojawianie się);
+- wyłanianie się i klarowanie zrzutu z tafli (część przewijana) na `power2.out`.
 
 ## Kursor i docki nad taflą
 

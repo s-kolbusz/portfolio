@@ -1,5 +1,3 @@
-import { ANIMATION } from '@/lib/constants/animations'
-
 /**
  * The opening sequence as one piece of matter: the hero (the name soaks up
  * the blob's colour like blotting paper, the camera flies into a soaked
@@ -66,6 +64,13 @@ export interface ChoreographyInput {
   stage: StageLayout | null
   /** Blob size multiplier (smaller on phones). */
   scale: number
+  /**
+   * How far the page has moved from the middle of the frame to its place,
+   * 0–1. The move opens the final act, which the scroll triggers and then
+   * plays in time (see signature-scene); defaults to done once the heading
+   * beat is reached.
+   */
+  placed?: number
 }
 
 export interface Rect {
@@ -412,6 +417,7 @@ export function choreograph({
   hero = null,
   stage,
   scale,
+  placed,
 }: ChoreographyInput): ChoreographyFrame {
   const radius = 0.75 * (viewportHeight / 2) * scale
 
@@ -458,7 +464,8 @@ export function choreograph({
 
   const progress = pinProgress(timeY, stage)
   const centred = (viewportHeight - stage.box.height) / 2
-  const boxShift = (centred - stage.box.offsetTop) * (1 - finalAct(progress).image)
+  const settled = placed ?? (progress >= HEADING_AT ? 1 : 0)
+  const boxShift = (centred - stage.box.offsetTop) * (1 - settled)
   const laidOut = boxRect(scrollY, stage)
   const box = { ...laidOut, top: laidOut.top + boxShift }
   const viscosity = viscosityAt(progress)
@@ -604,48 +611,4 @@ export function mixColour(
 /** GSAP's power2.out, the site's reveal ease. */
 export function power2Out(t: number) {
   return 1 - (1 - t) * (1 - t)
-}
-
-/**
- * The final act, directed like every reveal on the site: the same ease
- * (power2.out), duration (1 s) and stagger (0.1 s), laid out in seconds and
- * then played by the scroll across the heading beat instead of on a timer.
- * First the page moves from the middle of the frame to its place; 0.2 s in,
- * the heading's items rise into theirs, one after another.
- */
-export const FINAL_ACT = {
-  image: { start: 0, duration: ANIMATION.duration.medium },
-  heading: {
-    start: ANIMATION.delay.short,
-    duration: ANIMATION.duration.medium,
-    stagger: ANIMATION.stagger.normal,
-  },
-} as const
-
-/** Heading items in the final act: tagline, title, description, link. */
-export const FINAL_ACT_ITEMS = 4
-
-const FINAL_ACT_LENGTH =
-  FINAL_ACT.heading.start +
-  FINAL_ACT.heading.stagger * (FINAL_ACT_ITEMS - 1) +
-  FINAL_ACT.heading.duration
-
-/** Where the final act is at pin progress P: each part's eased progress, 0–1. */
-export function finalAct(progress: number) {
-  const seconds = linear(...BEATS.heading, progress) * FINAL_ACT_LENGTH
-  const part = (start: number, duration: number) =>
-    power2Out(Math.min(1, Math.max(0, (seconds - start) / duration)))
-  return {
-    image: part(FINAL_ACT.image.start, FINAL_ACT.image.duration),
-    heading: (index: number) =>
-      part(FINAL_ACT.heading.start + index * FINAL_ACT.heading.stagger, FINAL_ACT.heading.duration),
-  }
-}
-
-/**
- * The heading's entrance: item `index` of the final act (see FINAL_ACT),
- * eased, 0 → 1.
- */
-export function headingMotion(progress: number, index: number) {
-  return finalAct(progress).heading(Math.min(index, FINAL_ACT_ITEMS - 1))
 }

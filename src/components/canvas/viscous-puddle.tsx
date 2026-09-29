@@ -21,6 +21,7 @@ import {
   SIGNATURE_STATIC_ATTR,
   SIGNATURE_TEXT_SELECTOR,
   SIGNATURE_TRACK_SELECTOR,
+  signatureAct,
 } from './viscous-puddle/signature-bus'
 import {
   createImageTexture,
@@ -342,6 +343,7 @@ export function ViscousPuddle() {
       choreograph({
         scrollY: window.scrollY,
         timeY: state.timeY ?? window.scrollY,
+        placed: signatureAct.placed ?? undefined,
         viewportWidth: state.canvasWidth,
         viewportHeight: window.innerHeight,
         hero: state.hero,

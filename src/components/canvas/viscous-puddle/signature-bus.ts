@@ -11,6 +11,13 @@ export interface SignatureFrame {
 
 type Listener = (frame: SignatureFrame | null) => void
 
+/**
+ * The final act's page move, played in time by the scene (0 in the middle of
+ * the frame → 1 in place) and read by the canvas, so the image it draws and
+ * the DOM image move together. null while the scene is not driving it.
+ */
+export const signatureAct: { placed: number | null } = { placed: null }
+
 const listeners = new Set<Listener>()
 
 /** `null` means the canvas is gone (unmounted, no WebGL): readouts should hide. */
