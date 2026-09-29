@@ -16,7 +16,15 @@ type Listener = (frame: SignatureFrame | null) => void
  * the frame → 1 in place) and read by the canvas, so the image it draws and
  * the DOM image move together. null while the scene is not driving it.
  */
-export const signatureAct: { placed: number | null } = { placed: null }
+export const signatureAct: {
+  placed: number | null
+  /**
+   * True while the final act plays its exit. The story then waits at the
+   * act's threshold, so the page does not sink back into the water before
+   * the heading has hidden behind it; afterwards it glides on to the scroll.
+   */
+  exiting: boolean
+} = { placed: null, exiting: false }
 
 const listeners = new Set<Listener>()
 

@@ -6,7 +6,14 @@ import { createPortal } from 'react-dom'
 import { usePrefersReducedMotion } from '@/hooks/use-media'
 import { gsap } from '@/lib/gsap-core'
 
-import { choreograph, mix, type HeroLayout, type StageLayout } from './viscous-puddle/choreography'
+import {
+  choreograph,
+  HEADING_AT,
+  mix,
+  STORY_END,
+  type HeroLayout,
+  type StageLayout,
+} from './viscous-puddle/choreography'
 import { measureName } from './viscous-puddle/name-mask'
 import {
   HERO_CHAR_SELECTOR,
@@ -384,7 +391,15 @@ export function ViscousPuddle() {
 
       // The story eases after the scroll, like everything Lenis moves: a
       // short glide on start and stop. A long jump (anchor, resize) lands at once.
-      const scrollNow = window.scrollY
+      // While the final act plays its exit, the story waits just below the
+      // act's threshold (the page must not sink before the heading has hidden;
+      // just below, so the act does not read it as crossed again).
+      let scrollNow = window.scrollY
+      if (signatureAct.exiting && state.stage) {
+        const threshold =
+          state.stage.trackDocTop + state.stage.pinDistance * STORY_END * HEADING_AT - 1
+        scrollNow = Math.max(scrollNow, threshold)
+      }
       if (
         reduced ||
         state.timeY === null ||
@@ -395,7 +410,7 @@ export function ViscousPuddle() {
         state.timeY = lerp(state.timeY, scrollNow, ease(STORY_SMOOTHING))
         if (Math.abs(scrollNow - state.timeY) < 0.1) state.timeY = scrollNow
       }
-      const catchingUp = state.timeY !== scrollNow
+      const catchingUp = state.timeY !== scrollNow || signatureAct.exiting
 
       const primary = getPrimaryRgb()
       state.colorR = lerp(state.colorR, primary[0], ease(0.3))

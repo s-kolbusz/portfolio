@@ -180,6 +180,9 @@ strony, a przy scrollu w górę odtwarza się wstecz:
 - **Wyjście to lustro wejścia:** najpierw tekst zjeżdża i gaśnie, chowając się
   za zrzutem (stagger od ostatniego elementu), a od 0,6 s zrzut wraca na środek.
   Każda sekwencja startuje z bieżącego stanu, więc przerwanie w połowie nie skacze.
+- Podczas wyjścia przebieg sceny czeka tuż pod progiem, więc zrzut nie schodzi
+  pod wodę, zanim tekst się schowa i zrzut wróci na środek. Potem przebieg
+  płynnie dogania scroll.
 
 ## Kursor i docki nad taflą
 

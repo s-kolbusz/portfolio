@@ -92,7 +92,13 @@ export function SignatureScene() {
     // was interrupted.
     const play = (show: boolean) => {
       act?.kill()
-      act = gsap.timeline()
+      // The story holds at the threshold until the exit has finished.
+      signatureAct.exiting = !show
+      act = gsap.timeline({
+        onComplete: () => {
+          signatureAct.exiting = false
+        },
+      })
       if (show) {
         act.to(move, { ...tween, placed: 1, onUpdate: syncMove })
         act.to(
@@ -113,6 +119,7 @@ export function SignatureScene() {
     const land = (show: boolean) => {
       act?.kill()
       act = null
+      signatureAct.exiting = false
       move.placed = show ? 1 : 0
       gsap.set(targets, show ? { y: 0, opacity: 1 } : { y: REVEAL.y, opacity: 0 })
       syncMove()
@@ -122,6 +129,7 @@ export function SignatureScene() {
     const reset = () => {
       act?.kill()
       act = null
+      signatureAct.exiting = false
       gsap.set(targets, { clearProps: 'transform,opacity' })
       signatureAct.placed = null
       shown = null
