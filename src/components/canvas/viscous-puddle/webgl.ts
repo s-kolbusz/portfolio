@@ -2,11 +2,32 @@ import { FRAGMENT_SRC, VERTEX_SRC } from './shaders'
 
 interface PuddleUniforms {
   uTime: WebGLUniformLocation | null
-  uMouse: WebGLUniformLocation | null
-  uResolution: WebGLUniformLocation | null
-  uColor: WebGLUniformLocation | null
+  uViewport: WebGLUniformLocation | null
+  uDpr: WebGLUniformLocation | null
   uScale: WebGLUniformLocation | null
   uOpacity: WebGLUniformLocation | null
+  uDetail: WebGLUniformLocation | null
+  uColor: WebGLUniformLocation | null
+  uTargetColor: WebGLUniformLocation | null
+  uSolid: WebGLUniformLocation | null
+  uBody: WebGLUniformLocation | null
+  uCenter: WebGLUniformLocation | null
+  uHalfSize: WebGLUniformLocation | null
+  uCorner: WebGLUniformLocation | null
+  uFluid: WebGLUniformLocation | null
+  uFlow: WebGLUniformLocation | null
+  uImage: WebGLUniformLocation | null
+  uHasImage: WebGLUniformLocation | null
+  uImageRect: WebGLUniformLocation | null
+  uImageIn: WebGLUniformLocation | null
+  uClarity: WebGLUniformLocation | null
+  uSurface: WebGLUniformLocation | null
+  uLiquidEdge: WebGLUniformLocation | null
+  uBallVelocity: WebGLUniformLocation | null
+  uBallSink: WebGLUniformLocation | null
+  uImageRadius: WebGLUniformLocation | null
+  uBall: WebGLUniformLocation | null
+  uDrain: WebGLUniformLocation | null
 }
 
 interface PuddleWebGLContext {
@@ -111,11 +132,32 @@ export function setupPuddleWebGL(canvas: HTMLCanvasElement): PuddleWebGLContext 
 
   const uniforms: PuddleUniforms = {
     uTime: gl.getUniformLocation(program, 'uTime'),
-    uMouse: gl.getUniformLocation(program, 'uMouse'),
-    uResolution: gl.getUniformLocation(program, 'uResolution'),
-    uColor: gl.getUniformLocation(program, 'uColor'),
+    uViewport: gl.getUniformLocation(program, 'uViewport'),
+    uDpr: gl.getUniformLocation(program, 'uDpr'),
     uScale: gl.getUniformLocation(program, 'uScale'),
     uOpacity: gl.getUniformLocation(program, 'uOpacity'),
+    uDetail: gl.getUniformLocation(program, 'uDetail'),
+    uColor: gl.getUniformLocation(program, 'uColor'),
+    uTargetColor: gl.getUniformLocation(program, 'uTargetColor'),
+    uSolid: gl.getUniformLocation(program, 'uSolid'),
+    uBody: gl.getUniformLocation(program, 'uBody'),
+    uCenter: gl.getUniformLocation(program, 'uCenter'),
+    uHalfSize: gl.getUniformLocation(program, 'uHalfSize'),
+    uCorner: gl.getUniformLocation(program, 'uCorner'),
+    uFluid: gl.getUniformLocation(program, 'uFluid'),
+    uFlow: gl.getUniformLocation(program, 'uFlow'),
+    uImage: gl.getUniformLocation(program, 'uImage'),
+    uHasImage: gl.getUniformLocation(program, 'uHasImage'),
+    uImageRect: gl.getUniformLocation(program, 'uImageRect'),
+    uImageIn: gl.getUniformLocation(program, 'uImageIn'),
+    uClarity: gl.getUniformLocation(program, 'uClarity'),
+    uSurface: gl.getUniformLocation(program, 'uSurface'),
+    uLiquidEdge: gl.getUniformLocation(program, 'uLiquidEdge'),
+    uBallVelocity: gl.getUniformLocation(program, 'uBallVelocity'),
+    uBallSink: gl.getUniformLocation(program, 'uBallSink'),
+    uImageRadius: gl.getUniformLocation(program, 'uImageRadius'),
+    uBall: gl.getUniformLocation(program, 'uBall'),
+    uDrain: gl.getUniformLocation(program, 'uDrain'),
   }
 
   gl.enable(gl.BLEND)
@@ -128,6 +170,53 @@ export function setupPuddleWebGL(canvas: HTMLCanvasElement): PuddleWebGLContext 
     vbo,
     uniforms,
   }
+}
+
+/** Uploads a decoded image as the texture the matter turns into (unit 0). */
+export function createImageTexture(gl: WebGL2RenderingContext, image: TexImageSource) {
+  const texture = gl.createTexture()
+  if (!texture) return null
+  gl.activeTexture(gl.TEXTURE0)
+  gl.bindTexture(gl.TEXTURE_2D, texture)
+  // Rows stay top-down: the shader samples with a top-left origin.
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false)
+  gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false)
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)
+  gl.generateMipmap(gl.TEXTURE_2D)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+  return texture
+}
+
+/**
+ * The page's own background colour: the median of the pixels along the
+ * image's left, right and bottom edges (where a page shows its background),
+ * rather than an average that the content would tint.
+ */
+export function pageColour(image: CanvasImageSource): [number, number, number] | null {
+  const canvas = document.createElement('canvas')
+  canvas.width = 64
+  canvas.height = 36
+  const context = canvas.getContext('2d', { willReadFrequently: true })
+  if (!context) return null
+  context.drawImage(image, 0, 0, canvas.width, canvas.height)
+  const { data } = context.getImageData(0, 0, canvas.width, canvas.height)
+  const channels: [number[], number[], number[]] = [[], [], []]
+  const take = (x: number, y: number) => {
+    const i = (y * canvas.width + x) * 4
+    for (let c = 0; c < 3; c++) channels[c].push(data[i + c])
+  }
+  for (let y = 0; y < canvas.height; y++) {
+    for (const x of [1, 2, canvas.width - 3, canvas.width - 2]) take(x, y)
+  }
+  for (let x = 0; x < canvas.width; x++) take(x, canvas.height - 2)
+  const median = (values: number[]) => {
+    const sorted = [...values].sort((a, b) => a - b)
+    return sorted[Math.floor(sorted.length / 2)] / 255
+  }
+  return [median(channels[0]), median(channels[1]), median(channels[2])]
 }
 
 export function disposePuddleWebGL({ gl, program, vao, vbo }: PuddleWebGLContext) {

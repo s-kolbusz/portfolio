@@ -150,6 +150,7 @@ export function DockNav() {
     <>
       <nav
         ref={dockRef}
+        data-adapt-theme
         className="dock-nav dock-nav--desktop"
         role="navigation"
         aria-label={t('main_navigation')}
@@ -182,6 +183,7 @@ export function DockNav() {
 
       <nav
         ref={mobileDockRef}
+        data-adapt-theme
         className="dock-nav dock-nav--mobile"
         role="navigation"
         aria-label="Mobile navigation"

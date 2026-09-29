@@ -39,6 +39,18 @@
     "tagline": "Buduję wysokowydajne produkty cyfrowe z naciskiem na dopracowanie wizualne i doskonałość techniczną.",
     "cta": "Zobacz moje projekty"
   },
+  "signature": {
+    "tagline": "01 · Produkt · Strony dla firm z Podhala",
+    "title": "stronypodhale.pl",
+    "description": "Produkt z jawnym cennikiem: strony dla lokalnych firm z domeną, hostingiem i opieką w cenie.",
+    "link": "Zobacz stronę",
+    "alt": "Strona główna stronypodhale.pl z podglądem realizacji Zakofy",
+    "readouts": {
+      "viscosity": "lepkość",
+      "colour": "kolor",
+      "clarity": "przejrzystość"
+    }
+  },
   "about": {
     "title": "Doświadczenie i Kontekst",
     "figure_profile": "RYS. 1.0 — PROFIL",
@@ -208,7 +220,10 @@
           "title": "Rozwój",
           "desc": "Wysokiej jakości budowa i testy."
         },
-        "3": { "title": "Dostarczenie", "desc": "Strojenie wydajności i start." }
+        "3": {
+          "title": "Dostarczenie",
+          "desc": "Strojenie wydajności i start."
+        }
       }
     }
   },

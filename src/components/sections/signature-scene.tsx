@@ -1,0 +1,383 @@
+'use client'
+
+import { useEffect, useRef } from 'react'
+
+import { useTranslations } from 'next-intl'
+import Image from 'next/image'
+
+import { ArrowUpRightIcon } from '@phosphor-icons/react'
+
+import {
+  HEADING_AT,
+  mixColour,
+  readoutMotion,
+  smoothstep,
+  toHex,
+  type ReadoutKey,
+} from '@/components/canvas/viscous-puddle/choreography'
+import {
+  ADAPT_THEME_SELECTOR,
+  SIGNATURE_FRAME_SELECTOR,
+  signatureAct,
+  subscribeSignature,
+} from '@/components/canvas/viscous-puddle/signature-bus'
+import { Button } from '@/components/ui/button'
+import { EditorialHeader } from '@/components/ui/editorial-header'
+import { REVEAL } from '@/hooks/timeline/reveal-engine'
+import { useIsMobile } from '@/hooks/use-media'
+import { ANIMATION } from '@/lib/constants/animations'
+import { gsap } from '@/lib/gsap-core'
+
+// Right-hand readouts in the order they retire (leftmost first), so one
+// leaving never shifts the ones still showing.
+const READOUTS: ReadoutKey[] = ['target', 'colour', 'viscosity', 'clarity']
+
+// Muted text that lightens with the matter behind it (--scene-dark 0–1).
+const SCENE_MUTED =
+  'color-mix(in oklab, var(--muted-foreground), rgb(255 255 255 / 0.72) calc(var(--scene-dark, 0) * 100%))'
+
+/**
+ * First scene after the hero, where the hero blob sets into stronypodhale.pl.
+ * Script: docs/design/2026-09-25-przejscie-sygnaturowe-scenariusz.md
+ *
+ * A tall track pins the stage for 2.5 screens (2 of story, then half a
+ * screen where the finished frame holds and the scroll is braked) while the blob
+ * canvas (`ViscousPuddle`) plays the transformation and reports its state for
+ * the mono readouts. Heading, image and link are one frame: once the page
+ * has formed, the readouts give way and the heading enters in their place
+ * with the site's reveal motion, scrubbed by the scroll, still inside the pin.
+ *
+ * The image stays fully visible unless the canvas drives
+ * `--signature-reveal`, and the heading is visible unless the canvas is
+ * running, so with reduced motion or without WebGL (where the pin also
+ * collapses) the scene is a plain section.
+ */
+export function SignatureScene() {
+  const t = useTranslations('signature')
+  const headerRef = useRef<HTMLDivElement>(null)
+  const linkRef = useRef<HTMLDivElement>(null)
+  const stageRef = useRef<HTMLDivElement>(null)
+  const readoutsRef = useRef<HTMLDivElement>(null)
+  const readoutRefs = useRef<Partial<Record<ReadoutKey, HTMLSpanElement | null>>>({})
+  const isMobile = useIsMobile()
+
+  // The final act, triggered by the scroll and then played in time like
+  // every reveal on the site: the page moves from the middle of the frame to
+  // its place (1 s, power2.out), and as it settles the heading and link rise
+  // in (same ease and duration, 0.1 s stagger). Scrolling back above the
+  // trigger plays it in reverse. The scene also switches to the dark palette
+  // as the matter behind it darkens: readouts blend towards light as it
+  // goes, the rest (hidden until the act) flips once the darkening is done.
+  useEffect(() => {
+    const header = headerRef.current
+    const link = linkRef.current
+    const stage = stageRef.current
+    if (!header || !link || !stage) return
+
+    const targets = [...Array.from(header.children), link] as HTMLElement[]
+    // The cursor ball sinks beneath these (see the blob shader).
+    for (const target of targets) target.setAttribute('data-signature-text', '')
+    const frameElement = stage.querySelector<HTMLElement>(SIGNATURE_FRAME_SELECTOR)
+
+    const move = { placed: 0 }
+    const syncMove = () => {
+      signatureAct.placed = move.placed
+    }
+    const tween = { duration: REVEAL.duration, ease: REVEAL.ease }
+    let act: gsap.core.Timeline | null = null
+
+    // In: the page moves to its place, then the heading rises in over it.
+    // Out: the mirror, the heading sinks back behind the page first, then
+    // the page returns to the middle. Each starts from wherever the other
+    // was interrupted.
+    const play = (show: boolean) => {
+      act?.kill()
+      // The story holds at the threshold until the exit has finished.
+      signatureAct.exiting = !show
+      act = gsap.timeline({
+        onComplete: () => {
+          signatureAct.exiting = false
+        },
+      })
+      if (show) {
+        act.to(move, { ...tween, placed: 1, onUpdate: syncMove })
+        act.to(
+          targets,
+          { ...tween, y: 0, opacity: 1, stagger: REVEAL.stagger },
+          ANIMATION.delay.medium
+        )
+      } else {
+        act.to(targets, {
+          ...tween,
+          y: REVEAL.y,
+          opacity: 0,
+          stagger: { each: REVEAL.stagger, from: 'end' },
+        })
+        act.to(move, { ...tween, placed: 0, onUpdate: syncMove }, ANIMATION.delay.medium)
+      }
+    }
+    const land = (show: boolean) => {
+      act?.kill()
+      act = null
+      signatureAct.exiting = false
+      move.placed = show ? 1 : 0
+      gsap.set(targets, show ? { y: 0, opacity: 1 } : { y: REVEAL.y, opacity: 0 })
+      syncMove()
+    }
+    let shown: boolean | null = null
+
+    const reset = () => {
+      act?.kill()
+      act = null
+      signatureAct.exiting = false
+      gsap.set(targets, { clearProps: 'transform,opacity' })
+      signatureAct.placed = null
+      shown = null
+      if (frameElement) frameElement.style.transform = ''
+      if (readoutsRef.current) readoutsRef.current.style.transform = ''
+      stage.classList.remove('dark')
+      stage.style.removeProperty('--scene-dark')
+    }
+
+    const unsubscribe = subscribeSignature((frame) => {
+      // Until the canvas reports in (reduced motion, no WebGL) the scene is
+      // a plain, visible section.
+      if (!frame) {
+        reset()
+        return
+      }
+      const { progress, solid } = frame.step
+      const show = progress >= HEADING_AT
+      if (show !== shown) {
+        // First frame: land on the right state without playing.
+        if (shown === null) land(show)
+        else play(show)
+        shown = show
+      }
+      // While the page is alone in the frame it sits in the middle; the act
+      // moves it to its place. The readouts ride just above it.
+      const shift = frame.step.boxShift
+      const moved = shift ? `translateY(${shift.toFixed(2)}px)` : ''
+      if (frameElement) frameElement.style.transform = moved
+      if (readoutsRef.current) readoutsRef.current.style.transform = moved
+      stage.style.setProperty('--scene-dark', solid.toFixed(3))
+      stage.classList.toggle('dark', solid >= 0.999)
+    })
+
+    return () => {
+      unsubscribe()
+      reset()
+    }
+  }, [])
+
+  // The fixed chrome (docks, cursor) reads on whatever is under it: over
+  // the darkened water sheet it takes the dark palette, so icons and the
+  // cursor stay visible (a no-op on the dark theme).
+  useEffect(() => {
+    let pointerY = -1
+    const onPointerMove = (event: PointerEvent) => {
+      pointerY = event.clientY
+    }
+    window.addEventListener('pointermove', onPointerMove, { passive: true })
+    const clear = () => {
+      for (const element of document.querySelectorAll<HTMLElement>(ADAPT_THEME_SELECTOR)) {
+        element.classList.remove('dark')
+      }
+    }
+
+    const unsubscribe = subscribeSignature((frame) => {
+      const step = frame?.step
+      const onSheet = frame && step && step.liquidEdge > 0 && step.body
+      if (!onSheet) {
+        clear()
+        return
+      }
+      const sheetBottom = step.centerY + step.halfHeight
+      const sheetDark = step.solid >= 0.5
+      for (const element of document.querySelectorAll<HTMLElement>(ADAPT_THEME_SELECTOR)) {
+        let y = pointerY
+        if (element.dataset.adaptTheme !== 'pointer') {
+          const rect = element.getBoundingClientRect()
+          y = rect.top + rect.height / 2
+        }
+        element.classList.toggle('dark', sheetDark && y >= 0 && y < sheetBottom)
+      }
+    })
+
+    return () => {
+      unsubscribe()
+      window.removeEventListener('pointermove', onPointerMove)
+      clear()
+    }
+  }, [])
+
+  // Readouts are written straight to the DOM every frame, not through React.
+  useEffect(() => {
+    const labels: Record<Exclude<ReadoutKey, 'target'>, string> = {
+      viscosity: t('readouts.viscosity'),
+      colour: t('readouts.colour'),
+      clarity: t('readouts.clarity'),
+    }
+
+    return subscribeSignature((frame) => {
+      const elements = readoutRefs.current
+      if (!frame) {
+        for (const key of READOUTS) {
+          const element = elements[key]
+          if (!element) continue
+          element.style.opacity = '0'
+          element.style.transform = ''
+          if (key !== 'target') element.style.display = 'none'
+        }
+        return
+      }
+
+      const { step, startColour, targetColour } = frame
+      const motion = readoutMotion(step.progress, isMobile)
+      const values: Record<Exclude<ReadoutKey, 'target'>, string> = {
+        viscosity: step.viscosity.toFixed(2),
+        colour: toHex(mixColour(startColour, targetColour, step.solid)),
+        clarity: `${Math.round(step.clarity * 100)}%`,
+      }
+
+      for (const key of READOUTS) {
+        const element = elements[key]
+        if (!element) continue
+        const { enter, exit } = motion[key]
+
+        // The site's reveal (rise and fade in, lift and fade out), but
+        // scrubbed by the scroll instead of timed.
+        const opacity = Math.min(smoothstep(0.3, 1, enter), 1 - smoothstep(0, 0.6, exit))
+        const rise = (1 - smoothstep(0, 1, enter)) * 14 - smoothstep(0, 1, exit) * 10
+        element.style.opacity = opacity.toFixed(3)
+        element.style.transform = `translateY(${rise.toFixed(1)}px)`
+        if (key === 'target') continue
+
+        element.textContent = `${labels[key]} ${values[key]}`
+        if (isMobile) {
+          element.style.display = opacity > 0 ? '' : 'none'
+          continue
+        }
+        // A new readout opens its slot before it fades in and closes it after
+        // it has faded, so the row slides instead of jumping.
+        const room = Math.min(smoothstep(0, 0.6, enter), 1 - smoothstep(0.4, 1, exit))
+        element.style.display = ''
+        element.style.maxWidth = `${(room * 16).toFixed(2)}em`
+        element.style.marginLeft = `${(room * 2).toFixed(3)}rem`
+      }
+    })
+  }, [t, isMobile])
+
+  return (
+    <section id="work" className="w-full">
+      {/* Overlaps the hero's last screen (plus the hero's short extra hold),
+          so this pin starts the moment the hero's story ends and the matter
+          that filled the frame carries straight on. */}
+      <div
+        data-signature-track
+        data-scroll-heavy
+        className="relative -mt-[130svh] h-[350svh] data-signature-static:mt-0 data-signature-static:h-auto motion-reduce:mt-0 motion-reduce:h-auto"
+      >
+        {/* The hold: the finished frame stands still here and the scroll is
+            braked (STORY_END in the choreography: the last fifth of the pin). */}
+        <div
+          aria-hidden="true"
+          data-scroll-heavy="0.3"
+          data-scroll-range="box"
+          className="pointer-events-none absolute left-0 w-px"
+          style={{ top: '200svh', height: '50svh' }}
+        />
+        {/* Where the pin ends: the hero CTA scrolls here so the whole transformation plays. */}
+        <div
+          id="work-formed"
+          aria-hidden="true"
+          className="pointer-events-none absolute left-0 h-px w-px"
+          style={{ top: 'calc(100% - 100svh)' }}
+        />
+
+        <div
+          ref={stageRef}
+          data-signature-stage
+          className="text-foreground sticky top-0 flex h-svh w-full flex-col justify-center px-6 pt-20 pb-10 in-data-signature-static:static in-data-signature-static:h-auto in-data-signature-static:py-24 motion-reduce:static motion-reduce:h-auto motion-reduce:py-24 lg:px-24"
+        >
+          <div className="mx-auto flex w-full max-w-[min(96rem,calc((100svh-22rem)*16/9))] flex-col gap-6 md:gap-8">
+            <div className="relative">
+              {/* Readouts narrate the forming in the spot the heading will take. */}
+              <div
+                ref={readoutsRef}
+                aria-hidden="true"
+                className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-6 font-mono text-xs tracking-widest uppercase"
+              >
+                <span
+                  ref={(element) => {
+                    readoutRefs.current.target = element
+                  }}
+                  data-signature-text
+                  className="text-primary whitespace-nowrap"
+                  style={{ opacity: 0 }}
+                >
+                  01 — {t('title')}
+                </span>
+                <span
+                  className="flex flex-col items-end gap-1 tabular-nums md:flex-row md:gap-0"
+                  style={{ color: SCENE_MUTED }}
+                >
+                  {READOUTS.filter((key) => key !== 'target').map((key) => (
+                    <span
+                      key={key}
+                      ref={(element) => {
+                        readoutRefs.current[key] = element
+                      }}
+                      data-signature-text
+                      className="overflow-hidden whitespace-nowrap will-change-transform"
+                      style={{ opacity: 0, display: 'none' }}
+                    />
+                  ))}
+                </span>
+              </div>
+
+              <EditorialHeader
+                ref={headerRef}
+                tagline={t('tagline')}
+                title={t('title')}
+                subtitle={t('description')}
+                className="gap-4 md:flex-col md:items-start md:justify-start md:gap-4 xl:flex-row xl:items-end xl:justify-between xl:gap-8"
+                titleClassName="text-4xl sm:text-5xl"
+                subtitleClassName="text-base md:text-left md:text-lg xl:text-right"
+              />
+            </div>
+
+            <div
+              data-signature-frame
+              className="relative aspect-video w-full overflow-hidden rounded-2xl"
+            >
+              <Image
+                src="/images/projects/stronypodhale.avif"
+                alt={t('alt')}
+                fill
+                sizes="(min-width: 1536px) 1536px, 100vw"
+                className="object-cover"
+                style={{ opacity: 'var(--signature-reveal, 1)' }}
+              />
+            </div>
+
+            {/* Left on phones: the droplet rests below the image's right corner there. */}
+            <div ref={linkRef} className="flex md:justify-end">
+              <Button
+                href="https://stronypodhale.pl"
+                target="_blank"
+                variant="ghost"
+                className="group -ml-4 font-mono text-sm tracking-widest uppercase hover:bg-transparent md:-mr-4 md:ml-0"
+                rightIcon={
+                  <ArrowUpRightIcon className="text-primary transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                }
+              >
+                {t('link')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}

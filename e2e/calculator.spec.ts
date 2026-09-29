@@ -22,13 +22,14 @@ test.describe('Print Calculator accessibility', () => {
     const priceDisplay = page.locator('#calculator .font-serif.text-6xl')
     const initialPrice = await priceDisplay.textContent()
 
-    // Change a slider value
-    await widthInput.fill('20')
-
-    // Wait for animation or state update
-    await page.waitForTimeout(500)
-
-    const updatedPrice = await priceDisplay.textContent()
-    expect(initialPrice).not.toEqual(updatedPrice)
+    // Change a slider value. The calculator is loaded lazily, so a fill that
+    // lands before hydration changes the input but not React state, and
+    // refilling the same value then fires no change. Each attempt moves the
+    // slider away and back, until the hydrated component reacts.
+    await expect(async () => {
+      await widthInput.fill('1')
+      await widthInput.fill('20')
+      await expect(priceDisplay).not.toHaveText(initialPrice ?? '', { timeout: 1000 })
+    }).toPass({ timeout: 15_000 })
   })
 })
