@@ -78,6 +78,7 @@ export function SignatureScene() {
       for (const target of targets) {
         target.style.opacity = ''
         target.style.transform = ''
+        target.style.clipPath = ''
       }
       if (frameElement) frameElement.style.transform = ''
       if (readoutsRef.current) readoutsRef.current.style.transform = ''
@@ -94,9 +95,13 @@ export function SignatureScene() {
       }
       const { progress, solid } = frame.step
       targets.forEach((target, index) => {
-        const enter = smoothstep(0, 1, headingMotion(progress, index, targets.length))
+        const enter = headingMotion(progress, index)
+        const offset = (1 - enter) * REVEAL.y
         target.style.opacity = enter.toFixed(3)
-        target.style.transform = `translateY(${((1 - enter) * REVEAL.y).toFixed(1)}px)`
+        target.style.transform = offset ? `translateY(${offset.toFixed(1)}px)` : ''
+        // Masked to its own box, so each line rises out of its place instead
+        // of sliding over the page screenshot right below the heading.
+        target.style.clipPath = offset > 0.5 ? `inset(0 0 ${offset.toFixed(1)}px 0)` : ''
       })
       // While the page is alone in the frame it sits in the middle; it
       // moves up to its place as the heading enters.

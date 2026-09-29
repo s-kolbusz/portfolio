@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import {
   BEATS,
+  finalAct,
+  power2Out,
   boxRect,
   choreograph,
   HEADING_AT,
@@ -134,6 +136,20 @@ describe('signature transition choreography', () => {
     })
     expect(lagging.progress).toBeCloseTo(0.5)
     expect(lagging.box.top - lagging.boxShift).toBe(-65)
+  })
+
+  it('directs the final act with the site reveal: power2.out, 1 s, stagger 0.1 s', () => {
+    const [from, until] = BEATS.heading
+    // 1.5 s of choreography (0.2 s delay + 3 × 0.1 s stagger + 1 s) over the beat.
+    const at = (seconds: number) => finalAct(from + ((until - from) * seconds) / 1.5)
+    expect(at(0).image).toBe(0)
+    expect(at(0.5).image).toBeCloseTo(power2Out(0.5))
+    expect(at(1).image).toBe(1)
+    expect(at(0.2).heading(0)).toBe(0)
+    expect(at(0.7).heading(0)).toBeCloseTo(power2Out(0.5))
+    expect(at(0.8).heading(1)).toBeCloseTo(power2Out(0.5))
+    expect(at(1.5).heading(3)).toBe(1)
+    expect(at(1.4).heading(3)).toBeLessThan(1)
   })
 
   it('depends only on the scroll position, so reversing retraces the same path', () => {

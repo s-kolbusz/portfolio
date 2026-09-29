@@ -165,6 +165,18 @@ Dalsza droga kulki (kolejne sceny, kontakt) należy do kroków 2 i 5 roadmapy.
   nieudokumentowanych momentach. Próby z tłem strony i paskiem przypiętym u góry
   zostawiały przypadkowe kolory, więc strona nie steruje już kolorem przeglądarki.
 
+## Wersja 10: wyreżyserowany akt końcowy
+
+Wyłanianie się zrzutu, jego przesunięcie na miejsce i wejście tekstu mają te
+same parametry co reveal na reszcie strony: easing `power2.out`, czas 1 s,
+stagger 0,1 s. Są rozpisane w sekundach i przewijane scrollem przez etap
+nagłówka (`FINAL_ACT` w choreografii):
+
+- 0,0–1,0 s: zrzut przesuwa się ze środka kadru na swoje miejsce;
+- od 0,2 s: etykieta, tytuł, opis, link, każdy 1 s, co 0,1 s (koniec po 1,5 s);
+- każda linia wyłania się z własnego obrysu (maska), więc nie wjeżdża na zrzut;
+- wyłanianie się i klarowanie zrzutu z tafli też na `power2.out`.
+
 ## Kursor i docki nad taflą
 
 Stały interfejs (docki, kursor) przyjmuje paletę tego, co jest pod nim: nad
