@@ -3,8 +3,8 @@
     "back": "Back"
   },
   "Metadata": {
-    "title": "Sebastian Kolbusz | Senior Frontend Engineer",
-    "description": "Senior Frontend Engineer in Zakopane building fast Next.js websites, SaaS interfaces, and polished digital experiences for ambitious brands."
+    "title": "Sebastian Kolbusz | Creative Developer · Full-stack Engineer",
+    "description": "Creative developer and full-stack engineer based in Zakopane, Poland. Animated websites (GSAP, WebGL), Next.js applications and Payload CMS. Founder of stronypodhale.pl."
   },
   "actions": {
     "skip_to_main": "Skip to main content",
@@ -72,7 +72,7 @@
       "strategy_title": "Development Strategy",
       "read_more": "Read Technical Details",
       "strategy_p1": "My approach to web architecture is grounded in the belief that a professional digital appearance is built on a flawless technical foundation. By prioritizing performance, accessibility, and smooth interaction design, I help brands establish immediate authority.",
-      "strategy_p2": "Based in Zakopane, I bridge the gap between global standards and the personal touch required for local business success. Whether I'm building a complex React dashboard for a SaaS startup or a refined presence for a local service, my focus is on delivering results that stand the test of time.",
+      "strategy_p2": "Based in Zakopane, I bridge the gap between global standards and the personal touch every project deserves. Whether I'm building a complex React dashboard for a SaaS startup or an animated website for a brand, my focus is on delivering results that stand the test of time.",
       "strategy_p3": "I treat every project as a long-term investment in your brand's digital future. By utilizing modern technologies like Next.js and Tailwind CSS, I ensure that your website is not only visually stunning but also optimized for visibility and reliability."
     }
   },
@@ -84,43 +84,7 @@
     "explore": "Explore Case Study",
     "externalCase": "See it on stronypodhale.pl",
     "highlights_label": "Key Technical Outcomes",
-    "stack_label": "Technical Stack",
-    "zakofy": {
-      "description": "Custom offer presentation platform for Tatra mountain tours. Elevated the client's digital presence through a refined UI and high-performance architecture.",
-      "highlights": {
-        "0": "Engaging visual storytelling",
-        "1": "Streamlined inquiry flow",
-        "2": "Optimized static site generation",
-        "3": "Significant increase in lighthouse scores"
-      }
-    },
-    "your-krakow-travel": {
-      "description": "Unified offer presentation platform for a premier private tour provider. Centralized fragmented offerings into a cohesive and performant digital identity.",
-      "highlights": {
-        "0": "Refined tour catalog architecture",
-        "1": "Streamlined navigation and UX",
-        "2": "Structured data for search visibility",
-        "3": "Accessible and responsive layout"
-      }
-    },
-    "wellezza": {
-      "description": "Digital appearance for a local hair salon. Integrated third-party booking systems into a high-performance, custom-built storefront.",
-      "highlights": {
-        "0": "Seamless booking integration",
-        "1": "100/100 Lighthouse performance",
-        "2": "Custom branding implementation",
-        "3": "Optimized for local search visibility"
-      }
-    },
-    "billboard-zakopane": {
-      "description": "Professional platform for a regional advertising leader. Streamlined the client journey with interactive location mapping and a modern technical base.",
-      "highlights": {
-        "0": "Interactive mapping integration",
-        "1": "Professional brand narrative",
-        "2": "Streamlined technical foundation",
-        "3": "Scalable service architecture"
-      }
-    }
+    "stack_label": "Technical Stack"
   },
   "services": {
     "title": "Services",
@@ -221,7 +185,7 @@
     "h2_niche": "Modern Websites and Apps for Your Business",
     "h2_offer": "Explore My Core Services",
     "h2_trust": "Why Work With Me?",
-    "trust_content": "I build technical solutions focusing on performance, accessibility, and high conversion rates. As a senior engineer with experience in global projects, I deliver top-tier code quality, whether I'm building a complex application for a tech startup or a responsive platform for a local business. Every project is built on a modern technology stack (Next.js, React), ensuring lightning-fast load times, excellent Core Web Vitals scores, and a natural advantage in SEO.",
+    "trust_content": "I build technical solutions focusing on performance, accessibility, and high conversion rates. As a senior engineer with experience in global projects, I deliver top-tier code quality, whether I'm building a complex application for a tech startup or an animated website for a brand. Every project is built on a modern technology stack (Next.js, React), ensuring lightning-fast load times, excellent Core Web Vitals scores, and a natural advantage in SEO.",
     "local_note": "For small businesses in the Podhale region I build sites at lower rates, under a separate brand — <link>stronypodhale.pl</link>.",
     "h2_faq": "Frequently Asked Questions",
     "faq": {

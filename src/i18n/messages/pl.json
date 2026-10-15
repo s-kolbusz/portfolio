@@ -72,7 +72,7 @@
       "strategy_title": "Strategia Rozwoju",
       "read_more": "Poznaj szczegóły techniczne",
       "strategy_p1": "Moje podejście do architektury webowej opiera się na przekonaniu, że profesjonalny wizerunek cyfrowy buduje się na bezbłędnym fundamencie technicznym. Priorytetyzując wydajność, dostępność i płynność interakcji, pomagam markom budować natychmiastowy autorytet.",
-      "strategy_p2": "Działając z Zakopanego, łączę światowe standardy z osobistym podejściem potrzebnym do sukcesu lokalnych firm. Niezależnie od tego, czy projektuję złożony dashboard React dla startupu SaaS, czy buduję dopracowaną obecność dla lokalnej usługi, skupiam się na dostarczaniu wyników, które przetrwają próbę czasu.",
+      "strategy_p2": "Działając z Zakopanego, łączę światowe standardy z osobistym podejściem do każdego projektu. Niezależnie od tego, czy projektuję złożony dashboard React dla startupu SaaS, czy animowaną stronę dla marki, skupiam się na dostarczaniu wyników, które przetrwają próbę czasu.",
       "strategy_p3": "Każdy projekt traktuję jako długoterminową inwestycję w cyfrową przyszłość Twojej marki. Wykorzystując nowoczesne technologie, takie jak Next.js i Tailwind CSS, zapewniam, że Twoja strona jest nie tylko estetyczna, ale także zoptymalizowana pod kątem widoczności i niezawodności."
     }
   },
@@ -84,43 +84,7 @@
     "explore": "Zobacz Case Study",
     "externalCase": "Zobacz na stronypodhale.pl",
     "highlights_label": "Kluczowe Wyniki Techniczne",
-    "stack_label": "Stack Technologiczny",
-    "zakofy": {
-      "description": "Dedykowany system prezentacji oferty dla turystyki na Podhalu. Nowoczesna strona internetowa dla biznesu w Zakopanem, która podnosi standard wizerunku cyfrowego poprzez dopracowane UI i ultraszybkie działanie.",
-      "highlights": {
-        "0": "Angażujący storytelling wizualny",
-        "1": "Uproszczony proces zapytań",
-        "2": "Optymalizacja statyczna (SSG)",
-        "3": "Znaczący wzrost wyników Lighthouse"
-      }
-    },
-    "your-krakow-travel": {
-      "description": "Zunifikowana platforma prezentacji oferty dla wiodącego dostawcy wycieczek. Skonsolidowałem rozproszoną ofertę w spójną i wydajną tożsamość cyfrową.",
-      "highlights": {
-        "0": "Dopracowana architektura katalogu",
-        "1": "Uproszczona nawigacja i UX",
-        "2": "Dane strukturalne dla SEO",
-        "3": "Dostępny i responsywny układ"
-      }
-    },
-    "wellezza": {
-      "description": "Wizerunek cyfrowy dla lokalnego salonu fryzjerskiego. Zintegrowałem zewnętrzne systemy rezerwacji z wydajną, dedykowaną stroną.",
-      "highlights": {
-        "0": "Bezproblemowa integracja rezerwacji",
-        "1": "Wydajność Lighthouse 100/100",
-        "2": "Wdrożenie dedykowanego brandingu",
-        "3": "Optymalizacja pod lokalne SEO"
-      }
-    },
-    "billboard-zakopane": {
-      "description": "Profesjonalna platforma dla regionalnego lidera reklamy. Uprościłem ścieżkę klienta dzięki interaktywnej mapie lokalizacji.",
-      "highlights": {
-        "0": "Interaktywna integracja map",
-        "1": "Profesjonalna narracja marki",
-        "2": "Uproszczony fundament techniczny",
-        "3": "Skalowalna architektura usług"
-      }
-    }
+    "stack_label": "Stack Technologiczny"
   },
   "services": {
     "title": "Usługi",
@@ -221,13 +185,13 @@
     "h2_niche": "Nowoczesne strony i aplikacje internetowe dla Twojego biznesu",
     "h2_offer": "Poznaj moje usługi webowe",
     "h2_trust": "Dlaczego warto współpracować ze mną?",
-    "trust_content": "Tworzę rozwiązania techniczne nastawione na wydajność, dostępność i wysokie wskaźniki konwersji. Jako inżynier z doświadczeniem przy globalnych projektach, dostarczam kod najwyższej jakości, niezależnie czy buduję skomplikowaną aplikację dla startupu, czy responsywną stronę dla lokalnego biznesu z Podhala. Każdy projekt opieram na nowoczesnym stosie technologicznym (Next.js, React), co gwarantuje błyskawiczne ładowanie, świetne wyniki w Core Web Vitals i naturalną przewagę w pozycjonowaniu (SEO).",
+    "trust_content": "Tworzę rozwiązania techniczne nastawione na wydajność, dostępność i wysokie wskaźniki konwersji. Jako inżynier z doświadczeniem przy globalnych projektach, dostarczam kod najwyższej jakości, niezależnie czy buduję skomplikowaną aplikację dla startupu, czy animowaną stronę dla marki. Każdy projekt opieram na nowoczesnym stosie technologicznym (Next.js, React), co gwarantuje błyskawiczne ładowanie, świetne wyniki w Core Web Vitals i naturalną przewagę w pozycjonowaniu (SEO).",
     "local_note": "Małym firmom z Podhala robię strony taniej, pod osobną marką — <link>stronypodhale.pl</link>.",
     "h2_faq": "Często zadawane pytania",
     "faq": {
       "0": {
         "question": "Jak długo trwa tworzenie strony www?",
-        "answer": "Standardowy landing page powstaje zazwyczaj w 1-2 tygodnie, podczas gdy bardziej rozbudowana strona biznesowa lub serwis dla pensjonatu może zająć 3-5 tygodni, zależnie od dostępności materiałów i procesu akceptacji."
+        "answer": "Standardowy landing page powstaje zazwyczaj w 1-2 tygodnie, podczas gdy bardziej rozbudowana strona biznesowa może zająć 3-5 tygodni, zależnie od dostępności materiałów i procesu akceptacji."
       },
       "1": {
         "question": "Czy zajmujesz się również hostingiem i utrzymaniem?",

@@ -51,10 +51,10 @@ export default async function ProjectDetailPage({ params }: Props) {
   if (!project) notFound()
 
   // Previous/next chain the case studies only — never a card that leaves the site.
-  const allProjects = getCaseStudies(locale)
-  const currentIdx = allProjects.findIndex((p) => p.id === slug)
-  const prevProject = currentIdx > 0 ? allProjects[currentIdx - 1] : undefined
-  const nextProject = currentIdx < allProjects.length - 1 ? allProjects[currentIdx + 1] : undefined
+  const caseStudies = getCaseStudies(locale)
+  const currentIdx = caseStudies.findIndex((p) => p.id === slug)
+  const prevProject = currentIdx > 0 ? caseStudies[currentIdx - 1] : undefined
+  const nextProject = currentIdx < caseStudies.length - 1 ? caseStudies[currentIdx + 1] : undefined
   const structuredDataDescription = `${project.subtitle}. ${project.tagline}`
 
   return (

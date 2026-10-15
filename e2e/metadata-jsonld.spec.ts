@@ -43,17 +43,16 @@ test('projects index page exposes canonical metadata and ItemList JSON-LD', asyn
     '@context': 'https://schema.org',
     '@type': 'ItemList',
   })
-  expect(itemListPayload?.itemListElement).toEqual(
-    expect.arrayContaining([
-      expect.objectContaining({
-        '@type': 'ListItem',
-        position: 1,
-        name: 'Zakofy',
-        // Client work is described on stronypodhale.pl, so the list points there.
-        url: 'https://stronypodhale.pl/strona-firmowa/',
-      }),
-    ])
-  )
+  // The list names the case studies on this site only; client work is described
+  // in stronypodhale.pl's own structured data.
+  expect(itemListPayload?.itemListElement).toEqual([
+    expect.objectContaining({
+      '@type': 'ListItem',
+      position: 1,
+      name: 'ready2order',
+      url: 'https://kolbusz.xyz/en/projects/ready2order',
+    }),
+  ])
 })
 
 test('project detail page exposes canonical metadata and CreativeWork JSON-LD', async ({

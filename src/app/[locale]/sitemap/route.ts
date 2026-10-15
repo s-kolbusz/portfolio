@@ -15,7 +15,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
   const projects = getCaseStudies(currentLocale)
   const uniqueProjectIds = Array.from(new Set(projects.map((p) => p.id)))
 
-  const staticRoutes = ['', '/projects', '/cv', '/services', '/design']
+  // /design is an internal design-system preview, not a page for search (SEB-66, audit A9).
+  const staticRoutes = ['', '/projects', '/cv', '/services']
   const sitemapEntries = []
 
   // Add static routes

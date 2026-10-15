@@ -132,4 +132,24 @@ describe('Lightbox', () => {
     fireEvent.keyDown(document, { key: 'Escape' })
     expect(onClose).toHaveBeenCalled()
   })
+
+  // The e2e version needs a live case study with a gallery, and none exists until
+  // SEB-73; this covers the same contract at the component level.
+  it('returns focus to the element that opened it once it closes', async () => {
+    const trigger = document.createElement('button')
+    trigger.textContent = 'View high-res'
+    document.body.appendChild(trigger)
+    trigger.focus()
+
+    const { unmount } = render(<Lightbox images={images} initialIndex={0} onClose={vi.fn()} />)
+    screen.getAllByLabelText('close')[0].focus()
+    expect(trigger).not.toHaveFocus()
+
+    unmount()
+    // Focus comes back on the next tick, so the page does not jump while closing.
+    await new Promise((resolve) => setTimeout(resolve, 0))
+
+    expect(trigger).toHaveFocus()
+    trigger.remove()
+  })
 })

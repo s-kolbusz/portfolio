@@ -1,6 +1,9 @@
 import { render } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
+import { STUDIO } from '@/data/studio'
+import { SITE_ROLE } from '@/lib/site'
+
 import { JsonLd } from './json-ld'
 
 function getScriptContent(id: string): unknown {
@@ -57,7 +60,28 @@ describe('JsonLd', () => {
     render(<JsonLd />)
 
     const person = getScriptContent('person') as Record<string, unknown>
-    expect(person['jobTitle']).toBe('Senior Frontend Engineer')
+    expect(person['jobTitle']).toBe(SITE_ROLE)
+  })
+
+  it('Person works for stronypodhale.pl under the @id that site declares', () => {
+    render(<JsonLd />)
+
+    const person = getScriptContent('person') as Record<string, unknown>
+    expect(person['worksFor']).toMatchObject({
+      '@type': 'ProfessionalService',
+      '@id': STUDIO.id,
+      url: STUDIO.url,
+    })
+  })
+
+  it('ProfessionalService does not present itself as a local Podhale business', () => {
+    render(<JsonLd />)
+
+    const service = getScriptContent('professionalservice') as Record<string, unknown>
+    // Local web design for Podhale is stronypodhale.pl's market (SEB-66).
+    expect(service['areaServed']).toEqual([{ '@type': 'Country', name: 'Poland' }])
+    expect(service['address']).toBeUndefined()
+    expect(service['geo']).toBeUndefined()
   })
 
   it('WebSite schema has @id but no potentialAction (no search feature on this site)', () => {

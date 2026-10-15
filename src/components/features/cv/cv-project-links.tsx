@@ -1,15 +1,13 @@
 'use client'
 
-import { getEntryHref, isExternalEntry } from '@/data/entry-href'
-import { Link } from '@/i18n/navigation'
+import { EntryLink } from '@/components/features/project/entry-link'
+import type { LinkableEntry } from '@/data/entry-href'
 import { useNavigationStore } from '@/lib/stores/navigation'
 
-interface CvProjectLinksProps {
-  projects: { id: string; title: string; externalUrl?: string }[]
+type CvProjectLinksProps = {
+  projects: (LinkableEntry & { title: string })[]
   label: string
 }
-
-const linkClassName = 'text-foreground hover:text-primary font-serif text-sm transition-colors'
 
 export function CvProjectLinks({ projects, label }: CvProjectLinksProps) {
   const setProjectOrigin = useNavigationStore((state) => state.setProjectOrigin)
@@ -22,25 +20,13 @@ export function CvProjectLinks({ projects, label }: CvProjectLinksProps) {
       <ul className="flex flex-wrap gap-x-6 gap-y-2">
         {projects.map((project) => (
           <li key={project.id}>
-            {/* Client work described on stronypodhale.pl opens there. */}
-            {isExternalEntry(project) ? (
-              <a
-                href={getEntryHref(project)}
-                target="_blank"
-                rel="noopener"
-                className={linkClassName}
-              >
-                {project.title}
-              </a>
-            ) : (
-              <Link
-                href={getEntryHref(project)}
-                className={linkClassName}
-                onClick={() => setProjectOrigin(null)}
-              >
-                {project.title}
-              </Link>
-            )}
+            <EntryLink
+              entry={project}
+              className="text-foreground hover:text-primary font-serif text-sm transition-colors"
+              onInternalClick={() => setProjectOrigin(null)}
+            >
+              {project.title}
+            </EntryLink>
           </li>
         ))}
       </ul>

@@ -9,6 +9,7 @@ import {
 } from './get-projects'
 import type { PortfolioEntryContent } from './projects'
 import { projectsEn } from './projects-en'
+import { STUDIO } from './studio'
 
 describe('get-projects', () => {
   it('returns entries sorted by order for a locale', () => {
@@ -53,14 +54,13 @@ describe('get-projects', () => {
     const caseStudies = getCaseStudies('en')
 
     expect(caseStudies.map((project) => project.id)).toEqual(['ready2order'])
-    expect(caseStudies.every((project) => !project.externalUrl)).toBe(true)
   })
 
   it('finds a case study by slug, but not client work that lives elsewhere', () => {
     expect(getCaseStudy('ready2order', 'pl')?.id).toBe('ready2order')
     expect(getCaseStudy('zakofy', 'pl')).toBeUndefined()
     // The card itself is still listed, with its own copy.
-    expect(getProject('zakofy', 'pl')?.externalUrl).toBe('https://stronypodhale.pl/strona-firmowa/')
+    expect(getProject('zakofy', 'pl')?.studioCaseUrl).toBe(STUDIO.pages.companySite)
   })
 
   it('throws when localized content is missing for a portfolio entry', () => {

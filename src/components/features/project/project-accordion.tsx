@@ -7,8 +7,9 @@ import { ArrowUpRightIcon } from '@phosphor-icons/react'
 
 import { Accordion } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
-import { getEntryHref, isExternalEntry } from '@/data/entry-href'
+import { getEntryHref, isStudioCase } from '@/data/entry-href'
 import type { PortfolioEntry } from '@/data/projects'
+import { STUDIO_LINK_REL } from '@/data/studio'
 import { useNavigationStore } from '@/lib/stores/navigation'
 
 interface ProjectAccordionProps {
@@ -25,7 +26,7 @@ export function ProjectAccordion({ project, isOpen, onAnimationComplete }: Proje
   const description = project.tagline
   const highlights = project.pullQuotes || []
   // Client work described on stronypodhale.pl: the call to action leaves the site.
-  const isExternal = isExternalEntry(project)
+  const isStudio = isStudioCase(project)
 
   return (
     <Accordion
@@ -44,22 +45,25 @@ export function ProjectAccordion({ project, isOpen, onAnimationComplete }: Proje
           </p>
 
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
-            <div className="flex flex-col gap-4">
-              <span className="text-primary font-mono text-xs tracking-widest uppercase">
-                {t('highlights_label')}
-              </span>
-              <ul className="flex flex-col gap-3">
-                {highlights.map((highlight, index) => (
-                  <li
-                    key={index}
-                    className="text-muted-foreground flex items-start gap-3 font-sans"
-                  >
-                    <div className="bg-primary/40 mt-2.5 h-1 w-1 shrink-0 rounded-full" />
-                    <span className="text-base leading-snug sm:text-lg">{highlight}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {/* Client work keeps a short card — its full story is on stronypodhale.pl. */}
+            {!isStudio && (
+              <div className="flex flex-col gap-4">
+                <span className="text-primary font-mono text-xs tracking-widest uppercase">
+                  {t('highlights_label')}
+                </span>
+                <ul className="flex flex-col gap-3">
+                  {highlights.map((highlight, index) => (
+                    <li
+                      key={index}
+                      className="text-muted-foreground flex items-start gap-3 font-sans"
+                    >
+                      <div className="bg-primary/40 mt-2.5 h-1 w-1 shrink-0 rounded-full" />
+                      <span className="text-base leading-snug sm:text-lg">{highlight}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             <div className="flex flex-col gap-6">
               <div className="flex flex-col gap-2">
@@ -90,27 +94,18 @@ export function ProjectAccordion({ project, isOpen, onAnimationComplete }: Proje
               )}
             </div>
           </div>
-          {isExternal ? (
-            <Button
-              variant="secondary"
-              size="lg"
-              href={getEntryHref(project)}
-              target="_blank"
-              rel="noopener"
-              tabIndex={isOpen ? 0 : -1}
-            >
-              {t('externalCase')}
-            </Button>
-          ) : (
-            <Button
-              variant="secondary"
-              size="lg"
-              href={getEntryHref(project)}
-              onClick={() => setProjectOrigin(null)}
-            >
-              {t('explore')}
-            </Button>
-          )}
+          {/* Out of the tab order while collapsed, like the live-site link above. */}
+          <Button
+            variant="secondary"
+            size="lg"
+            href={getEntryHref(project)}
+            tabIndex={isOpen ? 0 : -1}
+            {...(isStudio
+              ? { target: '_blank', rel: STUDIO_LINK_REL }
+              : { onClick: () => setProjectOrigin(null) })}
+          >
+            {isStudio ? t('externalCase') : t('explore')}
+          </Button>
         </div>
 
         <div className="md:col-span-5">
