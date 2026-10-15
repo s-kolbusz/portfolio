@@ -3,8 +3,8 @@
     "back": "Wróć"
   },
   "Metadata": {
-    "title": "Sebastian Kolbusz | Tworzenie Stron Internetowych Zakopane & Podhale",
-    "description": "Specjalista tworzenia stron internetowych Zakopane i Podhale. Ultraszybkie witryny, sklepy e-commerce i aplikacje webowe – Next.js, SEO i Core Web Vitals dla firm z Małopolski."
+    "title": "Sebastian Kolbusz | Creative Developer · Full-stack Engineer",
+    "description": "Creative developer i full-stack engineer z Zakopanego. Animowane strony (GSAP, WebGL), aplikacje w Next.js i panele w Payload CMS. Strony dla małych firm z Podhala robię w stronypodhale.pl."
   },
   "actions": {
     "skip_to_main": "Przejdź do treści",
@@ -82,6 +82,7 @@
     "viewAll": "Wszystkie Projekty",
     "visitSite": "Uruchom Projekt",
     "explore": "Zobacz Case Study",
+    "externalCase": "Zobacz na stronypodhale.pl",
     "highlights_label": "Kluczowe Wyniki Techniczne",
     "stack_label": "Stack Technologiczny",
     "zakofy": {
@@ -214,9 +215,9 @@
   },
   "services_page": {
     "ideal_for_label": "Idealnie sprawdzi się dla",
-    "meta_title": "Tworzenie Stron Internetowych Zakopane & Podhale",
-    "meta_description": "Profesjonalne tworzenie stron internetowych Zakopane i strony internetowe Podhale. Szybkie witryny, landing page i aplikacje webowe dla firm z Zakopanego, Nowego Targu i całej Małopolski.",
-    "h1": "Profesjonalne Tworzenie Stron Internetowych – Zakopane i Podhale",
+    "meta_title": "Usługi: animowane strony, aplikacje Next.js i Payload CMS",
+    "meta_description": "Animowane strony, aplikacje w Next.js, panele w Payload CMS i audyty wydajności dla firm i agencji. Strony dla małych firm z Podhala: stronypodhale.pl.",
+    "h1": "Strony, aplikacje i audyty dla firm i agencji",
     "h2_niche": "Nowoczesne strony i aplikacje internetowe dla Twojego biznesu",
     "h2_offer": "Poznaj moje usługi webowe",
     "h2_trust": "Dlaczego warto współpracować ze mną?",
@@ -225,14 +226,10 @@
     "h2_faq": "Często zadawane pytania",
     "faq": {
       "0": {
-        "question": "Ile kosztuje strona internetowa w Zakopanem?",
-        "answer": "Cena zależy od złożoności i wymagań projektu. Proste wizytówki i landing page zaczynają się od 3500 zł, a wielostronicowe serwisy dla hoteli czy firm od 8000 zł. Zawsze przedstawiam jasną wycenę przed rozpoczęciem prac."
-      },
-      "1": {
         "question": "Jak długo trwa tworzenie strony www?",
         "answer": "Standardowy landing page powstaje zazwyczaj w 1-2 tygodnie, podczas gdy bardziej rozbudowana strona biznesowa lub serwis dla pensjonatu może zająć 3-5 tygodni, zależnie od dostępności materiałów i procesu akceptacji."
       },
-      "2": {
+      "1": {
         "question": "Czy zajmujesz się również hostingiem i utrzymaniem?",
         "answer": "Tak. Pomagam skonfigurować zoptymalizowany, szybki hosting (np. Vercel) i oferuję usługi stałego wsparcia technicznego w modelu godzinowym, aby strona była zawsze aktualna i bezpieczna."
       }
@@ -315,7 +312,8 @@
     "prevPage": "Poprzednia strona",
     "nextPage": "Następna strona",
     "bookPages": "Strony książki",
-    "pageNumber": "Strona {page}"
+    "pageNumber": "Strona {page}",
+    "externalLabel": "Zobacz na stronypodhale.pl"
   },
   "lightbox": {
     "title": "Powiększenie zdjęcia",

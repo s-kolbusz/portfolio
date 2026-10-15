@@ -82,6 +82,7 @@
     "viewAll": "Explore All Work",
     "visitSite": "Launch Project",
     "explore": "Explore Case Study",
+    "externalCase": "See it on stronypodhale.pl",
     "highlights_label": "Key Technical Outcomes",
     "stack_label": "Technical Stack",
     "zakofy": {
@@ -315,7 +316,8 @@
     "prevPage": "Previous page",
     "nextPage": "Next page",
     "bookPages": "Book pages",
-    "pageNumber": "Page {page}"
+    "pageNumber": "Page {page}",
+    "externalLabel": "See it on stronypodhale.pl"
   },
   "lightbox": {
     "title": "Image lightbox",

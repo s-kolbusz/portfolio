@@ -41,15 +41,24 @@ describe('locale sitemap route', () => {
   it('includes x-default for project detail routes', async () => {
     const xml = await getSitemapXml('en')
 
-    // Should contain project slugs with x-default
-    expect(xml).toContain('href="https://kolbusz.xyz/en/projects/zakofy"')
-    expect(xml).toContain('href="https://kolbusz.xyz/pl/projects/zakofy"')
+    // Should contain case-study slugs with x-default
+    expect(xml).toContain('href="https://kolbusz.xyz/en/projects/ready2order"')
+    expect(xml).toContain('href="https://kolbusz.xyz/pl/projects/ready2order"')
 
-    // Count x-default occurrences (one per URL entry: 4 static + 5 projects = 9)
+    // Count x-default occurrences (one per URL entry: 5 static + 1 case study = 6)
     const xDefaultMatches = xml.match(/hreflang="x-default"/g)
     expect(xDefaultMatches).not.toBeNull()
     // should have x-default for every url entry
-    expect((xDefaultMatches ?? []).length).toBeGreaterThanOrEqual(9)
+    expect((xDefaultMatches ?? []).length).toBeGreaterThanOrEqual(6)
+  })
+
+  it('leaves out client work that redirects to stronypodhale.pl', async () => {
+    const xml = await getSitemapXml('en')
+
+    for (const slug of ['zakofy', 'your-krakow-travel', 'wellezza', 'billboard-zakopane']) {
+      expect(xml).not.toContain(`/projects/${slug}"`)
+      expect(xml).not.toContain(`/projects/${slug}<`)
+    }
   })
 
   it('x-default always points to the en variant even when served for pl locale', async () => {

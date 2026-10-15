@@ -85,7 +85,7 @@ export default async function CVPage({ params }: Props) {
         </div>
 
         <CvProjectLinks
-          projects={projects.map((p) => ({ id: p.id, title: p.title }))}
+          projects={projects.map((p) => ({ id: p.id, title: p.title, externalUrl: p.externalUrl }))}
           label={t('selectedWork')}
         />
       </div>

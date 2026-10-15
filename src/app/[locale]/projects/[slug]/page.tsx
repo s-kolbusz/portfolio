@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation'
 import { ProjectCaseStudy } from '@/components/features/project/project-book/project-case-study'
 import { RoleCaseStudy } from '@/components/features/project/project-book/role-case-study'
 import { StructuredData } from '@/components/seo/structured-data'
-import { getProject, getProjects } from '@/data/get-projects'
+import { getCaseStudies, getCaseStudy } from '@/data/get-projects'
 import { requireRoutingLocale } from '@/i18n/locale'
 import { routing } from '@/i18n/routing'
 import { buildProjectDetailPageMetadata } from '@/lib/page-metadata'
@@ -18,15 +18,17 @@ type Props = {
 export const dynamicParams = false
 export const dynamic = 'force-static'
 
+// Only entries with a case study here. Client work described on stronypodhale.pl
+// has no page: next.config.ts redirects its old URLs there (SEB-20).
 export function generateStaticParams() {
-  const slugs = getProjects('en').map((p) => p.id)
+  const slugs = getCaseStudies('en').map((p) => p.id)
   return routing.locales.flatMap((locale) => slugs.map((slug) => ({ locale, slug })))
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale: localeParam, slug } = await params
   const locale = requireRoutingLocale(localeParam)
-  const project = getProject(slug, locale)
+  const project = getCaseStudy(slug, locale)
   if (!project) return {}
 
   const t = await getTranslations({ locale, namespace: 'projectsBook' })
@@ -45,10 +47,11 @@ export default async function ProjectDetailPage({ params }: Props) {
 
   setRequestLocale(locale)
 
-  const project = getProject(slug, locale)
+  const project = getCaseStudy(slug, locale)
   if (!project) notFound()
 
-  const allProjects = getProjects(locale)
+  // Previous/next chain the case studies only — never a card that leaves the site.
+  const allProjects = getCaseStudies(locale)
   const currentIdx = allProjects.findIndex((p) => p.id === slug)
   const prevProject = currentIdx > 0 ? allProjects[currentIdx - 1] : undefined
   const nextProject = currentIdx < allProjects.length - 1 ? allProjects[currentIdx + 1] : undefined

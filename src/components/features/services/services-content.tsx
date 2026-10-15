@@ -52,7 +52,9 @@ export function ServicesContent() {
     reveal(faqRef, { y: 150 })
   })
 
-  const faqItems = [0, 1, 2]
+  // Each locale lists its own questions: the Polish page no longer answers
+  // "how much is a website in Zakopane" — that question belongs to stronypodhale.pl.
+  const faqItems = Object.keys(t.raw('faq') as Record<string, unknown>)
 
   return (
     <BaseSection

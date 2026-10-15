@@ -43,7 +43,7 @@ export default async function ProjectsPage({ params }: Props) {
               itemListElement: projects.map((project, index) => ({
                 '@type': 'ListItem',
                 position: index + 1,
-                url: toAbsoluteSiteUrl(`/${locale}/projects/${project.id}`),
+                url: project.externalUrl ?? toAbsoluteSiteUrl(`/${locale}/projects/${project.id}`),
                 name: project.title,
               })),
             },

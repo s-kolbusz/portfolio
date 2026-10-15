@@ -21,9 +21,13 @@ export const JsonLd = () => {
       addressLocality: 'Zakopane',
       addressCountry: 'PL',
     },
+    // The web studio the owner runs. Same @id stronypodhale.pl declares for itself,
+    // whose `founder` points back here — one entity graph across both domains.
     worksFor: {
-      '@type': 'Organization',
-      name: 'Freelance',
+      '@type': 'ProfessionalService',
+      '@id': 'https://stronypodhale.pl/#business',
+      name: 'stronypodhale.pl',
+      url: 'https://stronypodhale.pl/',
     },
     sameAs: [
       'https://github.com/s-kolbusz',
@@ -71,13 +75,9 @@ export const JsonLd = () => {
       latitude: 49.299181,
       longitude: 19.949562,
     },
-    areaServed: [
-      { '@type': 'City', name: 'Zakopane' },
-      { '@type': 'City', name: 'Nowy Targ' },
-      { '@type': 'AdministrativeArea', name: 'Podhale' },
-      { '@type': 'AdministrativeArea', name: 'Małopolska' },
-      { '@type': 'Country', name: 'Poland' },
-    ],
+    // Local websites for Podhale firms are stronypodhale.pl's market (SEB-66);
+    // claiming the same towns here made the two sites compete for one query.
+    areaServed: [{ '@type': 'Country', name: 'Poland' }],
     priceRange: '$$$',
     founder: {
       '@type': 'Person',

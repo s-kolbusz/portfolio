@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef } from 'react'
+import type { ReactNode } from 'react'
 
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
@@ -8,6 +9,7 @@ import Image from 'next/image'
 import { ArrowLeftIcon, ArrowUpRightIcon, StarIcon } from '@phosphor-icons/react'
 
 import { Button } from '@/components/ui/button'
+import { getEntryHref, isExternalEntry } from '@/data/entry-href'
 import type { PortfolioEntry } from '@/data/projects'
 import { useTimeline } from '@/hooks/timeline'
 import { Link } from '@/i18n/navigation'
@@ -19,6 +21,33 @@ import { ProjectMeta } from '../project-meta'
 
 interface ProjectCardStackProps {
   projects: PortfolioEntry[]
+}
+
+interface EntryLinkProps {
+  entry: PortfolioEntry
+  className: string
+  onInternalClick: () => void
+  children: ReactNode
+}
+
+/**
+ * The card's case study here, or — for client work described on
+ * stronypodhale.pl — that page in a new tab.
+ */
+function EntryLink({ entry, className, onInternalClick, children }: EntryLinkProps) {
+  if (isExternalEntry(entry)) {
+    return (
+      <a href={getEntryHref(entry)} target="_blank" rel="noopener" className={className}>
+        {children}
+      </a>
+    )
+  }
+
+  return (
+    <Link href={getEntryHref(entry)} className={className} onClick={onInternalClick}>
+      {children}
+    </Link>
+  )
 }
 
 export function ProjectCardStack({ projects }: ProjectCardStackProps) {
@@ -78,10 +107,10 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
         {projects.map((entry, index) => (
           <article key={entry.id} data-stack-item className="group py-6 opacity-0 first:pt-0">
             {/* Title row */}
-            <Link
-              href={`/projects/${entry.id}`}
+            <EntryLink
+              entry={entry}
               className="flex items-start justify-between gap-3"
-              onClick={() => setProjectOrigin('projects')}
+              onInternalClick={() => setProjectOrigin('projects')}
             >
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
@@ -103,7 +132,7 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
               <span className="border-border/60 text-muted-foreground shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-medium">
                 {t(`categories.${entry.category}`)}
               </span>
-            </Link>
+            </EntryLink>
 
             {/* Image — compact, flush edges */}
             <div className="bg-muted relative mt-4 aspect-video w-full overflow-hidden">
@@ -127,13 +156,13 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
 
             {/* Actions — matching accordion style */}
             <div className="mt-3 flex items-center justify-between gap-5">
-              <Link
-                href={`/projects/${entry.id}`}
+              <EntryLink
+                entry={entry}
                 className="group/link text-foreground hover:text-primary flex items-center gap-1 font-mono text-xs font-bold tracking-widest uppercase transition-colors"
-                onClick={() => setProjectOrigin('projects')}
+                onInternalClick={() => setProjectOrigin('projects')}
               >
-                {t('exploreLabel')}
-              </Link>
+                {isExternalEntry(entry) ? t('externalLabel') : t('exploreLabel')}
+              </EntryLink>
 
               {entry.liveUrl && (
                 <a

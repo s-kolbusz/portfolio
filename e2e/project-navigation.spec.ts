@@ -6,37 +6,30 @@ async function openRoute(page: Page, path: string) {
   await page.goto(path, { timeout: 60_000, waitUntil: 'networkidle' })
 }
 
-test.skip('project list navigation reaches details and preserves prev/next project sequence', async ({
-  page,
-}) => {
+// Client work moved to stronypodhale.pl (SEB-20, SEB-21): its old case-study URLs
+// hand their signal over with a 301 instead of answering 404.
+test('old case-study URLs of client work redirect to stronypodhale.pl', async ({ page }) => {
+  const moved = [
+    ['/en/projects/zakofy', 'https://stronypodhale.pl/strona-firmowa/'],
+    ['/pl/projects/your-krakow-travel', 'https://stronypodhale.pl/strona-firmowa/'],
+    ['/en/projects/wellezza', 'https://stronypodhale.pl/#realizacje'],
+    ['/pl/projects/billboard-zakopane', 'https://stronypodhale.pl/strona-firmowa/'],
+  ] as const
+
+  for (const [path, destination] of moved) {
+    const response = await page.request.get(path, { maxRedirects: 0, timeout: 120_000 })
+
+    expect(response.status(), path).toBe(301)
+    expect(response.headers()['location'], path).toBe(destination)
+  }
+})
+
+test('client work on the projects page links out to stronypodhale.pl', async ({ page }) => {
   test.setTimeout(180_000)
   await page.setViewportSize({ width: 900, height: 1200 })
   await openRoute(page, '/en/projects')
 
   const zakofyLink = page.getByRole('link', { name: /zakofy/i }).first()
-  await expect(zakofyLink).toBeVisible()
-  await zakofyLink.click({ force: true })
-
-  await expect(page).toHaveURL(/\/en\/projects\/zakofy$/)
-  // Wait for the new page's heading to ensure transition completed
-  await expect(page.getByRole('heading', { name: /zakofy/i, level: 1 })).toBeVisible()
-  await expect(page.getByRole('navigation', { name: 'Project navigation' })).toBeVisible()
-
-  const nextProjectLink = page.getByRole('link', { name: /next project/i })
-  await expect(nextProjectLink).toBeVisible()
-  await expect(nextProjectLink).toHaveAttribute('href', /\/en\/projects\/your-krakow-travel$/)
-  await nextProjectLink.click({ force: true })
-
-  await expect(page).toHaveURL(/\/en\/projects\/your-krakow-travel$/)
-  // Wait for the new page's heading to ensure transition completed
-  await expect(page.getByRole('heading', { name: /your krakow travel/i, level: 1 })).toBeVisible()
-
-  const previousProjectLink = page.getByRole('link', { name: /previous project/i })
-  await expect(previousProjectLink).toBeVisible()
-  await expect(previousProjectLink).toHaveAttribute('href', /\/en\/projects\/zakofy$/)
-  await previousProjectLink.click({ force: true })
-
-  await expect(page).toHaveURL(/\/en\/projects\/zakofy$/)
-  // Wait for the new page's heading to ensure transition completed
-  await expect(page.getByRole('heading', { name: /zakofy/i, level: 1 })).toBeVisible()
+  await expect(zakofyLink).toHaveAttribute('href', 'https://stronypodhale.pl/strona-firmowa/')
+  await expect(zakofyLink).toHaveAttribute('target', '_blank')
 })

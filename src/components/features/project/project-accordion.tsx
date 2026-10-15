@@ -7,6 +7,7 @@ import { ArrowUpRightIcon } from '@phosphor-icons/react'
 
 import { Accordion } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
+import { getEntryHref, isExternalEntry } from '@/data/entry-href'
 import type { PortfolioEntry } from '@/data/projects'
 import { useNavigationStore } from '@/lib/stores/navigation'
 
@@ -23,6 +24,8 @@ export function ProjectAccordion({ project, isOpen, onAnimationComplete }: Proje
   // Use localized content directly from the project object
   const description = project.tagline
   const highlights = project.pullQuotes || []
+  // Client work described on stronypodhale.pl: the call to action leaves the site.
+  const isExternal = isExternalEntry(project)
 
   return (
     <Accordion
@@ -87,14 +90,27 @@ export function ProjectAccordion({ project, isOpen, onAnimationComplete }: Proje
               )}
             </div>
           </div>
-          <Button
-            variant="secondary"
-            size="lg"
-            href={`/projects/${project.id}`}
-            onClick={() => setProjectOrigin(null)}
-          >
-            {t('explore')}
-          </Button>
+          {isExternal ? (
+            <Button
+              variant="secondary"
+              size="lg"
+              href={getEntryHref(project)}
+              target="_blank"
+              rel="noopener"
+              tabIndex={isOpen ? 0 : -1}
+            >
+              {t('externalCase')}
+            </Button>
+          ) : (
+            <Button
+              variant="secondary"
+              size="lg"
+              href={getEntryHref(project)}
+              onClick={() => setProjectOrigin(null)}
+            >
+              {t('explore')}
+            </Button>
+          )}
         </div>
 
         <div className="md:col-span-5">

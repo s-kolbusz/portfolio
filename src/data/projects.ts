@@ -34,6 +34,14 @@ export interface PortfolioEntryBase {
   featured: boolean
   order: number
   liveUrl?: string
+  /**
+   * Client work that lives on stronypodhale.pl, the owner's web studio. Such an
+   * entry keeps its card here (image, a line or two) but has no case study of its
+   * own: every link points at this address and the old /projects/<id> pages
+   * redirect to it with a 301 (SEB-20, SEB-21). One description of a project, on
+   * the domain that sells the work, rather than two competing with each other.
+   */
+  externalUrl?: string
   timeline?: readonly RolePhase[]
   metrics?: readonly ProjectMetric[]
 }
@@ -101,6 +109,7 @@ export const portfolioEntries = [
     featured: true,
     order: 1,
     liveUrl: 'https://zakofy.com',
+    externalUrl: 'https://stronypodhale.pl/strona-firmowa/',
     metrics: [
       { label: 'Lighthouse', value: 100, description: 'Performance Score' },
       { label: 'LCP', value: 0.8, unit: 's', description: 'Largest Contentful Paint' },
@@ -128,6 +137,7 @@ export const portfolioEntries = [
     featured: true,
     order: 2,
     liveUrl: 'https://yourkrakowtravel.com',
+    externalUrl: 'https://stronypodhale.pl/strona-firmowa/',
     metrics: [
       { label: 'Lighthouse', value: 100, description: 'Performance Score' },
       { label: 'FID', value: 15, unit: 'ms', description: 'First Input Delay' },
@@ -155,6 +165,7 @@ export const portfolioEntries = [
     featured: true,
     order: 3,
     liveUrl: 'https://wellezza.pl',
+    externalUrl: 'https://stronypodhale.pl/#realizacje',
     metrics: [
       { label: 'Lighthouse', value: 100, description: 'Performance Score' },
       { label: 'A11y', value: 100, description: 'Accessibility Score' },
@@ -182,6 +193,7 @@ export const portfolioEntries = [
     featured: true,
     order: 4,
     liveUrl: 'https://billboardzakopane.pl',
+    externalUrl: 'https://stronypodhale.pl/strona-firmowa/',
     metrics: [
       { label: 'Lighthouse', value: 100, description: 'Performance Score' },
       { label: 'CLS', value: 0, description: 'Cumulative Layout Shift' },

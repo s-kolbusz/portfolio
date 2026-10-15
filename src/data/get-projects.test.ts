@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { getFeaturedProjects, getProject, getProjects } from './get-projects'
+import {
+  getCaseStudies,
+  getCaseStudy,
+  getFeaturedProjects,
+  getProject,
+  getProjects,
+} from './get-projects'
 import type { PortfolioEntryContent } from './projects'
 import { projectsEn } from './projects-en'
 
@@ -41,6 +47,20 @@ describe('get-projects', () => {
 
     expect(featuredProjects.length).toBeGreaterThan(0)
     expect(featuredProjects.every((project) => project.featured)).toBe(true)
+  })
+
+  it('keeps client work described on stronypodhale.pl out of the case studies', () => {
+    const caseStudies = getCaseStudies('en')
+
+    expect(caseStudies.map((project) => project.id)).toEqual(['ready2order'])
+    expect(caseStudies.every((project) => !project.externalUrl)).toBe(true)
+  })
+
+  it('finds a case study by slug, but not client work that lives elsewhere', () => {
+    expect(getCaseStudy('ready2order', 'pl')?.id).toBe('ready2order')
+    expect(getCaseStudy('zakofy', 'pl')).toBeUndefined()
+    // The card itself is still listed, with its own copy.
+    expect(getProject('zakofy', 'pl')?.externalUrl).toBe('https://stronypodhale.pl/strona-firmowa/')
   })
 
   it('throws when localized content is missing for a portfolio entry', () => {
