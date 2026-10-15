@@ -1,8 +1,10 @@
 import { ImageResponse } from 'next/og'
 
+import { SITE_ROLE } from '@/lib/site'
+
 export const runtime = 'edge'
 
-export const alt = 'Sebastian Kolbusz - Senior Frontend Engineer'
+export const alt = `Sebastian Kolbusz - ${SITE_ROLE}`
 export const size = {
   width: 1200,
   height: 630,
@@ -78,7 +80,7 @@ export default function Image() {
             textAlign: 'center',
           }}
         >
-          Senior Frontend Engineer
+          {SITE_ROLE}
         </span>
       </div>
       <div

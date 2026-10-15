@@ -1,6 +1,8 @@
 import type { NextConfig } from 'next'
 import createNextIntlPlugin from 'next-intl/plugin'
 
+import { externalProjectRedirects } from './src/data/project-redirects'
+
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
 const nextConfig: NextConfig = {
@@ -23,6 +25,7 @@ const nextConfig: NextConfig = {
         destination: '/en',
         permanent: true,
       },
+      ...externalProjectRedirects(),
     ]
   },
   async rewrites() {

@@ -12,7 +12,7 @@ import { SkipToMain } from '@/components/ui/skip-to-main'
 import { getLocaleFromParams } from '@/i18n/locale'
 import { Link } from '@/i18n/navigation'
 import { routing } from '@/i18n/routing'
-import { SITE_ORIGIN, SITE_TWITTER_HANDLE } from '@/lib/site'
+import { SITE_DESCRIPTION, SITE_ORIGIN, SITE_ROLE, SITE_TWITTER_HANDLE } from '@/lib/site'
 
 import '../globals.css'
 
@@ -74,17 +74,16 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_ORIGIN),
   title: {
-    default: 'Sebastian Kolbusz | Senior Frontend Engineer',
+    default: `Sebastian Kolbusz | ${SITE_ROLE}`,
     template: '%s | Sebastian Kolbusz',
   },
-  description:
-    'Senior Frontend Engineer in Zakopane building fast Next.js websites, SaaS interfaces, and polished digital experiences for ambitious brands.',
+  description: SITE_DESCRIPTION,
   keywords: [
     'Sebastian Kolbusz',
-    'Senior Frontend Engineer',
+    'Creative Developer',
+    'Full-stack Engineer',
     'Next.js Specialist',
-    'Web Architect',
-    'Programista Zakopane',
+    'Payload CMS Developer',
     'Frontend Developer Poland',
     'Cinematic Web Experiences',
     'High-End Web Development',
@@ -101,15 +100,13 @@ export const metadata: Metadata = {
     type: 'website',
     url: SITE_ORIGIN,
     siteName: 'Sebastian Kolbusz Portfolio',
-    title: 'Sebastian Kolbusz | Senior Frontend Engineer',
-    description:
-      'Senior Frontend Engineer in Zakopane building fast Next.js websites, SaaS interfaces, and polished digital experiences for ambitious brands.',
+    title: `Sebastian Kolbusz | ${SITE_ROLE}`,
+    description: SITE_DESCRIPTION,
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Sebastian Kolbusz | Senior Frontend Engineer',
-    description:
-      'Senior Frontend Engineer in Zakopane building fast Next.js websites, SaaS interfaces, and polished digital experiences for ambitious brands.',
+    title: `Sebastian Kolbusz | ${SITE_ROLE}`,
+    description: SITE_DESCRIPTION,
     creator: SITE_TWITTER_HANDLE,
   },
   robots: {

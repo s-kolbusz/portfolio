@@ -5,13 +5,15 @@ import { useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 
-import { ArrowRightIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
+import { ArrowRightIcon, ArrowSquareOutIcon, ArrowUpRightIcon } from '@phosphor-icons/react'
 
+import { isStudioCase } from '@/data/entry-href'
 import type { PortfolioEntry } from '@/data/projects'
-import { Link } from '@/i18n/navigation'
 import { ANIMATION } from '@/lib/constants/animations'
 import { gsap, useGSAP } from '@/lib/gsap-core'
 import { useNavigationStore } from '@/lib/stores/navigation'
+
+import { EntryLink } from '../entry-link'
 
 interface BookSpreadProps {
   entry: PortfolioEntry
@@ -140,6 +142,7 @@ export function BookSpread({ entry, index }: BookSpreadProps) {
 
   const displayNumber = String(index + 1).padStart(2, '0')
   const isRole = entry.type === 'role'
+  const isStudio = isStudioCase(entry)
 
   return (
     <section
@@ -200,18 +203,26 @@ export function BookSpread({ entry, index }: BookSpreadProps) {
 
         {/* Links */}
         <div className="flex items-center justify-between gap-4 pt-2">
-          <Link
-            href={`/projects/${entry.id}`}
+          {/* Client work described on stronypodhale.pl leaves the site instead. */}
+          <EntryLink
+            entry={entry}
             data-spread-link
             className="group text-primary hover:text-primary/80 inline-flex items-center gap-2 text-sm font-medium opacity-0 transition-colors"
-            onClick={() => setProjectOrigin('projects')}
+            onInternalClick={() => setProjectOrigin('projects')}
           >
-            {t('exploreLabel')}
-            <ArrowRightIcon
-              weight="bold"
-              className="size-4 transition-transform group-hover:translate-x-1"
-            />
-          </Link>
+            {isStudio ? t('externalLabel') : t('exploreLabel')}
+            {isStudio ? (
+              <ArrowUpRightIcon
+                weight="bold"
+                className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              />
+            ) : (
+              <ArrowRightIcon
+                weight="bold"
+                className="size-4 transition-transform group-hover:translate-x-1"
+              />
+            )}
+          </EntryLink>
 
           {entry.liveUrl && (
             <a

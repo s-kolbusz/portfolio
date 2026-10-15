@@ -1,3 +1,5 @@
+import { STUDIO } from './studio'
+
 // ---------------------------------------------------------------------------
 // Portfolio Entry — Locale-independent shared base
 // ---------------------------------------------------------------------------
@@ -34,6 +36,15 @@ export interface PortfolioEntryBase {
   featured: boolean
   order: number
   liveUrl?: string
+  /**
+   * Client work described on stronypodhale.pl, the owner's web studio: the page
+   * there that shows this project. Such an entry keeps a short card here but has
+   * no case study of its own — every link points at this address and the old
+   * /projects/<id> pages redirect to it with a 301 (SEB-20, SEB-21). One
+   * description of a project, on the domain that sells the work, rather than two
+   * competing with each other. Not the client's own site: that is `liveUrl`.
+   */
+  studioCaseUrl?: string
   timeline?: readonly RolePhase[]
   metrics?: readonly ProjectMetric[]
 }
@@ -101,6 +112,7 @@ export const portfolioEntries = [
     featured: true,
     order: 1,
     liveUrl: 'https://zakofy.com',
+    studioCaseUrl: STUDIO.pages.companySite,
     metrics: [
       { label: 'Lighthouse', value: 100, description: 'Performance Score' },
       { label: 'LCP', value: 0.8, unit: 's', description: 'Largest Contentful Paint' },
@@ -128,6 +140,7 @@ export const portfolioEntries = [
     featured: true,
     order: 2,
     liveUrl: 'https://yourkrakowtravel.com',
+    studioCaseUrl: STUDIO.pages.companySite,
     metrics: [
       { label: 'Lighthouse', value: 100, description: 'Performance Score' },
       { label: 'FID', value: 15, unit: 'ms', description: 'First Input Delay' },
@@ -155,6 +168,7 @@ export const portfolioEntries = [
     featured: true,
     order: 3,
     liveUrl: 'https://wellezza.pl',
+    studioCaseUrl: STUDIO.pages.work,
     metrics: [
       { label: 'Lighthouse', value: 100, description: 'Performance Score' },
       { label: 'A11y', value: 100, description: 'Accessibility Score' },
@@ -182,6 +196,7 @@ export const portfolioEntries = [
     featured: true,
     order: 4,
     liveUrl: 'https://billboardzakopane.pl',
+    studioCaseUrl: STUDIO.pages.companySite,
     metrics: [
       { label: 'Lighthouse', value: 100, description: 'Performance Score' },
       { label: 'CLS', value: 0, description: 'Cumulative Layout Shift' },

@@ -1,4 +1,4 @@
-import { getProjects } from '@/data/get-projects'
+import { getCaseStudies } from '@/data/get-projects'
 import { routing, type Locale } from '@/i18n/routing'
 import { toAbsoluteSiteUrl } from '@/lib/site'
 
@@ -11,10 +11,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
   const currentLocale = locale as Locale
   const locales = routing.locales
 
-  const projects = getProjects(currentLocale)
+  // Case studies only: client work on stronypodhale.pl redirects away (SEB-20).
+  const projects = getCaseStudies(currentLocale)
   const uniqueProjectIds = Array.from(new Set(projects.map((p) => p.id)))
 
-  const staticRoutes = ['', '/projects', '/cv', '/services', '/design']
+  // /design is an internal design-system preview, not a page for search (SEB-66, audit A9).
+  const staticRoutes = ['', '/projects', '/cv', '/services']
   const sitemapEntries = []
 
   // Add static routes
