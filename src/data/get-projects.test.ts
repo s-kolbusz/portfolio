@@ -60,7 +60,7 @@ describe('get-projects', () => {
     expect(getCaseStudy('ready2order', 'pl')?.id).toBe('ready2order')
     expect(getCaseStudy('zakofy', 'pl')).toBeUndefined()
     // The card itself is still listed, with its own copy.
-    expect(getProject('zakofy', 'pl')?.studioCaseUrl).toBe(STUDIO.pages.companySite)
+    expect(getProject('zakofy', 'pl')?.studioCaseUrl).toBe(STUDIO.cases.zakofy)
   })
 
   it('throws when localized content is missing for a portfolio entry', () => {
