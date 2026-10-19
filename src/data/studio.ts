@@ -15,6 +15,11 @@ export const STUDIO = {
     /** The work section of the home page, for projects no offer page shows. */
     work: 'https://stronypodhale.pl/#realizacje',
   },
+  /** A project's own description on stronypodhale.pl (SEB-108), where it has one. */
+  cases: {
+    zakofy: 'https://stronypodhale.pl/realizacje/zakofy/',
+    yourKrakowTravel: 'https://stronypodhale.pl/realizacje/yourkrakowtravel/',
+  },
 } as const
 
 /**

@@ -112,7 +112,7 @@ export const portfolioEntries = [
     featured: true,
     order: 1,
     liveUrl: 'https://zakofy.com',
-    studioCaseUrl: STUDIO.pages.companySite,
+    studioCaseUrl: STUDIO.cases.zakofy,
     metrics: [
       { label: 'Lighthouse', value: 100, description: 'Performance Score' },
       { label: 'LCP', value: 0.8, unit: 's', description: 'Largest Contentful Paint' },
@@ -140,7 +140,7 @@ export const portfolioEntries = [
     featured: true,
     order: 2,
     liveUrl: 'https://yourkrakowtravel.com',
-    studioCaseUrl: STUDIO.pages.companySite,
+    studioCaseUrl: STUDIO.cases.yourKrakowTravel,
     metrics: [
       { label: 'Lighthouse', value: 100, description: 'Performance Score' },
       { label: 'FID', value: 15, unit: 'ms', description: 'First Input Delay' },
