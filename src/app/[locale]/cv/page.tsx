@@ -76,7 +76,8 @@ export default async function CVPage({ params }: Props) {
         {/* The same document the PDF is printed from: generated from ~/Projects/.context/cv. */}
         <article
           lang={locale}
-          className="mx-auto w-full max-w-[210mm] overflow-hidden rounded-sm bg-[#fcfaf6] px-6 py-8 shadow-2xl md:px-[13mm] md:py-[12mm]"
+          // A real A4 sheet where it fits; margins and type size come from the document itself.
+          className="mx-auto w-full overflow-hidden rounded-sm bg-[#fcfaf6] shadow-2xl min-[840px]:h-[297mm] min-[840px]:w-[210mm]"
           dangerouslySetInnerHTML={{ __html: CV_HTML[locale] }}
         />
 

@@ -11,6 +11,16 @@
 .cv-doc * {
   box-sizing: border-box;
 }
+@media screen {
+  .cv-doc {
+    padding: var(--cv-margin) 13mm;
+  }
+}
+@media screen and (max-width: 839px) {
+  .cv-doc {
+    padding: 24px 20px;
+  }
+}
 .cv-doc {
   font-family:
     var(--font-sans, 'Satoshi'),
@@ -19,8 +29,8 @@
     'Segoe UI',
     Roboto,
     sans-serif;
-  font-size: 10.2pt;
-  line-height: 1.284;
+  font-size: var(--cv-fs);
+  line-height: var(--cv-lh);
   hyphens: none;
   -webkit-hyphens: none;
   color: var(--fg);
@@ -77,12 +87,12 @@
   text-transform: uppercase;
   letter-spacing: 0.45pt;
   color: var(--fg);
-  margin: 6.46pt 0 2.6pt;
+  margin: var(--cv-h2top) 0 2.6pt;
   padding-bottom: 1.6pt;
   border-bottom: 0.8pt solid var(--emerald);
 }
 .cv-doc p {
-  margin: 0 0 2.37pt;
+  margin: 0 0 var(--cv-gap);
 }
 .cv-doc .job {
   display: flex;
@@ -113,7 +123,7 @@
   list-style: disc outside;
 }
 .cv-doc li {
-  margin: 0 0 2.37pt;
+  margin: 0 0 var(--cv-gap);
   padding-left: 1pt;
 }
 .cv-doc li::marker {
