@@ -77,7 +77,8 @@ export default async function CVPage({ params }: Props) {
         <article
           lang={locale}
           // A real A4 sheet where it fits; margins and type size come from the document itself.
-          className="mx-auto w-full overflow-hidden rounded-sm bg-[#fcfaf6] shadow-2xl min-[840px]:h-[297mm] min-[840px]:w-[210mm]"
+          // zoom scales the whole sheet uniformly, so wide screens get a readable page, still A4.
+          className="mx-auto w-full overflow-hidden rounded-sm bg-[#fcfaf6] shadow-2xl min-[840px]:h-[297mm] min-[840px]:w-[210mm] min-[1280px]:[zoom:1.2] min-[1440px]:[zoom:1.4] min-[1680px]:[zoom:1.6]"
           dangerouslySetInnerHTML={{ __html: CV_HTML[locale] }}
         />
 
