@@ -208,7 +208,10 @@
           "title": "Rozwój",
           "desc": "Wysokiej jakości budowa i testy."
         },
-        "3": { "title": "Dostarczenie", "desc": "Strojenie wydajności i start." }
+        "3": {
+          "title": "Dostarczenie",
+          "desc": "Strojenie wydajności i start."
+        }
       }
     }
   },
@@ -270,16 +273,10 @@
   },
   "cv": {
     "title": "Curriculum Vitae",
-    "metaDescription": "CV | Sebastian Kolbusz — Senior Frontend Engineer z ponad 6-letnim doświadczeniem. Specjalista React, Next.js i TypeScript. Dostępny dla projektów freelance.",
-    "print": "Drukuj / Zapisz PDF",
-    "summary": "Podsumowanie Zawodowe",
-    "experience": "Doświadczenie Zawodowe",
-    "education": "Wykształcenie",
-    "skills": "Ekspertyza Techniczna",
-    "languages": "Języki",
-    "contact": "Kontakt Bezpośredni",
+    "metaDescription": "CV | Sebastian Kolbusz - Senior Frontend Engineer. Domyślnie Astro, aplikacje: React i Next.js. 6 lat przy POS SaaS. Własne studio WWW od 2026. Pobierz PDF.",
     "backHome": "Powrót do strony",
-    "selectedWork": "Wybrane Projekty"
+    "selectedWork": "Wybrane Projekty",
+    "download": "Pobierz CV (PDF)"
   },
   "projectsBook": {
     "title": "Wybrane Prace",

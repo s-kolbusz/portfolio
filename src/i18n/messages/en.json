@@ -208,7 +208,10 @@
           "title": "Development",
           "desc": "High-fidelity build and testing."
         },
-        "3": { "title": "Delivery", "desc": "Performance tuning and launch." }
+        "3": {
+          "title": "Delivery",
+          "desc": "Performance tuning and launch."
+        }
       }
     }
   },
@@ -270,16 +273,10 @@
   },
   "cv": {
     "title": "Curriculum Vitae",
-    "metaDescription": "CV | Sebastian Kolbusz — Senior Frontend Engineer with 6+ years of experience. Specialist in React, Next.js, and TypeScript. Available for freelance projects.",
-    "print": "Print / Save as PDF",
-    "summary": "Professional Summary",
-    "experience": "Professional Experience",
-    "education": "Academic Background",
-    "skills": "Technical Expertise",
-    "languages": "Languages",
-    "contact": "Direct Contact",
+    "metaDescription": "CV | Sebastian Kolbusz - Senior Frontend Engineer. Astro by default, React and Next.js where the product is an application; six years on a POS SaaS platform, own web studio since 2026. Download the PDF.",
     "backHome": "Back to Overview",
-    "selectedWork": "Selected Case Studies"
+    "selectedWork": "Selected Case Studies",
+    "download": "Download CV (PDF)"
   },
   "projectsBook": {
     "title": "Selected Work",
