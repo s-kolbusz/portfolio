@@ -3,23 +3,14 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 
 import { ArrowLeftIcon } from '@phosphor-icons/react/dist/ssr'
 
-import { CVLayout } from '@/components/features/cv/cv-layout'
-import { CVPrintButton } from '@/components/features/cv/cv-print-button'
+import { CVDownloadButton } from '@/components/features/cv/cv-download-button'
 import { CvProjectLinks } from '@/components/features/cv/cv-project-links'
 import { BaseSection } from '@/components/ui/base-section'
 import { Button } from '@/components/ui/button'
-import type { CVData } from '@/data/cv'
-import { cvDataEn } from '@/data/cv-en'
-import { cvDataPl } from '@/data/cv-pl'
+import { CV_HTML } from '@/data/cv/cv-html.generated'
 import { getProjects } from '@/data/get-projects'
 import { getLocaleFromParams } from '@/i18n/locale'
-import type { Locale } from '@/i18n/routing'
 import { buildCvPageMetadata } from '@/lib/page-metadata'
-
-const cvDataByLocale: Record<Locale, CVData> = {
-  en: cvDataEn,
-  pl: cvDataPl,
-}
 
 type Props = {
   params: Promise<{ locale: string }>
@@ -42,17 +33,16 @@ export default async function CVPage({ params }: Props) {
   setRequestLocale(locale)
   const t = await getTranslations({ locale, namespace: 'cv' })
 
-  const cvData = cvDataByLocale[locale]
   const projects = getProjects(locale)
 
   return (
-    <main id="main-content" className="bg-neutral-100/50 dark:bg-neutral-900/50 print:bg-white">
+    <main id="main-content" className="bg-neutral-100/50 dark:bg-neutral-900/50">
       <BaseSection
         id="cv-header-nav"
-        className="min-h-0 py-8 md:py-10 print:hidden"
-        containerClassName="max-w-[210mm] lg:px-6 print:hidden"
+        className="min-h-0 py-8 md:py-10"
+        containerClassName="max-w-[210mm] lg:px-6"
       >
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-4">
           <Button
             href="/"
             locale={locale}
@@ -67,22 +57,30 @@ export default async function CVPage({ params }: Props) {
             {t('backHome')}
           </Button>
 
+          {/* On small screens the floating locale switcher sits here, so the button moves below. */}
           <div className="hidden lg:block">
-            <CVPrintButton />
+            <CVDownloadButton />
           </div>
         </div>
 
         <h1 className="w-full pt-4 text-center font-serif text-5xl font-normal lg:text-7xl">
           {t('title')}
         </h1>
+
+        <div className="flex justify-center pt-6 lg:hidden">
+          <CVDownloadButton />
+        </div>
       </BaseSection>
 
-      <div className="flex flex-col justify-center gap-8 pt-4 pb-18 print:p-0">
-        <CVLayout data={cvData} />
-
-        <div className="flex items-center justify-center lg:hidden">
-          <CVPrintButton />
-        </div>
+      <div className="flex flex-col justify-center gap-8 px-4 pt-4 pb-18">
+        {/* The same document the PDF is printed from: generated from ~/Projects/.context/cv. */}
+        <article
+          lang={locale}
+          // A real A4 sheet where it fits; margins and type size come from the document itself.
+          // zoom scales the whole sheet uniformly, so wide screens get a readable page, still A4.
+          className="mx-auto w-full overflow-hidden rounded-sm bg-[#fcfaf6] shadow-2xl min-[840px]:h-[297mm] min-[840px]:w-[210mm] min-[1280px]:[zoom:1.2] min-[1440px]:[zoom:1.4] min-[1680px]:[zoom:1.6]"
+          dangerouslySetInnerHTML={{ __html: CV_HTML[locale] }}
+        />
 
         <CvProjectLinks
           projects={projects.map((p) => ({
