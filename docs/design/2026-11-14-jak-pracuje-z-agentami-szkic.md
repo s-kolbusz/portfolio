@@ -125,12 +125,16 @@ pomijają najczęściej.
 
 Dlatego weryfikacji nie zostawiam modelowi. Przejmują ją narzędzia, które radziły sobie z nią, zanim LLM
 stały się popularne: formatowanie, lint, sprawdzanie typów, testy jednostkowe z progiem pokrycia, testy
-w przeglądarce, test dostępności i porównanie zrzutów ekranu `[?1]`. Zrzuty wzorcowe powstają w tym
+w przeglądarce, test dostępności i porównanie zrzutów ekranu. Zrzuty wzorcowe powstają w tym
 samym środowisku, w którym chodzą testy, bo ten sam ekran na innym systemie renderuje czcionki inaczej.
+
+Narzędzia nie zastępują procesu wokół nich. Burza mózgów, planowanie i rozbijanie pracy na etapy
+pozostają tak samo ważne, także teraz, gdy buduję Airchos: testy sprawdzają, czy rzecz zrobiono dobrze,
+a nie, czy zrobiono właściwą rzecz.
 
 Zielone testy to warunek, a nie koniec. Zdarzyło się, że agent zaproponował wydanie całej przebudowy,
 bo testy przechodziły, a ja zaakceptowałem jedną scenę. Akceptacja jednej sceny nie jest zgodą na
-wydanie. Wygląd i ruch oceniam sam, w przeglądarce i na własnym telefonie `[?3]`.
+wydanie. Wygląd i ruch oceniam sam, w przeglądarce i na własnym telefonie.
 
 ### 2. Najpierw pytania i plan, potem kod
 
@@ -174,12 +178,12 @@ Wyniki poleceń w terminalu przechodzą przez filtr, który skraca je, zanim tra
 ### 5. Narzędzie wchodzi do stosu po teście odczytu i po pomiarze
 
 Zanim narzędzie trafi do mojego stosu, sprawdzam, czy agent może z niego czytać przez API. Tej reguły
-nauczyłem się drogo: strategia projektu wpisana w strony jednego z narzędzi do zarządzania zadaniami
-była dla agenta niewidoczna, bo te strony to dokumenty CRDT, których nie da się odczytać kluczem API
-`[?2]`.
+nauczyłem się drogo na Plane: strategia projektu wpisana w jego strony była dla agenta niewidoczna, bo
+te strony to dokumenty CRDT, których nie da się odczytać kluczem API. Linear ten test przechodzi:
+dokumenty odpowiadają na zwykłe zapytanie.
 
-Druga połowa reguły: wybór narzędzia poprzedza pomiar. Narzędzie do przeszukiwania kodu wybrałem po
-teście trzech kandydatów na tym samym zadaniu `[?8]`. Agent może zmierzyć i przedstawić wynik. Decyzja,
+Druga połowa reguły: wybór narzędzia poprzedza pomiar. Narzędzie do przeszukiwania kodu, trail, wybrałem
+po teście trzech kandydatów na tym samym zadaniu `[?8]`. Agent może zmierzyć i przedstawić wynik. Decyzja,
 co zostaje, jest moja.
 
 ### 6. Co zostaje przy mnie
@@ -210,14 +214,17 @@ u mnie nie działają `[?9]`.
 Zaznacz przy każdym: **prawda / fałsz / pomiń**. To wszystko, co wywnioskowałem, a nie przeczytałem
 wprost, oraz decyzje o tym, co wolno nazwać publicznie.
 
-1. Narzędzia „sprzed LLM” z drogi Airchos to u mnie na co dzień: formatowanie, lint, sprawdzanie typów,
-   testy jednostkowe, testy e2e, test dostępności i regresja wizualna. Agent nie może zgłosić „gotowe”,
-   zanim przejdą. (Źródła mówią osobno o „narzędziach sprzed LLM” i osobno o komendach repozytorium;
-   połączenie jest moje.)
-2. Strona może wymieniać narzędzia z nazwy: Claude Code, Linear, Plane (jako to, które nie przeszło
-   testu odczytu), trail, RTK. (W szkicu Plane jest opisane bez nazwy.)
-3. Wygląd i ruch zawsze oceniam sam, w przeglądarce i na własnym telefonie; zielone testy do tego nie
-   wystarczają. (Wywnioskowane z dwóch learnings, nie z reguły.)
+1. **PRAWDA (właściciel, 14.11), z uzupełnieniem:** narzędzia „sprzed LLM” to formatowanie, lint,
+   sprawdzanie typów, testy jednostkowe, testy e2e, test dostępności i regresja wizualna; agent nie
+   zgłasza „gotowe”, zanim przejdą. Uzupełnienie właściciela: ważną częścią pozostaje cały proces wokół
+   (burza mózgów, planowanie, rozbijanie pracy na etapy), mimo budowania Airchos. Dopisane w sekcji 1
+   tekstu; zdanie „testy sprawdzają, czy rzecz zrobiono dobrze, a nie, czy zrobiono właściwą rzecz”
+   jest moim sformułowaniem tego uzupełnienia, do poprawienia.
+2. **PRAWDA (właściciel, 14.11):** strona może wymieniać narzędzia z nazwy: Claude Code, Linear, Plane
+   (jako to, które nie przeszło testu odczytu), trail, RTK. W tekście nazwane są na razie Plane, Linear
+   i trail; RTK czeka na punkt 7.
+3. **PRAWDA (właściciel, 14.11):** wygląd i ruch zawsze oceniam sam, w przeglądarce i na własnym
+   telefonie; zielone testy do tego nie wystarczają.
 4. Airchos jest moim projektem, który oddaje weryfikację pracy agentów narzędziom, i może być
    podlinkowany z tej strony jako „dokąd stąd”. (Wiem o nim tylko tyle, ile jest w sekcji 5 konceptu.)
 5. Odrzuconą próbę redesignu z września mogę opisać zdaniem „wyglądała dobrze na planszach i nie
