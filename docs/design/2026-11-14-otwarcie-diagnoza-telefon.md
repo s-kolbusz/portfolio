@@ -397,5 +397,24 @@ tak żeby nieregularna była tylko materia; najwyżej dwa kroje i trzy rozmiary;
 przewijania. Kandydaci na krój nagłówkowy do pokazania na żywo: Satoshi w grubej odmianie (jedna rodzina,
 precyzja), Bricolage Grotesque (charakter, zmienna szerokość), Instrument Serif (jeśli zostaje szeryf).
 
+### Krój nagłówkowy: kandydaci po odrzuceniu pierwszej listy (2026-11-15)
+
+Właściciel odrzucił Bricolage Grotesque i Instrument Serif jako „AI slop, widzę je wszędzie”. Warunki:
+kroje niszowe, z otwartych foundries, darmowe (atrybucja dopuszczalna), ładne i dopasowane.
+
+Sprawdzone na stronach foundry (licencja SIL OFL, polskie znaki ą ć ę ł ń ó ś ź ż w zestawie):
+
+| Krój          | Foundry, autor                          | Charakter                                                                                  | Uwagi                                     |
+| ------------- | --------------------------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------- |
+| Sprat         | Collletttivo, Ethan Nakache             | Ostry szeryf wg liternictwa Erica Gilla; zmienny w szerokości i grubości, 18 odmian.       | Najbardziej plakatowy; osie do użycia.    |
+| Ortica        | Collletttivo, Ben Bovani                | Dwie osobowości: Linear (lekki, kolczaste szeryfy) i Angular (gruby, same odcinki proste). | Angular „krzepnie” dosłownie w odcinki.   |
+| Ronzino       | Collletttivo, L. Gorlero, N. Mazzaferro | Grotesk „informacyjny”, celowo anonimowy; 6 odmian; wydany 01.2025.                        | Charakter niesie wtedy wyłącznie materia. |
+| Absans        | Collletttivo, Valerio Monopoli          | Grotesk z początku XX w. z drobnymi nieregularnościami; jedna odmiana.                     | Tylko Regular.                            |
+| Apfel Grotezk | Collletttivo, Luigi Gorlero             | Okrągły, przyjazny bezszeryf, 5 odmian.                                                    | Raczej za miękki do tej strony.           |
+
+Do sprawdzenia, niepotwierdzone: Bona Nova (polski krój, Heidrich i Machalski; licencja i zestaw znaków
+niezweryfikowane w tej sesji). Katalogów Velvetyne i uncut.wtf nie udało się odczytać automatycznie.
+Wybór zapada po pokazaniu krojów na żywo na imieniu i polskim zdaniu; pobranie plików wymaga zgody.
+
 Poza zakresem, zauważone przy okazji: etykieta w hero to nadal „Web Architect” (`src/i18n/messages/pl.json:38`),
 a dokument decyzji każe ją zastąpić.
