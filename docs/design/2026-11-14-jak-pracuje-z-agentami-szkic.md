@@ -120,8 +120,8 @@ używam też Gemini i ChatGPT, a ChatGPT także do pierwszych wersji tekstów po
 redaguję. Nie wierzę im na słowo, tak jak nie wierzę na słowo nikomu: sprawdzam, zanim przyjmę.
 
 Poniżej jest sześć reguł, według których ta współpraca działa. Cały proces służy jednemu: jakość
-i bezpieczeństwo przede wszystkim. Każda reguła powstała po konkretnym błędzie i każda ma coś, co jej
-pilnuje.
+i bezpieczeństwo przede wszystkim. Bezpieczeństwo znaczy tu dwie rzeczy: kod bez luk i żadnych sekretów
+w repozytorium. Każda reguła powstała po konkretnym błędzie i każda ma coś, co jej pilnuje.
 
 ### 1. „Gotowe” znaczy sprawdzone
 
@@ -260,8 +260,9 @@ wprost, oraz decyzje o tym, co wolno nazwać publicznie.
     sztucznie. Słowa właściciela: „jakość i bezpieczeństwo przede wszystkim, a po to mamy ten proces”.
     Zmienione: wstęp nazywa ten cel wprost; sekcje 2 i 4 uzasadniają reguły jakością wyniku, koszt jest
     w sekcji 4 jednym zdaniem jako skutek uboczny; zdanie o raporcie zużycia tokenów usunięte z tekstu.
-    Moje sformułowania do poprawienia: „wynik trudniej sprawdzić” i „daje lepszy wynik”. Nie dopisałem,
-    co dokładnie znaczy tu „bezpieczeństwo”, bo źródła tego nie mówią.
+    Moje sformułowania do poprawienia: „wynik trudniej sprawdzić” i „daje lepszy wynik”. Definicja
+    bezpieczeństwa dopisana we wstępie słowami właściciela (14.11): „kod bez luk i żadnych sekretów
+    w repo”. Tekst nie mówi, czym to jest pilnowane, bo źródła tego nie podają.
 15. **PRAWDA (właściciel, 14.11):** sześć sekcji w tej kolejności.
 
 Wszystkie 15 zdań jest rozstrzygnięte. Zostają trzy moje sformułowania oznaczone wyżej jako „do
