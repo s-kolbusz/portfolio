@@ -369,5 +369,33 @@ Przyczyny po stronie wykonania (ocena własna):
    (jak nasiąkanie liter w produkcyjnym hero) albo wcale.
 6. Jedna płaska zieleń na dużych powierzchniach, bez światła, głębi i ziarna; podpisy mono wersalikami.
 
+### Kompozycja i krój: uzupełnienie oceny (2026-11-15)
+
+Właściciel słusznie wytknął, że poprzedni wpis pominął kompozycję: „zaburzone hierarchia, grupowanie,
+układ”, „zbiór elementów rzuconych na pustą kartkę”, bez historii i wartości. **Decyzja: Fraunces do
+wymiany** (nie pasuje do strony, którą budujemy); Satoshi i JetBrains Mono zostają. To znosi wcześniejszy
+zakaz ruszania typografii w zakresie kroju nagłówkowego.
+
+Błędy kompozycji w próbkach (390×844):
+
+1. **Hierarchia odwrócona.** Największy i najciemniejszy jest podpis (imię, 18,5vw, półgruby szeryf),
+   a to, co ma opowiadać (materia i rzecz), jest jaśniejsze i lżejsze. Nie ma jednego głównego elementu.
+2. **Grupowanie.** Rola (lewo) i zdanie (prawo, wyrównane do prawej) to jedna wypowiedź rozdarta na dwa
+   rogi. Podpis rzeczy wisi między rzeczą a imieniem i raz jest bliżej jednego, raz drugiego.
+3. **Układ bez siatki.** Nic nie dzieli krawędzi ani osi; rzecz ląduje losowo, więc pusta przestrzeń
+   między nią a imieniem jest przypadkowa, nie zamierzona. Dół jest wciśnięty w dock, a przełącznik
+   motywu nachodzi na materię.
+4. **Brak wypowiedzi.** Ekran nie mówi, kim jest ta osoba ani co oferuje: rola ma 12 px, zdanie jest
+   ogólnikiem, między rzeczą a człowiekiem nie ma żadnego związku w tekście, nie ma wskazówki „dalej”.
+5. **Cztery style pisma na jednym ekranie** (szeryf, mono wersalikami ×2, szary bezszeryf), interlinia
+   imienia 0,86 zlepia wiersze.
+
+Zasady dla przebudowy (propozycja): jedna siatka i jeden lewy margines dla wszystkiego; jeden główny
+element (scena materii, ok. 60% wysokości); jeden blok tekstu (imię, rola, jedno zdanie) na wspólnej
+krawędzi i w stałych odstępach; podpis rzeczy zawsze w tym samym miejscu i przywiązany do bloku tekstu,
+tak żeby nieregularna była tylko materia; najwyżej dwa kroje i trzy rozmiary; widoczna wskazówka
+przewijania. Kandydaci na krój nagłówkowy do pokazania na żywo: Satoshi w grubej odmianie (jedna rodzina,
+precyzja), Bricolage Grotesque (charakter, zmienna szerokość), Instrument Serif (jeśli zostaje szeryf).
+
 Poza zakresem, zauważone przy okazji: etykieta w hero to nadal „Web Architect” (`src/i18n/messages/pl.json:38`),
 a dokument decyzji każe ją zastąpić.
