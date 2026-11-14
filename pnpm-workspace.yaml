@@ -10,11 +10,12 @@ overrides:
   picomatch: '>=4.0.4'
   brace-expansion@1: '^1.1.16'
   brace-expansion@5: '^5.0.8'
-  vite: '^8.0.16'
+  vite: '^8.1.6'
   postcss: '^8.5.18'
   js-yaml: '^4.3.0'
   sharp: '^0.35.0'
   source-map-js: '^1.2.2'
+  zod: '^4.6.6'
 
 auditConfig:
   ignoreGhsas:
