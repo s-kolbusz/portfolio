@@ -17,8 +17,15 @@ nowszy**), `2026-11-14-lusion-przepis.md` (zasady ruchu i ciągłości), `2026-1
 - **Propozycje, które ogólnie się spodobały, ale nie mają decyzji w szczegółach:** akty strony głównej (4),
   linie „Jak pracuję” (7), ślady części osobistej na stronie głównej (3), narzędzia narracji (8),
   kandydaci na easter eggi (9), szablon drogi (5).
-- **Nic z tego dokumentu nie jest zgodą na pisanie kodu.** Plan A, B, C dla otwarcia czeka na akceptację
-  właściciela. Do czasu, aż właściciel zaktualizuje zadania w Linear (SEB-63…73), obowiązują one w swoim
+- **Rozstrzygnięte 14.11 (odpowiedzi właściciela, szczegóły w `otwarcie-diagnoza-telefon.md`, sekcja 5):**
+  pionowy zrzut stronypodhale na telefonie jest w porządku; wynurzanie go na cały ekran **nie** (portfolio
+  nie ma być zastąpione widokiem cudzej strony; projekt ma być pokazany kreatywnie, a pojawianie ma mieć
+  nieregularne, falujące, zniekształcone krawędzie, jak u Lusion). Plan B: warunkowo, ocena później na
+  telefonie właściciela. **Główny problem otwarcia to hero, a nie przejście ani urządzenie:** moment
+  załadowania, sposób pojawiania się elementów, ich wygląd i układ (imię, blob, trochę tekstu) są nudne.
+  Przejście do stronypodhale jest „na tyle ciekawe, na ile może być przy tak nudnym hero”.
+- **Nic z tego dokumentu nie jest zgodą na pisanie kodu.** Plan A w kształcie z diagnozy (pełny ekran)
+  nie został przyjęty; plan C bez decyzji. Do czasu, aż właściciel zaktualizuje zadania w Linear (SEB-63…73), obowiązują one w swoim
   wrześniowym brzmieniu, a ten dokument mówi, w którą stronę zostaną zmienione.
 
 **Który dokument wygrywa:** ten koncept wygrywa z dokumentem z 24.09 tylko w punktach z sekcji 11. Reszta
@@ -230,8 +237,10 @@ Dwie nowe podstrony w warstwie pracy (przyjęte):
 
 ## 12. Otwarte
 
-1. Plan A, B, C dla otwarcia: czy na telefonie może się wynurzać pionowy zrzut stronypodhale; czy
-   przewijanie palcem może się zatrzymywać na gotowym kadrze; na jakim telefonie otwarcie nie robi wrażenia.
+1. Otwarcie: **nowy kierunek dla hero** (załadowanie, pojawianie się, wygląd, układ). Właściciel wskazał
+   14.11, że to tu leży problem; propozycji jeszcze nie ma. Zamknięte tego dnia: pionowy zrzut na telefonie
+   tak, pełny ekran nie, plan B do oceny później, telefon odniesienia to iPhone z Safari. Otwarte zostaje,
+   jak ma wyglądać wynurzanie z falującymi krawędziami w ramce oraz plan C.
 2. Linie z sekcji 7: które brzmią jak właściciel.
 3. Źródła pochwał pluginu.
 4. Które rzeczy z części osobistej mogą być publiczne i jakie są zdjęcia.

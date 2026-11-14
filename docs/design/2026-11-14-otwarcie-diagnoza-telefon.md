@@ -1,6 +1,6 @@
 # Otwarcie strony: diagnoza (telefon) i propozycje
 
-Data: 2026-11-14 · Gałąź: `redesign/decyzje` (fcbc6a8d) · Status: **diagnoza, bez zmian w kodzie**
+Data: 2026-11-14 · Gałąź: `redesign/decyzje` (fcbc6a8d) · Status: **diagnoza, bez zmian w kodzie; plan A w tym kształcie nieprzyjęty, właściciel wskazał hero jako główny problem (sekcja 5)**
 Zakres: hero + scena sygnaturowa. Miara: Lusion rozumiany jako **ciągłość** (każda sekunda wynika
 z poprzedniej, uwaga ma jeden cel, wszystko płynne i dokończone, przejście do następnego miejsca też).
 
@@ -223,6 +223,27 @@ Pierwsze pół dnia z A (sam DPR z adaptacją) można wdrożyć osobno i od razu
    czy scroll na telefonie ma zostać całkowicie wolny?
 3. Na jakim telefonie strona „nie robi wrażenia” (model, przeglądarka)? Od tego zależy próg DPR i to, czy
    problemem jest też płynność, której emulacja nie pokazała.
+
+### Odpowiedzi właściciela (2026-11-14)
+
+1. **Pionowy zrzut: tak. Pełny ekran: nie.** Jego słowa: „pionowy zrzut jest ok, ale rozbudowanie go na
+   cały ekran wydaje mi się trochę ryzykowne - nie chcemy zastępować naszego portfolio widokiem nowej
+   strony, a w kreatywny sposób ten projekt zaprezentować - tak jak w lusion, pojawianie wiąże się
+   z nieregularnymi, falującymi, zniekształconymi krawędziami”. Plan A z sekcji 4 nie jest więc przyjęty
+   w opisanym kształcie i nie został wdrożony. Z planu A zostają do ponownego zaproponowania: pionowy
+   zrzut w ramce, wyższa rozdzielczość tafli, miejsce spoczynku kulki.
+2. **Plan B: tak, później.** Warunkowo; ocena na telefonie właściciela, nie teraz.
+3. **Telefon odniesienia: iPhone, Safari.** Ale właściciel zaznaczył, że nie o przeglądarkę chodzi.
+4. **Diagnoza celowała obok.** Pytanie o to, co jest nie tak (za mały zrzut, za szybko, zacina się),
+   właściciel odrzucił w całości: problemem jest **moment otwarcia i samo hero**, nie pierwsze przejście
+   i nie rodzaj urządzenia. Jego słowa: „Hero jest nudne, imię nazwisko, blob i trochę tekstu. To jak się
+   pojawiają jest nudne. To jak wyglądają jest nudne. To jak są rozłożone jest nudne.” oraz „Samo
+   przejście jest na tyle kreatywne i ciekawe na ile może być wykorzystując tak nudne hero”.
+
+**Co z tego wynika:** punkty 2.1–2.4 tej diagnozy (skala zrzutu, tempo, rozmycie, kulka) nie są tym, co
+właściciel odczuwa jako słabe. Najbliżej jego uwagi jest pierwszy punkt z 2.5 (ładowanie: przez 2 s strona
+wygląda jak statyczny tekst), ale zakres jest szerszy: pojawianie się, wygląd i układ hero. Następny krok
+to propozycje kierunku dla hero (2–3 konkretne kandydatury do poprawienia), a nie wdrożenie planu A.
 
 Poza zakresem, zauważone przy okazji: etykieta w hero to nadal „Web Architect” (`src/i18n/messages/pl.json:38`),
 a dokument decyzji każe ją zastąpić.
