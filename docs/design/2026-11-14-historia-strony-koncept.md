@@ -240,7 +240,10 @@ Dwie nowe podstrony w warstwie pracy (przyjęte):
 1. Otwarcie: **nowy kierunek dla hero** (załadowanie, pojawianie się, wygląd, układ). Właściciel wskazał
    14.11, że to tu leży problem; propozycji jeszcze nie ma. Zamknięte tego dnia: pionowy zrzut na telefonie
    tak, pełny ekran nie, plan B do oceny później, telefon odniesienia to iPhone z Safari. Otwarte zostaje,
-   jak ma wyglądać wynurzanie z falującymi krawędziami w ramce oraz plan C.
+   jak ma wyglądać wynurzanie z falującymi krawędziami w ramce oraz plan C. Kierunek hero po drugiej
+   rundzie (diagnoza, sekcja 5): hero ma opowiadać historię, prowadzi „Materia próbuje kształtów”
+   (4–5 rzeczy, bez auta), układ plakatowy, tafla odpływa przy załadowaniu. Otwarte: wybór między trzema
+   historiami po próbkach w kodzie i ostateczna lista kształtów.
 2. Linie z sekcji 7: które brzmią jak właściciel.
 3. Źródła pochwał pluginu.
 4. Które rzeczy z części osobistej mogą być publiczne i jakie są zdjęcia.

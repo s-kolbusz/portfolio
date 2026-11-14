@@ -245,5 +245,37 @@ właściciel odczuwa jako słabe. Najbliżej jego uwagi jest pierwszy punkt z 2.
 wygląda jak statyczny tekst), ale zakres jest szerszy: pojawianie się, wygląd i układ hero. Następny krok
 to propozycje kierunku dla hero (2–3 konkretne kandydatury do poprawienia), a nie wdrożenie planu A.
 
+### Kierunek dla hero: druga runda odpowiedzi (2026-11-14)
+
+Właściciel odrzucił samo przestawianie imienia i bloba: „Plama i Sebastian Kolbusz to zero storytellingu
+i kreatywności, to tylko 2 elementy”. Blob ma być integralną częścią strony i jej charakterem, ale hero
+w obecnej formie nie jest świętością. Hero ma **opowiadać historię**, a pomysły mają czerpać z referencji.
+
+**Przyjęte:**
+
+- Układ na telefonie: **plakat**. Blob duży, wychodzi poza ekran; imię ogromne, do lewej, u dołu; rola
+  i zdanie małe, w rogach. Imię jest podpisem, nie tematem.
+- Pojawianie: **tafla odpływa i litery tężeją** (oba naraz). Strona startuje jako pełna zielona tafla,
+  która ściąga się falującą krawędzią do bloba i odsłania imię.
+- Prawdą o dzisiejszym hero jest: blob za mały i za grzeczny; maszyna do pisania może zniknąć; pod imieniem
+  za dużo tekstu; blob powinien reagować na palec; „mamy blob i tekst, ale nie mamy historii”.
+- Zniekształcanie liter jest dozwolone. Wrześniowe odrzucenie dotyczyło wykonania („niedorzeczny
+  i w żadnej mierze nie profesjonalny”), nie pomysłu. Warunek: „implementacja MUSI być na poziomie stron
+  AWWWARDS”. Zapis „Czego unikamy” w scenariuszu hero z 25.09 należy czytać z tą poprawką.
+
+**Historia hero: prowadzi „Materia próbuje kształtów”.** Ta sama materia krzepnie po kolei w rzeczy, które
+właściciel robi, i znów się rozpływa; dotknięcie rozpuszcza kształt; scroll zostaje przy pierwszej rzeczy
+i wchodzi w scenę stronypodhale. Poprawki właściciela:
+
+- Nie wchodzimy w wewnętrzne role stronypodhale (żadnego „strona dla pensjonatu”). Jeśli przeglądarka, to
+  po prostu stronypodhale; obok niej plugin albo okno IDE zamiast kolejnej przeglądarki.
+- Kształtów ma być **4–5**, trzy to za mało. Dozwolone: strona www, wydruk 3D, dom i energia.
+  **Auto: nie.** Kandydaci na komplet (propozycja, bez decyzji): stronypodhale, plugin aspect-preview,
+  okno IDE, wydruk 3D, panel energii.
+
+**Bez decyzji:** dwie pozostałe historie też się spodobały („Pod powierzchnią”: blob jako okno, pod wodą
+leżą realizacje, palec klaruje wodę; „Rozkładam na czynniki”: materia rozpada się na podpisane części
+i składa w coś stałego). Właściciel chce **próbek** w prawdziwym kodzie, żeby wybrać. Próbek jeszcze nie ma.
+
 Poza zakresem, zauważone przy okazji: etykieta w hero to nadal „Web Architect” (`src/i18n/messages/pl.json:38`),
 a dokument decyzji każe ją zastąpić.
