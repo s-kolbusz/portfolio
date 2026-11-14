@@ -114,8 +114,9 @@ z części 3.
 
 ### Wstęp
 
-Pracuję sam, a część pracy wykonują agenci AI. Nie wierzę im na słowo, tak jak nie wierzę na słowo
-nikomu: sprawdzam, zanim przyjmę. Poniżej jest sześć reguł, według których ta współpraca działa. Każda
+Pracuję sam, a część pracy wykonują agenci AI. Kod piszę z Claude. Do researchu poza kodem często
+używam też Gemini i ChatGPT, a ChatGPT także do pierwszych wersji tekstów po polsku, które potem
+redaguję. Nie wierzę im na słowo, tak jak nie wierzę na słowo nikomu: sprawdzam, zanim przyjmę. Poniżej jest sześć reguł, według których ta współpraca działa. Każda
 powstała po konkretnym błędzie i każda ma coś, co jej pilnuje.
 
 ### 1. „Gotowe” znaczy sprawdzone
@@ -124,8 +125,8 @@ Agenci zgłaszali „gotowe”, gdy nie było gotowe. Modele są niekonsekwentne
 pomijają najczęściej.
 
 Dlatego weryfikacji nie zostawiam modelowi. Przejmują ją narzędzia, które radziły sobie z nią, zanim LLM
-stały się popularne: formatowanie, lint, sprawdzanie typów, testy jednostkowe z progiem pokrycia, testy
-w przeglądarce, test dostępności i porównanie zrzutów ekranu. Zrzuty wzorcowe powstają w tym
+stały się popularne: formatowanie, lint, sprawdzanie typów, testy jednostkowe z progiem pokrycia (80%
+gałęzi, 85% funkcji i linii), testy w przeglądarce, test dostępności i porównanie zrzutów ekranu. Zrzuty wzorcowe powstają w tym
 samym środowisku, w którym chodzą testy, bo ten sam ekran na innym systemie renderuje czcionki inaczej.
 
 Narzędzia nie zastępują procesu wokół nich. Burza mózgów, planowanie i rozbijanie pracy na etapy
@@ -198,7 +199,7 @@ etykietę „nie ruszać”. Istnieją po to, żeby ktoś czegoś nie naprawił.
 
 Przy mnie zostają też: wybór narzędzi, moment wydania i każde zdanie, które mówi o mnie. Teksty
 o sobie dostaję jako konkretne propozycje złożone z faktów i poprawiam je; otwarte pytania o siebie
-u mnie nie działają `[?9]`.
+u mnie nie działają.
 
 ### Dokąd stąd
 
@@ -236,12 +237,14 @@ wprost, oraz decyzje o tym, co wolno nazwać publicznie.
    jednym zdaniem. Nazwa RTK nie pada w tekście; do dopisania, jeśli właściciel zechce.
 8. **PRAWDA (właściciel, 14.11):** trail wybrany 4 listopada po teście trzech kandydatów na tym samym
    zadaniu. Nazwy dwóch pozostałych narzędzi nie trafiają na stronę.
-9. Zdanie „otwarte pytania o siebie u mnie nie działają” może być na stronie. (Jest w koncepcie jako
-   metoda pracy; to jednak zdanie o Tobie, nie o agentach.)
-10. Progi pokrycia testów (80% gałęzi, 85% funkcji i linii) mogą być podane liczbami. (W szkicu jest
-    tylko „z progiem pokrycia”.)
-11. Reguły dotyczą pracy z Claude; innych modeli na stałe nie używam. (Źródła mówią tylko o Claude
-    i o jednej odrzuconej sesji GPT.)
+9. **PRAWDA (właściciel, 14.11):** zdanie „otwarte pytania o siebie u mnie nie działają” może być na
+   stronie.
+10. **PRAWDA (właściciel, 14.11):** progi pokrycia testów (80% gałęzi, 85% funkcji i linii) podane
+    liczbami; dopisane w sekcji 1 tekstu.
+11. **PRAWDA Z ZASTRZEŻENIEM (właściciel, 14.11):** reguły dotyczą pracy z Claude. Zastrzeżenie
+    właściciela: Gemini i ChatGPT często używa do researchu poza kodem, a samego ChatGPT do pisania
+    treści po polsku, które idą do redakcji. Dopisane we wstępie; „pierwsze wersje tekstów, które potem
+    redaguję” to moje odczytanie słów „pisanie treści do redakcji”, do poprawienia.
 12. Model „jedna sesja nadzoruje, małe sesje robią jedną rzecz” wziąłem z Elephant-Goldfish (egm.dev)
     i chcę podać to źródło na stronie. (Źródło jest w pamięci projektu; w szkicu go nie ma.)
 13. Kolejność „pytania → specyfikacja → plan → wykonanie → weryfikacja” stosuję przy każdej większej
