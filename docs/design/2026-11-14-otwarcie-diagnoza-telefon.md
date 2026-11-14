@@ -303,5 +303,22 @@ Podpisy kształtów i lista rzeczy to propozycje. Sprawdzone tylko w Chromium (3
 i 1440×900, build produkcyjny); **nie sprawdzone na prawdziwym iPhonie**: płynność, filtr na literach
 w Safari i zachowanie paska adresu wymagają urządzenia.
 
+### Ocena próbek przez właściciela (2026-11-14)
+
+**Wybrane: połączenie „Materii” i „Czynników”.** „Pod powierzchnią” odpada z dalszej pracy. Do poprawienia
+w następnej wersji (słowa właściciela, streszczone):
+
+- więcej organiczności, nieregularności, „kontrolowanego chaosu”;
+- obiekt ma mutować bardziej organicznie i naturalnie, lekko się przemieszczać i **nie pojawiać się
+  zawsze w tym samym miejscu**;
+- tekst może ciekawie reagować na zmiany formy;
+- relacja głównego bloba i małego, który idzie za myszką, do poprawienia; tak samo interakcja małego
+  bloba z utworzoną materią (dziś po skrzepnięciu nie ma żadnej);
+- **ilustracje kształtów są „zbyt nudne, proste, ai-owe”**: obecne piktogramy (okno, kadr, edytor,
+  nakrętka, panel) nie zostają w tej formie.
+
+Kierunek połączenia (propozycja): rozpad na krople staje się przejściem między rzeczami, a krople są
+częściami rzeczy, która z nich powstaje. Styl ilustracji czeka na decyzję właściciela.
+
 Poza zakresem, zauważone przy okazji: etykieta w hero to nadal „Web Architect” (`src/i18n/messages/pl.json:38`),
 a dokument decyzji każe ją zastąpić.
