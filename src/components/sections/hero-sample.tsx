@@ -118,7 +118,7 @@ function loadPage(gl: WebGL2RenderingContext, src: string) {
   return page
 }
 
-export function HeroSample({ variant }: { variant: HeroSampleVariant }) {
+export function HeroSample({ variant }: { variant: Exclude<HeroSampleVariant, 'zlozenie'> }) {
   const t = useTranslations('hero')
   const name = t('name')
   const prefersReducedMotion = usePrefersReducedMotion()

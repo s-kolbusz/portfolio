@@ -5,6 +5,7 @@ import {
   HERO_SAMPLE_VARIANTS,
   type HeroSampleVariant,
 } from '@/components/canvas/hero-samples/variants'
+import { HeroAssembly } from '@/components/sections/hero-assembly'
 import { HeroSample } from '@/components/sections/hero-sample'
 import { requireRoutingLocale } from '@/i18n/locale'
 import { Link } from '@/i18n/navigation'
@@ -24,6 +25,7 @@ export function generateStaticParams() {
 }
 
 const TITLES: Record<HeroSampleVariant, string> = {
+  zlozenie: 'Złożenie: materia rozbiera rzeczy na części',
   materia: 'Materia próbuje kształtów',
   okno: 'Pod powierzchnią',
   czynniki: 'Rozkładam na czynniki',
@@ -42,7 +44,7 @@ export default async function HeroSamplePage({ params }: Props) {
 
   return (
     <main id="main-content" className="flex min-h-screen flex-col">
-      <HeroSample key={variant} variant={variant} />
+      {variant === 'zlozenie' ? <HeroAssembly /> : <HeroSample key={variant} variant={variant} />}
       <nav
         aria-label="Próbki hero"
         className="flex flex-col gap-3 px-6 py-16 font-mono text-xs tracking-widest uppercase md:px-12"

@@ -320,5 +320,24 @@ w następnej wersji (słowa właściciela, streszczone):
 Kierunek połączenia (propozycja): rozpad na krople staje się przejściem między rzeczami, a krople są
 częściami rzeczy, która z nich powstaje. Styl ilustracji czeka na decyzję właściciela.
 
+### Próbka druga: „Złożenie” (2026-11-14)
+
+Właściciel wybrał styl ilustracji **„rozebrane na części”**: rzecz nie jest ikoną, tylko układem swoich
+części, jak na rysunku złożeniowym. Wdrożone jako podgląd pod `/pl/design/hero/zlozenie`
+(`src/components/sections/hero-assembly.tsx`, `src/components/canvas/hero-samples/assembly-shader.ts`);
+trzy pierwsze próbki zostają pod swoimi adresami do porównania.
+
+Co robi: materia rozpada się na krople, każda kropla krzepnie w jedną podpisaną część rzeczy (strona:
+nagłówek, zdjęcie, treść, kontakt, serwer; plugin; wydruk 3D; dom i energia; Airchos), części topnieją,
+materia zbiera się **w innym miejscu** i rozbiera następną rzecz. Za każdym razem inne położenie, obrót,
+rozstaw i kolejność części. Imię odpowiada na każdą zmianę stanu (fala przez litery, kontur na moment
+płynny). Mały blob bez wskaźnika krąży wokół materii jak satelita, z palcem albo kursorem idzie za nim;
+gotową część, której dotknie, miejscowo roztapia i lekko odpycha. Dotknięcie ekranu w trakcie postoju
+przechodzi do następnej rzeczy.
+
+Nadal próbka: bez przejścia w scroll i scenę stronypodhale, podpisy na stałe po polsku, rysunek części
+z prostych brył, bez testów jednostkowych. Sprawdzone w Chromium (390×844 z dotykiem, 1440×900),
+**nie na prawdziwym iPhonie**. Znane: mały blob krążąc bywa przez chwilę nad gotową częścią.
+
 Poza zakresem, zauważone przy okazji: etykieta w hero to nadal „Web Architect” (`src/i18n/messages/pl.json:38`),
 a dokument decyzji każe ją zastąpić.
