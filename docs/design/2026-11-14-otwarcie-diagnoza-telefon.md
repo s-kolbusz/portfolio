@@ -339,5 +339,35 @@ Nadal próbka: bez przejścia w scroll i scenę stronypodhale, podpisy na stałe
 z prostych brył, bez testów jednostkowych. Sprawdzone w Chromium (390×844 z dotykiem, 1440×900),
 **nie na prawdziwym iPhonie**. Znane: mały blob krążąc bywa przez chwilę nad gotową częścią.
 
+### Ocena „Złożenia” przez właściciela (2026-11-15)
+
+**Kierunek zostaje i będzie dociągany. Wykonanie odrzucone:** „wygląda jak prototyp, nie jak coś, co
+mógłbym uznać za podstawę do poprawiania”; poziom „licealisty”, a poprzeczką jest Lusion i wyżej.
+
+Uwagi właściciela:
+
+- Chaos ma być **w blobie i kroplach, nie w ostatecznych kształtach** (próbka losowo obracała gotowe części).
+- Wszystko dzieje się liniowo, monotonnie; blob przeskakuje; nic nie przechodzi naturalnie; „małe
+  sekwencje posklejane na ślinę”.
+- Reakcja tekstu (fala przez litery, falujący kontur) jest „całkowicie bez sensu”.
+- Osobne podpisy części nie działają; raczej jeden podpis tego, co powstaje (bez pełnej pewności).
+- Ikony są brzydkie, a ich morfowanie nie pasuje do bloba.
+- Do sprawdzenia także kompozycja, krój, barwa koloru, kształty.
+
+Przyczyny po stronie wykonania (ocena własna):
+
+1. Ruch jest maszyną stanów ze stałymi czasami i przejściami od zera do zera, stąd szwy i skoki
+   (promień i położenie bloba zmieniają się skokiem między fazami). Potrzebny jeden ciągły układ
+   fizyczny: pozycje i prędkości, sprężyny, tłumienie, nakładające się akcje, zmienne tempo.
+2. Morfowanie to mieszanie dwóch pól odległości (koło ↔ bryła), czyli przenikanie, a nie zachowanie
+   cieczy. Ciecz powinna **wlewać się w formę** i tężeć od miejsca styku.
+3. Kształty to prostokąty z wyciętymi otworami, czyli zestaw ikon. Potrzebny autorski rysunek w jednym
+   systemie (ścieżki, jedna grubość, siatka), zamieniony na pole odległości.
+4. Prawo strony zostało odwrócone: gotowa rzecz ma być **precyzyjna i równa**, a nieregularna ma być
+   tylko ciecz. Kontrast płynne ↔ stałe jest wtedy widoczny.
+5. Reakcja tekstu nie miała przyczyny w obrazie. Tekst reaguje tylko na faktyczny styk z materią
+   (jak nasiąkanie liter w produkcyjnym hero) albo wcale.
+6. Jedna płaska zieleń na dużych powierzchniach, bez światła, głębi i ziarna; podpisy mono wersalikami.
+
 Poza zakresem, zauważone przy okazji: etykieta w hero to nadal „Web Architect” (`src/i18n/messages/pl.json:38`),
 a dokument decyzji każe ją zastąpić.
