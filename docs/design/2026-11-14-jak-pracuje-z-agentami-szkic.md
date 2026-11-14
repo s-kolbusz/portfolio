@@ -145,7 +145,7 @@ Kolejność wzięła się z kosztu. Zgadywanie i kolejne rundy poprawek kosztuj�
 research na starcie. Prototypy powstają tylko w prawdziwym kodzie, nie na planszach obok repozytorium.
 
 Dokument po większej przeróbce czyta recenzent, który nie zna rozmowy. Przy pierwszej czystej wersji
-konceptu tej strony znalazł 15 luk `[?6]`.
+konceptu tej strony znalazł 15 luk.
 
 ### 3. Decyzje żyją w plikach, nie w rozmowie
 
@@ -172,7 +172,7 @@ zrobić, czego nie dotykać, czego nie robić i po czym poznać koniec.
 Domyślnie pracuje jeden wykonawca. Przed pokazaniem wyniku jest najwyżej jedna pętla poprawek, a gdy
 coś jest niejasne, agent zadaje jedno pytanie, zamiast produkować rundę wariantów. Drugi recenzent
 pojawia się przy nowym kierunku albo na moją prośbę. Po większej rundzie dostaję zużycie tokenów.
-Wyniki poleceń w terminalu przechodzą przez filtr, który skraca je, zanim trafią do modelu `[?7]`.
+Wyniki poleceń w terminalu przechodzą przez filtr, który skraca je, zanim trafią do modelu.
 
 ### 5. Narzędzie wchodzi do stosu po teście odczytu i po pomiarze
 
@@ -182,7 +182,7 @@ te strony to dokumenty CRDT, których nie da się odczytać kluczem API. Linear 
 dokumenty odpowiadają na zwykłe zapytanie.
 
 Druga połowa reguły: wybór narzędzia poprzedza pomiar. Narzędzie do przeszukiwania kodu, trail, wybrałem
-po teście trzech kandydatów na tym samym zadaniu `[?8]`. Agent może zmierzyć i przedstawić wynik. Decyzja,
+po teście trzech kandydatów na tym samym zadaniu. Agent może zmierzyć i przedstawić wynik. Decyzja,
 co zostaje, jest moja.
 
 ### 6. Co zostaje przy mnie
@@ -230,15 +230,12 @@ wprost, oraz decyzje o tym, co wolno nazwać publicznie.
    właściciela: „była dobrym rozpoczęciem, na które brakło mi czasu”. Przykład usunięty z tekstu; reguła
    „prototypy tylko w prawdziwym kodzie” została bez anegdoty. Uwaga dla następnej sesji: pamięć
    projektu opisuje tę próbę ostrzej (studia odrzucone); na stronie obowiązuje wersja właściciela.
-6. **PYTANIE BYŁO NIEJASNE, zadane ponownie:** gdy koncept strony został przepisany na czysto, osobny
-   agent, który nie znał rozmowy, przeczytał go i wypisał 15 miejsc niejasnych albo brakujących. W tekście
-   używam tego jako przykładu, po co jest taki recenzent. Do zaznaczenia: ten przykład razem z liczbą 15
-   może zostać na stronie.
-7. Filtr wyników terminala (RTK) rzeczywiście działa u mnie na co dzień i warto o nim wspomnieć jednym
-   zdaniem.
-8. Test narzędzi do przeszukiwania kodu z 4 listopada objął trzech kandydatów (trail, tokensave,
-   graphify) na tym samym zadaniu. (Źródło mówi, że trail „wygrał z” dwoma pozostałymi; „to samo
-   zadanie” jest moim założeniem.)
+6. **PRAWDA (właściciel, 14.11):** przykład recenzenta bez kontekstu, który w czystej wersji konceptu
+   znalazł 15 miejsc niejasnych albo brakujących, może zostać na stronie razem z liczbą.
+7. **PRAWDA (właściciel, 14.11):** filtr wyników terminala (RTK) działa na co dzień i zostaje w tekście
+   jednym zdaniem. Nazwa RTK nie pada w tekście; do dopisania, jeśli właściciel zechce.
+8. **PRAWDA (właściciel, 14.11):** trail wybrany 4 listopada po teście trzech kandydatów na tym samym
+   zadaniu. Nazwy dwóch pozostałych narzędzi nie trafiają na stronę.
 9. Zdanie „otwarte pytania o siebie u mnie nie działają” może być na stronie. (Jest w koncepcie jako
    metoda pracy; to jednak zdanie o Tobie, nie o agentach.)
 10. Progi pokrycia testów (80% gałęzi, 85% funkcji i linii) mogą być podane liczbami. (W szkicu jest
