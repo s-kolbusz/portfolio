@@ -1,7 +1,7 @@
 # „Jak pracuję z agentami”: szkic treści podstrony
 
-**Status:** pierwszy szkic do poprawienia przez właściciela. To dokument, nie kod. Nic z niego nie jest
-jeszcze decyzją.
+**Status:** szkic po pierwszej rundzie odpowiedzi właściciela (14.11): wszystkie 15 zdań z części 3
+jest rozstrzygnięte i naniesione. Tekst czeka na jego redakcję. To dokument, nie kod.
 
 **Miejsce w koncepcie:** podstrona w warstwie pracy, przyjęta w sekcji 7 konceptu
 (`2026-11-14-historia-strony-koncept.md`). Powiązana droga: sekcja 5, „Agenci AI → Airchos”.
@@ -70,9 +70,10 @@ Każda sekcja: reguła w jednym zdaniu, skąd się wzięła, jak jest pilnowana.
 
 - **Reguła:** Sesja zajmuje się jednym tematem, pracę wykonuje jeden agent, a przed pokazaniem wyniku
   jest najwyżej jedna pętla poprawek.
-- **Skąd:** Każda wiadomość płaci za całą dotychczasową historię, więc długa sesja drożeje z każdym
-  krokiem. Sesja nadzorująca, która sama przerabiała wszystkie otwarte decyzje w głównym wątku, została
-  wycofana.
+- **Skąd:** Długa sesja, która miesza tematy, po streszczeniu gubi ustalenia, a jej wynik trudniej
+  sprawdzić. Sesja nadzorująca, która sama przerabiała wszystkie otwarte decyzje w głównym wątku, została
+  wycofana. Koszt jest skutkiem ubocznym, nie powodem (odpowiedź 14 właściciela: jakość i bezpieczeństwo
+  przede wszystkim).
 - **Pilnowane przez:** podział na sesję nadzorującą (kierunek, start małych sesji, przegląd wyników)
   i małe sesje od jednej rzeczy; krótkie zlecenia z listą rzeczy nietykalnych i jasnym końcem; jedno
   pytanie zamiast rundy wariantów; raport zużycia po większej rundzie; filtr, który skraca wyniki poleceń
@@ -109,15 +110,18 @@ Każda sekcja: reguła w jednym zdaniu, skąd się wzięła, jak jest pilnowana.
 
 ## Część 2. Szkic tekstu
 
-Pierwsza osoba, bez ścieżek, kluczy i numerów zadań. Zdania oznaczone `[?n]` zależą od punktu n
+Pierwsza osoba, bez ścieżek, kluczy i numerów zadań. Po odpowiedziach właściciela
 z części 3.
 
 ### Wstęp
 
 Pracuję sam, a część pracy wykonują agenci AI. Kod piszę z Claude. Do researchu poza kodem często
 używam też Gemini i ChatGPT, a ChatGPT także do pierwszych wersji tekstów po polsku, które potem
-redaguję. Nie wierzę im na słowo, tak jak nie wierzę na słowo nikomu: sprawdzam, zanim przyjmę. Poniżej jest sześć reguł, według których ta współpraca działa. Każda
-powstała po konkretnym błędzie i każda ma coś, co jej pilnuje.
+redaguję. Nie wierzę im na słowo, tak jak nie wierzę na słowo nikomu: sprawdzam, zanim przyjmę.
+
+Poniżej jest sześć reguł, według których ta współpraca działa. Cały proces służy jednemu: jakość
+i bezpieczeństwo przede wszystkim. Każda reguła powstała po konkretnym błędzie i każda ma coś, co jej
+pilnuje.
 
 ### 1. „Gotowe” znaczy sprawdzone
 
@@ -140,10 +144,11 @@ wydanie. Wygląd i ruch oceniam sam, w przeglądarce i na własnym telefonie.
 ### 2. Najpierw pytania i plan, potem kod
 
 Większa zmiana ma stałą kolejność: seria pytań, która szuka dziury w pomyśle, potem specyfikacja, plan,
-wykonanie i weryfikacja. Drobiazgi (tekst, kolor, odstęp) idą bez tej ścieżki.
+wykonanie i weryfikacja. Drobiazgi (tekst, kolor, odstęp) idą bez tej ścieżki. Tak samo pracuję
+w projektach dla klientów.
 
-Kolejność wzięła się z kosztu. Zgadywanie i kolejne rundy poprawek kosztują więcej niż jeden porządny
-research na starcie. Prototypy powstają tylko w prawdziwym kodzie, nie na planszach obok repozytorium.
+Zgadywanie kończy się kolejnymi rundami poprawek. Jeden porządny research na starcie daje lepszy wynik.
+Prototypy powstają tylko w prawdziwym kodzie, nie na planszach obok repozytorium.
 
 Dokument po większej przeróbce czyta recenzent, który nie zna rozmowy. Przy pierwszej czystej wersji
 konceptu tej strony znalazł 15 luk.
@@ -163,17 +168,19 @@ Kosztuje to, co się przeczyta, a nie sposób czytania.
 
 ### 4. Jedna sesja, jeden temat, jeden wykonawca
 
-Każda wiadomość w sesji płaci za całą dotychczasową historię. Długa sesja, która miesza tematy, drożeje
-z każdym krokiem i po streszczeniu gubi szczegóły.
+Długa sesja, która miesza tematy, gubi szczegóły: po streszczeniu rozmowy część ustaleń znika, a wynik
+trudniej sprawdzić. Rośnie też jej koszt, ale to skutek uboczny, nie powód tej reguły.
 
 Dlatego jedna sesja pilnuje kierunku, a konkretne rzeczy (jedna podstrona, jeden etap) robią osobne, małe
 sesje. Ciężka praca wraca jako plik i kilka zdań podsumowania. Zlecenie dla agenta jest krótkie: co
-zrobić, czego nie dotykać, czego nie robić i po czym poznać koniec.
+zrobić, czego nie dotykać, czego nie robić i po czym poznać koniec. Ten podział wziąłem z modelu
+Elephant-Goldfish (egm.dev).
 
-Domyślnie pracuje jeden wykonawca. Przed pokazaniem wyniku jest najwyżej jedna pętla poprawek, a gdy
-coś jest niejasne, agent zadaje jedno pytanie, zamiast produkować rundę wariantów. Drugi recenzent
-pojawia się przy nowym kierunku albo na moją prośbę. Po większej rundzie dostaję zużycie tokenów.
-Wyniki poleceń w terminalu przechodzą przez filtr, który skraca je, zanim trafią do modelu.
+Domyślnie pracuje jeden wykonawca. Przed pokazaniem wyniku jest najwyżej jedna pętla poprawek; potem
+wynik oglądam ja, zamiast pozwalać agentowi poprawiać go w kółko. Gdy coś jest niejasne, agent zadaje
+jedno pytanie, zamiast produkować rundę wariantów. Drugi recenzent pojawia się przy nowym kierunku albo
+na moją prośbę. Wyniki poleceń w terminalu przechodzą przez filtr, który skraca je, zanim trafią do
+modelu.
 
 ### 5. Narzędzie wchodzi do stosu po teście odczytu i po pomiarze
 
@@ -245,14 +252,20 @@ wprost, oraz decyzje o tym, co wolno nazwać publicznie.
     właściciela: Gemini i ChatGPT często używa do researchu poza kodem, a samego ChatGPT do pisania
     treści po polsku, które idą do redakcji. Dopisane we wstępie; „pierwsze wersje tekstów, które potem
     redaguję” to moje odczytanie słów „pisanie treści do redakcji”, do poprawienia.
-12. Model „jedna sesja nadzoruje, małe sesje robią jedną rzecz” wziąłem z Elephant-Goldfish (egm.dev)
-    i chcę podać to źródło na stronie. (Źródło jest w pamięci projektu; w szkicu go nie ma.)
-13. Kolejność „pytania → specyfikacja → plan → wykonanie → weryfikacja” stosuję przy każdej większej
-    zmianie, także w projektach dla klientów, nie tylko na tej stronie.
-14. Jedna pętla poprawek i jeden wykonawca to reguły z powodu kosztu, i tak mogę je uzasadnić na
-    stronie („to moje pieniądze”), bez podawania kwot.
-15. Strona ma sześć sekcji w tej kolejności; nic nie trzeba łączyć ani wyrzucać. (Jeśli fałsz: pierwsi
-    kandydaci do połączenia to 3 z 4.)
+12. **PRAWDA (właściciel, 14.11):** model „jedna sesja nadzoruje, małe sesje robią jedną rzecz” pochodzi
+    z Elephant-Goldfish (egm.dev); źródło podane w sekcji 4 tekstu.
+13. **PRAWDA (właściciel, 14.11):** kolejność „pytania → specyfikacja → plan → wykonanie → weryfikacja”
+    obowiązuje przy każdej większej zmianie, także w projektach dla klientów; dopisane w sekcji 2.
+14. **FAŁSZ (właściciel, 14.11):** uzasadnianie jednego wykonawcy i jednej pętli poprawek kosztem brzmi
+    sztucznie. Słowa właściciela: „jakość i bezpieczeństwo przede wszystkim, a po to mamy ten proces”.
+    Zmienione: wstęp nazywa ten cel wprost; sekcje 2 i 4 uzasadniają reguły jakością wyniku, koszt jest
+    w sekcji 4 jednym zdaniem jako skutek uboczny; zdanie o raporcie zużycia tokenów usunięte z tekstu.
+    Moje sformułowania do poprawienia: „wynik trudniej sprawdzić” i „daje lepszy wynik”. Nie dopisałem,
+    co dokładnie znaczy tu „bezpieczeństwo”, bo źródła tego nie mówią.
+15. **PRAWDA (właściciel, 14.11):** sześć sekcji w tej kolejności.
+
+Wszystkie 15 zdań jest rozstrzygnięte. Zostają trzy moje sformułowania oznaczone wyżej jako „do
+poprawienia” (punkty 1, 11, 14).
 
 ---
 
