@@ -112,7 +112,8 @@ export function Button(props: ButtonProps) {
       ...(handleClick ? { onClick: handleClick } : {}),
     }
 
-    if (isExternalHref(href)) {
+    // External links and file downloads skip locale-aware routing.
+    if (isExternalHref(href) || anchorProps.download !== undefined) {
       const resolvedRel = target === '_blank' ? (rel ?? 'noopener noreferrer') : rel
 
       return (

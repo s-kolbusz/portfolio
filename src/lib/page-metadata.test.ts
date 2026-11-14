@@ -31,9 +31,9 @@ describe('page metadata', () => {
             "x-default": "https://kolbusz.xyz/en",
           },
         },
-        "description": "Senior Frontend Engineer in Zakopane building fast Next.js websites, SaaS interfaces, and polished digital experiences for ambitious brands.",
+        "description": "Creative developer and full-stack engineer based in Zakopane, Poland. Animated websites (GSAP, WebGL), Next.js applications and Payload CMS. Founder of…",
         "openGraph": {
-          "description": "Senior Frontend Engineer in Zakopane building fast Next.js websites, SaaS interfaces, and polished digital experiences for ambitious brands.",
+          "description": "Creative developer and full-stack engineer based in Zakopane, Poland. Animated websites (GSAP, WebGL), Next.js applications and Payload CMS. Founder of…",
           "images": [
             {
               "alt": "Sebastian Kolbusz - High-performance web engineering",
@@ -44,21 +44,21 @@ describe('page metadata', () => {
           ],
           "locale": "en_US",
           "siteName": "Sebastian Kolbusz Portfolio",
-          "title": "Sebastian Kolbusz | Senior Frontend Engineer",
+          "title": "Sebastian Kolbusz | Creative Developer · Full-stack Engineer",
           "type": "website",
           "url": "https://kolbusz.xyz/en",
         },
         "title": {
-          "absolute": "Sebastian Kolbusz | Senior Frontend Engineer",
+          "absolute": "Sebastian Kolbusz | Creative Developer · Full-stack Engineer",
         },
         "twitter": {
           "card": "summary_large_image",
           "creator": "@s_kolbusz",
-          "description": "Senior Frontend Engineer in Zakopane building fast Next.js websites, SaaS interfaces, and polished digital experiences for ambitious brands.",
+          "description": "Creative developer and full-stack engineer based in Zakopane, Poland. Animated websites (GSAP, WebGL), Next.js applications and Payload CMS. Founder of…",
           "images": [
             "https://kolbusz.xyz/og-image",
           ],
-          "title": "Sebastian Kolbusz | Senior Frontend Engineer",
+          "title": "Sebastian Kolbusz | Creative Developer · Full-stack Engineer",
         },
       }
     `)
@@ -81,9 +81,9 @@ describe('page metadata', () => {
             "x-default": "https://kolbusz.xyz/en/cv",
           },
         },
-        "description": "Senior Frontend Engineer in Zakopane building fast Next.js websites, SaaS interfaces, and polished digital experiences for ambitious brands.",
+        "description": "Creative developer and full-stack engineer based in Zakopane, Poland. Animated websites (GSAP, WebGL), Next.js applications and Payload CMS. Founder of…",
         "openGraph": {
-          "description": "Senior Frontend Engineer in Zakopane building fast Next.js websites, SaaS interfaces, and polished digital experiences for ambitious brands.",
+          "description": "Creative developer and full-stack engineer based in Zakopane, Poland. Animated websites (GSAP, WebGL), Next.js applications and Payload CMS. Founder of…",
           "images": [
             {
               "alt": "Sebastian Kolbusz - High-performance web engineering",
@@ -102,7 +102,7 @@ describe('page metadata', () => {
         "twitter": {
           "card": "summary_large_image",
           "creator": "@s_kolbusz",
-          "description": "Senior Frontend Engineer in Zakopane building fast Next.js websites, SaaS interfaces, and polished digital experiences for ambitious brands.",
+          "description": "Creative developer and full-stack engineer based in Zakopane, Poland. Animated websites (GSAP, WebGL), Next.js applications and Payload CMS. Founder of…",
           "images": [
             "https://kolbusz.xyz/og-image",
           ],

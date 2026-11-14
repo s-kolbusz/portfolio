@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
+import { isStudioCase } from '@/data/entry-href'
+import { getCaseStudies } from '@/data/get-projects'
+import { portfolioEntries } from '@/data/projects'
+
 import { GET } from './route'
+
+// Home, projects, cv, services — /design is noindex and stays out.
+const STATIC_ROUTE_COUNT = 4
 
 async function getSitemapXml(locale: string) {
   const response = await GET(new Request(`https://kolbusz.xyz/${locale}/sitemap.xml`), {
@@ -41,15 +48,31 @@ describe('locale sitemap route', () => {
   it('includes x-default for project detail routes', async () => {
     const xml = await getSitemapXml('en')
 
-    // Should contain project slugs with x-default
-    expect(xml).toContain('href="https://kolbusz.xyz/en/projects/zakofy"')
-    expect(xml).toContain('href="https://kolbusz.xyz/pl/projects/zakofy"')
+    // Should contain case-study slugs with x-default
+    expect(xml).toContain('href="https://kolbusz.xyz/en/projects/ready2order"')
+    expect(xml).toContain('href="https://kolbusz.xyz/pl/projects/ready2order"')
 
-    // Count x-default occurrences (one per URL entry: 4 static + 5 projects = 9)
-    const xDefaultMatches = xml.match(/hreflang="x-default"/g)
-    expect(xDefaultMatches).not.toBeNull()
-    // should have x-default for every url entry
-    expect((xDefaultMatches ?? []).length).toBeGreaterThanOrEqual(9)
+    // One x-default per URL entry: the static routes plus every case study.
+    const xDefaultMatches = xml.match(/hreflang="x-default"/g) ?? []
+    expect(xDefaultMatches).toHaveLength(STATIC_ROUTE_COUNT + getCaseStudies('en').length)
+  })
+
+  it('leaves out client work that redirects to stronypodhale.pl', async () => {
+    const xml = await getSitemapXml('en')
+
+    const moved = portfolioEntries.filter(isStudioCase)
+    expect(moved.length).toBeGreaterThan(0)
+
+    for (const { id } of moved) {
+      expect(xml).not.toContain(`/projects/${id}"`)
+      expect(xml).not.toContain(`/projects/${id}<`)
+    }
+  })
+
+  it('leaves out the noindex design preview', async () => {
+    const xml = await getSitemapXml('en')
+
+    expect(xml).not.toContain('/design')
   })
 
   it('x-default always points to the en variant even when served for pl locale', async () => {

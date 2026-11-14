@@ -4,7 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { ProjectBook } from '@/components/features/project/project-book/project-book'
 import { ProjectCardStack } from '@/components/features/project/project-book/project-card-stack'
 import { StructuredData } from '@/components/seo/structured-data'
-import { getProjects } from '@/data/get-projects'
+import { getCaseStudies, getProjects } from '@/data/get-projects'
 import { getLocaleFromParams } from '@/i18n/locale'
 import { buildProjectsPageMetadata } from '@/lib/page-metadata'
 import { toAbsoluteSiteUrl } from '@/lib/site'
@@ -30,6 +30,9 @@ export default async function ProjectsPage({ params }: Props) {
 
   setRequestLocale(locale)
   const projects = getProjects(locale)
+  // The list describes the case studies on this site. Client work is listed on
+  // stronypodhale.pl, whose own structured data describes it.
+  const caseStudies = getCaseStudies(locale)
 
   return (
     <main id="main-content">
@@ -40,7 +43,7 @@ export default async function ProjectsPage({ params }: Props) {
             data: {
               '@context': 'https://schema.org',
               '@type': 'ItemList',
-              itemListElement: projects.map((project, index) => ({
+              itemListElement: caseStudies.map((project, index) => ({
                 '@type': 'ListItem',
                 position: index + 1,
                 url: toAbsoluteSiteUrl(`/${locale}/projects/${project.id}`),

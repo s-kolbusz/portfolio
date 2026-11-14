@@ -5,7 +5,7 @@ ignoredBuiltDependencies:
 # Lives here, not under `pnpm.overrides` in package.json — pnpm 11 stopped
 # reading that field, which broke `install --frozen-lockfile` on CI.
 overrides:
-  undici: '^7.28.0'
+  undici: '^7.30.1'
   flatted: '>=3.4.2'
   picomatch: '>=4.0.4'
   brace-expansion@1: '^1.1.16'
@@ -14,6 +14,7 @@ overrides:
   postcss: '^8.5.18'
   js-yaml: '^4.3.0'
   sharp: '^0.35.0'
+  source-map-js: '^1.2.2'
 
 auditConfig:
   ignoreGhsas:
@@ -26,3 +27,9 @@ auditConfig:
     # -import, -jsx-a11y and @eslint/eslintrc all still pin minimatch 3.
     # Drop this entry once those plugins move off it.
     - GHSA-mh99-v99m-4gvg
+    # braces 3.0.3, reached only via eslint-config-next > @next/eslint-plugin-next
+    # > fast-glob > micromatch — lint time, nothing in the shipped bundle. 3.0.3 is
+    # the latest release and the advisory lists no patched version, so there is
+    # nothing to upgrade to; the plugin still pins fast-glob 3.3.1 in 16.4.1.
+    # Drop this entry once a fixed braces or a fast-glob without it ships.
+    - GHSA-vfj7-8cjw-p6xm

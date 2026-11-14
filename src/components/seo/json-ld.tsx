@@ -1,4 +1,5 @@
-import { SITE_AUTHOR, SITE_NAME, SITE_ORIGIN } from '@/lib/site'
+import { STUDIO } from '@/data/studio'
+import { SITE_AUTHOR, SITE_NAME, SITE_ORIGIN, SITE_ROLE } from '@/lib/site'
 
 import { StructuredData } from './structured-data'
 
@@ -9,7 +10,7 @@ export const JsonLd = () => {
     '@id': `${SITE_ORIGIN}/#about`,
     name: SITE_AUTHOR,
     url: SITE_ORIGIN,
-    jobTitle: 'Senior Frontend Engineer',
+    jobTitle: SITE_ROLE,
     image: {
       '@type': 'ImageObject',
       url: `${SITE_ORIGIN}/images/sebastian_kolbusz_caricature.avif`,
@@ -21,9 +22,13 @@ export const JsonLd = () => {
       addressLocality: 'Zakopane',
       addressCountry: 'PL',
     },
+    // The web studio the owner runs. Same @id stronypodhale.pl declares for itself,
+    // whose `founder` points back here — one entity graph across both domains.
     worksFor: {
-      '@type': 'Organization',
-      name: 'Freelance',
+      '@type': 'ProfessionalService',
+      '@id': STUDIO.id,
+      name: STUDIO.name,
+      url: STUDIO.url,
     },
     sameAs: [
       'https://github.com/s-kolbusz',
@@ -60,24 +65,11 @@ export const JsonLd = () => {
     name: SITE_NAME,
     url: SITE_ORIGIN,
     image: `${SITE_ORIGIN}/images/sebastian_kolbusz_caricature.avif`,
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: 'Zakopane',
-      addressRegion: 'Małopolskie',
-      addressCountry: 'PL',
-    },
-    geo: {
-      '@type': 'GeoCoordinates',
-      latitude: 49.299181,
-      longitude: 19.949562,
-    },
-    areaServed: [
-      { '@type': 'City', name: 'Zakopane' },
-      { '@type': 'City', name: 'Nowy Targ' },
-      { '@type': 'AdministrativeArea', name: 'Podhale' },
-      { '@type': 'AdministrativeArea', name: 'Małopolska' },
-      { '@type': 'Country', name: 'Poland' },
-    ],
+    // Local websites for Podhale firms are stronypodhale.pl's market (SEB-66).
+    // A street-level address, coordinates and the same towns here made this read
+    // as a local business and the two sites compete for one query; where the
+    // owner lives stays on the Person.
+    areaServed: [{ '@type': 'Country', name: 'Poland' }],
     priceRange: '$$$',
     founder: {
       '@type': 'Person',

@@ -5,7 +5,7 @@ const CORE_ROUTES = [
   '/en',
   '/en/cv',
   '/en/projects',
-  '/en/projects/zakofy',
+  '/en/projects/ready2order',
   '/en/design',
   '/en/services',
 ] as const
@@ -15,7 +15,7 @@ const ROUTES_WITH_SKIP_LINK = [
   '/en/cv',
   '/en/projects',
   '/en/design',
-  '/en/projects/zakofy',
+  '/en/projects/ready2order',
   '/en/services',
   '/en/does-not-exist',
 ] as const
@@ -96,7 +96,11 @@ test('project book traps focus to the active panel and ignores inactive panels',
   await expect(projectPanel).not.toHaveAttribute('inert', '')
 })
 
-test('lightbox restores focus to the trigger after keyboard close', async ({ page }) => {
+// No live case study has a gallery right now: the client projects that had one
+// moved to stronypodhale.pl (SEB-21) and ready2order is a role page without images.
+// The focus-return contract is covered by lightbox.test.tsx meanwhile; re-enable
+// this against the stronypodhale case study once SEB-73 adds it.
+test.skip('lightbox restores focus to the trigger after keyboard close', async ({ page }) => {
   await page.goto('/en/projects/zakofy')
 
   const trigger = page.getByRole('button', { name: /view high-res/i }).first()

@@ -43,32 +43,32 @@ test('projects index page exposes canonical metadata and ItemList JSON-LD', asyn
     '@context': 'https://schema.org',
     '@type': 'ItemList',
   })
-  expect(itemListPayload?.itemListElement).toEqual(
-    expect.arrayContaining([
-      expect.objectContaining({
-        '@type': 'ListItem',
-        position: 1,
-        name: 'Zakofy',
-        url: 'https://kolbusz.xyz/en/projects/zakofy',
-      }),
-    ])
-  )
+  // The list names the case studies on this site only; client work is described
+  // in stronypodhale.pl's own structured data.
+  expect(itemListPayload?.itemListElement).toEqual([
+    expect.objectContaining({
+      '@type': 'ListItem',
+      position: 1,
+      name: 'ready2order',
+      url: 'https://kolbusz.xyz/en/projects/ready2order',
+    }),
+  ])
 })
 
 test('project detail page exposes canonical metadata and CreativeWork JSON-LD', async ({
   page,
 }) => {
   test.setTimeout(180_000)
-  await openRoute(page, '/en/projects/zakofy')
+  await openRoute(page, '/en/projects/ready2order')
 
-  await expect(page).toHaveTitle('Zakofy | Sebastian Kolbusz')
+  await expect(page).toHaveTitle('ready2order | Sebastian Kolbusz')
   await expect(page.locator('meta[name="description"]')).toHaveAttribute(
     'content',
-    'Custom Tatra Mountain Offer Platform. Providing a modern digital appearance for mountain tourism with a custom-built offer presentation system.'
+    'Senior Frontend Engineer — Enterprise POS. Optimizing and scaling cross-platform POS software used by thousands of businesses across Europe.'
   )
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://kolbusz.xyz/en/projects/zakofy'
+    'https://kolbusz.xyz/en/projects/ready2order'
   )
 
   const creativeWorkPayload = await getJsonLdPayloadByType(page, 'CreativeWork')
@@ -76,7 +76,7 @@ test('project detail page exposes canonical metadata and CreativeWork JSON-LD', 
   expect(creativeWorkPayload).toMatchObject({
     '@context': 'https://schema.org',
     '@type': 'CreativeWork',
-    headline: 'Zakofy',
-    url: 'https://kolbusz.xyz/en/projects/zakofy',
+    headline: 'ready2order',
+    url: 'https://kolbusz.xyz/en/projects/ready2order',
   })
 })

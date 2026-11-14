@@ -1,32 +1,31 @@
-# Sebastian Kolbusz — Senior Frontend Engineer
+# Sebastian Kolbusz — Creative Developer · Full-stack Engineer
 
-> Personal portfolio and service site for Sebastian Kolbusz, a Senior Frontend Engineer based in Zakopane, Poland, specialising in high-performance Next.js applications, SaaS interfaces, and cinematic web experiences.
+> Personal site of Sebastian Kolbusz, a creative developer and full-stack engineer based in Zakopane, Poland: animated websites (GSAP, WebGL), Next.js applications and Payload CMS. Founder of stronypodhale.pl, a web studio for small businesses in Podhale.
 
 ## About
 
-Sebastian Kolbusz is a Senior Frontend Engineer with deep expertise in React, Next.js, TypeScript, GSAP, and WebGL. He builds fast, polished, and accessible websites and web applications for ambitious brands across Poland and internationally.
+Sebastian Kolbusz builds animated websites and web applications with React, Next.js, TypeScript, GSAP and WebGL, and content-managed sites on Payload CMS, for companies and agencies in Poland and abroad.
+
+Websites for small businesses in Podhale (Zakopane, Nowy Targ and the surrounding area) are made and maintained by his studio, stronypodhale.pl — offer, prices and client work are described there: https://stronypodhale.pl/
 
 Location: Zakopane, Poland
 Email: office@kolbusz.xyz
 
 ## Services
 
-- **Landing pages** — High-converting, performance-optimised single-page sites
-- **Full websites** — Multi-page websites with CMS integration and i18n support
-- **Web applications** — Complex SaaS and data-driven React/Next.js applications
+- **Animated websites** — Landing pages and multi-page sites with motion, WebGL and custom interactions
+- **Web applications** — SaaS and data-driven React/Next.js applications
+- **Payload CMS** — Content-managed sites and admin panels
 - **Hourly consulting** — Frontend architecture, performance audits, and code reviews
 
 ## Skills & Technologies
 
-Next.js, React, TypeScript, Tailwind CSS, GSAP, WebGL / Three.js, Lenis (smooth scroll), Zustand, Vitest, Playwright, Vercel, GitHub Actions, PostgreSQL (basic), Figma
+Next.js, React, TypeScript, Tailwind CSS, GSAP, WebGL / Three.js, Lenis (smooth scroll), Payload CMS, Zustand, Vitest, Playwright, Vercel, GitHub Actions, PostgreSQL (basic), Figma
 
-## Selected Projects
+## Work
 
-- **Zakofy** — Custom Tatra Mountain offer platform (Next.js, SSG, performance-focused)
-- **Your Krakow Travel** — Consolidated tour discovery platform with structured data and accessibility-first design
-- **Wellezza** — Professional salon web presence with 100/100 Lighthouse score and booking integration
-- **Billboard Zakopane** — B2B outdoor advertising catalog with interactive map
-- **ready2order** — Senior Frontend Engineer role on an enterprise POS SaaS product
+- **ready2order** — Senior Frontend Engineer role on an enterprise POS SaaS product (2019–2025)
+- **stronypodhale.pl** — Founder of a web studio for small businesses in Podhale; its client work (Zakofy, Your Krakow Travel, Wellezza, KAF Garage and others) is described at https://stronypodhale.pl/#realizacje
 
 ## Links
 
@@ -34,6 +33,7 @@ Next.js, React, TypeScript, Tailwind CSS, GSAP, WebGL / Three.js, Lenis (smooth 
 - Projects: https://kolbusz.xyz/en/projects
 - Services: https://kolbusz.xyz/en/services
 - CV: https://kolbusz.xyz/en/cv
+- Studio: https://stronypodhale.pl/
 - LinkedIn: https://linkedin.com/in/skolbusz
 - GitHub: https://github.com/s-kolbusz
 - X / Twitter: https://x.com/s_kolbusz
