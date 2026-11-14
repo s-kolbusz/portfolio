@@ -277,5 +277,31 @@ i wchodzi w scenę stronypodhale. Poprawki właściciela:
 leżą realizacje, palec klaruje wodę; „Rozkładam na czynniki”: materia rozpada się na podpisane części
 i składa w coś stałego). Właściciel chce **próbek** w prawdziwym kodzie, żeby wybrać. Próbek jeszcze nie ma.
 
+### Próbki trzech historii hero: wdrożone jako podgląd (2026-11-14)
+
+Trzy próbki są w prawdziwym kodzie pod osobną trasą (noindex, poza stroną główną); produkcyjne hero,
+scena sygnaturowa i desktop strony głównej są nietknięte.
+
+- `/pl/design/hero/materia`: materia krzepnie po kolei w pięć rzeczy (stronypodhale, plugin
+  aspect-preview, edytor/Airchos, wydruk 3D, panel energii); dotknięcie rozpuszcza kształt.
+- `/pl/design/hero/okno`: pod materią leżą zrzuty realizacji, kulka (palec, kursor) klaruje wodę; bez
+  dotyku kulka wędruje sama, strony zmieniają się co ok. 5 s albo po dotknięciu.
+- `/pl/design/hero/czynniki`: blob rozpada się na cztery podpisane krople (projekt, kod, serwer,
+  utrzymanie), krople stykają się parami i zlewają w jeden stały kształt.
+
+Wspólne dla wszystkich: układ plakatowy, odpływ pełnej tafli przy załadowaniu (tafla jest renderowana już
+po stronie serwera), litery zostają mokre (zielone, z falującym konturem) i schną do atramentu, kulka
+idzie za palcem.
+
+Kod: `src/components/sections/hero-sample.tsx`, `src/components/canvas/hero-samples/`,
+`src/app/[locale]/design/hero/[variant]/page.tsx`.
+
+**To są próbki do wyboru historii, nie wykonanie końcowe.** Świadomie nie ma w nich: przejścia w scroll
+i w scenę stronypodhale, dopasowania rozdzielczości do wydajności telefonu, wersji dla ograniczonego
+ruchu poza statycznym układem, tłumaczeń podpisów (są wpisane na stałe po polsku), testów jednostkowych.
+Podpisy kształtów i lista rzeczy to propozycje. Sprawdzone tylko w Chromium (390×844 z dotykiem
+i 1440×900, build produkcyjny); **nie sprawdzone na prawdziwym iPhonie**: płynność, filtr na literach
+w Safari i zachowanie paska adresu wymagają urządzenia.
+
 Poza zakresem, zauważone przy okazji: etykieta w hero to nadal „Web Architect” (`src/i18n/messages/pl.json:38`),
 a dokument decyzji każe ją zastąpić.
