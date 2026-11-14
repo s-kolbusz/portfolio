@@ -48,7 +48,7 @@ Każda sekcja: reguła w jednym zdaniu, skąd się wzięła, jak jest pilnowana.
 - **Reguła:** Nowa funkcja przechodzi kolejno przez pytania szukające dziury w pomyśle, specyfikację,
   plan, wykonanie i weryfikację; drobiazgi idą bez tej ścieżki.
 - **Skąd:** Zgadywanie i kolejne rundy poprawek kosztują więcej niż jeden porządny research na starcie.
-  Wcześniejsza próba redesignu prototypowała poza prawdziwym kodem i została odrzucona w całości.
+  (Przykład z wrześniową próbą redesignu usunięty po odpowiedzi 5 właściciela.)
 - **Pilnowane przez:** stałą kolejność kroków zapisaną w regułach, prototypy tylko w prawdziwym
   repozytorium, czytanie dokumentu „na zimno” przez recenzenta bez kontekstu po większych przeróbkach.
 - **Źródła:** G-CLAUDE (workflow); KONTEKST (nawyk 9); PAMIĘĆ (`project_kolbusz_redesign…`); README;
@@ -142,8 +142,7 @@ Większa zmiana ma stałą kolejność: seria pytań, która szuka dziury w pomy
 wykonanie i weryfikacja. Drobiazgi (tekst, kolor, odstęp) idą bez tej ścieżki.
 
 Kolejność wzięła się z kosztu. Zgadywanie i kolejne rundy poprawek kosztują więcej niż jeden porządny
-research na starcie. Prototypy powstają tylko w prawdziwym kodzie: wcześniejsza próba, robiona obok
-repozytorium, wyglądała dobrze na planszach i nie nadawała się do niczego `[?5]`.
+research na starcie. Prototypy powstają tylko w prawdziwym kodzie, nie na planszach obok repozytorium.
 
 Dokument po większej przeróbce czyta recenzent, który nie zna rozmowy. Przy pierwszej czystej wersji
 konceptu tej strony znalazł 15 luk `[?6]`.
@@ -204,7 +203,7 @@ u mnie nie działają `[?9]`.
 ### Dokąd stąd
 
 - Droga „Agenci AI → Airchos”: ta sama zasada, czyli weryfikacja oddana narzędziom, jako osobny
-  projekt `[?4]`.
+  projekt.
 - Notatki „dlaczego”: krótkie teksty o pojedynczych decyzjach technicznych.
 
 ---
@@ -225,12 +224,16 @@ wprost, oraz decyzje o tym, co wolno nazwać publicznie.
    i trail; RTK czeka na punkt 7.
 3. **PRAWDA (właściciel, 14.11):** wygląd i ruch zawsze oceniam sam, w przeglądarce i na własnym
    telefonie; zielone testy do tego nie wystarczają.
-4. Airchos jest moim projektem, który oddaje weryfikację pracy agentów narzędziom, i może być
-   podlinkowany z tej strony jako „dokąd stąd”. (Wiem o nim tylko tyle, ile jest w sekcji 5 konceptu.)
-5. Odrzuconą próbę redesignu z września mogę opisać zdaniem „wyglądała dobrze na planszach i nie
-   nadawała się do niczego”. (Źródło mówi: prototypowana poza kodem, odrzucona, „zabiła duszę strony”;
-   sformułowanie jest moje.)
-6. Liczba „15 luk” znalezionych przez recenzenta bez kontekstu może być publiczna.
+4. **PRAWDA (właściciel, 14.11):** Airchos jest moim projektem, który oddaje weryfikację pracy agentów
+   narzędziom, i może być podlinkowany z tej strony jako „dokąd stąd”.
+5. **FAŁSZ (właściciel, 14.11):** wrześniowa próba redesignu nie „nie nadawała się do niczego”. Słowa
+   właściciela: „była dobrym rozpoczęciem, na które brakło mi czasu”. Przykład usunięty z tekstu; reguła
+   „prototypy tylko w prawdziwym kodzie” została bez anegdoty. Uwaga dla następnej sesji: pamięć
+   projektu opisuje tę próbę ostrzej (studia odrzucone); na stronie obowiązuje wersja właściciela.
+6. **PYTANIE BYŁO NIEJASNE, zadane ponownie:** gdy koncept strony został przepisany na czysto, osobny
+   agent, który nie znał rozmowy, przeczytał go i wypisał 15 miejsc niejasnych albo brakujących. W tekście
+   używam tego jako przykładu, po co jest taki recenzent. Do zaznaczenia: ten przykład razem z liczbą 15
+   może zostać na stronie.
 7. Filtr wyników terminala (RTK) rzeczywiście działa u mnie na co dzień i warto o nim wspomnieć jednym
    zdaniem.
 8. Test narzędzi do przeszukiwania kodu z 4 listopada objął trzech kandydatów (trail, tokensave,
