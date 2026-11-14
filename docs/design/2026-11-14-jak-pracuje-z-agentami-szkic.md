@@ -1,7 +1,7 @@
 # „Jak pracuję z agentami”: szkic treści podstrony
 
 **Status:** szkic po pierwszej rundzie odpowiedzi właściciela (14.11): wszystkie 15 zdań z części 3
-jest rozstrzygnięte i naniesione. Tekst czeka na jego redakcję. To dokument, nie kod.
+jest rozstrzygnięte i naniesione. Sformułowania zatwierdzone przez niego 15.11; tekst jest gotowy jako wsad do budowy podstrony. To dokument, nie kod.
 
 **Miejsce w koncepcie:** podstrona w warstwie pracy, przyjęta w sekcji 7 konceptu
 (`2026-11-14-historia-strony-koncept.md`). Powiązana droga: sekcja 5, „Agenci AI → Airchos”.
@@ -226,7 +226,7 @@ wprost, oraz decyzje o tym, co wolno nazwać publicznie.
    zgłasza „gotowe”, zanim przejdą. Uzupełnienie właściciela: ważną częścią pozostaje cały proces wokół
    (burza mózgów, planowanie, rozbijanie pracy na etapy), mimo budowania Airchos. Dopisane w sekcji 1
    tekstu; zdanie „testy sprawdzają, czy rzecz zrobiono dobrze, a nie, czy zrobiono właściwą rzecz”
-   jest moim sformułowaniem tego uzupełnienia, do poprawienia.
+   jest moim sformułowaniem tego uzupełnienia; właściciel 15.11: zostaje.
 2. **PRAWDA (właściciel, 14.11):** strona może wymieniać narzędzia z nazwy: Claude Code, Linear, Plane
    (jako to, które nie przeszło testu odczytu), trail, RTK. W tekście nazwane są na razie Plane, Linear
    i trail; RTK czeka na punkt 7.
@@ -251,7 +251,8 @@ wprost, oraz decyzje o tym, co wolno nazwać publicznie.
 11. **PRAWDA Z ZASTRZEŻENIEM (właściciel, 14.11):** reguły dotyczą pracy z Claude. Zastrzeżenie
     właściciela: Gemini i ChatGPT często używa do researchu poza kodem, a samego ChatGPT do pisania
     treści po polsku, które idą do redakcji. Dopisane we wstępie; „pierwsze wersje tekstów, które potem
-    redaguję” to moje odczytanie słów „pisanie treści do redakcji”, do poprawienia.
+    redaguję” to moje odczytanie słów „pisanie treści do redakcji”; właściciel 15.11: redaguje je sam,
+    zostaje.
 12. **PRAWDA (właściciel, 14.11):** model „jedna sesja nadzoruje, małe sesje robią jedną rzecz” pochodzi
     z Elephant-Goldfish (egm.dev); źródło podane w sekcji 4 tekstu.
 13. **PRAWDA (właściciel, 14.11):** kolejność „pytania → specyfikacja → plan → wykonanie → weryfikacja”
@@ -260,13 +261,13 @@ wprost, oraz decyzje o tym, co wolno nazwać publicznie.
     sztucznie. Słowa właściciela: „jakość i bezpieczeństwo przede wszystkim, a po to mamy ten proces”.
     Zmienione: wstęp nazywa ten cel wprost; sekcje 2 i 4 uzasadniają reguły jakością wyniku, koszt jest
     w sekcji 4 jednym zdaniem jako skutek uboczny; zdanie o raporcie zużycia tokenów usunięte z tekstu.
-    Moje sformułowania do poprawienia: „wynik trudniej sprawdzić” i „daje lepszy wynik”. Definicja
+    Moje sformułowania „wynik trudniej sprawdzić” i „daje lepszy wynik”: właściciel 15.11: zostają. Definicja
     bezpieczeństwa dopisana we wstępie słowami właściciela (14.11): „kod bez luk i żadnych sekretów
     w repo”. Tekst nie mówi, czym to jest pilnowane, bo źródła tego nie podają.
 15. **PRAWDA (właściciel, 14.11):** sześć sekcji w tej kolejności.
 
-Wszystkie 15 zdań jest rozstrzygnięte. Zostają trzy moje sformułowania oznaczone wyżej jako „do
-poprawienia” (punkty 1, 11, 14).
+Wszystkie 15 zdań jest rozstrzygnięte, a trzy moje sformułowania (punkty 1, 11 i 14) właściciel
+zatwierdził 15.11. Otwartych punktów w tym szkicu nie ma.
 
 ---
 
