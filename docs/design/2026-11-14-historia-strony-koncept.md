@@ -155,7 +155,8 @@ Drogi, potwierdzone i poprawione przez właściciela:
    nowa płyta, procesor, silniki, mechanizm osi X i Y, głowica (dysza, extruder, procesor głowicy). Potem
    zainteresowanie spadło. Dziś drukuje, gdy ktoś poprosi albo sam czegoś potrzebuje; nie stricte dla
    zarobku ani zabawy, choć chętnie by ją monetyzował. Na stronie: historia w części osobistej **oraz**
-   uczciwe „drukuję na zamówienie” z kalkulatorem.
+   uczciwe „mogę wydrukować na zamówienie” z kalkulatorem. Zamówień jeszcze nie było (właściciel, 15.11),
+   więc tekst nie może sugerować działającej usługi ani klientów.
 2. **Dom.** Płot z paneli → falowniki i pompa ciepła → Home Assistant → własne panele z danymi o energii.
    Właściciel: „mega mi się podobało”.
 3. **Zakofy → plugin aspect-preview.** Strona turystyczna → potrzeba kadrowania zdjęć w CMS-ie → plugin
@@ -166,9 +167,11 @@ Drogi, potwierdzone i poprawione przez właściciela:
    narzędzia, które radziły sobie z nią jeszcze przed popularyzacją LLM. Airchos należy do **pracy**.
 5. **Auta.** Usterka → kabel i VCDS → diagnostyka aut w rodzinie. Doszła eksploatacja (oleje, filtry)
    i małe naprawy. Nie ma jeszcze definicji.
-6. **ready2order, paczka −50%.** Nie jedna zmiana: przebudowa konfiguracji Webpacka, aktualizacja dla
-   lepszych zabezpieczeń, usunięcie Reduxa, który dublował cache Apollo Client. Dużo małych czynników
-   złożyło się na wynik.
+
+Publiczne (właściciel, 15.11): drukarka, dom i auta mogą być na stronie. Kandydat na kolejną drogę:
+**dron** („możemy dorzucić też drona, i guess”); faktów jeszcze nie ma, do zebrania propozycjami. 6. **ready2order, paczka −50%.** Nie jedna zmiana: przebudowa konfiguracji Webpacka, aktualizacja dla
+lepszych zabezpieczeń, usunięcie Reduxa, który dublował cache Apollo Client. Dużo małych czynników
+złożyło się na wynik.
 
 **Szablon drogi (propozycja, do ustalenia):** tytuł, stan, daty, od czego się zaczęło, kolejne kroki, co
 z tego zostało, definicja (jeśli jest) i „dokąd stąd”. Droga to historia w części osobistej; podstrona
@@ -240,7 +243,8 @@ Dwie nowe podstrony w warstwie pracy (przyjęte):
 - Katalog-książka `/projects` znika. Etap „katalog” wymaga nowej definicji (krótki indeks albo nic).
 - `/about` staje się stroną „Kim jestem” z definicjami i drogami.
 - Dochodzą: szablon drogi, notatki „dlaczego”, „Jak pracuję z agentami”, stany rzeczy, drzwi na końcu stron.
-- Druk 3D: „realna usługa” z dokumentu wrześniowego zmienia się w „drukuję na zamówienie”.
+- Druk 3D: „realna usługa” z dokumentu wrześniowego zmienia się w „mogę wydrukować na zamówienie”
+  (zamówień jeszcze nie było).
 - Kolejność: najpierw podniesienie otwarcia (plan A, B, C), potem reszta. Dokument z 24.09 i zadania
   w Linear wymagają aktualizacji; to decyzja właściciela.
 
@@ -256,5 +260,6 @@ Dwie nowe podstrony w warstwie pracy (przyjęte):
 2. Linie z sekcji 7: zamknięte 15.11 (cztery linie przyjęte, dwie odrzucone).
 3. Źródła pochwał pluginu: zamknięte 15.11, publicznych źródeł nie ma, pochwał nie cytujemy (pomysł 7
    z przeglądu jomor.design przez to odpada dla pluginu).
-4. Które rzeczy z części osobistej mogą być publiczne i jakie są zdjęcia.
+4. Część osobista: drukarka, dom i auta mogą być publiczne (15.11); dron jako kandydat. Otwarte: jakie są
+   zdjęcia do każdej drogi i fakty o dronie.
 5. Wybór easter eggów.
