@@ -161,24 +161,31 @@ export function HeroAssembly() {
       if (step.changed) renderer.setMask(things[step.thing]!.mask)
       if (section.dataset.phase !== step.phase) section.dataset.phase = step.phase
       if (section.dataset.thing !== String(step.thing)) section.dataset.thing = String(step.thing)
-      renderer.draw({ ...step, stage: layout.stage, color, time })
+      renderer.draw({ ...step, stage: layout.stage, color })
       if (cover.style.display !== 'none') cover.style.display = 'none'
 
       // The text is uncovered as the sheet drains past it; after that it does not move.
-      if (!textShown && time > 0.6) {
+      if (!textShown && time > 0.95) {
         textShown = true
         showText(true)
       }
       // One caption: what the matter has become. It changes while the matter is liquid.
+      // It stays through the liquid state and is replaced when the next thing starts to form.
       const named = step.phase === 'forming' || step.phase === 'hold'
       if (named && captionThing !== step.thing) {
         captionThing = step.thing
-        caption.textContent = THINGS[step.thing]?.caption ?? ''
-      }
-      if (named !== captionShown) {
-        captionShown = named
-        caption.style.transition = `opacity ${named ? 0.7 : 0.35}s ${SETTLE}`
-        caption.style.opacity = named ? '1' : '0'
+        const next = THINGS[step.thing]?.caption ?? ''
+        caption.style.transition = `opacity 0.25s ${SETTLE}`
+        caption.style.opacity = '0'
+        window.setTimeout(
+          () => {
+            caption.textContent = next
+            caption.style.transition = `opacity 0.7s ${SETTLE}`
+            caption.style.opacity = '1'
+          },
+          captionShown ? 260 : 0
+        )
+        captionShown = true
       }
     }
     frame = requestAnimationFrame(render)
@@ -214,16 +221,16 @@ export function HeroAssembly() {
         aria-hidden="true"
       />
 
-      <div className="pointer-events-none relative z-10 mx-auto grid h-full w-full max-w-[1440px] grid-cols-1 grid-rows-[auto_1fr_auto] px-6 pt-24 pb-28 md:grid-cols-12 md:grid-rows-1 md:gap-x-6 md:pt-24 md:pr-40 md:pb-24 md:pl-12">
+      <div className="pointer-events-none relative z-10 mx-auto grid h-full w-full max-w-[1440px] grid-cols-1 grid-rows-[auto_1fr_auto] px-6 pt-24 pb-28 md:grid-cols-12 md:grid-rows-1 md:gap-x-6 md:pt-24 md:pr-48 md:pb-24 md:pl-12">
         {/* The object: a square on the grid; the matter is drawn into it. */}
         <div className="md:col-span-6 md:col-start-7 md:row-start-1 md:flex md:flex-col md:justify-end">
           <div
             ref={stageRef}
-            className="mx-auto aspect-square w-full max-w-[41svh] md:mr-0 md:max-w-[66svh]"
+            className="mx-auto aspect-square w-full max-w-[38svh] md:mr-0 md:max-w-[64svh]"
           />
           <div
             data-rise
-            className="border-foreground/20 mx-auto mt-3 flex w-full max-w-[41svh] translate-y-3 items-center justify-between border-t pt-3 text-[15px] leading-none opacity-0 md:mr-0 md:max-w-[66svh] md:text-base"
+            className="border-foreground/20 mx-auto mt-5 flex w-full max-w-[38svh] translate-y-3 items-center justify-between border-t pt-3 text-[15px] leading-none opacity-0 md:mr-0 md:max-w-[64svh] md:text-lg"
           >
             <span ref={captionRef} className="opacity-0" />
             <ArrowDownIcon aria-hidden="true" className="text-foreground/50 size-4" />
@@ -236,7 +243,7 @@ export function HeroAssembly() {
         <div className="row-start-3 flex flex-col md:col-span-6 md:col-start-1 md:row-start-1 md:justify-end">
           <h1
             aria-label={name}
-            className="text-[15.5vw] leading-[0.95] font-normal tracking-[-0.015em] md:text-[min(8.4vw,7.6rem)]"
+            className="text-[15.5vw] leading-[0.95] font-normal tracking-[-0.015em] md:text-[min(9.4vw,8.6rem)]"
             style={{ fontFamily: 'var(--font-hero-display), var(--font-serif), serif' }}
           >
             {words.map((word) => (

@@ -416,5 +416,33 @@ Do sprawdzenia, niepotwierdzone: Bona Nova (polski krój, Heidrich i Machalski; 
 niezweryfikowane w tej sesji). Katalogów Velvetyne i uncut.wtf nie udało się odczytać automatycznie.
 Wybór zapada po pokazaniu krojów na żywo na imieniu i polskim zdaniu; pobranie plików wymaga zgody.
 
+### Trzy rundy z krytykami (`/cook`), 2026-11-15
+
+Wskazania właściciela przed startem: krój **Bona Nova** (polski, darmowy), referencje dla hero to
+borndigital.be (obiekt), papertiger.com (układ, storytelling), zajno (tekst), toyfight.co; Lusion nie jest
+dobrym wzorem dla hero. Limit: 3 rundy, jeden budujący, dwóch krytyków na rundę.
+
+Co powstało pod `/pl/design/hero/zlozenie` (strona główna nietknięta):
+
+- **Materia jako pole kropel z masą** (`matter-story.ts`, `matter-renderer.ts`): każda kropla jest
+  ciągnięta sprężyną tam, gdzie teraz należy (blob, kropla w drodze, miejsce w rysunku); nic nie jest
+  interpolowane między pozami, więc nic nie skacze. Rysunek krzepnie tam, gdzie krople doszły i stanęły.
+- **Rysunki** (`things.ts`): dokładne części na jednej siatce, trzy płaskie tony zieleni; na razie dwie
+  rzeczy (układ stronypodhale, wydruk w trakcie).
+- **Kompozycja:** jedna siatka, jeden obiekt, linia z jednym podpisem, jeden blok tekstu; imię w Bona Nova.
+
+**Błąd w rundzie 2 i jego korekta.** Krytycy żądali od cieczy światła, połysku i cienia; dodałem je i blob
+przestał być sobą. Właściciel: „Płaski, pastelowy blob, to był cały zamysł, miałeś poprawić jego ruch,
+przekształcanie, interakcje, a nie dodawać mu światłocieni”. Całe cieniowanie usunięte; blob jest znów
+płaski, pastelowy, z miękką krawędzią. **Reguła: wygląd bloba jest nietykalny, krytycy muszą to dostać jako
+założenie, a brak odpowiedzi na pytanie wstępne nie jest zgodą na zmianę czegoś, co właściciel wcześniej
+zastrzegł.**
+
+Oceny krytyków (1–10, referencje ≈ 8,5): runda 1 układ ~5, typografia ~6, materia ~4,5, ruch ~5; runda 2
+układ ~5,5, typografia ~6,3, materia ~5, ruch ~4,8. Runda 3 bez krytyków (najpierw ocena właściciela).
+Poprzeczka 8,5 nie jest osiągnięta. Najsłabsze: rysunki rzeczy nadal czytane jako „ikony z zestawu UI”.
+Nie sprawdzone: prawdziwy iPhone, czas klatki, interakcja palcem na zrzutach. Stan pętli jest w katalogu
+`cook/` (lokalnie, poza gitem).
+
 Poza zakresem, zauważone przy okazji: etykieta w hero to nadal „Web Architect” (`src/i18n/messages/pl.json:38`),
 a dokument decyzji każe ją zastąpić.

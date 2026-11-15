@@ -60,10 +60,10 @@ const GOLDEN = 2.39996323
 
 /** Seconds: the sheet stands, then lets go from the far corners inwards. */
 /** How much wider than its share a liquid drop's spot is drawn. */
-const WIDE = 1.5
+const WIDE = 1.8
 
-const BIRTH_HOLD = 0.1
-const BIRTH_SPREAD = 0.55
+const BIRTH_HOLD = 0
+const BIRTH_SPREAD = 0.42
 
 function halton(index: number, base: number) {
   let result = 0
@@ -155,7 +155,7 @@ export function createStory(options: {
     const distance = Math.hypot(x - blob.x, y - blob.y) / far
     // The far corners let go first, in ragged patches.
     const patch = 0.5 + 0.5 * Math.sin(x * 0.013 + 1.7) * Math.cos(y * 0.011 - 0.6)
-    birthAt[i] = BIRTH_HOLD + (1 - distance) * BIRTH_SPREAD + patch * 0.45 + seeds[i]! * 0.12
+    birthAt[i] = BIRTH_HOLD + (1 - distance) * BIRTH_SPREAD + patch * 0.3 + seeds[i]! * 0.08
     states[i * 3] = spacing.sheet * 1.6 * WIDE
     states[i * 3 + 2] = 1 / (WIDE * WIDE)
     groupOf[i] = -1
@@ -257,7 +257,7 @@ export function createStory(options: {
     const { stage } = layout
     const stageX = stage.x + stage.size / 2
     const stageY = stage.y + stage.size / 2
-    const born = clock > BIRTH_HOLD + BIRTH_SPREAD + 1.1
+    const born = clock > BIRTH_HOLD + BIRTH_SPREAD + 0.95
 
     // The blob is never still: it drifts about the middle of the stage.
     const settledBlob = phase === 'forming' || phase === 'hold' ? 0.25 : 1
@@ -275,7 +275,7 @@ export function createStory(options: {
     // --- What happens next (only decides where matter is pulled) ---
     if (phase === 'birth' && born) {
       phase = 'blob'
-      nextAt = clock + random(1.1, 1.6)
+      nextAt = clock + random(0.35, 0.6)
     }
     if (phase === 'blob' && (clock >= nextAt || tapped)) {
       assign()
@@ -303,7 +303,7 @@ export function createStory(options: {
             group.mode = 'fill'
             group.clock = 0
             // It pours from where the drop is, the nearest spots first.
-            const pour = stage.size * random(0.85, 1.2)
+            const pour = stage.size * random(0.5, 0.72)
             for (let i = 0; i < count; i++) {
               if (groups[groupOf[i]!] !== group) continue
               const sx = stage.x + spots[i * 2]! * stage.size
@@ -317,7 +317,7 @@ export function createStory(options: {
       formed = settled / count
       if (formed > 0.985 && groups.every((group) => group.mode === 'fill')) {
         phase = 'hold'
-        nextAt = clock + random(2.5, 3.3)
+        nextAt = clock + random(2.2, 2.9)
       }
     }
     if (phase === 'hold' && (clock >= nextAt || tapped)) {
@@ -374,7 +374,7 @@ export function createStory(options: {
       if (groups.every((group) => group.mode === 'blob')) {
         phase = 'blob'
         thing = (thing + 1) % things.length
-        nextAt = clock + random(1.6, 2.6)
+        nextAt = clock + random(0.7, 1.3)
       }
     }
 
@@ -486,7 +486,7 @@ export function createStory(options: {
       if (settling) {
         const off = Math.hypot(targetX - x, targetY - y)
         const speed = Math.hypot(velocities[ix]!, velocities[iy]!)
-        if (off < spacing.fill * 1.6 && speed < stage.size * 0.22) settledNow += dt / 0.3
+        if (off < spacing.fill * 1.6 && speed < stage.size * 0.22) settledNow += dt / 0.6
         else settledNow -= dt / 0.5
       } else settledNow -= dt / 0.22
 
@@ -533,7 +533,7 @@ export function createStory(options: {
       states[i * 3 + 1] = Math.min(1, Math.max(0, settledNow))
       // Weight follows the spot actually drawn, so the amount of matter stays the same.
       const drawn = Math.max(states[i * 3]! / Math.max(size * 1.6, 1e-3), 0.2)
-      states[i * 3 + 2] = 1 / (drawn * drawn)
+      states[i * 3 + 2] = isBall && !pointer.active ? 0 : 1 / (drawn * drawn)
     }
 
     const frame: StoryFrame = {

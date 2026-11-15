@@ -168,9 +168,9 @@ const print: Thing = {
   parts: [
     // Frame: two posts and the beam the head rides.
     (ctx) => {
-      solid(ctx, 8, 2, 4, 86, 2, DEEP)
-      solid(ctx, 88, 2, 4, 86, 2, DEEP)
-      solid(ctx, 8, 14, 84, 4, 2, DEEP)
+      solid(ctx, 7, 2, 5.5, 85, 2.75, DEEP)
+      solid(ctx, 87.5, 2, 5.5, 85, 2.75, DEEP)
+      solid(ctx, 7, 13.2, 86, 5.5, 2.75, DEEP)
     },
     // Spool, with the filament running to the head.
     (ctx) => {
@@ -181,11 +181,11 @@ const print: Thing = {
       cut(ctx, () => disc(ctx, 25, 33, 3.2))
       ctx.globalCompositeOperation = 'source-over'
       ctx.strokeStyle = DEEPEST
-      ctx.lineWidth = 1.1
+      ctx.lineWidth = 1.7
       ctx.lineCap = 'round'
       ctx.beginPath()
-      ctx.moveTo(33.5, 26.5)
-      ctx.bezierCurveTo(42, 20, 52, 21.5, 58.5, 20.5)
+      ctx.moveTo(32.6, 25)
+      ctx.bezierCurveTo(40, 12, 50, 4.5, 60, 9.4)
       ctx.stroke()
     },
     // Head: carriage on the beam, nozzle down to the layer being laid.
@@ -223,16 +223,19 @@ const print: Thing = {
       ctx.closePath()
       ctx.fill()
       // The layer in progress stops at the nozzle.
-      cut(ctx, () => box(ctx, 60.6, top - 0.2, 12, 2.5, 0))
-      const layers = 21
+      const layers = 12
+      const pitch = (bottom - top) / layers
+      // The layer in progress stops at the nozzle; the one below is still fresh.
+      cut(ctx, () => box(ctx, 60.6, top - 0.2, 14, pitch + 0.2, 0))
+      on(ctx, DEEPEST, () => box(ctx, 30, top, 60, pitch, 0))
       for (let layer = 1; layer < layers; layer++) {
-        const y = top + (layer / layers) * (bottom - top)
-        on(ctx, DEEP, () => box(ctx, 30, y - 0.28, 60, 0.56, 0))
+        const y = top + layer * pitch
+        on(ctx, DEEP, () => box(ctx, 30, y - 0.5, 60, 1, 0))
       }
     },
     (ctx) => {
-      solid(ctx, 0, 86, 100, 7, 3.5)
-      on(ctx, DEEPEST, () => box(ctx, 0, 91.2, 100, 1.8, 0))
+      solid(ctx, 0, 86, 100, 6, 3)
+      on(ctx, DEEPEST, () => box(ctx, 0, 90.2, 100, 1.8, 0))
     },
   ],
 }

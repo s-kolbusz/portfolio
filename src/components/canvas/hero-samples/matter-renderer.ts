@@ -59,22 +59,14 @@ const SURFACE_FRAGMENT = /* glsl */ `#version 300 es
   // The square the drawing sits in: xy top-left, z size (px).
   uniform vec3 uStage;
   uniform vec3 uColor;
-  uniform float uTime;
-  uniform float uDpr;
   out vec4 fragColor;
-
-  float hash(vec2 p) {
-    p = fract(p * vec2(123.34, 456.21));
-    p += dot(p, p + 45.32);
-    return fract(p.x * p.y);
-  }
 
   void main() {
     vec2 field = texture(uField, vUv).rg;
     float amount = field.r;
     // Share of the matter here that has come to rest.
     float settled = clamp(field.g / max(amount, 1e-4), 0.0, 1.0);
-    float set = smoothstep(0.35, 0.92, settled);
+    float set = smoothstep(0.2, 0.95, settled);
 
     vec2 px = vec2(vUv.x, 1.0 - vUv.y) * uViewport;
     vec2 muv = (px - uStage.xy) / uStage.z;
@@ -85,31 +77,26 @@ const SURFACE_FRAGMENT = /* glsl */ `#version 300 es
     // drawing's softened outline, blended by how much has set here. The
     // surface is where the blend crosses one half, so the edge travels from
     // the drop's outline to the drawing's instead of one fading over the other.
-    float level = mix(amount / 0.5, drawing.g * step(0.12, amount), set);
-    float slope = max(fwidth(level), 1e-4);
-    // Signed distance to the surface in device pixels, positive inside.
-    float sd = (level - 0.5) / slope;
-    float alpha = clamp(sd + 0.5, 0.0, 1.0);
-    // Fully set, the drawing is exact, fine details included.
-    float exact = smoothstep(0.86, 1.0, set);
+    // The liquid's level is read from a slightly coarser copy of the field:
+    // the body is one smooth mass, and single drops never show.
+    float liquid = textureLod(uField, vUv, 2.5).r / 0.5;
+    float level = mix(liquid, drawing.g * step(0.12, amount), set);
+
+    // The blob as it has always been: flat, pastel, with a soft edge and a
+    // slightly deeper middle. No light, no gloss, no shadow. As matter sets,
+    // the edge tightens until the drawing is exact.
+    float soft = mix(0.2, 0.012, set);
+    float alpha = smoothstep(0.5 - soft, 0.5 + soft, level);
+    float exact = smoothstep(0.9, 1.0, set);
     alpha = mix(alpha, drawing.a * step(0.12, amount), exact);
 
-    // Liquid is a bead: a thin light along the rim that faces up-left, a
-    // thin shade along the one that faces away, and a body that deepens
-    // inwards. Set matter is flat, in the drawing's tones.
-    vec2 grad = vec2(dFdx(level), dFdy(level));
-    vec2 facing = normalize(grad + 1e-5);
-    // Only the outer rim: the body's own unevenness must not read as ridges.
-    float outer = 1.0 - smoothstep(0.6, 0.82, level);
-    float rim = smoothstep(9.0 * uDpr, 1.0 * uDpr, sd) * smoothstep(-1.0, 1.5 * uDpr, sd) * outer;
-    float lit = dot(facing, normalize(vec2(1.0, -1.0)));
-    float body = smoothstep(0.55, 0.95, level);
-    vec3 wet = uColor * mix(1.04, 0.9, body);
-    wet += rim * max(lit, 0.0) * 0.2;
-    wet -= rim * max(-lit, 0.0) * 0.14;
-    vec3 dry = uColor * mix(0.58, 0.94, drawing.r);
+    // Depth comes from a heavily blurred copy of the field, so it is one
+    // smooth falloff towards the middle and never shows the single drops.
+    float thick = textureLod(uField, vUv, 5.5).r / 0.5;
+    float depth = smoothstep(0.45, 1.0, thick);
+    vec3 wet = mix(uColor, uColor * 0.85, depth);
+    vec3 dry = uColor * mix(0.5, 0.94, drawing.r);
     vec3 color = mix(wet, dry, set * inside);
-    color += (hash(px + fract(uTime) * 61.0) - 0.5) * 0.018;
 
     fragColor = vec4(color * alpha, alpha);
   }
@@ -156,7 +143,6 @@ export interface MatterRenderer {
     count: number
     stage: { x: number; y: number; size: number }
     color: readonly [number, number, number]
-    time: number
   }) => void
   dispose: () => void
 }
@@ -226,10 +212,8 @@ export function createMatterRenderer(canvas: HTMLCanvasElement): MatterRenderer 
     field: gl.getUniformLocation(surface, 'uField'),
     mask: gl.getUniformLocation(surface, 'uMask'),
     viewport: gl.getUniformLocation(surface, 'uViewport'),
-    dpr: gl.getUniformLocation(surface, 'uDpr'),
     stage: gl.getUniformLocation(surface, 'uStage'),
     color: gl.getUniformLocation(surface, 'uColor'),
-    time: gl.getUniformLocation(surface, 'uTime'),
   }
 
   return {
@@ -253,7 +237,7 @@ export function createMatterRenderer(canvas: HTMLCanvasElement): MatterRenderer 
         float ? gl.HALF_FLOAT : gl.UNSIGNED_BYTE,
         null
       )
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
@@ -280,7 +264,7 @@ export function createMatterRenderer(canvas: HTMLCanvasElement): MatterRenderer 
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
     },
-    draw({ positions, states, count, stage, color, time }) {
+    draw({ positions, states, count, stage, color }) {
       // 1. The field.
       gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer)
       gl.viewport(0, 0, size.fieldWidth, size.fieldHeight)
@@ -307,15 +291,15 @@ export function createMatterRenderer(canvas: HTMLCanvasElement): MatterRenderer 
       gl.useProgram(surface)
       gl.activeTexture(gl.TEXTURE0)
       gl.bindTexture(gl.TEXTURE_2D, fieldTexture)
+      // Coarse levels of the field give the smooth depth.
+      gl.generateMipmap(gl.TEXTURE_2D)
       gl.activeTexture(gl.TEXTURE1)
       gl.bindTexture(gl.TEXTURE_2D, maskTexture)
       gl.uniform1i(uSurface.field, 0)
       gl.uniform1i(uSurface.mask, 1)
       gl.uniform2f(uSurface.viewport, size.width, size.height)
-      gl.uniform1f(uSurface.dpr, size.dpr)
       gl.uniform3f(uSurface.stage, stage.x, stage.y, stage.size)
       gl.uniform3f(uSurface.color, color[0], color[1], color[2])
-      gl.uniform1f(uSurface.time, time)
       gl.bindVertexArray(quadVao)
       gl.drawArrays(gl.TRIANGLES, 0, 6)
       gl.bindVertexArray(null)
