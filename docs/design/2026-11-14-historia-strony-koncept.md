@@ -56,7 +56,7 @@ w Next.js, a Astro i Payload w sekcji 7 to przykłady decyzji z innych projektó
 | stronypodhale         | Własne studio właściciela dla lokalnych firm, osobna marka i strona stronypodhale.pl.                                                    |
 | ready2order           | Austriacka firma (system kasowy SaaS), w której właściciel pracował 2019–2025.                                                           |
 | Plugin aspect-preview | Wtyczka open source do Payload CMS, kadrowanie zdjęć z podglądem proporcji.                                                              |
-| Zakofy                | Strona turystyczna właściciela, dla której powstał plugin.                                                                               |
+| Zakofy                | Strona turystyczna klienta, zbudowana przez właściciela; dla niej powstał plugin (15.11).                                                |
 | Piczura               | Strona dla klienta, w realizacji.                                                                                                        |
 | Airchos               | Własne narzędzie właściciela: bramki jakości dla agentów AI, w realizacji.                                                               |
 | Kontor                | Niepubliczny projekt właściciela; pomijamy.                                                                                              |
@@ -255,7 +255,6 @@ Dwie nowe podstrony w warstwie pracy (przyjęte):
    historiami po próbkach w kodzie i ostateczna lista kształtów.
 2. Linie z sekcji 7: zamknięte 15.11 (cztery linie przyjęte, dwie odrzucone).
 3. Źródła pochwał pluginu: zamknięte 15.11, publicznych źródeł nie ma, pochwał nie cytujemy (pomysł 7
-   z przeglądu jomor.design przez to odpada dla pluginu). Do wyjaśnienia: słownik nazywa Zakofy stroną
-   właściciela, a pochwały pochodzą „od właściciela zakofy”; czyja to strona.
+   z przeglądu jomor.design przez to odpada dla pluginu).
 4. Które rzeczy z części osobistej mogą być publiczne i jakie są zdjęcia.
 5. Wybór easter eggów.
