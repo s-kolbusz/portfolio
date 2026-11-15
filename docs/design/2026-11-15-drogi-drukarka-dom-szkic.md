@@ -6,6 +6,8 @@ bez zmian. Źródło faktów: `2026-11-14-historia-strony-koncept.md`, sekcje 5,
 
 ## Teksty (wersja Codexa po jednej rundzie poprawek)
 
+Drukarka: oznaczona przez właściciela 15.11 (punkty 1, 2, 4, 5 tak; zdanie z punktu 3 usunięte, reszta bez zmian).
+
 **Tytuł**
 Przebudowa drukarki 3D
 
@@ -23,7 +25,7 @@ Kupiłem drukarkę 3D z ciekawości. Fascynowało mnie, że w domu mogę sam rob
 - Potem moje zainteresowanie drukarką spadło.
 
 **Co z tego zostało**
-Dziś drukuję, gdy ktoś mnie poprosi albo sam czegoś potrzebuję. Nie robię tego stricte dla zarobku ani dla zabawy.
+Dziś drukuję, gdy ktoś mnie poprosi albo sam czegoś potrzebuję.
 
 **Definicja**
 W domu mogę sam zrobić nie tylko oprogramowanie.
@@ -57,14 +59,14 @@ Teraz korzystam z działającej instalacji i własnych paneli z danymi o energii
 
 ## Do potwierdzenia (tak / nie / popraw)
 
-Drukarka:
+Drukarka (oznaczone 15.11):
 
-1. Stan drukarki to „zrozumiane i odłożone”.
-2. Przebudowa objęła: płytę, procesor, silniki, mechanizm osi X i Y oraz głowicę (dysza, extruder,
+1. **Tak.** Stan drukarki to „zrozumiane i odłożone”.
+2. **Tak.** Przebudowa objęła: płytę, procesor, silniki, mechanizm osi X i Y oraz głowicę (dysza, extruder,
    procesor głowicy). Tekst mówi „wymieniłem” o płycie, procesorze, silnikach i mechanizmie osi.
-3. Zdanie „Nie robię tego stricte dla zarobku ani dla zabawy” może zostać na stronie.
-4. Obok tej drogi będzie kalkulator ceny wydruku.
-5. Tekst nie mówi, że chętnie byś drukarkę monetyzował; wystarczy „mogę wydrukować na zamówienie”.
+3. **Nie, usunięte** („niekoniecznie musimy to dawać”). Zdanie „Nie robię tego stricte dla zarobku ani dla zabawy” może zostać na stronie.
+4. **Tak.** Obok tej drogi będzie kalkulator ceny wydruku.
+5. **Tak.** Tekst nie mówi, że chętnie byś drukarkę monetyzował; wystarczy „mogę wydrukować na zamówienie”.
 
 Dom:
 
