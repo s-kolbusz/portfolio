@@ -260,6 +260,8 @@ Dwie nowe podstrony w warstwie pracy (przyjęte):
 2. Linie z sekcji 7: zamknięte 15.11 (cztery linie przyjęte, dwie odrzucone).
 3. Źródła pochwał pluginu: zamknięte 15.11, publicznych źródeł nie ma, pochwał nie cytujemy (pomysł 7
    z przeglądu jomor.design przez to odpada dla pluginu).
-4. Część osobista: drukarka, dom i auta mogą być publiczne (15.11); dron jako kandydat. Otwarte: jakie są
-   zdjęcia do każdej drogi i fakty o dronie.
+4. Część osobista: drukarka, dom i auta mogą być publiczne (15.11); dron jako kandydat. Zdjęcia
+   (właściciel, 15.11): drukarka: coś jest, może dorobić; dom: płot jest, ekrany z danymi może zrzucić,
+   pompa nie nadaje się na zdjęcie; auta: zdjęć nie ma i nie będzie, droga zostaje samym tekstem; dron:
+   materiał jest, głównie wideo. Otwarte: fakty o dronie.
 5. Wybór easter eggów.
