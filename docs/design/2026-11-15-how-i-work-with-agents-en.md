@@ -1,7 +1,7 @@
 # “How I work with agents”: English copy for the subpage
 
-**Status:** English version of the Polish copy approved by the owner on 15.11. The translation itself has
-not been read by him yet. A document, not code.
+**Status:** English version of the Polish copy. Translation read and approved by the owner on 15.11; no
+open points. A document, not code.
 
 **Source:** part 2 of `2026-11-14-jak-pracuje-z-agentami-szkic.md`. The Polish text wins where the two
 differ. If the Polish copy changes, this file has to follow.
@@ -110,7 +110,7 @@ good at open-ended questions about myself.
 
 ## Where next
 
-- The road “AI agents → Airchos”: the same principle, verification handed to tools, as a separate
+- The path “AI agents → Airchos”: the same principle, verification handed to tools, as a separate
   project.
 - “Why” notes: short texts about single technical decisions.
 
@@ -130,11 +130,9 @@ Not open questions about content; only places where English forced a choice.
 4. **Changed (owner, 15.11):** no literal translation of Polish sayings. “Seria pytań, która szuka dziury
    w pomyśle” is now “a round of questions to pick holes in the idea”, his wording and the English idiom.
 5. **OK (owner, 15.11):** “whether the thing was built right, not whether the right thing was built”.
-6. **Changed (owner, 15.11: sounded odd):** “open questions about myself don't work on me” is now “I'm no
-   good at open-ended questions about myself”. Waiting for his reply on the new wording.
-7. **Open, context given to the owner:** “droga” is “road” and notatki „dlaczego” are “Why” notes, only in
-   the closing “Where next” list. Both are names used across the whole site, so they should be settled
-   once in the concept, not on this page. Candidates for “droga”: road, path, route.
-8. **Open, owner asked to unify (15.11):** this document now uses American spelling (“color”,
-   “summarized”). The current site mixes “optimized”, “specialized” with “colour”; aligning the site's
-   own English files is a separate small change in `src/`, not done here.
+6. **OK (owner, 15.11):** “I'm no good at open-ended questions about myself” (the first version, “open
+   questions about myself don't work on me”, sounded odd to him).
+7. **Decided for the whole site (owner, 15.11):** “droga” is “path” in English. Notatki „dlaczego” are
+   “Why” notes.
+8. **Decided for the whole site (owner, 15.11):** American spelling. The current site still has “colour”
+   twice in its English files in `src/`; fixing that is a separate small change, not done here.
