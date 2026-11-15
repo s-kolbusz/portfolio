@@ -503,3 +503,48 @@ Nie sprawdzone: prawdziwy iPhone, czas klatki, wskaźnik i palec (zrzuty tego ni
 
 Poza zakresem, zauważone przy okazji: etykieta w hero to nadal „Web Architect” (`src/i18n/messages/pl.json:38`),
 a dokument decyzji każe ją zastąpić.
+
+### Prawdziwa ciecz zamiast sprężyn (2026-11-15/16)
+
+Diagnoza uzgodniona z właścicielem: sztuczność brała się z tego, że każda cząstka była przywiązana sprężyną
+do z góry przypisanego miejsca, a cząstki na siebie nie działały. To zostało usunięte w całości; **żadna
+cząstka nie ma już miejsca ani punktu docelowego**. Wygląd bloba, układ, typografia i rysunki bez zmian.
+
+Jak to teraz działa (`src/components/canvas/hero-samples/`):
+
+- **`matter-fluid.ts`, ciecz.** Cząstki odpychają się, gdy jest ciasno, trzymają razem, gdy są rozciągane,
+  hamują przy zbliżaniu i przejmują ruch sąsiadów. Napięcie powierzchniowe jest osobną siłą: materia jest
+  ciągnięta tam, gdzie w pobliżu jest jej więcej. Zlewanie, szyjki, zrywanie i nieregularne kształty
+  wynikają z tego same.
+- **`matter-moulds.ts`, forma.** Rysunek i litery to dwa pola liczone z istniejących masek: ściana (pole
+  odległości i jego kierunek) oraz „pragnienie” (przyciąga tam, gdzie formie jeszcze brakuje materii,
+  przestaje, gdy jest pełna). Materia wypełnia formę, bo sama się w niej rozpycha.
+- **`matter-story.ts`, historia jako siły.** Blob to ciążenie ku środkowi sceny (w środku żadne). Litery
+  buduje deszcz drobnych kropel rzuconych zza słów, grube krople z boków zbierają się w bloba. Gdy litery
+  przestają przyjmować materię, nadmiar spływa do bloba, wchodzi prawdziwy tekst, a forma puszcza (najpierw
+  najbliżej bloba). Rzecz: każda część rysunku ściąga sobie kroplę na własną stronę, więc blob dzieli się
+  na tyle nierównych kropel, ile rysunek ma części; kropla, która ma dość, spada w formę. Tężenie to
+  rosnąca lepkość tam, gdzie materia stoi w pełnej części formy. Topnienie idzie tą samą drogą wstecz.
+  Wskaźnik ma własną małą kroplę, którą blob wciąga, gdy podejdzie blisko.
+
+Dwa świadome odstępstwa od „samej fizyki”: ok. 1/3 materii jest od startu oznaczona jako ta, na którą
+działają litery (bez tego blob zalewał słowa jednym słupem), a podział bloba prowadzą punkty przyciągania
+wyznaczone z części rysunku. To są podziały i pola, nie przypisania do punktów.
+
+Odrzucone po drodze: kohezja z samego ciśnienia (ciecz zastygała jak plastelina), większa sztywność (rozpad
+symulacji), „pragnienie” odpychające nadmiar (wyrzucało materię z kadru), przyciąganie liter z daleka
+(krople przelatywały przez słowa), wybuch jako sposób rozbierania bloba (piana zamiast kropel).
+
+Sprawdzone: ruch oglądany na gęstych paskach, klatka po klatce w 60 kl./s, z prawdziwej strony (zegar
+strony przesuwany ręcznie, `cook/strips.mjs`, paski w `cook/stills/final/`) na 390×844, 1440×900 i
+3440×1440. Czas klatki, Chrome na Macu, build produkcyjny, ekran 120 Hz (`cook/frame-time.mjs`): JS na
+klatkę średnio 1,8 ms w układzie telefonu (1734 cząstki), 2,9 ms na 1440×900 i 3,3 ms na 3440×1440
+(2860 cząstek), 95. percentyl 2,8 / 4,5 / 4,8 ms; telefon z procesorem spowolnionym 4×: średnio 6,9 ms, 95. percentyl 10,3 ms. Przy 60 Hz symulacja robi dwa kroki na klatkę, więc koszt jest mniej więcej dwa
+razy większy. Testy jednostkowe: `matter-fluid.test.ts`, `matter-moulds.test.ts`, `matter-story.test.ts`.
+
+Nie sprawdzone: prawdziwy iPhone i Safari, koszt po stronie GPU, dotyk palcem (tylko mysz w skrypcie).
+
+Wciąż nie tak: początek podziału bloba rozchyla się w zbyt regularną gwiazdę; litery z materii mają braki
+w cienkich kreskach (wypełnienie ok. 75–85%), które przykrywa dopiero prawdziwy tekst; rzecz przed
+stężeniem przechodzi przez fazę jednolitej „płyty” nad rysunkiem; blob bywa na chwilę sklejony ze słowami,
+gdy litery puszczają; kropla wskaźnika dolatuje do niego rozproszona i zbiera się dopiero na miejscu.

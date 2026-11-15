@@ -1,20 +1,24 @@
+import { createFluid } from './matter-fluid'
+import { createMould, type Mould } from './matter-moulds'
 import type { RasterThing } from './things'
 
 /**
- * The matter as a few thousand small drops with mass. Nothing is moved along
- * a curve: every drop is pulled, and what the eye reads as choreography is
- * weight.
+ * The matter is one liquid (matter-fluid.ts): a few thousand particles that
+ * push apart, hold together and drag on each other. Nothing here moves a
+ * particle to a place; the story only changes what pulls on the liquid.
  *
- * - A travelling drop falls towards where it is going (a steady pull, like
- *   gravity or surface tension), so it starts slowly and arrives fast, on an
- *   arc of its own. It is never round: it stretches along its way, wobbles
- *   and bulges at its own pace, and trails the drops that are slow to follow.
- * - The blob is the heavy body. What reaches it is swallowed: it bulges,
- *   recoils and rings for a moment. Nothing flees from it.
- * - A drawing (a thing, or the letters of the name) is exact; drops pour
- *   into it from where they land and it sets wherever they come to rest.
+ * - The blob is the heavy body: a steady pull towards the middle of the
+ *   stage, loose inside it. What reaches it is absorbed because liquid that
+ *   touches liquid runs together.
+ * - A drawing (a thing, or the letters of the name) is a mould
+ *   (matter-moulds.ts): it draws matter to where it is still empty, lets it
+ *   spread inside, and holds it. Matter that has come to rest in a full part
+ *   of the mould sets: it thickens until it stands still, and the renderer
+ *   swaps it for the exact drawing.
+ * - Letting go is the mould's hold running out from the blob outwards; the
+ *   matter beads up by itself and falls back.
  *
- * All chaos lives here. What the drops settle into is precise.
+ * All chaos lives in the liquid. What it sets into is precise.
  */
 
 export interface Rect {
@@ -53,103 +57,37 @@ export interface StoryFrame {
   phase: 'birth' | 'blob' | 'forming' | 'hold' | 'melting'
 }
 
-type Mode = 'blob' | 'fly' | 'fill' | 'bead'
-
-interface Group {
-  mode: Mode
-  count: number
-  /** Centre of the drop, with its own inertia. */
-  x: number
-  y: number
-  vx: number
-  vy: number
-  /** Where it is heading: a place in a drawing (0–1 of its rectangle), or the blob. */
-  homeX: number
-  homeY: number
-  into: 'name' | 'thing' | 'blob'
-  /** The drawing its drops' spots belong to. */
-  spotsIn: 'name' | 'thing'
-  clock: number
-  /** Story time at which it sets off / lets go. */
-  at: number
-  radius: number
-  /** How hard it is pulled (px/s²): small drops fall faster than large ones. */
-  pull: number
-  /** Which way it circles on the way in. */
-  swerve: number
-  /** Its own wobble: phase, pace and depth. */
-  phase: number
-  pace: number
-  depth: number
-  /** Whether it has come close enough to start braking. */
-  near: boolean
-}
-
 const GOLDEN = 2.39996323
-/** How much wider than its share a liquid drop's spot is drawn. */
+/** How much wider than its share a liquid particle's spot is drawn. */
 const WIDE = 1.45
-/** Share of the matter that builds the letters on load. */
+/** Share of the matter the letters can hold. */
 const NAME_SHARE = 0.34
-/** How many drops gather into the blob on load. */
-const BLOB_DROPS = 11
+/** The liquid rests a little tighter than its nominal spacing; this evens it out. */
+const LOOSEN = 1.08
+/** Matter in a mould is given a little more room than it has, so it presses outwards and fills. */
+const SWELL = 1.06
+
+/** Forces, as multiples of the stage size per second squared (so every screen moves alike). */
+const WEIGHT = 4.6
+const THIRST = 9
+const WALL = 14
+const CURRENT = 0.4
+const SEED = 12
+/** Drag (1/s): the air, the blob's own thickness, a mould, and matter that has set. */
+const AIR = 1.5
+const BODY = 2.2
+const MOULD = 5
+const LANDING = 26
+const SET = 46
+/** How readily particles take on their neighbours' motion (1/s): liquid, and set. */
+const RUNNY = 5
+const STIFF = 40
 
 const random = (from: number, to: number) => from + Math.random() * (to - from)
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value))
 const smooth = (from: number, to: number, value: number) => {
   const t = clamp01((value - from) / (to - from))
   return t * t * (3 - 2 * t)
-}
-
-/** Cut a part's settling points into unequal pieces along its longer side. */
-function pieces(part: { points: Float32Array }, howMany: number) {
-  const size = part.points.length / 2
-  if (howMany <= 1 || size < howMany * 6) {
-    let sumX = 0
-    let sumY = 0
-    for (let j = 0; j < size; j++) {
-      sumX += part.points[j * 2]!
-      sumY += part.points[j * 2 + 1]!
-    }
-    return [{ x: sumX / Math.max(1, size), y: sumY / Math.max(1, size), points: part.points }]
-  }
-  let minX = 1
-  let maxX = 0
-  let minY = 1
-  let maxY = 0
-  for (let j = 0; j < size; j++) {
-    minX = Math.min(minX, part.points[j * 2]!)
-    maxX = Math.max(maxX, part.points[j * 2]!)
-    minY = Math.min(minY, part.points[j * 2 + 1]!)
-    maxY = Math.max(maxY, part.points[j * 2 + 1]!)
-  }
-  const axis = maxX - minX > maxY - minY ? 0 : 1
-  const sorted = Array.from({ length: size }, (_, j) => j).sort(
-    (first, second) => part.points[first * 2 + axis]! - part.points[second * 2 + axis]!
-  )
-  // Unequal shares: cut points jittered around an even split.
-  const cuts: number[] = []
-  for (let cut = 1; cut < howMany; cut++) {
-    cuts.push(clamp01(cut / howMany + random(-0.4, 0.4) / howMany))
-  }
-  cuts.sort((a, b) => a - b)
-  const result: Array<{ x: number; y: number; points: Float32Array }> = []
-  let from = 0
-  for (let piece = 0; piece < howMany; piece++) {
-    const to = piece === howMany - 1 ? size : Math.max(from + 3, Math.round(size * cuts[piece]!))
-    const points = new Float32Array((to - from) * 2)
-    let sumX = 0
-    let sumY = 0
-    for (let j = from; j < to; j++) {
-      const source = sorted[j]!
-      points[(j - from) * 2] = part.points[source * 2]!
-      points[(j - from) * 2 + 1] = part.points[source * 2 + 1]!
-      sumX += part.points[source * 2]!
-      sumY += part.points[source * 2 + 1]!
-    }
-    result.push({ x: sumX / (to - from), y: sumY / (to - from), points })
-    from = to
-  }
-  return result
 }
 
 export function createStory(options: {
@@ -160,335 +98,547 @@ export function createStory(options: {
   name: RasterThing | null
   layout: StoryLayout
 }) {
-  const { count, ballCount, things, name } = options
+  const { count, ballCount, things } = options
   let layout = options.layout
   const total = count + ballCount
 
-  const positions = new Float32Array(total * 2)
-  const velocities = new Float32Array(total * 2)
-  /** Per drop: spot size (px), settled (0–1), weight. */
+  const fluid = createFluid(total)
+  const { positions, velocities, accelerations } = fluid
+  /** Per particle, for the renderer: spot size (px), settled (0–1), weight. */
   const states = new Float32Array(total * 3)
-  /** Place in the blob (unit disc) and in its travelling drop (unit disc). */
-  const inBlob = new Float32Array(total * 2)
-  const inDrop = new Float32Array(total * 2)
-  /** Spot in its drawing (0–1 of that drawing's rectangle). */
-  const spots = new Float32Array(total * 2)
-  const groupOf = new Int16Array(total).fill(-1)
-  const delays = new Float32Array(total)
-  const seeds = new Float32Array(total)
+  /** Each particle is a little larger or smaller than the next, so the liquid never packs into a lattice. */
+  const girth = new Float32Array(total)
+  /** 1 loose liquid, 0 held in a mould. */
+  const wet = new Float32Array(total).fill(1)
+  const settled = new Float32Array(total)
+  /** 1 for the matter the letters draw on load; the rest answers only to the blob. */
+  const lettered = new Uint8Array(total)
+  /** When the mould's hold on each particle runs out (story time). */
+  const letGoAt = new Float32Array(total).fill(Infinity)
+  {
+    let sum = 0
+    for (let i = 0; i < total; i++) {
+      girth[i] = random(0.84, 1.16)
+      sum += girth[i]! * girth[i]!
+    }
+    const even = Math.sqrt(total / sum)
+    for (let i = 0; i < total; i++) girth[i] = girth[i]! * even
+  }
 
-  // Spacing of drops in each state; the spot each one draws follows it, so
-  // the matter keeps the same density whether loose or packed tight.
-  const spacing = { blob: 1, drop: 1, thing: 1, name: 1 }
-  let blobRadius = 1
+  // The moulds: the wall is read finely (thin strokes), the thirst coarsely.
+  const nameMould = options.name
+    ? createMould(options.name.mask, {
+        detail: Math.min(640, Math.round(layout.name.width)),
+        coarse: 44,
+        reach: 0.16,
+      })
+    : null
+  const thingMoulds = things.map((thing) => createMould(thing.mask, { detail: 256, coarse: 36 }))
+
+  // Lengths that follow the layout.
   const stageRect = (): Rect => ({
     x: layout.stage.x,
     y: layout.stage.y,
     width: layout.stage.size,
     height: layout.stage.size,
   })
-  const rectOf = (which: 'name' | 'thing') => (which === 'name' ? layout.name : stageRect())
-
+  const scale = { unit: 1, spacing: 1, radius: 1, name: 1, things: thingMoulds.map(() => 1) }
   const measure = () => {
-    const { stage } = layout
-    blobRadius = stage.size * 0.43
-    spacing.blob = blobRadius * Math.sqrt(Math.PI / count)
-    spacing.drop = spacing.blob * 0.86
+    scale.unit = layout.stage.size
+    scale.radius = layout.stage.size * 0.43
+    scale.spacing = scale.radius * Math.sqrt(Math.PI / count)
+    if (nameMould) {
+      const area = layout.name.width * layout.name.height * nameMould.coverage
+      scale.name = Math.sqrt(area / (count * NAME_SHARE))
+    }
+    thingMoulds.forEach((mould, index) => {
+      scale.things[index] = layout.stage.size * Math.sqrt(mould.coverage / total)
+    })
   }
   measure()
 
-  // The heavy body, with its own inertia.
-  const blob = {
+  const home = () => ({
     x: layout.stage.x + layout.stage.size / 2,
     y: layout.stage.y + layout.stage.size / 2,
-    vx: 0,
-    vy: 0,
-    /** Its radius follows how much matter it holds. */
-    radius: 0,
-    /** Rings after it swallows something. */
-    ring: 0,
-  }
-  const ball: Group = {
-    mode: 'fly',
-    count: ballCount,
-    x: blob.x,
-    y: blob.y,
-    vx: 0,
-    vy: 0,
-    homeX: 0.5,
-    homeY: 0.5,
-    into: 'blob',
-    spotsIn: 'thing',
-    clock: 0,
-    at: 0,
-    radius: 1,
-    pull: 0,
-    swerve: 0,
-    phase: 0,
-    pace: 7,
-    depth: 0.1,
-    near: false,
-  }
+  })
 
-  // Places in the blob are dealt at random, so any share of the matter fills
-  // the whole body evenly.
-  const order = Array.from({ length: count }, (_, i) => i)
-  for (let i = count - 1; i > 0; i--) {
-    const other = Math.floor(Math.random() * (i + 1))
-    ;[order[i], order[other]] = [order[other]!, order[i]!]
-  }
-  for (let i = 0; i < total; i++) {
-    seeds[i] = Math.random()
-    const place = i < count ? order[i]! : i
-    const radius = Math.sqrt((place + 0.5) / total)
-    inBlob[i * 2] = radius * Math.cos(place * GOLDEN)
-    inBlob[i * 2 + 1] = radius * Math.sin(place * GOLDEN)
-    states[i * 3] = spacing.drop * 1.6 * WIDE
-    states[i * 3 + 2] = 1 / (WIDE * WIDE)
-    positions[i * 2] = blob.x
-    positions[i * 2 + 1] = blob.y
-  }
-  for (let j = 0; j < ballCount; j++) {
-    const i = count + j
-    const radius = Math.sqrt((j + 0.5) / ballCount)
-    inDrop[i * 2] = radius * Math.cos(j * GOLDEN)
-    inDrop[i * 2 + 1] = radius * Math.sin(j * GOLDEN)
-  }
-
-  let groups: Group[] = []
   let phase: StoryFrame['phase'] = 'birth'
   let clock = 0
+  let phaseAt = 0
   let nextAt = 0
   let thing = 0
   let formed = 0
   let changed = true
-  let drawing: StoryFrame['drawing'] = name ? 'name' : 'thing'
-  let inked = !name
-  /** When the letters finished setting; they let go a moment later. */
-  let nameSetAt = -1
-  let nameReleased = false
-
-  const newGroup = (
-    size: number,
-    into: 'name' | 'thing' | 'blob',
-    homeX: number,
-    homeY: number
-  ): Group => {
-    // Small drops are quick and nervous, large ones slow and heavy.
-    const heft = clamp01(size / (count * 0.16))
-    return {
-      mode: 'fly',
-      count: size,
-      x: blob.x,
-      y: blob.y,
-      vx: 0,
-      vy: 0,
-      homeX,
-      homeY,
-      into,
-      spotsIn: into === 'name' ? 'name' : 'thing',
-      clock: 0,
-      at: 0,
-      radius: spacing.drop * Math.sqrt(size / Math.PI),
-      pull: layout.stage.size * random(5.2, 8.5) * (1.25 - 0.6 * heft),
-      swerve: random(0.25, 1) * (Math.random() < 0.5 ? -1 : 1),
-      phase: random(0, 6.28),
-      pace: random(5.5, 9.5) * (1.3 - 0.6 * heft),
-      depth: random(0.1, 0.24),
-      near: false,
+  let drawing: StoryFrame['drawing'] = nameMould ? 'name' : 'thing'
+  let inked = !nameMould
+  let inkedAt = -1
+  /** The letters have taken what they can: what is left over on them goes to the blob. */
+  let lettersDone = !nameMould
+  let lettersDoneAt = -1
+  let mostSet = 0
+  let mostSetAt = 0
+  /** The mould the matter answers to now, how strongly it draws, and whether it is letting go. */
+  let mould: Mould | null = nameMould
+  let draw = nameMould ? 1 : 0
+  let releasing = false
+  /** How much the blob's weight counts (0 while a thing has the matter). */
+  let weight = 1
+  let calmFor = 0
+  /** How much matter is in the middle of the stage (from the last frame). */
+  let inCore = 0
+  /**
+   * Where each part of the thing being formed gathers its matter first: a
+   * point out on its own side of the blob, pulling as hard as it still needs
+   * matter. The blob is drawn apart into as many unequal drops as the thing
+   * has parts; a drop that has its fill is let go and falls into the mould.
+   */
+  interface Seed {
+    x: number
+    y: number
+    /** Share of the matter its part holds, and how many particles that is. */
+    share: number
+    /** Radius within which matter counts as gathered (px). */
+    reach: number
+    need: number
+    have: number
+    done: boolean
+    /** How hard it draws; no two alike, so the drops leave at their own pace. */
+    vigour: number
+  }
+  let seeds: Seed[] = []
+  let sownAt = 0
+  const sow = (far = 1) => {
+    const parts = things[thing]?.parts ?? []
+    const whole = parts.reduce((sum, part) => sum + part.points.length, 0)
+    seeds = []
+    if (!whole) return
+    for (const part of parts) {
+      const share = part.points.length / whole
+      if (share < 0.02) continue
+      let dx = part.x - 0.5
+      let dy = part.y - 0.5
+      let distance = Math.hypot(dx, dy)
+      if (distance < 0.04) {
+        const turn = random(0, 6.2831853)
+        dx = Math.cos(turn)
+        dy = Math.sin(turn)
+        distance = 1
+      }
+      // Out on its own side, but never beyond the frame.
+      const ux = dx / distance
+      const uy = dy / distance
+      const centre = home()
+      const room = scale.spacing * Math.sqrt((share * total) / Math.PI)
+      const toEdge = Math.min(
+        ux > 0 ? (layout.width - centre.x) / ux : ux < 0 ? -centre.x / ux : Infinity,
+        uy > 0 ? (layout.height - centre.y) / uy : uy < 0 ? -centre.y / uy : Infinity
+      )
+      const out = Math.min(random(0.5, 0.72) * far, Math.max(0.3, (toEdge - room) / scale.unit))
+      seeds.push({
+        x: ux * out,
+        y: uy * out,
+        share,
+        reach: 0,
+        need: 1,
+        have: 0,
+        done: false,
+        vigour: random(0.55, 1.5),
+      })
     }
+    sownAt = clock
   }
+  const blob = { ...home(), radius: 0 }
 
-  const pack = (group: Group, index: number, members: number[]) => {
-    members.forEach((i, j) => {
-      groupOf[i] = index
-      const radius = Math.sqrt((j + 0.5) / members.length)
-      inDrop[i * 2] = radius * Math.cos(j * GOLDEN)
-      inDrop[i * 2 + 1] = radius * Math.sin(j * GOLDEN)
-    })
-    group.count = members.length
-    group.radius = spacing.drop * Math.sqrt(members.length / Math.PI)
-  }
-
-  // --- Load: drops come in from beyond the frame, each at its own pace.
-  // Some gather into the blob, some build the letters of the name. ---
+  // --- Load: the matter comes in from beyond the frame as unequal drops,
+  // each already moving, each on a course of its own. ---
   {
     const { width, height } = layout
-    const reach = Math.hypot(width, height) / 2
-    const nameCount = name ? Math.round(count * NAME_SHARE) : 0
-    let cursor = 0
-    const launch = (group: Group, towardsX: number, towardsY: number) => {
-      // From outside the frame, roughly on its own side of it.
-      const side = Math.atan2(towardsY - height / 2, towardsX - width / 2) + random(-1.1, 1.1)
-      // Just beyond the edge: the first of them is in the frame within a few frames.
-      const distance = reach * random(1.0, 1.28) + group.radius
-      group.x = width / 2 + Math.cos(side) * distance
-      group.y = height / 2 + Math.sin(side) * distance
-      // Already moving, and not straight at its goal.
-      const dx = towardsX - group.x
-      const dy = towardsY - group.y
-      const length = Math.hypot(dx, dy) || 1
-      const speed = layout.stage.size * random(1.6, 3.2)
-      const sideways = layout.stage.size * random(0.5, 1.5) * group.swerve
-      group.vx = (dx / length) * speed + (-dy / length) * sideways
-      group.vy = (dy / length) * speed + (dx / length) * sideways
-      group.at = random(0, 0.5)
+    const centre = home()
+    const aims: Array<{ x: number; y: number; size: number; letters: boolean }> = []
+    const split = (howMany: number, amount: number) => {
+      const shares = Array.from({ length: howMany }, () => 0.25 + Math.random() ** 2 * 2.4)
+      const whole = shares.reduce((sum, share) => sum + share, 0)
+      return shares.map((share) => Math.max(8, Math.round((share / whole) * amount)))
     }
-
-    if (name && nameCount) {
-      spacing.name = Math.sqrt((layout.name.width * layout.name.height * name.coverage) / nameCount)
-      // Each word arrives as several unequal drops.
-      const chunks = name.parts.flatMap((part) => pieces(part, part.points.length > 80 ? 4 : 2))
-      for (const chunk of chunks) {
-        const size = chunk.points.length / 2
-        const group = newGroup(size, 'name', chunk.x, chunk.y)
-        const members: number[] = []
-        for (let j = 0; j < size && cursor < count; j++, cursor++) {
-          members.push(cursor)
-          spots[cursor * 2] = chunk.points[j * 2]!
-          spots[cursor * 2 + 1] = chunk.points[j * 2 + 1]!
+    const rain = (howMany: number, amount: number) => {
+      const shares = Array.from({ length: howMany }, () => random(0.75, 1.25))
+      const whole = shares.reduce((sum, share) => sum + share, 0)
+      return shares.map((share) => Math.round((share / whole) * amount))
+    }
+    const mobileish = width < 768
+    if (nameMould) {
+      // Aimed at the letters, spread along them.
+      // Spread along them: each new aim is the candidate farthest from the ones before.
+      const chosen: Array<[number, number]> = []
+      // The letters are written by a rain of small drops.
+      for (const size of rain(mobileish ? 18 : 24, count * NAME_SHARE * 1.03)) {
+        let best = nameMould.pointInside()
+        let bestGap = -1
+        for (let attempt = 0; attempt < 24; attempt++) {
+          const candidate = nameMould.pointInside()
+          let gap = Infinity
+          for (const [cu, cv] of chosen) {
+            gap = Math.min(gap, Math.hypot(candidate[0] - cu, candidate[1] - cv))
+          }
+          if (gap > bestGap) {
+            bestGap = gap
+            best = candidate
+          }
         }
-        pack(group, groups.length, members)
-        launch(
-          group,
-          layout.name.x + chunk.x * layout.name.width,
-          layout.name.y + chunk.y * layout.name.height
-        )
-        groups.push(group)
+        chosen.push(best)
+        const [u, v] = best
+        aims.push({
+          x: layout.name.x + u * layout.name.width,
+          y: layout.name.y + v * layout.name.width,
+          size,
+          letters: true,
+        })
       }
     }
-    const rest = count - cursor
-    const shares = Array.from({ length: BLOB_DROPS }, () => 0.2 + Math.random() ** 2 * 2.6)
-    const whole = shares.reduce((sum, share) => sum + share, 0)
-    shares.forEach((share, index) => {
-      const size =
-        index === BLOB_DROPS - 1 ? count - cursor : Math.max(6, Math.round((share / whole) * rest))
-      if (size <= 0 || cursor >= count) return
-      const group = newGroup(size, 'blob', 0.5, 0.5)
-      const members: number[] = []
-      for (let j = 0; j < size && cursor < count; j++, cursor++) members.push(cursor)
-      pack(group, groups.length, members)
-      launch(group, blob.x, blob.y)
-      // The blob's drops trickle in over a longer stretch than the letters'.
-      group.at = random(0, 1.2)
-      groups.push(group)
-    })
-    for (let i = 0; i < count; i++) {
-      const group = groups[groupOf[i]!]
-      if (!group) continue
-      positions[i * 2] = group.x + inDrop[i * 2]! * group.radius
-      positions[i * 2 + 1] = group.y + inDrop[i * 2 + 1]! * group.radius
-      velocities[i * 2] = group.vx
-      velocities[i * 2 + 1] = group.vy
-    }
-  }
-
-  const membersOf = (group: Group) => {
-    const index = groups.indexOf(group)
-    const members: number[] = []
-    for (let i = 0; i < count; i++) if (groupOf[i] === index) members.push(i)
-    return members
-  }
-
-  const centreOf = (members: number[]) => {
-    let x = 0
-    let y = 0
-    for (const i of members) {
-      x += positions[i * 2]!
-      y += positions[i * 2 + 1]!
-    }
-    const n = Math.max(1, members.length)
-    return { x: x / n, y: y / n }
-  }
-
-  /** The blob swallows a drop: it takes its matter and its momentum. */
-  const swallow = (group: Group) => {
-    const share = group.count / count
-    blob.vx += group.vx * share * 2.2
-    blob.vy += group.vy * share * 2.2
-    blob.ring = Math.min(1, blob.ring + 0.35 + share * 3)
-    group.mode = 'blob'
-  }
-
-  /** A drop lands on its place in a drawing and pours out from there. */
-  const land = (group: Group) => {
-    const rect = rectOf(group.spotsIn)
-    group.mode = 'fill'
-    group.clock = 0
-    const pour = layout.stage.size * random(0.55, 0.85)
-    for (const i of membersOf(group)) {
-      const sx = rect.x + spots[i * 2]! * rect.width
-      const sy = rect.y + spots[i * 2 + 1]! * rect.height
-      delays[i] = Math.hypot(sx - group.x, sy - group.y) / pour + seeds[i]! * 0.07
-    }
-  }
-
-  /** A set piece lets go: its edges first, beading up where it stood, then it falls home. */
-  const release = (group: Group) => {
-    const members = membersOf(group)
-    const centre = centreOf(members)
-    group.mode = 'bead'
-    group.into = 'blob'
-    group.x = centre.x
-    group.y = centre.y
-    group.vx = 0
-    group.vy = 0
-    group.clock = 0
-    group.at = 0
-    group.near = false
-    let reach = 1
-    for (const i of members) {
-      reach = Math.max(
-        reach,
-        Math.hypot(positions[i * 2]! - centre.x, positions[i * 2 + 1]! - centre.y)
-      )
-    }
-    for (const i of members) {
-      const edge =
-        Math.hypot(positions[i * 2]! - centre.x, positions[i * 2 + 1]! - centre.y) / reach
-      delays[i] = (1 - edge) * 0.34 + seeds[i]! * 0.07
-    }
-  }
-
-  /** Hand each piece of the next thing its wedge of the blob, so drops leave towards where they are going. */
-  const assign = () => {
-    const raster = things[thing]!
-    spacing.thing = layout.stage.size * Math.sqrt(raster.coverage / count)
-    const byAngle = Array.from({ length: count }, (_, i) => i).sort((a, b) => {
-      const angleA = Math.atan2(positions[a * 2 + 1]! - blob.y, positions[a * 2]! - blob.x)
-      const angleB = Math.atan2(positions[b * 2 + 1]! - blob.y, positions[b * 2]! - blob.x)
-      return angleA - angleB
-    })
-    // The larger parts arrive as two or three drops of different sizes.
-    const chunks = raster.parts
-      .flatMap((part) => {
-        const size = part.points.length / 2
-        return pieces(part, size > count * 0.2 ? 3 : size > count * 0.07 ? 2 : 1)
+    const aimed = aims.reduce((sum, aim) => sum + aim.size, 0)
+    for (const size of split(11, total - aimed)) {
+      aims.push({
+        x: centre.x + random(-0.2, 0.2) * scale.radius,
+        y: centre.y + random(-0.2, 0.2) * scale.radius,
+        size,
+        letters: false,
       })
-      .map((chunk) => ({ chunk, angle: Math.atan2(chunk.y - 0.5, chunk.x - 0.5) }))
-      .sort((a, b) => a.angle - b.angle)
-
-    groups = []
+    }
     let cursor = 0
-    chunks.forEach(({ chunk }) => {
-      const size = chunk.points.length / 2
-      const group = newGroup(size, 'thing', chunk.x, chunk.y)
-      const members: number[] = []
-      for (let j = 0; j < size; j++) {
-        const i = byAngle[(cursor + j) % count]!
-        members.push(i)
-        spots[i * 2] = chunk.points[j * 2]!
-        spots[i * 2 + 1] = chunk.points[j * 2 + 1]!
+    aims.forEach((aim, index) => {
+      const size = index === aims.length - 1 ? total - cursor : Math.min(aim.size, total - cursor)
+      if (size <= 0) return
+      const radius = scale.spacing * Math.sqrt(size / Math.PI)
+      // From just beyond the edge of the frame. What builds the letters comes from
+      // behind them, so it does not cross the blob; the rest comes from the sides,
+      // so it does not cross the letters (the name stands above and below the stage).
+      const side = aim.letters
+        ? Math.atan2(aim.y - centre.y, aim.x - centre.x) + random(-0.8, 0.8)
+        : (Math.random() < 0.5 ? 0 : Math.PI) + random(-0.55, 0.55)
+      const dirX = Math.cos(side)
+      const dirY = Math.sin(side)
+      const toEdgeX = dirX > 0 ? (width - aim.x) / dirX : dirX < 0 ? -aim.x / dirX : Infinity
+      const toEdgeY = dirY > 0 ? (height - aim.y) / dirY : dirY < 0 ? -aim.y / dirY : Infinity
+      const stretch = random(1, 1.5)
+      const away =
+        Math.max(0, Math.min(toEdgeX, toEdgeY)) +
+        radius * stretch * 1.1 +
+        scale.unit * (aim.letters ? random(0, 0.9) : random(0.5, 3))
+      const startX = aim.x + dirX * away
+      const startY = aim.y + dirY * away
+      // Already on its way, not straight at where it is going, its front faster than its tail.
+      // The rain is thrown just hard enough to reach the letters through the air;
+      // the blob's drops only need a start, its weight does the rest.
+      const speed = aim.letters ? away * AIR * random(1.1, 1.45) : scale.unit * random(0.7, 1.7)
+      const sideways =
+        scale.unit *
+        (aim.letters ? random(0, 0.2) : random(0.15, 0.6)) *
+        (Math.random() < 0.5 ? -1 : 1)
+      const lead = random(0, 0.12)
+      for (let j = 0; j < size; j++, cursor++) {
+        const r = Math.sqrt((j + 0.5) / size) * radius
+        const along = r * Math.cos(j * GOLDEN) * stretch
+        const across = (r * Math.sin(j * GOLDEN)) / stretch
+        lettered[cursor] = aim.letters ? 1 : 0
+        positions[cursor * 2] = startX - dirX * along + dirY * across
+        positions[cursor * 2 + 1] = startY - dirY * along - dirX * across
+        const pace = speed * (1 + (lead * along) / (radius * stretch))
+        velocities[cursor * 2] = -dirX * pace - dirY * sideways
+        velocities[cursor * 2 + 1] = -dirY * pace + dirX * sideways
       }
-      pack(group, groups.length, members)
-      group.mode = 'blob'
-      // They leave when they are ready, not in a queue: most within a second, a few late.
-      group.at = clock + (Math.random() < 0.75 ? random(0.05, 0.9) : random(0.9, 1.5))
-      cursor += size
-      groups.push(group)
     })
-    drawing = 'thing'
-    changed = true
+    // The particles that answer to the pointer are scattered through the matter.
+    for (let j = 0; j < ballCount; j++) {
+      const a = count + j
+      const b = Math.floor(Math.random() * count)
+      lettered[a] = 0
+      lettered[b] = 0
+      for (const array of [positions, velocities]) {
+        for (let axis = 0; axis < 2; axis++) {
+          const kept = array[a * 2 + axis]!
+          array[a * 2 + axis] = array[b * 2 + axis]!
+          array[b * 2 + axis] = kept
+        }
+      }
+    }
+  }
+
+  const rectOf = (which: 'name' | 'thing') => (which === 'name' ? layout.name : stageRect())
+
+  /** The mould lets go: its hold runs out from the blob outwards. */
+  const letGo = () => {
+    const centre = home()
+    const pace = scale.unit * 1.5
+    for (let i = 0; i < total; i++) {
+      const distance = Math.hypot(positions[i * 2]! - centre.x, positions[i * 2 + 1]! - centre.y)
+      letGoAt[i] = clock + distance / pace
+    }
+    releasing = true
+  }
+  const open = (next: Mould) => {
+    mould = next
+    draw = 0
+    releasing = false
+    letGoAt.fill(Infinity)
+    next.count()
+    next.settle(0)
+  }
+
+  const advance = (
+    dt: number,
+    pointer: { x: number; y: number; active: boolean },
+    rounds: number
+  ) => {
+    const centre = home()
+    const { unit, spacing, radius } = scale
+    const rect = rectOf(drawing)
+    const mouldSpacing = drawing === 'name' ? scale.name : (scale.things[thing] ?? spacing)
+    const isName = drawing === 'name'
+    const perWidth = 1 / rect.width
+
+    // What the mould holds, and where it is still empty.
+    if (mould && draw > 0) {
+      mould.count()
+      const share = 1 / (isName ? count * NAME_SHARE : total)
+      for (let i = 0; i < total; i++) {
+        // Only matter that answers to this mould counts as filling it.
+        if (isName && !lettered[i]) continue
+        mould.add(
+          (positions[i * 2]! - rect.x) * perWidth,
+          (positions[i * 2 + 1]! - rect.y) * perWidth,
+          share
+        )
+      }
+      mould.settle(isName ? 4 : 8)
+    }
+
+    // The letters keep their matter from the blob only while they are still empty somewhere.
+    const hungry = !isName || !lettersDone
+
+    // The pointer's own drop is drawn towards the blob when it comes near.
+    const pointerToBlob = Math.hypot(pointer.x - centre.x, pointer.y - centre.y)
+    const drawnIn = pointer.active ? smooth(radius * 1.6, radius * 0.95, pointerToBlob) : 0
+    const reach = Math.max(unit * 0.16, spacing * 9)
+
+    // Seeds count what they have gathered afresh every frame.
+    const sowing = (phase === 'forming' || phase === 'melting') && seeds.some((seed) => !seed.done)
+    for (const seed of seeds) {
+      seed.reach = 1.3 * spacing * Math.sqrt((seed.share * total) / Math.PI)
+      seed.have = 0
+    }
+
+    // The blob's weight is nil only inside the body it already is: an empty
+    // middle draws matter all the way in.
+    const hollow = radius * Math.sqrt(clamp01(inCore / (0.36 * total)))
+    let core = 0
+
+    let resting = 0
+    let gathered = 0
+    let energy = 0
+    let sumX = 0
+    let sumY = 0
+    for (let i = 0; i < total; i++) {
+      const ix = i * 2
+      const iy = ix + 1
+      const x = positions[ix]!
+      const y = positions[iy]!
+      const vx = velocities[ix]!
+      const vy = velocities[iy]!
+      const speed = Math.hypot(vx, vy)
+      const called = i >= count && pointer.active
+      let ax = 0
+      let ay = 0
+      let drag = AIR
+      let viscosity = RUNNY
+      let inMould = false
+      let grip = 0
+      let wetting = 0
+      let landing = 0
+      /** How much it answers to the mould rather than to the blob (while the mould is still thirsty). */
+      let answering = 0
+
+      // --- The parts of a thing gather their matter out on their own sides first. ---
+      let gathering = 0
+      if (sowing && !called) {
+        // It answers to the one part that draws it hardest, so the pulls never cancel
+        // and the blob comes apart cleanly; as a part gets its fill, the others take over.
+        let best = 0
+        let bestX = 0
+        let bestY = 0
+        let vigour = 1
+        let nearness = 1
+        for (const seed of seeds) {
+          if (seed.done) continue
+          const sx = centre.x + seed.x * unit - x
+          const sy = centre.y + seed.y * unit - y
+          const distance = Math.hypot(sx, sy) || 1
+          if (distance < seed.reach) {
+            seed.have++
+            drag += 6
+          }
+          const pull = (seed.need * Math.min(1, seed.reach / distance)) / distance
+          if (pull > best) {
+            best = pull
+            bestX = sx / distance
+            bestY = sy / distance
+            vigour = seed.vigour
+            nearness = Math.min(1, seed.reach / distance)
+          }
+        }
+        if (best > 0) {
+          gathering = 1
+          // What is nearest goes first: drops are drawn off the rim, the middle thins last.
+          const pull = SEED * unit * vigour * (0.25 + 0.75 * nearness * nearness)
+          ax += bestX * pull
+          ay += bestY * pull
+        }
+      }
+
+      // --- The mould: its thirst, its wall, its hold. ---
+      if (mould && draw > 0 && !called && (!isName || lettered[i])) {
+        grip = draw * (1 - gathering) * (releasing ? 1 - clamp01((clock - letGoAt[i]!) / 0.3) : 1)
+        if (grip > 0) {
+          const u = (x - rect.x) * perWidth
+          const v = (y - rect.y) * perWidth
+          mould.wall(u, v)
+          const distance = mould.distance * rect.width
+          inMould = distance < mouldSpacing * 0.4
+          mould.thirst(u, v)
+          const fill = mould.fill
+          answering = grip * (releasing || !hungry ? 0 : 1)
+          const still = 1 - settled[i]!
+          if (!releasing) {
+            // The letters answer to small gaps too; a thing draws more evenly.
+            const pull =
+              (mould.pull / (mould.pull + (isName ? 0.3 : 1))) * THIRST * unit * grip * still
+            ax += mould.towardsX * pull
+            ay += mould.towardsY * pull
+          }
+          if (distance > 0) {
+            // Just outside: drawn in. The letters only take what they have room for.
+            const near = isName ? 1 - smooth(mouldSpacing * 2, mouldSpacing * 5, distance) : 1
+            const room = isName ? 1 - smooth(1, 1.3, fill) : 1
+            const pull =
+              WALL * unit * Math.min(1, distance / (mouldSpacing * 0.8)) * grip * near * room
+            ax -= mould.awayX * pull
+            ay -= mould.awayY * pull
+            // Being drawn in, it wets the drawing instead of holding itself round.
+            wetting = grip * room * (1 - smooth(mouldSpacing * 1.5, mouldSpacing * 6, distance))
+            landing = grip * (isName ? 1 : room) * (1 - smooth(unit * 0.04, unit * 0.2, distance))
+          } else {
+            wetting = grip
+            landing = grip
+          }
+          // It sets where it has come to rest and the mould around it is full.
+          const rests =
+            inMould && grip > 0.6 && speed < unit * 0.14 && fill > 0.55 && (!isName || fill < 1.4)
+          settled[i] = clamp01(settled[i]! + (rests ? dt / 0.4 : -dt / 0.3))
+          // The drawing is a surface: what lands on it stays on it.
+          // (Only what arrives fast is braked; what creeps along it to an empty part is not.)
+          drag += inMould ? MOULD * grip : LANDING * landing * smooth(unit * 0.3, unit * 0.9, speed)
+        }
+      }
+      if (grip <= 0) settled[i] = clamp01(settled[i]! - dt / 0.25)
+      const set = settled[i]!
+      drag += SET * set * set
+      viscosity += STIFF * set
+
+      // --- The blob's weight: none inside it, steady beyond it. ---
+      const toX = centre.x - x
+      const toY = centre.y - y
+      const far = Math.hypot(toX, toY) || 1
+      const heavy = weight * (inMould ? 1 - grip : 1 - answering)
+      if (heavy > 0) {
+        const pull = WEIGHT * unit * smooth(hollow * 0.8, hollow * 0.8 + radius * 0.5, far) * heavy
+        ax += (toX / far) * pull
+        ay += (toY / far) * pull
+        drag += BODY * heavy * (1 - smooth(radius * 0.9, radius * 1.5, far))
+      }
+
+      // --- Slow currents, shared by neighbours, keep the liquid from ever standing still. ---
+      if (!inMould) {
+        const wave = 4.4 / radius
+        const push = CURRENT * unit
+        ax += Math.sin((y - centre.y) * wave + clock * 0.7) * push
+        ay += Math.cos((x - centre.x) * wave * 1.13 - clock * 0.53) * push
+      }
+
+      // --- The pointer: its own drop follows it; liquid nearby reaches for it; set matter softens. ---
+      if (pointer.active) {
+        const px = pointer.x - x
+        const py = pointer.y - y
+        const distance = Math.hypot(px, py) || 1
+        if (called) {
+          const pull = Math.min(distance * 90, unit * 30) * (1 - 0.75 * drawnIn)
+          ax += (px / distance) * pull
+          ay += (py / distance) * pull
+          // Near the pointer it is held still, so it gathers into a drop instead of circling.
+          drag += 4 + 14 * (1 - smooth(reach * 0.5, reach * 2, distance))
+        } else if (distance < reach) {
+          const closeness = (1 - distance / reach) ** 2
+          if (inMould) settled[i] = clamp01(settled[i]! - dt * 3 * closeness)
+          else {
+            ax += (px / distance) * closeness * unit * 5
+            ay += (py / distance) * closeness * unit * 5
+          }
+        }
+      }
+
+      accelerations[ix] = ax
+      accelerations[iy] = ay
+      fluid.drag[i] = drag
+      fluid.viscosity[i] = called ? RUNNY * drawnIn : viscosity
+
+      // Loose or held: the spacing it wants, and whether surface tension acts on it.
+      const loose = inMould ? 1 - grip : 1
+      wet[i] = wet[i]! + (loose - wet[i]!) * (1 - Math.exp(-dt / 0.16))
+      const liquid = wet[i]!
+      // What builds the letters wets them: it does not pull itself into beads until it is let go.
+      // (The pointer's drop is held by the pointer, not by itself, until the blob draws it in.)
+      fluid.loose[i] = called ? drawnIn : Math.min(liquid, 1 - wetting, 1 - answering)
+      fluid.sizes[i] =
+        girth[i]! * (mouldSpacing * SWELL + (spacing * LOOSEN - mouldSpacing * SWELL) * liquid)
+
+      // What the renderer draws: a wide soft spot when liquid, a tight one in a mould.
+      const own = girth[i]! * (mouldSpacing + (spacing - mouldSpacing) * liquid)
+      const wide = 1 + (WIDE - 1) * liquid
+      states[i * 3] = own * 1.6 * wide
+      states[i * 3 + 1] = set
+      states[i * 3 + 2] = 1 / (wide * wide)
+
+      if (set > 0.5) resting++
+      if (far < radius * 0.6) core++
+      if (far < radius * 1.3) {
+        gathered++
+        sumX += x
+        sumY += y
+      }
+      energy += speed
+    }
+
+    if (sowing) {
+      for (const seed of seeds) {
+        if (seed.done) continue
+        seed.need = clamp01(1 - seed.have / (seed.share * total))
+        // It has its fill (or has waited long enough): the drop is let go.
+        if (
+          seed.need < (phase === 'melting' ? 0.35 : 0.15) ||
+          clock > sownAt + (phase === 'melting' ? 0.9 : 1.8)
+        )
+          seed.done = true
+      }
+    }
+
+    inCore = core
+    for (let round = 0; round < rounds; round++) fluid.step(dt / rounds)
+
+    return {
+      resting,
+      gathered,
+      calm: energy / total < unit * 0.14,
+      centreX: gathered ? sumX / gathered : centre.x,
+      centreY: gathered ? sumY / gathered : centre.y,
+    }
   }
 
   const step = (
@@ -496,309 +646,101 @@ export function createStory(options: {
     pointer: { x: number; y: number; active: boolean },
     tapped: boolean
   ): StoryFrame => {
-    const dt = Math.min(delta, 1 / 30)
+    // Short steps keep the liquid stiff; a slow frame is slowed down rather than made coarse.
+    const rounds = Math.min(3, Math.max(1, Math.ceil(delta * 110)))
+    const dt = Math.min(delta, rounds / 110)
     clock += dt
-    const { stage } = layout
-    const stageX = stage.x + stage.size / 2
-    const stageY = stage.y + stage.size / 2
+    const { spacing } = scale
 
-    // --- The blob: drifts about the middle, carries momentum, rings when fed ---
-    let held = 0
-    for (let i = 0; i < count; i++) {
-      const group = groups[groupOf[i]!]
-      if (!group || group.mode === 'blob') held++
-    }
-    const calm = phase === 'forming' || phase === 'hold' ? 0.25 : 1
-    const driftX =
-      (Math.sin(clock * 0.23) * 0.07 + Math.sin(clock * 0.41 + 2.1) * 0.04) * stage.size * calm
-    const driftY =
-      (Math.cos(clock * 0.19 + 0.7) * 0.06 + Math.sin(clock * 0.37 + 4) * 0.035) * stage.size * calm
-    blob.vx += ((stageX + driftX - blob.x) * 22 - blob.vx * 5.5) * dt
-    blob.vy += ((stageY + driftY - blob.y) * 22 - blob.vy * 5.5) * dt
-    blob.x += blob.vx * dt
-    blob.y += blob.vy * dt
-    const full = blobRadius * Math.sqrt(Math.max(held, 1) / count)
-    blob.radius += (full - blob.radius) * (1 - Math.exp(-dt / 0.22))
-    blob.ring = Math.max(0, blob.ring - dt / 1.1)
+    // A mould draws harder as it opens; the blob's weight returns as a thing lets go.
+    const thingHasIt = phase === 'forming' || phase === 'hold'
+    draw = Math.min(1, draw + (mould ? dt / 0.35 : 0))
+    // (While a thing comes apart into drops, the blob waits for them.)
+    const apart = phase === 'melting' && seeds.some((seed) => !seed.done)
+    weight += ((thingHasIt || apart ? 0 : 1) - weight) * (1 - Math.exp(-dt / 0.2))
 
-    // --- What happens next (only decides where matter is pulled) ---
-    let settled = 0
-    for (let i = 0; i < count; i++) settled += states[i * 3 + 1]!
-    formed = settled / count
+    fluid.cohere(
+      {
+        x: -layout.width * 0.15,
+        y: -layout.height * 0.15,
+        width: layout.width * 1.3,
+        height: layout.height * 1.3,
+      },
+      spacing
+    )
+    const now = advance(dt, pointer, rounds)
+    calmFor = now.calm ? calmFor + dt : 0
+    const allHome = now.gathered > total * 0.985 && calmFor > 0.25
 
-    for (const group of groups) {
-      group.clock += dt
-      if (group.mode === 'bead' && group.clock > 0.5) {
-        group.mode = 'fly'
-        group.clock = 0
-      }
-    }
-
+    // --- What happens next. Every change has a cause in the matter itself. ---
     if (phase === 'birth') {
-      if (name && nameSetAt < 0) {
-        let nameSettled = 0
-        let nameTotal = 0
-        for (const group of groups) {
-          if (group.spotsIn !== 'name' || group.into !== 'name') continue
-          for (const i of membersOf(group)) {
-            nameSettled += states[i * 3 + 1]!
-            nameTotal++
-          }
+      formed = clamp01(now.resting / (count * NAME_SHARE))
+      if (nameMould && !lettersDone) {
+        // The letters are full, or have stopped taking matter in.
+        if (formed > mostSet + 0.04) {
+          mostSet = formed
+          mostSetAt = clock
         }
-        if (nameTotal && nameSettled / nameTotal > 0.97) nameSetAt = clock
-      }
-      if (nameSetAt >= 0 && clock > nameSetAt + 0.3) inked = true
-      if (nameSetAt >= 0 && !nameReleased && clock > nameSetAt + 0.7) {
-        nameReleased = true
-        // The letters have dried: their matter beads up and falls into the blob.
-        for (const group of groups) {
-          if (group.mode === 'fill') group.at = clock + random(0, 0.4)
+        const full = nameMould.filled() > 0.84 && formed > 0.7
+        const stalled = formed > 0.4 && clock > mostSetAt + 0.35
+        if (full || stalled || clock > 6) {
+          lettersDone = true
+          lettersDoneAt = clock
         }
       }
-      if (nameReleased) {
-        for (const group of groups) {
-          if (group.mode === 'fill' && clock >= group.at) release(group)
-        }
+      // What was left over has run off: the letters dry to ink.
+      if (nameMould && lettersDone && !inked && clock > lettersDoneAt + 0.3) {
+        inked = true
+        inkedAt = clock
       }
-      if ((nameReleased || !name) && groups.every((group) => group.mode === 'blob')) {
+      // The text has taken over; the matter is let go, nearest the blob first.
+      if (nameMould && inked && !releasing && clock > inkedAt + 0.45) letGo()
+      if ((releasing || !nameMould) && (allHome || clock > phaseAt + 12)) {
         phase = 'blob'
+        phaseAt = clock
+        mould = null
         nextAt = clock + random(0.5, 0.9)
       }
-    }
-    if (phase === 'blob' && (clock >= nextAt || tapped)) {
-      assign()
-      phase = 'forming'
-    }
-    if (phase === 'forming') {
-      for (const group of groups) {
-        if (group.mode === 'blob' && group.into === 'thing' && clock >= group.at) {
-          const centre = centreOf(membersOf(group))
-          group.mode = 'fly'
-          group.x = centre.x
-          group.y = centre.y
-          // It is pushed out of the body before it starts to fall.
-          group.vx = (centre.x - blob.x) * 2.4 + blob.vx
-          group.vy = (centre.y - blob.y) * 2.4 + blob.vy
-          group.clock = 0
-          group.near = false
-        }
+    } else if (phase === 'blob') {
+      if (clock >= nextAt || tapped) {
+        phase = 'forming'
+        phaseAt = clock
+        drawing = 'thing'
+        changed = true
+        open(thingMoulds[thing]!)
+        sow()
       }
-      if (formed > 0.985 && groups.every((group) => group.mode === 'fill')) {
+    } else if (phase === 'forming') {
+      formed = clamp01(now.resting / total)
+      if (formed > 0.93 || (calmFor > 0.6 && clock > phaseAt + 1.5) || clock > phaseAt + 9) {
         phase = 'hold'
+        phaseAt = clock
         nextAt = clock + random(2.3, 3)
       }
-    }
-    if (phase === 'hold' && (clock >= nextAt || tapped)) {
-      phase = 'melting'
-      for (const group of groups) {
-        group.at = clock + (Math.random() < 0.7 ? random(0, 0.6) : random(0.6, 1.1))
+    } else if (phase === 'hold') {
+      formed = clamp01(now.resting / total)
+      if (clock >= nextAt || tapped) {
+        phase = 'melting'
+        phaseAt = clock
+        letGo()
+        sow(0.8)
       }
-    }
-    if (phase === 'melting') {
-      for (const group of groups) {
-        if (group.mode === 'fill' && clock >= group.at) release(group)
-      }
-      if (groups.every((group) => group.mode === 'blob')) {
+    } else if (phase === 'melting') {
+      formed = clamp01(now.resting / total)
+      if ((allHome && clock > phaseAt + 0.6) || clock > phaseAt + 9) {
         phase = 'blob'
+        phaseAt = clock
+        mould = null
         thing = (thing + 1) % things.length
         nextAt = clock + random(0.8, 1.4)
       }
     }
 
-    // --- Travelling drops fall towards where they are going ---
-    for (const group of groups) {
-      if (group.mode !== 'fly' || clock < group.at) continue
-      const rect = rectOf(group.spotsIn)
-      const toBlob = group.into === 'blob'
-      const toX = toBlob ? blob.x : rect.x + group.homeX * rect.width
-      const toY = toBlob ? blob.y : rect.y + group.homeY * rect.height
-      const dx = toX - group.x
-      const dy = toY - group.y
-      const distance = Math.hypot(dx, dy) || 1
-      const speed = Math.hypot(group.vx, group.vy)
-      const close = toBlob ? Math.max(blob.radius * 0.8, stage.size * 0.1) : stage.size * 0.22
-      if (distance < close) group.near = true
-
-      // A steady pull, a little air, and a sideways current of its own.
-      const braking = group.near && !toBlob
-      const pull = group.pull * (braking ? 1.6 : 1)
-      let ax = (dx / distance) * pull
-      let ay = (dy / distance) * pull
-      const current = Math.sin(clock * 1.7 + group.phase) * stage.size * 0.9 * group.swerve
-      ax += (-dy / distance) * current
-      ay += (dx / distance) * current
-      // Close to a place in a drawing it brakes hard, so it lands instead of circling.
-      const drag = braking ? 7.5 : 0.55
-      ax -= group.vx * drag
-      ay -= group.vy * drag
-      group.vx += ax * dt
-      group.vy += ay * dt
-      group.x += group.vx * dt
-      group.y += group.vy * dt
-
-      if (toBlob) {
-        if (distance < Math.max(blob.radius * 0.6, stage.size * 0.07) || group.clock > 4)
-          swallow(group)
-      } else if ((distance < stage.size * 0.06 && speed < stage.size * 1.4) || group.clock > 2.2) {
-        land(group)
-      }
-    }
-
-    // The one loose drop follows the pointer. The blob is the heavier of the
-    // two: near it the drop is drawn in, and the blob reaches for it.
-    ball.radius = spacing.drop * Math.sqrt(ballCount / Math.PI)
-    {
-      const toBlob = Math.hypot(pointer.x - blob.x, pointer.y - blob.y)
-      const drawn = pointer.active ? smooth(blob.radius * 2.4, blob.radius * 0.9, toBlob) * 0.5 : 1
-      const toX = pointer.active ? pointer.x + (blob.x - pointer.x) * drawn : blob.x
-      const toY = pointer.active ? pointer.y + (blob.y - pointer.y) * drawn : blob.y
-      const stiffness = pointer.active ? 55 : 14
-      const damping = pointer.active ? 11 : 6
-      ball.vx += ((toX - ball.x) * stiffness - ball.vx * damping) * dt
-      ball.vy += ((toY - ball.y) * stiffness - ball.vy * damping) * dt
-      ball.x += ball.vx * dt
-      ball.y += ball.vy * dt
-    }
-
-    // --- Every drop ---
-    const reachOut = Math.max(ball.radius * 4.5, stage.size * 0.18)
-    for (let i = 0; i < total; i++) {
-      const ix = i * 2
-      const iy = ix + 1
-      const seed = seeds[i]!
-      let x = positions[ix]!
-      let y = positions[iy]!
-      const isBall = i >= count
-      const group = isBall ? ball : groups[groupOf[i]!]
-      const mode: Mode = isBall ? 'fly' : group ? group.mode : 'blob'
-
-      let targetX = x
-      let targetY = y
-      let stiffness = 0
-      let ratio = 0.7
-      let size = spacing.drop
-      let liquid = 1
-      let settling = false
-
-      if (mode === 'blob') {
-        // A lobed body that turns as one and is never a circle.
-        const bx = inBlob[ix]!
-        const by = inBlob[iy]!
-        const radius = Math.hypot(bx, by)
-        const angle = Math.atan2(by, bx) + clock * 0.11
-        const lobes =
-          1 +
-          0.13 * Math.sin(angle * 3 + clock * 0.62) +
-          0.08 * Math.sin(angle * 5 - clock * 0.83 + 1.3) +
-          0.05 * Math.sin(angle * 2 + clock * 0.31 + 4) +
-          // Just fed, it rings.
-          blob.ring * 0.1 * Math.sin(angle * 4 + clock * 9)
-        const r = radius * blob.radius * lobes
-        targetX = blob.x + Math.cos(angle) * r
-        targetY = blob.y + Math.sin(angle) * r
-        stiffness = 26 * (0.75 + 0.5 * seed)
-        ratio = 0.7 - 0.3 * blob.ring
-        size = spacing.blob
-      } else {
-        const g = group!
-        const rect = rectOf(g.spotsIn)
-        const poured = mode === 'fill' && g.clock >= delays[i]!
-        const holding = mode === 'bead' && g.clock < delays[i]!
-        if (!isBall && (poured || holding)) {
-          targetX = rect.x + spots[ix]! * rect.width
-          targetY = rect.y + spots[iy]! * rect.height
-          stiffness = 46 * (0.75 + 0.5 * seed)
-          ratio = 0.9
-          size = g.spotsIn === 'name' ? spacing.name : spacing.thing
-          liquid = 0.15
-          settling = poured
-        } else {
-          // Packed into its drop. The drop is alive: it stretches along its
-          // way, squashes and bulges at its own pace, and no two are alike.
-          const speed = Math.hypot(g.vx, g.vy)
-          const stretch = Math.min(0.85, speed / (stage.size * 2.6))
-          const dirX = speed > 1 ? g.vx / speed : 1
-          const dirY = speed > 1 ? g.vy / speed : 0
-          let ox = inDrop[ix]! * g.radius
-          let oy = inDrop[iy]! * g.radius
-          const turn = Math.atan2(oy, ox)
-          const bulge =
-            1 +
-            g.depth * Math.sin(turn * 2 + clock * g.pace + g.phase) +
-            g.depth * 0.6 * Math.sin(turn * 3 - clock * g.pace * 0.7 + g.phase * 2)
-          ox *= bulge
-          oy *= bulge
-          const along = ox * dirX + oy * dirY
-          const across = -ox * dirY + oy * dirX
-          // Longer along its way, thinner across it, heavier at the front.
-          const front = along * (1 + stretch * 1.1) - g.radius * stretch * 0.55
-          const side = across * (1 - stretch * 0.38)
-          targetX = g.x + dirX * front - dirY * side
-          targetY = g.y + dirY * front + dirX * side
-          // Some drops in it are slow to follow: that is its tail.
-          stiffness = (isBall ? 80 : 60) * (0.4 + 1.2 * seed)
-          ratio = isBall ? 0.78 : 0.72
-          size = spacing.drop
-        }
-      }
-
-      // It sets once it has come to rest on its spot.
-      let settledNow = states[i * 3 + 1]!
-      if (settling) {
-        const off = Math.hypot(targetX - x, targetY - y)
-        const speed = Math.hypot(velocities[ix]!, velocities[iy]!)
-        if (off < size * 1.8 && speed < stage.size * 0.22) settledNow += dt / 0.55
-        else settledNow -= dt / 0.5
-      } else settledNow -= dt / 0.22
-
-      let ax = (targetX - x) * stiffness
-      let ay = (targetY - y) * stiffness
-      const damping = 2 * Math.sqrt(Math.max(stiffness, 0.01)) * ratio
-      ax -= velocities[ix]! * damping
-      ay -= velocities[iy]! * damping
-
-      if (liquid > 0.5) {
-        // Neighbours share the current, so the body moves as one and does not clump.
-        const stir = stage.size * 0.07
-        ax += Math.sin(y * 0.012 + clock * 0.7) * stir
-        ay += Math.cos(x * 0.011 - clock * 0.6) * stir
-      }
-
-      // Liquid matter reaches for the loose drop; set matter near it goes wet again.
-      if (pointer.active && !isBall) {
-        const dx = ball.x - x
-        const dy = ball.y - y
-        const distance = Math.hypot(dx, dy)
-        if (distance < reachOut) {
-          const closeness = (1 - distance / reachOut) ** 2
-          if (liquid > 0.5) {
-            const force = closeness * stage.size * 9
-            ax += (dx / (distance || 1)) * force
-            ay += (dy / (distance || 1)) * force
-          } else settledNow -= dt * 3 * closeness
-        }
-      }
-
-      velocities[ix] = velocities[ix]! + ax * dt
-      velocities[iy] = velocities[iy]! + ay * dt
-      x += velocities[ix]! * dt
-      y += velocities[iy]! * dt
-      positions[ix] = x
-      positions[iy] = y
-
-      // Liquid is drawn with wide, light spots (a smooth body); on its way into a
-      // drawing the spots tighten, so the fill keeps the drawing's detail.
-      const wide = liquid > 0.5 ? WIDE : 1
-      // Without a pointer the loose drop is part of the blob and is not drawn.
-      const hidden = isBall && !pointer.active
-      const spot = hidden ? 0 : size * 1.6 * wide
-      const ease = 1 - Math.exp(-dt / 0.24)
-      states[i * 3] = states[i * 3]! + (spot - states[i * 3]!) * ease
-      states[i * 3 + 1] = Math.min(1, Math.max(0, settledNow))
-      // Weight follows the spot actually drawn, so the amount of matter stays the same.
-      const drawn = Math.max(states[i * 3]! / Math.max(size * 1.6, 1e-3), 0.2)
-      states[i * 3 + 2] = hidden ? 0 : 1 / (drawn * drawn)
-    }
+    // The heavy body, as the letters of the name feel it.
+    const ease = 1 - Math.exp(-dt / 0.25)
+    blob.x += (now.centreX - blob.x) * ease
+    blob.y += (now.centreY - blob.y) * ease
+    blob.radius += (spacing * Math.sqrt(now.gathered / Math.PI) * weight - blob.radius) * ease
 
     const frame: StoryFrame = {
       positions,
@@ -820,15 +762,18 @@ export function createStory(options: {
   return {
     step,
     resize(next: StoryLayout) {
+      // The matter keeps its place relative to the stage.
+      const before = home()
+      const ratio = next.stage.size / layout.stage.size
       layout = next
-      measure()
-      for (const group of groups) group.radius = spacing.drop * Math.sqrt(group.count / Math.PI)
-      spacing.thing = next.stage.size * Math.sqrt(things[thing]!.coverage / count)
-      if (name) {
-        spacing.name = Math.sqrt(
-          (next.name.width * next.name.height * name.coverage) / Math.max(1, count * NAME_SHARE)
-        )
+      const after = home()
+      for (let i = 0; i < total; i++) {
+        positions[i * 2] = after.x + (positions[i * 2]! - before.x) * ratio
+        positions[i * 2 + 1] = after.y + (positions[i * 2 + 1]! - before.y) * ratio
+        velocities[i * 2] = velocities[i * 2]! * ratio
+        velocities[i * 2 + 1] = velocities[i * 2 + 1]! * ratio
       }
+      measure()
     },
   }
 }
