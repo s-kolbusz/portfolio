@@ -1,7 +1,7 @@
 # Drogi: drukarka 3D i dom (pierwszy szkic)
 
-Data: 2026-11-15 · Status: **szkic do oznaczenia przez właściciela.** Teksty napisał ChatGPT (Codex CLI,
-`gpt-6.1-sol`) w dwóch rundach; Claude przygotował brief i sprawdził fakty. Treść tekstów jest przepisana
+Data: 2026-11-15 · Status: **oba teksty zatwierdzone przez właściciela 15.11.** Teksty napisał ChatGPT (Codex CLI,
+`gpt-6.1-sol`) w sześciu rundach (dwie wspólne, cztery poprawki domu z faktami od właściciela); Claude przygotował brief i sprawdził fakty. Treść tekstów jest przepisana
 bez zmian. Źródło faktów: `2026-11-14-historia-strony-koncept.md`, sekcje 5, 6 i 12.
 
 ## Teksty (wersja Codexa po jednej rundzie poprawek)
@@ -86,6 +86,8 @@ shelly (dogrzewanie ciepłej wody na żądanie)”. Nowe zdania do potwierdzenia
 12. **Tak.** Shelly to przekaźnik (tak nazywa go tekst; to moje dopowiedzenie).
 13. **Popraw:** „najpierw Home Assistant, potem reszta”. Punkt 8 był więc nieścisły; obowiązuje nowa kolejność.
 14. **Popraw:** falowniki zostały podłączone do Home Assistanta; najpierw był jeden Fronius, potem doszedł drugi innej firmy, a potrzeba zebrania danych od dwóch producentów uzasadniła HA.
+
+15. **Tak.** Kroki w historii domu po szóstej rundzie zgadzają się z tym, jak było (właściciel, 15.11).
 
 Uwaga do formy: obie historie mają ok. 100–115 słów, czyli trochę poniżej zamówionych 120. Krótsze wyszły
 po usunięciu dopowiedzeń; nie dopisywaliśmy niczego na siłę.
