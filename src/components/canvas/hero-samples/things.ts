@@ -1,155 +1,285 @@
 /**
  * The things the matter sets into, drawn as exact parts on one grid
- * (100 × 100 units, 6-unit margins, 4-unit gutters, two corner radii).
- * Each part is a closed solid; details are cut out of it. The drawings are
- * rasterised once: a crisp mask for the set state and, per part, the points
- * its share of the matter settles on.
+ * (100 × 100 units, 4-unit gutters, two corner radii, three tones of the
+ * one green). Each part is a closed solid: details are either cut out of it
+ * or laid on it in a deeper tone. The drawings are rasterised once into a
+ * mask for the set state and, per part, the points its share of the matter
+ * settles on.
  */
 
-type Draw = (ctx: CanvasRenderingContext2D) => void
+type Context = CanvasRenderingContext2D
+type Draw = (ctx: Context) => void
 
 export interface Thing {
   caption: string
   parts: Draw[]
 }
 
-function box(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+/** Tones are stored in the mask's red channel: 255 the matter's green, lower is deeper. */
+const BASE = '#ffffff'
+const DEEP = '#8a8a8a'
+const DEEPEST = '#3c3c3c'
+
+function box(ctx: Context, x: number, y: number, w: number, h: number, r: number) {
   ctx.beginPath()
   ctx.roundRect(x, y, w, h, Math.min(r, w / 2, h / 2))
 }
 
-function solid(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  r: number
-) {
+function solid(ctx: Context, x: number, y: number, w: number, h: number, r: number, tone = BASE) {
   ctx.globalCompositeOperation = 'source-over'
+  ctx.fillStyle = tone
   box(ctx, x, y, w, h, r)
   ctx.fill()
 }
 
-function cut(ctx: CanvasRenderingContext2D, path: () => void) {
+/** A detail in a deeper tone, only where the part already is. */
+function on(ctx: Context, tone: string, path: () => void) {
+  ctx.globalCompositeOperation = 'source-atop'
+  ctx.fillStyle = tone
+  path()
+  ctx.fill()
+  ctx.globalCompositeOperation = 'source-over'
+}
+
+function cut(ctx: Context, path: () => void) {
   ctx.globalCompositeOperation = 'destination-out'
   path()
   ctx.fill()
   ctx.globalCompositeOperation = 'source-over'
 }
 
+function polygon(ctx: Context, points: Array<[number, number]>) {
+  ctx.beginPath()
+  points.forEach(([x, y], index) => (index ? ctx.lineTo(x, y) : ctx.moveTo(x, y)))
+  ctx.closePath()
+}
+
+function disc(ctx: Context, x: number, y: number, r: number) {
+  ctx.beginPath()
+  ctx.arc(x, y, r, 0, Math.PI * 2)
+}
+
+/**
+ * stronypodhale.pl as it is laid out: a bar with the mark, links and a
+ * button; the opening panel with its headline and call; the framed page it
+ * shows (the Tatra ridge); three offers; the footer.
+ */
 const site: Thing = {
   caption: 'stronypodhale.pl',
   parts: [
-    // Bar: three dots and an address.
     (ctx) => {
-      solid(ctx, 6, 8, 88, 10, 5)
+      solid(ctx, 0, 2, 100, 10, 5)
+      cut(ctx, () => disc(ctx, 6.5, 7, 2.1))
+      for (const x of [44, 55, 66]) cut(ctx, () => box(ctx, x, 5.9, 8, 2.2, 1.1))
+      on(ctx, DEEPEST, () => box(ctx, 79, 4.2, 17, 5.6, 2.8))
+    },
+    // Headline, two lines of copy, the call.
+    (ctx) => {
+      solid(ctx, 0, 16, 44, 46, 4)
+      cut(ctx, () => box(ctx, 5, 22, 32, 5, 1.6))
+      cut(ctx, () => box(ctx, 5, 29.5, 24, 5, 1.6))
+      cut(ctx, () => box(ctx, 5, 39.5, 30, 1.9, 0.95))
+      cut(ctx, () => box(ctx, 5, 43.6, 22, 1.9, 0.95))
+      on(ctx, DEEPEST, () => box(ctx, 5, 50.5, 19, 6.4, 3.2))
+    },
+    // The page it shows: a frame, the sky cut away, two ridges, the sun.
+    (ctx) => {
+      solid(ctx, 48, 16, 52, 46, 4)
+      on(ctx, DEEP, () => box(ctx, 48, 16, 52, 6.5, 0))
       cut(ctx, () => {
         ctx.beginPath()
-        for (const x of [12.5, 18, 23.5]) {
-          ctx.moveTo(x + 1.5, 13)
-          ctx.arc(x, 13, 1.5, 0, Math.PI * 2)
+        for (const x of [52.4, 55.6, 58.8]) {
+          ctx.moveTo(x + 0.9, 19.3)
+          ctx.arc(x, 19.3, 0.9, 0, Math.PI * 2)
         }
       })
-      cut(ctx, () => box(ctx, 62, 11.2, 27, 3.6, 1.8))
+      cut(ctx, () => box(ctx, 51.5, 25.5, 45, 33, 2))
+      // Far ridge, then the near one, drawn back into the cut.
+      ctx.save()
+      box(ctx, 51.5, 25.5, 45, 33, 2)
+      ctx.clip()
+      ctx.fillStyle = BASE
+      polygon(ctx, [
+        [51.5, 50],
+        [58, 42],
+        [62, 45.5],
+        [70, 34],
+        [75.5, 41],
+        [79, 37.5],
+        [88, 47],
+        [96.5, 41],
+        [96.5, 58.5],
+        [51.5, 58.5],
+      ])
+      ctx.fill()
+      ctx.fillStyle = DEEP
+      polygon(ctx, [
+        [51.5, 58.5],
+        [51.5, 54],
+        [60, 49],
+        [67, 53],
+        [77, 45.5],
+        [86, 53.5],
+        [96.5, 49],
+        [96.5, 58.5],
+      ])
+      ctx.fill()
+      ctx.fillStyle = BASE
+      disc(ctx, 88.5, 31.5, 2.6)
+      ctx.fill()
+      ctx.restore()
     },
-    // Picture: the ridge above Kościelisko, the sky cut away.
+    // Three offers.
+    ...[0, 34.67, 69.33].map((x, index): Draw => (ctx) => {
+      solid(ctx, x, 66, 30.67, 20, 4)
+      on(ctx, index === 1 ? DEEPEST : DEEP, () => disc(ctx, x + 6.2, 72.4, 2.4))
+      cut(ctx, () => box(ctx, x + 4, 77.6, 19, 1.9, 0.95))
+      cut(ctx, () => box(ctx, x + 4, 81.4, 13, 1.9, 0.95))
+    }),
     (ctx) => {
-      solid(ctx, 6, 22, 56, 42, 4)
-      cut(ctx, () => {
-        ctx.beginPath()
-        ctx.moveTo(10, 26)
-        ctx.lineTo(58, 26)
-        ctx.lineTo(58, 44)
-        ctx.lineTo(50, 37)
-        ctx.lineTo(44, 43)
-        ctx.lineTo(33, 31)
-        ctx.lineTo(24, 42)
-        ctx.lineTo(19, 38)
-        ctx.lineTo(10, 49)
-        ctx.closePath()
-      })
+      solid(ctx, 0, 90, 100, 8, 4)
+      cut(ctx, () => box(ctx, 5, 93.1, 16, 1.8, 0.9))
+      cut(ctx, () => box(ctx, 80, 93.1, 15, 1.8, 0.9))
     },
-    // Copy.
-    (ctx) => {
-      solid(ctx, 66, 22, 28, 42, 4)
-      const lengths = [20, 16, 20, 11, 18, 13]
-      lengths.forEach((length, row) =>
-        cut(ctx, () => box(ctx, 70, 27.4 + row * 5.6, length, 2.4, 1.2))
-      )
-    },
-    // Call to action.
-    (ctx) => solid(ctx, 6, 68, 34, 12, 6),
-    // Server.
-    (ctx) => {
-      solid(ctx, 44, 68, 50, 12, 4)
-      cut(ctx, () => box(ctx, 48.5, 72.2, 15, 3.6, 1.8))
-      cut(ctx, () => box(ctx, 66.5, 72.2, 15, 3.6, 1.8))
-      cut(ctx, () => {
-        ctx.beginPath()
-        ctx.arc(88, 74, 1.6, 0, Math.PI * 2)
-      })
-    },
-    // Footer.
-    (ctx) => solid(ctx, 6, 84, 88, 8, 4),
   ],
 }
 
+/** A vessel's half-width at height t (0 top, 1 foot): neck, shoulder, belly, foot. */
+function vessel(t: number) {
+  const neck = 7.5
+  const belly = 21
+  const foot = 11
+  // A lip that flares a little, then the neck.
+  if (t < 0.16) return neck + 1.6 * (1 - t / 0.16) ** 2
+  if (t < 0.62) {
+    const u = (t - 0.16) / 0.46
+    return neck + (belly - neck) * (0.5 - 0.5 * Math.cos(u * Math.PI))
+  }
+  const u = (t - 0.62) / 0.38
+  return belly + (foot - belly) * (0.5 - 0.5 * Math.cos(u * Math.PI)) ** 1.15
+}
+
+/**
+ * A print in progress: the frame, the spool feeding the head, the head
+ * with its nozzle on the top layer, the vessel so far, the bed.
+ */
 const print: Thing = {
   caption: 'wydruk 3D',
   parts: [
-    // Spool.
+    // Frame: two posts and the beam the head rides.
     (ctx) => {
-      ctx.beginPath()
-      ctx.arc(20, 22, 13, 0, Math.PI * 2)
-      ctx.fill()
-      cut(ctx, () => {
-        ctx.beginPath()
-        ctx.arc(20, 22, 4.6, 0, Math.PI * 2)
-      })
+      solid(ctx, 8, 2, 4, 86, 2, DEEP)
+      solid(ctx, 88, 2, 4, 86, 2, DEEP)
+      solid(ctx, 8, 14, 84, 4, 2, DEEP)
     },
-    // Head: carriage and nozzle.
+    // Spool, with the filament running to the head.
     (ctx) => {
-      solid(ctx, 40, 8, 34, 12, 4)
+      ctx.fillStyle = BASE
+      disc(ctx, 25, 33, 11)
+      ctx.fill()
+      on(ctx, DEEP, () => disc(ctx, 25, 33, 7.4))
+      cut(ctx, () => disc(ctx, 25, 33, 3.2))
+      ctx.globalCompositeOperation = 'source-over'
+      ctx.strokeStyle = DEEPEST
+      ctx.lineWidth = 1.1
+      ctx.lineCap = 'round'
       ctx.beginPath()
-      ctx.moveTo(50, 22)
-      ctx.lineTo(64, 22)
-      ctx.lineTo(59, 31)
-      ctx.lineTo(55, 31)
+      ctx.moveTo(33.5, 26.5)
+      ctx.bezierCurveTo(42, 20, 52, 21.5, 58.5, 20.5)
+      ctx.stroke()
+    },
+    // Head: carriage on the beam, nozzle down to the layer being laid.
+    (ctx) => {
+      solid(ctx, 49, 9, 22, 14, 3.5)
+      cut(ctx, () => box(ctx, 53, 12.2, 6, 1.8, 0.9))
+      cut(ctx, () => box(ctx, 61, 12.2, 6, 1.8, 0.9))
+      ctx.fillStyle = DEEPEST
+      polygon(ctx, [
+        [55, 23],
+        [65, 23],
+        [61.4, 31.2],
+        [58.6, 31.2],
+      ])
+      ctx.fill()
+    },
+    // The vessel so far: its contour, the layers as lines, the top one half laid.
+    (ctx) => {
+      const top = 33.5
+      const bottom = 86
+      ctx.fillStyle = BASE
+      ctx.beginPath()
+      const steps = 60
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps
+        const y = top + t * (bottom - top)
+        const x = 60 - vessel(t)
+        if (i) ctx.lineTo(x, y)
+        else ctx.moveTo(x, y)
+      }
+      for (let i = steps; i >= 0; i--) {
+        const t = i / steps
+        ctx.lineTo(60 + vessel(t), top + t * (bottom - top))
+      }
       ctx.closePath()
       ctx.fill()
-    },
-    // The print: a vessel, layer on layer.
-    (ctx) => {
-      const layers = 13
-      for (let layer = 0; layer < layers; layer++) {
-        const t = layer / (layers - 1)
-        const half = 11 + 13 * Math.sin(Math.PI * (0.18 + t * 0.72)) ** 1.6
-        solid(ctx, 57 - half, 35 + layer * 3.6, half * 2, 2.9, 1.45)
+      // The layer in progress stops at the nozzle.
+      cut(ctx, () => box(ctx, 60.6, top - 0.2, 12, 2.5, 0))
+      const layers = 21
+      for (let layer = 1; layer < layers; layer++) {
+        const y = top + (layer / layers) * (bottom - top)
+        on(ctx, DEEP, () => box(ctx, 30, y - 0.28, 60, 0.56, 0))
       }
     },
-    // Bed.
-    (ctx) => solid(ctx, 6, 84, 88, 8, 4),
+    (ctx) => {
+      solid(ctx, 0, 86, 100, 7, 3.5)
+      on(ctx, DEEPEST, () => box(ctx, 0, 91.2, 100, 1.8, 0))
+    },
   ],
 }
 
 export const THINGS: Thing[] = [site, print]
 
 export interface RasterThing {
-  /** White-on-clear drawing, the set state. */
-  mask: HTMLCanvasElement
+  /**
+   * The drawing as texture data (RGBA, size × size): red = tone, green = a
+   * softened copy of the outline (the liquid's contour is blended into it
+   * as the matter sets), alpha = the exact drawing.
+   */
+  mask: { data: Uint8Array; size: number }
   /** Share of the square the drawing covers, 0–1. */
   coverage: number
   /** Per part: centroid (0–1) and the points (0–1, xy pairs) its matter settles on. */
   parts: Array<{ x: number; y: number; points: Float32Array }>
 }
 
+function soften(alpha: Float32Array, size: number, radius: number) {
+  const pass = (source: Float32Array, target: Float32Array, stride: number, other: number) => {
+    for (let line = 0; line < size; line++) {
+      let sum = 0
+      const at = (index: number) =>
+        source[line * other + Math.min(size - 1, Math.max(0, index)) * stride]!
+      for (let k = -radius; k <= radius; k++) sum += at(k)
+      for (let index = 0; index < size; index++) {
+        target[line * other + index * stride] = sum / (radius * 2 + 1)
+        sum += at(index + radius + 1) - at(index - radius)
+      }
+    }
+  }
+  const scratch = new Float32Array(alpha.length)
+  // Two box passes each way: close to a Gaussian.
+  for (let round = 0; round < 2; round++) {
+    pass(alpha, scratch, 1, size)
+    pass(scratch, alpha, size, 1)
+  }
+  return alpha
+}
+
 /** Rasterise a thing and lay `count` settling points over it, evenly. */
 export function rasterise(thing: Thing, count: number, size = 768): RasterThing {
-  const mask = document.createElement('canvas')
-  mask.width = size
-  mask.height = size
-  const maskCtx = mask.getContext('2d')!
+  const whole = document.createElement('canvas')
+  whole.width = size
+  whole.height = size
+  const wholeCtx = whole.getContext('2d', { willReadFrequently: true })!
   const scratch = document.createElement('canvas')
   scratch.width = size
   scratch.height = size
@@ -158,16 +288,27 @@ export function rasterise(thing: Thing, count: number, size = 768): RasterThing 
 
   thing.parts.forEach((draw, index) => {
     ctx.setTransform(1, 0, 0, 1, 0, 0)
+    ctx.globalCompositeOperation = 'source-over'
     ctx.clearRect(0, 0, size, size)
     ctx.scale(size / 100, size / 100)
-    ctx.fillStyle = '#fff'
     draw(ctx)
-    maskCtx.drawImage(scratch, 0, 0)
-    const alpha = ctx.getImageData(0, 0, size, size).data
+    wholeCtx.drawImage(scratch, 0, 0)
+    const pixels = ctx.getImageData(0, 0, size, size).data
     for (let pixel = 0; pixel < size * size; pixel++) {
-      if (alpha[pixel * 4 + 3]! > 127) ids[pixel] = index + 1
+      if (pixels[pixel * 4 + 3]! > 127) ids[pixel] = index + 1
     }
   })
+
+  const pixels = wholeCtx.getImageData(0, 0, size, size).data
+  const alpha = new Float32Array(size * size)
+  for (let pixel = 0; pixel < alpha.length; pixel++) alpha[pixel] = pixels[pixel * 4 + 3]! / 255
+  const soft = soften(alpha, size, Math.round(size / 190))
+  const data = new Uint8Array(size * size * 4)
+  for (let pixel = 0; pixel < size * size; pixel++) {
+    data[pixel * 4] = pixels[pixel * 4]!
+    data[pixel * 4 + 1] = Math.round(soft[pixel]! * 255)
+    data[pixel * 4 + 3] = pixels[pixel * 4 + 3]!
+  }
 
   let covered = 0
   for (let pixel = 0; pixel < ids.length; pixel++) if (ids[pixel]) covered++
@@ -213,5 +354,5 @@ export function rasterise(thing: Thing, count: number, size = 768): RasterThing 
     })
     return { x: sumX / Math.max(1, own.length), y: sumY / Math.max(1, own.length), points }
   })
-  return { mask, coverage, parts }
+  return { mask: { data, size }, coverage, parts }
 }

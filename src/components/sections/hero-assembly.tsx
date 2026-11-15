@@ -165,12 +165,12 @@ export function HeroAssembly() {
       if (cover.style.display !== 'none') cover.style.display = 'none'
 
       // The text is uncovered as the sheet drains past it; after that it does not move.
-      if (!textShown && time > 1.25) {
+      if (!textShown && time > 0.6) {
         textShown = true
         showText(true)
       }
       // One caption: what the matter has become. It changes while the matter is liquid.
-      const named = step.formed > 0.6
+      const named = step.phase === 'forming' || step.phase === 'hold'
       if (named && captionThing !== step.thing) {
         captionThing = step.thing
         caption.textContent = THINGS[step.thing]?.caption ?? ''
@@ -214,16 +214,16 @@ export function HeroAssembly() {
         aria-hidden="true"
       />
 
-      <div className="pointer-events-none relative z-10 mx-auto grid h-full w-full max-w-[1440px] grid-cols-1 grid-rows-[auto_1fr_auto] px-6 pt-20 pb-28 md:grid-cols-12 md:grid-rows-1 md:gap-x-6 md:pt-24 md:pr-32 md:pb-24 md:pl-12">
+      <div className="pointer-events-none relative z-10 mx-auto grid h-full w-full max-w-[1440px] grid-cols-1 grid-rows-[auto_1fr_auto] px-6 pt-24 pb-28 md:grid-cols-12 md:grid-rows-1 md:gap-x-6 md:pt-24 md:pr-40 md:pb-24 md:pl-12">
         {/* The object: a square on the grid; the matter is drawn into it. */}
-        <div className="md:col-span-5 md:col-start-8 md:row-start-1 md:flex md:flex-col md:justify-center">
+        <div className="md:col-span-6 md:col-start-7 md:row-start-1 md:flex md:flex-col md:justify-end">
           <div
             ref={stageRef}
-            className="mx-auto aspect-square w-full max-w-[42svh] md:max-w-[62svh]"
+            className="mx-auto aspect-square w-full max-w-[41svh] md:mr-0 md:max-w-[66svh]"
           />
           <div
             data-rise
-            className="border-foreground/15 mt-4 flex translate-y-3 items-center justify-between border-t pt-3 text-[13px] leading-none opacity-0"
+            className="border-foreground/20 mx-auto mt-3 flex w-full max-w-[41svh] translate-y-3 items-center justify-between border-t pt-3 text-[15px] leading-none opacity-0 md:mr-0 md:max-w-[66svh] md:text-base"
           >
             <span ref={captionRef} className="opacity-0" />
             <ArrowDownIcon aria-hidden="true" className="text-foreground/50 size-4" />
@@ -247,13 +247,13 @@ export function HeroAssembly() {
               </span>
             ))}
           </h1>
-          <div className="mt-4 flex max-w-[34ch] flex-col gap-1.5 md:mt-6">
-            <p data-rise className="translate-y-3 text-[13px] font-medium opacity-0 md:text-sm">
+          <div className="mt-4 flex max-w-[36ch] flex-col gap-1.5 md:mt-6 md:gap-2">
+            <p data-rise className="translate-y-3 text-base font-medium opacity-0 md:text-lg">
               {t('role')}
             </p>
             <p
               data-rise
-              className="text-muted-foreground translate-y-3 text-[15px] leading-snug opacity-0 md:text-base"
+              className="text-muted-foreground translate-y-3 text-base leading-snug opacity-0 md:text-lg"
             >
               {t('tagline')}
             </p>

@@ -59,8 +59,11 @@ interface Group {
 const GOLDEN = 2.39996323
 
 /** Seconds: the sheet stands, then lets go from the far corners inwards. */
-const BIRTH_HOLD = 0.35
-const BIRTH_SPREAD = 0.75
+/** How much wider than its share a liquid drop's spot is drawn. */
+const WIDE = 1.5
+
+const BIRTH_HOLD = 0.1
+const BIRTH_SPREAD = 0.55
 
 function halton(index: number, base: number) {
   let result = 0
@@ -88,7 +91,8 @@ export function createStory(options: {
 
   const positions = new Float32Array(total * 2)
   const velocities = new Float32Array(total * 2)
-  const states = new Float32Array(total * 2)
+  /** Per drop: spot size (px), settled (0–1), weight. */
+  const states = new Float32Array(total * 3)
   /** Place in the blob (unit disc) and in its travelling drop (unit disc). */
   const inBlob = new Float32Array(total * 2)
   const inDrop = new Float32Array(total * 2)
@@ -107,7 +111,7 @@ export function createStory(options: {
   const measure = () => {
     const { width, height, stage } = layout
     spacing.sheet = Math.sqrt((width * height) / count)
-    blobRadius = stage.size * 0.37
+    blobRadius = stage.size * 0.43
     spacing.blob = blobRadius * Math.sqrt(Math.PI / count)
     spacing.drop = spacing.blob * 0.86
   }
@@ -152,7 +156,8 @@ export function createStory(options: {
     // The far corners let go first, in ragged patches.
     const patch = 0.5 + 0.5 * Math.sin(x * 0.013 + 1.7) * Math.cos(y * 0.011 - 0.6)
     birthAt[i] = BIRTH_HOLD + (1 - distance) * BIRTH_SPREAD + patch * 0.45 + seeds[i]! * 0.12
-    states[i * 2] = spacing.sheet * 1.6 * 1.6
+    states[i * 3] = spacing.sheet * 1.6 * WIDE
+    states[i * 3 + 2] = 1 / (WIDE * WIDE)
     groupOf[i] = -1
   }
   for (let j = 0; j < ballCount; j++) {
@@ -252,7 +257,7 @@ export function createStory(options: {
     const { stage } = layout
     const stageX = stage.x + stage.size / 2
     const stageY = stage.y + stage.size / 2
-    const born = clock > BIRTH_HOLD + BIRTH_SPREAD + 1.25
+    const born = clock > BIRTH_HOLD + BIRTH_SPREAD + 1.1
 
     // The blob is never still: it drifts about the middle of the stage.
     const settledBlob = phase === 'forming' || phase === 'hold' ? 0.25 : 1
@@ -308,11 +313,11 @@ export function createStory(options: {
           }
         }
       }
-      for (let i = 0; i < count; i++) settled += states[i * 2 + 1]!
+      for (let i = 0; i < count; i++) settled += states[i * 3 + 1]!
       formed = settled / count
       if (formed > 0.985 && groups.every((group) => group.mode === 'fill')) {
         phase = 'hold'
-        nextAt = clock + random(3.2, 4.2)
+        nextAt = clock + random(2.5, 3.3)
       }
     }
     if (phase === 'hold' && (clock >= nextAt || tapped)) {
@@ -327,7 +332,7 @@ export function createStory(options: {
     }
     if (phase === 'melting') {
       let settled = 0
-      for (let i = 0; i < count; i++) settled += states[i * 2 + 1]!
+      for (let i = 0; i < count; i++) settled += states[i * 3 + 1]!
       formed = settled / count
       for (const group of groups) {
         group.clock += dt
@@ -434,7 +439,8 @@ export function createStory(options: {
         const bx = inBlob[ix]!
         const by = inBlob[iy]!
         const radius = Math.hypot(bx, by)
-        const angle = Math.atan2(by, bx) + clock * 0.16 * (1.25 - radius)
+        // It turns as one body (shearing it would comb the drops into streaks).
+        const angle = Math.atan2(by, bx) + clock * 0.11
         const lobes =
           1 +
           0.13 * Math.sin(angle * 3 + clock * 0.62) +
@@ -476,7 +482,7 @@ export function createStory(options: {
       }
 
       // Settled or not: it sets once it has come to rest on its spot.
-      let settledNow = states[iy]!
+      let settledNow = states[i * 3 + 1]!
       if (settling) {
         const off = Math.hypot(targetX - x, targetY - y)
         const speed = Math.hypot(velocities[ix]!, velocities[iy]!)
@@ -493,7 +499,7 @@ export function createStory(options: {
       if (stiffness > 0 && liquid > 0) {
         // Liquid is stirred: a slow field of currents, different everywhere.
         // Neighbours share the current, so the body moves as one and does not clump.
-        const stir = stage.size * 0.16 * liquid
+        const stir = stage.size * 0.1 * liquid
         ax += Math.sin(y * 0.012 + clock * 0.7) * stir
         ay += Math.cos(x * 0.011 - clock * 0.6) * stir
       }
@@ -518,9 +524,16 @@ export function createStory(options: {
       positions[ix] = x
       positions[iy] = y
       // Without a pointer the loose drop is not drawn at all: nothing stray in the frame.
-      const spot = isBall && !pointer.active ? 0 : size * 1.6
-      states[ix] = states[ix]! + (spot - states[ix]!) * (1 - Math.exp(-dt / 0.28))
-      states[iy] = Math.min(1, Math.max(0, settledNow))
+      // Liquid is drawn with wide, light spots (a smooth body); on its way into a
+      // drawing the spots tighten, so the fill keeps the drawing's detail.
+      const wide = liquid > 0.5 ? WIDE : 1
+      const spot = isBall && !pointer.active ? 0 : size * 1.6 * wide
+      const ease = 1 - Math.exp(-dt / 0.28)
+      states[i * 3] = states[i * 3]! + (spot - states[i * 3]!) * ease
+      states[i * 3 + 1] = Math.min(1, Math.max(0, settledNow))
+      // Weight follows the spot actually drawn, so the amount of matter stays the same.
+      const drawn = Math.max(states[i * 3]! / Math.max(size * 1.6, 1e-3), 0.2)
+      states[i * 3 + 2] = 1 / (drawn * drawn)
     }
 
     const frame: StoryFrame = {
