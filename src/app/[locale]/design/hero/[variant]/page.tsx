@@ -55,6 +55,7 @@ export default async function HeroSamplePage({ params }: Props) {
     <main id="main-content" className={`flex min-h-screen flex-col ${bonaNova.variable}`}>
       {variant === 'zlozenie' ? <HeroAssembly /> : <HeroSample key={variant} variant={variant} />}
       <nav
+        id="probki-hero"
         aria-label="Próbki hero"
         className="flex flex-col gap-3 px-6 py-16 font-mono text-xs tracking-widest uppercase md:px-12"
       >

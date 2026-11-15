@@ -444,5 +444,15 @@ Poprzeczka 8,5 nie jest osiągnięta. Najsłabsze: rysunki rzeczy nadal czytane 
 Nie sprawdzone: prawdziwy iPhone, czas klatki, interakcja palcem na zrzutach. Stan pętli jest w katalogu
 `cook/` (lokalnie, poza gitem).
 
+### Szkielet hero: „imię ramuje obiekt” (2026-11-15)
+
+Właściciel po rundach: największym problemem są zasady UI, układ i hierarchia, nie materia; materii nie
+ruszamy. Wybrany szkielet (z trzech pokazanych): **imię ramuje obiekt**. Pierwsze słowo imienia stoi nad
+obiektem, drugie pod nim (wyrównane do prawej), obiekt jest jedyną rzeczą, która się zmienia. Pod spodem
+jeden blok na jednej krawędzi: linia, rola po lewej i podpis rzeczy po prawej, zdanie, przycisk „Zobacz
+moje projekty”. Odstępy na skali 4 px. Na desktopie imię ramuje obiekt po przekątnej (lewy górny, prawy
+dolny róg), a blok tekstu stoi w lewym dolnym rogu. Odrzucone: „kto, co, dowód, akcja” oraz „zdanie
+prowadzi”. Wdrożone w `src/components/sections/hero-assembly.tsx`; shader i ruch materii bez zmian.
+
 Poza zakresem, zauważone przy okazji: etykieta w hero to nadal „Web Architect” (`src/i18n/messages/pl.json:38`),
 a dokument decyzji każe ją zastąpić.

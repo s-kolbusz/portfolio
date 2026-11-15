@@ -204,7 +204,9 @@ export function HeroAssembly() {
     }
   }, [prefersReducedMotion])
 
-  const words = name.split(' ')
+  // The first word goes above the object, the rest below it.
+  const [first, ...others] = name.split(' ')
+  const rest = others.join(' ')
 
   return (
     <section
@@ -221,50 +223,65 @@ export function HeroAssembly() {
         aria-hidden="true"
       />
 
-      <div className="pointer-events-none relative z-10 mx-auto grid h-full w-full max-w-[1440px] grid-cols-1 grid-rows-[auto_1fr_auto] px-6 pt-24 pb-28 md:grid-cols-12 md:grid-rows-1 md:gap-x-6 md:pt-24 md:pr-48 md:pb-24 md:pl-12">
+      {/*
+        One unit: the name frames the object (first word above it, second
+        below), so the two never compete. Under it, one block on one edge:
+        a rule, role and what the matter is now, the sentence, the action.
+        Spacing is on a 4 px scale: 12 around the object, 20 to the rule,
+        12 between lines, 16 to the action.
+      */}
+      <div className="pointer-events-none relative z-10 mx-auto flex h-full w-full max-w-[1440px] flex-col px-6 pt-[88px] pb-28 md:grid md:grid-cols-12 md:grid-rows-[auto_1fr_auto] md:gap-x-6 md:pt-24 md:pr-48 md:pb-20 md:pl-12">
+        <h1
+          aria-label={name}
+          className="contents text-[15.5vw] leading-none font-normal tracking-[-0.015em] md:text-[min(8.6vw,7.75rem)]"
+          style={{ fontFamily: 'var(--font-hero-display), var(--font-serif), serif' }}
+        >
+          <span
+            aria-hidden="true"
+            className="order-1 block overflow-hidden pb-[0.1em] md:col-span-7 md:col-start-1 md:row-start-1"
+          >
+            <span data-line className="block translate-y-[115%] will-change-transform">
+              {first}
+            </span>
+          </span>
+          <span
+            aria-hidden="true"
+            className="order-3 block overflow-hidden pb-[0.1em] text-right md:col-span-5 md:col-start-8 md:row-start-3 md:self-end"
+          >
+            <span data-line className="block translate-y-[115%] will-change-transform">
+              {rest}
+            </span>
+          </span>
+        </h1>
+
         {/* The object: a square on the grid; the matter is drawn into it. */}
-        <div className="md:col-span-6 md:col-start-7 md:row-start-1 md:flex md:flex-col md:justify-end">
-          <div
-            ref={stageRef}
-            className="mx-auto aspect-square w-full max-w-[38svh] md:mr-0 md:max-w-[64svh]"
-          />
+        <div
+          ref={stageRef}
+          className="order-2 mx-auto my-3 aspect-square w-full max-w-[min(100%,34svh)] md:col-span-5 md:col-start-5 md:row-span-3 md:row-start-1 md:my-0 md:max-w-[52svh] md:self-center"
+        />
+
+        <div className="order-4 mt-5 flex flex-col md:col-span-4 md:col-start-1 md:row-start-3 md:mt-0 md:self-end">
           <div
             data-rise
-            className="border-foreground/20 mx-auto mt-5 flex w-full max-w-[38svh] translate-y-3 items-center justify-between border-t pt-3 text-[15px] leading-none opacity-0 md:mr-0 md:max-w-[64svh] md:text-lg"
+            className="border-foreground/20 flex translate-y-3 items-baseline justify-between gap-4 border-t pt-3 text-[15px] leading-tight opacity-0 md:text-base"
           >
-            <span ref={captionRef} className="opacity-0" />
-            <ArrowDownIcon aria-hidden="true" className="text-foreground/50 size-4" />
+            <p className="font-medium">{t('role')}</p>
+            <span ref={captionRef} className="text-right opacity-0" />
           </div>
-        </div>
-
-        <div className="hidden md:block" />
-
-        {/* One block of text on one edge. */}
-        <div className="row-start-3 flex flex-col md:col-span-6 md:col-start-1 md:row-start-1 md:justify-end">
-          <h1
-            aria-label={name}
-            className="text-[15.5vw] leading-[0.95] font-normal tracking-[-0.015em] md:text-[min(9.4vw,8.6rem)]"
-            style={{ fontFamily: 'var(--font-hero-display), var(--font-serif), serif' }}
+          <p
+            data-rise
+            className="text-muted-foreground mt-3 max-w-[38ch] translate-y-3 text-[15px] leading-snug opacity-0 md:text-base"
           >
-            {words.map((word) => (
-              <span key={word} aria-hidden="true" className="block overflow-hidden pb-[0.08em]">
-                <span data-line className="block translate-y-[115%] will-change-transform">
-                  {word}
-                </span>
-              </span>
-            ))}
-          </h1>
-          <div className="mt-4 flex max-w-[36ch] flex-col gap-1.5 md:mt-6 md:gap-2">
-            <p data-rise className="translate-y-3 text-base font-medium opacity-0 md:text-lg">
-              {t('role')}
-            </p>
-            <p
-              data-rise
-              className="text-muted-foreground translate-y-3 text-base leading-snug opacity-0 md:text-lg"
-            >
-              {t('tagline')}
-            </p>
-          </div>
+            {t('tagline')}
+          </p>
+          <a
+            data-rise
+            href="#probki-hero"
+            className="border-foreground/25 hover:bg-foreground hover:text-background pointer-events-auto mt-4 inline-flex h-11 translate-y-3 items-center gap-2 self-start rounded-full border px-5 text-[15px] font-medium opacity-0 transition-colors"
+          >
+            {t('cta')}
+            <ArrowDownIcon aria-hidden="true" className="size-4" />
+          </a>
         </div>
       </div>
 
