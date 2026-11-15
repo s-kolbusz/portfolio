@@ -13,9 +13,10 @@ nowszy**), `2026-11-14-lusion-przepis.md` (zasady ruchu i ciągłości), `2026-1
 
 - **Przyjęte przez właściciela:** cel (1), zasady (2), trzy warstwy, hub i zniknięcie katalogu-książki (3),
   część osobista poza stroną główną, definicje i drogi (5), stan „zrozumiane i odłożone” (6), podstrony
-  notatki „dlaczego” i „Jak pracuję z agentami” (7), druk 3D w obu rolach, chęć posiadania easter eggów.
+  notatki „dlaczego” i „Jak pracuję z agentami” (7), druk 3D w obu rolach, chęć posiadania easter eggów, linie „Jak pracuję” (7; 15.11, jedna czeka na
+  potwierdzenie brzmienia).
 - **Propozycje, które ogólnie się spodobały, ale nie mają decyzji w szczegółach:** akty strony głównej (4),
-  linie „Jak pracuję” (7), ślady części osobistej na stronie głównej (3), narzędzia narracji (8),
+  ślady części osobistej na stronie głównej (3), narzędzia narracji (8),
   kandydaci na easter eggi (9), szablon drogi (5).
 - **Rozstrzygnięte 14.11 (odpowiedzi właściciela, szczegóły w `otwarcie-diagnoza-telefon.md`, sekcja 5):**
   pionowy zrzut stronypodhale na telefonie jest w porządku; wynurzanie go na cały ekran **nie** (portfolio
@@ -123,7 +124,7 @@ osobista jest dla tych, którzy są ciekawi samej osoby.
 | 1. Płynne               | Hero: imię, rola, jedno rzeczowe zdanie. Materia reaguje na palec i kursor.                                                                       | Zbudowane.                                    |
 | 2. Pierwsze krzepnięcie | Materia staje się taflą, z której wynurza się stronypodhale.pl; na telefonie na cały ekran, potem krzepnie w kartę.                               | Zbudowane, do podniesienia (plan A, B, C).    |
 | 3. Co skrzepło          | Trzy sceny, każda jest drzwiami (ramka rośnie, wchodzi się do środka): stronypodhale, ready2order, plugin. Każdą otwiera pytanie i jedna decyzja. | Do zrobienia.                                 |
-| 4. Oddech               | „Jak pracuję”: zasady współpracy razem z ich ceną (sekcja 7).                                                                                     | Do zrobienia.                                 |
+| 4. Oddech               | „Jak pracuję”: zasady współpracy (sekcja 7).                                                                                                      | Do zrobienia.                                 |
 | 5. Szczyt               | Kontakt. Materia wraca płynna; gdy odwiedzający pisze, nabiera kształtu, po wysłaniu krzepnie w potwierdzenie.                                    | Do zrobienia (propozycja).                    |
 | 6. Drzwi                | Dodatkowy scroll na końcu przenosi dalej, ze sprężyną jak u Lusion.                                                                               | Do zrobienia (propozycja).                    |
 
@@ -183,13 +184,21 @@ Każda rzecz w hubie ma stan widoczny w materii i podpisany rzeczowo: **w realiz
 **działa** (stałe), **zrozumiane i odłożone** (jak drukarka: zainteresowanie trwa, dopóki jest co
 rozumieć). Stanu „porzucone” nie używamy. Jak dokładnie stan wygląda w materii i na jakich elementach się pojawia, jest **otwarte**.
 
-## 7. „Jak pracuję”: zaleta razem z ceną (propozycja, linie do poprawienia przez właściciela)
+## 7. „Jak pracuję” (linie rozstrzygnięte przez właściciela 15.11)
 
-- „Pracuję sam. Projekt, kod, serwer i utrzymanie są w jednych rękach.”
-- „Nie używam szablonów ani cudzych widgetów tam, gdzie decydują o wrażeniu. To trwa dłużej.”
-- „Zadam więcej pytań »dlaczego«, niż się spodziewasz.”
-- „Biorę kilka projektów w roku.”
-- „Potrzebujesz sprawdzonej strony w stałej cenie? Od tego jest stronypodhale.pl.”
+- „Pracuję sam. Projekt, kod, serwer i utrzymanie są w jednych rękach.” (przyjęte)
+- „Nie używam szablonów ani cudzych widgetów tam, gdzie decydują o wrażeniu.” (przyjęte bez dopisku
+  „To trwa dłużej”; właściciel: „nie musimy od razu straszyć, że to trwa dłużej”)
+- „Do Twojego pomysłu dokładam własną wizję i wyczucie, żeby wyszedł jak najlepiej.” (**sformułowanie
+  do potwierdzenia**; sens od właściciela: „wykorzystam swoją wizję i wyczucie do tego, żeby jak najlepiej
+  zrealizować Twój pomysł”)
+- „Potrzebujesz sprawdzonej strony w stałej cenie? Od tego jest stronypodhale.pl.” (przyjęte)
+
+Odrzucone: „Zadam więcej pytań »dlaczego«, niż się spodziewasz.” (właściciel: „nie jestem aż tak
+komunikatywny”) oraz „Biorę kilka projektów w roku.”
+
+Wniosek dla tonu: sekcja pokazuje zalety współpracy i nie dopisuje do każdej jej „ceny”. Pierwotny
+pomysł „zaleta razem z ceną” przez to odpada.
 
 Dwie nowe podstrony w warstwie pracy (przyjęte):
 
@@ -245,7 +254,7 @@ Dwie nowe podstrony w warstwie pracy (przyjęte):
    rundzie (diagnoza, sekcja 5): hero ma opowiadać historię, prowadzi „Materia próbuje kształtów”
    (4–5 rzeczy, bez auta), układ plakatowy, tafla odpływa przy załadowaniu. Otwarte: wybór między trzema
    historiami po próbkach w kodzie i ostateczna lista kształtów.
-2. Linie z sekcji 7: które brzmią jak właściciel.
+2. Linie z sekcji 7: rozstrzygnięte 15.11; zostaje potwierdzenie brzmienia jednej linii (wizja i wyczucie).
 3. Źródła pochwał pluginu.
 4. Które rzeczy z części osobistej mogą być publiczne i jakie są zdjęcia.
 5. Wybór easter eggów.
