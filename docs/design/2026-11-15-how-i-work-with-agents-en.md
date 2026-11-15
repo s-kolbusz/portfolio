@@ -120,9 +120,9 @@ questions about myself don't work on me.
 
 Not open questions about content; only places where English forced a choice.
 
-1. Page title: “How I work with agents”. The owner asked (15.11) whether “How do I work with agents”
+1. **OK (owner, 15.11):** page title is “How I work with agents”. The owner asked (15.11) whether “How do I work with agents”
    is more correct. It is not: with “do” it becomes a question, as if asking for instructions; a title
-   that announces an explanation uses the statement order. Kept, pending his reply.
+   that announces an explanation uses the statement order. He kept it.
 2. **OK (owner, 15.11):** “bezpieczeństwo” is “security” (code without vulnerabilities, no secrets), not
    “safety”.
 3. **Changed (owner, 15.11: “executor” is not a good word):** “wykonawca” is now “one agent” in the
