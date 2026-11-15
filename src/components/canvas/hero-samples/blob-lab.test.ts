@@ -38,7 +38,6 @@ describe('stepBlobLab', () => {
     expect(last.radius).toBeCloseTo(radius, 6)
     expect(last.ballRadius).toBeCloseTo(0.25 * unit, 6)
     expect(last.merge).toBeCloseTo(0.6 * unit, 6)
-    expect(last.thread).toBe(0)
     expect(last.stretch).toBe(0)
     expect(last.squash).toBeCloseTo(0, 6)
     expect(last.mutate).toBe(0)
@@ -69,21 +68,6 @@ describe('stepBlobLab', () => {
     // A pointer far away is let go of.
     const far = play(params, 4, fixed(centre.x + radius * 4, centre.y))
     expect(far.last.centerX - centre.x).toBeLessThan(reached * 0.2)
-  })
-
-  it('reaches for the ball as it nears and holds on for a while as it leaves', () => {
-    const params = { ...PRODUCTION, reach: 1 }
-    const state = createBlobLabState()
-    const outside = centre.x + radius + 0.25 * unit + 400
-    const near = centre.x + radius + 0.25 * unit + 30
-    expect(play(params, 2, fixed(outside, centre.y), state).last.thread).toBeLessThan(0.5)
-    const reaching = play(params, 2, fixed(near, centre.y), state)
-    expect(reaching.last.thread).toBeGreaterThan(20)
-    // Pulled away fast: the bridge is still there at first, thinner, then gone.
-    const leaving = play(params, 3, fixed(outside, centre.y), state)
-    expect(leaving.frames[20]!.thread).toBeGreaterThan(1)
-    expect(leaving.frames[20]!.thread).toBeLessThan(reaching.last.thread)
-    expect(leaving.last.thread).toBeLessThan(0.5)
   })
 
   it('takes a gulp: the body rings when the ball goes in and is larger for what it took', () => {

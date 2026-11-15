@@ -4,8 +4,7 @@
  * same radius, the same cursor ball, the same follow.
  *
  * What the dials add is how the body answers the cursor ball: it leans after
- * the pointer, reaches for the ball before they touch and holds on to it as
- * it leaves, takes a gulp when the ball goes in, and the ball itself draws
+ * the pointer, takes a gulp when the ball goes in, and the ball itself draws
  * out along its way. All of it is a handful of springs; the shader only
  * draws what they say.
  */
@@ -15,10 +14,6 @@ export interface BlobLabParams {
   mutate: number
   /** How fast it wanders (1 = the proposed pace). */
   mutateSpeed: number
-  /** How thick the bridge between body and ball is (0–1). */
-  reach: number
-  /** From how far the body reaches, in blob radii. */
-  reachDistance: number
   /** How strongly the body answers to swallowing the ball (0–1). */
   gulp: number
   /** How much the ball draws out along its motion (0–1). */
@@ -33,8 +28,6 @@ export interface BlobLabParams {
 export const PRODUCTION: BlobLabParams = {
   mutate: 0,
   mutateSpeed: 1,
-  reach: 0,
-  reachDistance: 0.6,
   gulp: 0,
   stretch: 0,
   lean: 0,
@@ -45,8 +38,6 @@ export const PRODUCTION: BlobLabParams = {
 export const PROPOSAL: BlobLabParams = {
   mutate: 0.7,
   mutateSpeed: 1.5,
-  reach: 0,
-  reachDistance: 0.5,
   gulp: 0.5,
   stretch: 1,
   lean: 0.25,
@@ -61,8 +52,6 @@ export interface BlobLabState {
   ballY: number
   ballVX: number
   ballVY: number
-  /** How firmly body and ball hold on to each other (0–1). */
-  bond: number
   /** How much of the ball the body has taken in (0–1). */
   absorbed: number
   inside: boolean
@@ -89,7 +78,6 @@ export function createBlobLabState(): BlobLabState {
     ballY: 0,
     ballVX: 0,
     ballVY: 0,
-    bond: 0,
     absorbed: 0,
     inside: true,
     swell: 0,
@@ -134,8 +122,6 @@ export interface BlobLabFrame {
   stretchX: number
   stretchY: number
   stretch: number
-  /** Radius of the bridge between body and ball, px (0 none). */
-  thread: number
   mutate: number
   phase: number
 }
@@ -234,21 +220,8 @@ export function stepBlobLab(state: BlobLabState, input: BlobLabInput): BlobLabFr
   const distance = Math.hypot(fromX, fromY)
   const outX = distance > 1e-3 ? fromX / distance : state.gulpX
   const outY = distance > 1e-3 ? fromY / distance : state.gulpY
-  /** Rim to rim (negative when they overlap), and the ball's centre to the body's rim. */
-  const gap = distance - (baseRadius + ballRadius)
+  /** The ball's centre to the body's rim (negative inside). */
   const depth = distance - baseRadius
-
-  // --- Reaching and holding on: a bond that forms fast and lets go slowly. ---
-  const reachPx = Math.max(1, params.reachDistance * baseRadius)
-  const wants = 1 - smooth(0, reachPx, gap)
-  state.bond += (wants - state.bond) * ease(wants > state.bond ? 0.12 : 0.5)
-  // The bridge thins as it is drawn out, and is gone once the bond is.
-  // (Its radius includes the soft edge's width, which the shader takes off again.)
-  const full = (0.045 * unit + params.reach * ballRadius * 0.5) * state.bond
-  const thread =
-    params.reach > 0 && gap > -ballRadius && state.bond > 0.02
-      ? full / (1 + Math.max(0, gap) / (ballRadius * 2))
-      : 0
 
   // --- The gulp: going in sets the body ringing; what it took in makes it larger. ---
   const gulpHz = 1.6 + lively * 1.2
@@ -302,7 +275,6 @@ export function stepBlobLab(state: BlobLabState, input: BlobLabInput): BlobLabFr
     stretchX: pace > 1e-3 ? state.ballVX / pace : 1,
     stretchY: pace > 1e-3 ? state.ballVY / pace : 0,
     stretch,
-    thread,
     mutate: clamp01(params.mutate) * 0.22,
     phase: state.phase,
   }

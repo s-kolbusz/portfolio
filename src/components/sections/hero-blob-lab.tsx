@@ -45,20 +45,6 @@ const DIALS: Array<{
     min: 0,
     max: 1,
   },
-  {
-    key: 'reach',
-    label: 'Sięganie i nitka',
-    hint: 'most między ciałem a kroplą',
-    min: 0,
-    max: 1,
-  },
-  {
-    key: 'reachDistance',
-    label: 'Zasięg sięgania',
-    hint: 'z jak daleka ciało sięga',
-    min: 0.2,
-    max: 1.5,
-  },
   { key: 'gulp', label: 'Połknięcie', hint: 'reakcja ciała na wchłonięcie kropli', min: 0, max: 1 },
   {
     key: 'stretch',
@@ -195,7 +181,6 @@ export function HeroBlobLab() {
       uSquash: uniform('uSquash'),
       uBall: uniform('uBall'),
       uStretch: uniform('uStretch'),
-      uThread: uniform('uThread'),
       uMutate: uniform('uMutate'),
     }
 
@@ -286,7 +271,6 @@ export function HeroBlobLab() {
       gl.uniform3f(uniforms.uSquash, step.squashX, step.squashY, step.squash)
       gl.uniform4f(uniforms.uBall, step.ballX, step.ballY, step.ballRadius, step.merge)
       gl.uniform3f(uniforms.uStretch, step.stretchX, step.stretchY, step.stretch)
-      gl.uniform1f(uniforms.uThread, step.thread)
       gl.uniform2f(uniforms.uMutate, step.mutate, step.phase)
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
     }

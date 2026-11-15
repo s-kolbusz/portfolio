@@ -33,8 +33,6 @@ export const BLOB_LAB_FRAGMENT = /* glsl */ `#version 300 es
   // the axis and amount it is drawn out along.
   uniform vec4 uBall;
   uniform vec3 uStretch;
-  // Radius of the bridge between body and ball (px).
-  uniform float uThread;
   // How far the outline wanders, and its own clock.
   uniform vec2 uMutate;
 
@@ -78,13 +76,6 @@ export const BLOB_LAB_FRAGMENT = /* glsl */ `#version 300 es
     return (length(q) - radius) / (1.0 + max(amount, 0.0) * narrowing);
   }
 
-  float sdSegment(vec2 p, vec2 a, vec2 b) {
-    vec2 pa = p - a;
-    vec2 ba = b - a;
-    float h = clamp(dot(pa, ba) / max(dot(ba, ba), 1e-6), 0.0, 1.0);
-    return length(pa - ba * h);
-  }
-
   void main() {
     vec2 px = gl_FragCoord.xy / uDpr;
     px.y = uViewport.y - px.y;
@@ -117,15 +108,6 @@ export const BLOB_LAB_FRAGMENT = /* glsl */ `#version 300 es
 
     float ball = drawnOut((px - uBall.xy) / unit, uBall.z / unit, uStretch.xy, uStretch.z, 0.35);
     float d = smin(body, ball, uBall.w / unit);
-
-    // The bridge: the body reaching for the ball, and the ball's thread as it
-    // leaves. The edge is soft, so a line of no width would still show as a
-    // faint streak: the bridge is held back by the edge's own width and is
-    // gone, not thin, when its radius runs out.
-    if (uThread > 0.0) {
-      float thread = sdSegment(px, uCenter + drift * unit, uBall.xy) / unit - uThread / unit + 0.045;
-      d = smin(d, thread, 0.16 * uScale * max(0.05, smoothstep(0.0, 0.05, uThread / unit)));
-    }
 
     // Surface ripple, as on the live site.
     d += snoise(uv * 1.5 + uTime * 0.15) * 0.04 * uScale * uDetail;
