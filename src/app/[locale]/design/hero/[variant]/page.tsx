@@ -7,6 +7,7 @@ import {
   type HeroSampleVariant,
 } from '@/components/canvas/hero-samples/variants'
 import { HeroAssembly } from '@/components/sections/hero-assembly'
+import { HeroBlobLab } from '@/components/sections/hero-blob-lab'
 import { HeroSample } from '@/components/sections/hero-sample'
 import { requireRoutingLocale } from '@/i18n/locale'
 import { Link } from '@/i18n/navigation'
@@ -34,6 +35,7 @@ export function generateStaticParams() {
 }
 
 const TITLES: Record<HeroSampleVariant, string> = {
+  blob: 'Blob z produkcji: strojenie',
   zlozenie: 'Złożenie: materia rozbiera rzeczy na części',
   materia: 'Materia próbuje kształtów',
   okno: 'Pod powierzchnią',
@@ -53,7 +55,13 @@ export default async function HeroSamplePage({ params }: Props) {
 
   return (
     <main id="main-content" className={`flex min-h-screen flex-col ${bonaNova.variable}`}>
-      {variant === 'zlozenie' ? <HeroAssembly /> : <HeroSample key={variant} variant={variant} />}
+      {variant === 'blob' ? (
+        <HeroBlobLab />
+      ) : variant === 'zlozenie' ? (
+        <HeroAssembly />
+      ) : (
+        <HeroSample key={variant} variant={variant} />
+      )}
       <nav
         id="probki-hero"
         aria-label="Próbki hero"
