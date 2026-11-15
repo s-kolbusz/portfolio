@@ -2,6 +2,14 @@
 
 Data: 2026-11-15/16 · Status: **propozycja do poprawienia przez właściciela. Nic z tego nie jest zatwierdzone
 i nie powstał żaden kod ruchu.**
+
+**Ocena właściciela (2026-11-15): krok 1 (wejście) odrzucony.** „Mieszanie statyczności i kreatywnych animacji”
+to zły pomysł; wejście było najmniej kreatywne i najnudniejsze z dotychczasowych i nie ma nic wspólnego
+z poziomem Awwwards. Kroki 2–5 „wydają się sensowne”, ale interakcje mają lepiej oddawać istotę tego, co się
+dzieje, zamiast być „losową próbką umiejętności” i efekciarstwem. **Odrzucony jest też „język”** z kroków 1 i 3:
+to ta sama nitka między ciałem a kroplą, którą właściciel kazał usunąć całkowicie. Krok 1 i język zostają
+niżej tylko jako zapis tego, co odrzucono; nowe wejście i ciągnięcie bez nitki nie są jeszcze ustalone.
+
 Dotyczy kadru „imię ramuje obiekt” (`kadr-imie`, zrzut `cook/stills/kadry-final/1-kadr-imie-sheet.jpg`).
 Ustalenia, na których stoi: [diagnoza otwarcia, sekcja 5](./2026-11-14-otwarcie-diagnoza-telefon.md).
 Scroll po hero opisuje [scenariusz z września](./2026-09-25-scroll-hero-scenariusz.md); ten dokument go nie zmienia.
