@@ -5,9 +5,11 @@ import { notFound } from 'next/navigation'
 import {
   HERO_SAMPLE_VARIANTS,
   type HeroSampleVariant,
+  isHeroFrameVariant,
 } from '@/components/canvas/hero-samples/variants'
 import { HeroAssembly } from '@/components/sections/hero-assembly'
 import { HeroBlobLab } from '@/components/sections/hero-blob-lab'
+import { HeroFrame } from '@/components/sections/hero-frame'
 import { HeroSample } from '@/components/sections/hero-sample'
 import { requireRoutingLocale } from '@/i18n/locale'
 import { Link } from '@/i18n/navigation'
@@ -17,6 +19,7 @@ import { routing } from '@/i18n/routing'
 const bonaNova = Bona_Nova({
   subsets: ['latin', 'latin-ext'],
   weight: ['400', '700'],
+  style: ['normal', 'italic'],
   variable: '--font-hero-display',
   display: 'swap',
 })
@@ -40,6 +43,9 @@ const TITLES: Record<HeroSampleVariant, string> = {
   materia: 'Materia próbuje kształtów',
   okno: 'Pod powierzchnią',
   czynniki: 'Rozkładam na czynniki',
+  'kadr-imie': 'Kadr 1: największe jest imię',
+  'kadr-slowa': 'Kadr 2: największe są słowa',
+  'kadr-materia': 'Kadr 3: największa jest materia',
 }
 
 /**
@@ -59,6 +65,8 @@ export default async function HeroSamplePage({ params }: Props) {
         <HeroBlobLab />
       ) : variant === 'zlozenie' ? (
         <HeroAssembly />
+      ) : isHeroFrameVariant(variant) ? (
+        <HeroFrame variant={variant} />
       ) : (
         <HeroSample key={variant} variant={variant} />
       )}

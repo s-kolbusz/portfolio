@@ -623,3 +623,51 @@ Dotyk (ten sam dzień, na prośbę właściciela): na stronie głównej i w pró
 dotyka ekranu, i wraca do bloba po puszczeniu. Zdarzenia dotyku zamiast wskaźnika, bo te drugie przeglądarka
 przerywa w chwili, gdy palec zaczyna przewijać. Sprawdzone na emulowanym telefonie (`cook/stills/touch1/`),
 nie na prawdziwym.
+
+### Co hero mówi: jeden gest i trzy zdania; trzy kadry do wyboru (2026-11-15, późny wieczór)
+
+Runda pytań o treść, przed jakimkolwiek układem. Ustalenia właściciela:
+
+- **Bez listy dowodów w hero.** Lista rzeczy ze stanami (działa, w realizacji, zrozumiane i odłożone)
+  wyglądała na „upychaną na siłę”. Rzeczy zostają dla scen po scrollu. Poprawki faktów przy okazji: Piczura
+  jest zbudowana i live; Airchos nie do hero; ready2order „niekoniecznie”.
+- **Hero ma być osobiste** („to nie strona produktu, tylko moje portfolio”) i łączyć zabawę oraz wrażenie
+  z tym, co robi i jak pracuje.
+- **Jeden gest:** gość kroplą rozrywa bloba na kilka nierównych części, a blob, jako cięższa materia, sam
+  składa się z powrotem. Gest odgrywa trzy cechy naraz: rozkładanie na części, wszystko w jednych rękach,
+  nic z gotowych klocków. Tekst tylko nazywa to, co gość właśnie zobaczył.
+- **Tekst (angielski, zatwierdzony):** mała linia „I design and build websites and web apps.” oraz trzy
+  zdania, po jednym na chwilę bloba: „I take things apart.” / „I put them back together myself.” /
+  „Nothing off the shelf.” Wszystkie trzy są zawsze widoczne; zdanie bieżącej chwili jest w pełnym
+  atramencie, pozostałe przygaszone.
+- **Bez etykiety roli w hero.** „Web Architect” znika; tytuł zawodowy żyje w metadanych, docku i na
+  stronie o mnie.
+- Odrzucone: „By hand.” (koliduje ze stroną „Jak pracuję z agentami” i obiecuje pracę „jak jaskiniowiec”),
+  „No templates.” (mniej znaczenia). Pierwsze polskie brzmienie trzech zdań brzmiało źle; **polską wersję
+  trzeba napisać od nowa, nie tłumaczyć.**
+
+**Trzy kadry (statyczne, bez ruchu)** pod `/en/design/hero/kadr-imie`, `kadr-slowa`, `kadr-materia`
+(`src/components/sections/hero-frame.tsx`, `src/components/canvas/hero-samples/frame-shader.ts`). Różnią
+się tym, co jest największe:
+
+1. **Imię** (szkielet „imię ramuje obiekt”): imię ramuje bloba po przekątnej, trzy zdania są blokiem
+   w lewym dolnym rogu.
+2. **Słowa:** trzy zdania jako plakat na całą szerokość, blob rozrywany wśród nich, imię jako podpis.
+3. **Materia:** cała opowieść w jednym kadrze, z góry na dół: luźne krople, krople zlewające się, jedno
+   ciało; każde zdanie stoi przy swoim stanie.
+
+Blob w kadrach jest liczony tymi samymi wzorami co produkcyjny (płaski, pastelowy, miękka krawędź, wędrujący
+zarys), rozszerzonymi o kilka ciał i zwężający się „język” ciągniętej materii; czas stoi. Zrzuty:
+`cook/stills/kadry-final/` (lokalnie, poza gitem), skrypt `cook/kadry-shots.mjs`.
+
+Wnioski z budowy kadrów:
+
+- **Małe części bloba dymią.** Miękka krawędź ma stałą szerokość (ok. 18 px), więc część o promieniu
+  poniżej ok. 60 px wygląda jak kłębek dymu, a nie ciecz. Gest rozrywania będzie takie części produkował;
+  ruch musi to rozstrzygnąć (większe części albo krawędź skalowana z rozmiarem, co zmienia wygląd i wymaga
+  zgody właściciela).
+- **Części ułożone w jednej osi czyta się jako figurę** (pionek, butelka, totem). Ciągnięcie musi iść po
+  skosie, z przewężeniem, a stany materii nie mogą stać jeden nad drugim.
+- Na telefonie palec, który ciągnie bloba, jednocześnie przewija stronę; kadry tego nie rozstrzygają.
+
+Rekomendacja wykonawcy: kadr 2 (słowa). Wybór należy do właściciela; do tego czasu nie powstaje kod ruchu.
