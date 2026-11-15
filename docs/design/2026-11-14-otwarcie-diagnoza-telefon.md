@@ -678,3 +678,15 @@ trasie próbek do czasu, aż ruch dla kadru 1 będzie gotowy. Następny krok: sc
 krok po kroku i z przyczyną każdego ruchu, do poprawienia przez właściciela, zanim powstanie kod. Do
 rozstrzygnięcia w scenariuszu: małe części bloba, które dymią; gest rozrywania a przewijanie na telefonie;
 to, że w tym kadrze trzy zdania są najmniejszym elementem.
+
+### Scenariusz ruchu dla kadru 1: propozycja do poprawienia (2026-11-16)
+
+Rozpisany krok po kroku w [`2026-11-16-hero-kadr-1-scenariusz-ruchu.md`](./2026-11-16-hero-kadr-1-scenariusz-ruchu.md):
+wejście, spoczynek, ciągnięcie, powrót, wyjście, każdy ruch z przyczyną. Status: propozycja wykonawcy, nic
+nie jest zatwierdzone, kod ruchu nie powstał. Odpowiedzi na trzy problemy z wyboru kadru:
+
+- **Dym:** nic na ekranie nie jest mniejsze niż kropla na telefonie (promień 0,15 jednostki bloba), części się
+  nie dzielą, a przewężenia i ogonki żyją najwyżej ćwierć sekundy. Bez zmiany wyglądu.
+- **Telefon:** o tym, czy palec ciągnie, czy przewija, decyduje pierwszy ruch (w bok: ciągnie; w pionie:
+  przewija). Do sprawdzenia na prawdziwym iPhonie przed resztą ruchu.
+- **Rozmiar trzech zdań:** jedno pytanie do właściciela, z rekomendacją „zostawić i ocenić w ruchu”.

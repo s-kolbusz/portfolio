@@ -13,6 +13,7 @@ Czytaj w tej kolejności. Nowszy dokument wygrywa ze starszym.
 | `2026-11-15-how-i-work-with-agents-en.md`    | Angielska wersja tekstu podstrony „Jak pracuję z agentami”.                    | Zatwierdzone 15.11; polski tekst wygrywa.               |
 | `2026-09-24-redesign-decyzje.md`             | Tożsamość, podział marek, ceny, kontakt, SEO/GEO.                              | Obowiązuje tam, gdzie koncept z 14.11 nie mówi inaczej. |
 | `2026-09-25-*-scenariusz.md`                 | Scenariusze hero i sceny sygnaturowej.                                         | Opisują to, co zbudowane.                               |
+| `2026-11-16-hero-kadr-1-scenariusz-ruchu.md` | Scenariusz ruchu hero dla kadru 1: wejście, gest, powrót, wyjście.             | Propozycja; czeka na poprawki właściciela.              |
 | `2026-09-20…21-*.md`                         | Sesja GPT.                                                                     | ZASTĄPIONE; ustalenia audytu A1–A9 nadal ważne.         |
 
 ## Jak pracujemy nad redesignem
