@@ -65,7 +65,7 @@ Tasks don't live in a file. I tried: the file grew with every closed task and ha
 the start of every session. Now the agent asks the board only for the open tasks of one project. What
 costs is what gets read, not how it is read.
 
-## 4. One session, one topic, one executor
+## 4. One session, one topic, one agent
 
 A long session that mixes topics loses details: once the conversation is summarized, some of what was
 agreed is gone, and the result is harder to check. Its cost grows too, but that is a side effect, not
@@ -76,7 +76,7 @@ small sessions. Heavy work comes back as a file and a few sentences of summary. 
 short: what to do, what not to touch, what not to do, and how to tell it is finished. I took this split
 from the Elephant-Goldfish model (egm.dev).
 
-By default there is one executor. Before I'm shown a result there is at most one round of fixes; after
+By default one agent does the work. Before I'm shown a result there is at most one round of fixes; after
 that I look at it myself instead of letting the agent keep fixing it in circles. When something is
 unclear, the agent asks one question instead of producing a round of variants. A second reviewer comes
 in for a new direction or when I ask. Terminal command output goes through a filter that shortens it
@@ -120,10 +120,13 @@ questions about myself don't work on me.
 
 Not open questions about content; only places where English forced a choice.
 
-1. Page title: “How I work with agents”.
-2. “Bezpieczeństwo” is translated as “security” (code without vulnerabilities, no secrets), not “safety”.
-3. “Wykonawca” is “executor” in the heading of section 4 and in the text. An alternative is “one agent
-   doing the work”.
+1. Page title: “How I work with agents”. The owner asked (15.11) whether “How do I work with agents”
+   is more correct. It is not: with “do” it becomes a question, as if asking for instructions; a title
+   that announces an explanation uses the statement order. Kept, pending his reply.
+2. **OK (owner, 15.11):** “bezpieczeństwo” is “security” (code without vulnerabilities, no secrets), not
+   “safety”.
+3. **Changed (owner, 15.11: “executor” is not a good word):** “wykonawca” is now “one agent” in the
+   heading of section 4 and “one agent does the work” in the text.
 4. “Seria pytań, która szuka dziury w pomyśle” is “a round of questions that looks for the hole in the
    idea”. The internal name of that step is not used.
 5. “Testy sprawdzają, czy rzecz zrobiono dobrze, a nie, czy zrobiono właściwą rzecz” became “whether the
