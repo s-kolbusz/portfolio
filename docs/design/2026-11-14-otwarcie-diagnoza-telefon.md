@@ -589,3 +589,32 @@ ok. 15% materii zostaje w szczelinach między częściami; belka powstaje jako �
 rozleje się na całą szerokość; rozluźniony blob jest o ok. 10% większy i na chwilę dotyka liter imienia.
 Nie zrobione z rozpisu: tężenie frontem od miejsca dotknięcia, „ostatnia kropla” jako najciemniejszy
 element, różnice między trzema stanami rzeczy, zdanie przy obiekcie (układ).
+
+### Powrót do bloba z produkcji: charakter zamiast nowej techniki (2026-11-15)
+
+Po ocenie na żywo właściciel odrzucił hero, w którym ciecz buduje rysunki („dziecięco, mega niedopracowanie,
+kompletnie nieprofesjonalnie”), a potem także pomysł cieczy odsłaniającej zdjęcie w hero („niedopuszczalne”;
+zostaje tylko w przejściu z hero do sekcji). Sprawdzony po drodze EffectCraft (odpowiednik After Effects,
+sterowany z agenta przez lokalny kanał aplikacji) daje ostrą płaską ciecz, ale gotowy klip nie zareaguje na
+kursor, a to interakcja jest dla niego najważniejsza. Punktem wyjścia został więc blob z obecnej strony:
+„kształt i mutowanie wyglądały już naprawdę dobrze, potrzebowało dopracowania i ekspresji”.
+
+Jak to działa:
+
+- **Stół do strojenia** pod `/pl/design/hero/blob`: blob z produkcji przepisany wzór po wzorze i panel
+  suwaków. Właściciel stroi na żywo i kopiuje wartości; agent dostarcza tylko mechanizmy.
+- **Charakter bloba** (`viscous-puddle/character.ts`), wspólny dla próbki i strony głównej: zarys wędruje
+  w dużej skali (wygina samo ciało, przed zlaniem z kroplą), ciało pochyla się za kursorem z opóźnieniem,
+  po wejściu kropli faluje i rośnie o to, co wchłonęło, a kropla wyciąga się w kierunku ruchu.
+- **Ustawienia właściciela** (`TUNED`): mutacja 0,7, tempo 1,5, ciężar 0,25, połknięcie 0,5, bezwładność
+  kropli 1, sprężystość 0. Most między ciałem a kroplą („nitka”) został na jego prośbę usunięty.
+- **Na stronie głównej** charakter działa tylko na wolnego bloba: choreografia podaje `loose` (1 w spoczynku,
+  0 gdy blob przywiera do imienia i jako tafla), więc przywieranie, wsiąkanie, przelot i scena przejścia
+  wyglądają jak dotąd.
+
+Odrzucone po drodze: mutacja skalowana ostrym przełącznikiem ciało/kropla (cięła szew wzdłuż granicy między
+nimi), most jako odcinek o malejącej grubości (miękka krawędź rysowała go jako smugę z każdej odległości).
+
+Sprawdzone: zrzuty z przeglądarki, spoczynek, kursor i całe przewijanie strony głównej na 1440×900 i 390×844
+(`cook/stills/home1/`). Nie sprawdzone: ruch na żywo oceniał tylko właściciel i tylko na próbce; prawdziwy
+iPhone i Safari; testy e2e. Na telefonie strona główna nadal nie ma kropli pod palcem (próbka ma).

@@ -60,6 +60,14 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
   // z radius, w smooth-union width with the body (all px).
   uniform vec4 uBall;
 
+  // The blob's character (see character.ts), all nil for the plain blob:
+  // the axis and amount the body is drawn out along after a gulp, the same
+  // for the ball along its motion, and how far the body's outline wanders
+  // (x, in blob units) on its own clock (y).
+  uniform vec3 uSquash;
+  uniform vec3 uStretch;
+  uniform vec2 uMutate;
+
   in vec2 vUv;
   out vec4 fragColor;
 
@@ -71,6 +79,18 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
     r = min(r, min(b.x, b.y));
     vec2 q = abs(p) - b + r;
     return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r;
+  }
+
+  // A point as a shape drawn out along an axis (and narrowed across it) sees it.
+  vec2 drawnOut(vec2 p, vec2 axis, float amount, float narrowing) {
+    float along = dot(p, axis);
+    vec2 across = p - along * axis;
+    return axis * along / (1.0 + amount) + across * (1.0 + amount * narrowing);
+  }
+
+  // What a distance measured there has to be divided by to stay a distance.
+  float drawnOutScale(float amount, float narrowing) {
+    return 1.0 + max(amount, 0.0) * narrowing;
   }
 
   float smin(float a, float b, float k) {
@@ -139,10 +159,33 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
     float body = 1e3;
     if (uBody > 0.5) {
       vec2 halfSize = uHalfSize / unit + breathe * uScale;
-      body = sdRoundBox(uv - drift, halfSize, uCorner / unit + breathe * uScale);
+      body =
+        sdRoundBox(
+          drawnOut(uv - drift, uSquash.xy, uSquash.z, 0.6),
+          halfSize,
+          uCorner / unit + breathe * uScale
+        ) / drawnOutScale(uSquash.z, 0.6);
+
+      // The free blob's outline wanders: slow, large, and never the same way
+      // twice. Only the body's: the ball stays a drop, and the two still run
+      // together through the one smooth union below.
+      if (uMutate.x > 0.0) {
+        float t = uMutate.y;
+        vec2 warp = vec2(
+          snoise(uv * 0.4 + vec2(t * 0.07, 3.1)),
+          snoise(uv * 0.4 + vec2(-1.7, t * 0.06))
+        );
+        // One long wave, bent by a slower one: broad lobes, no corners.
+        float wander = snoise(uv * 0.5 + warp * 0.35 + vec2(t * 0.05, -t * 0.04));
+        body += wander * uMutate.x * uScale;
+      }
     }
 
-    float ball = sdCircle((px - uBall.xy) / unit, uBall.z / unit);
+    // The ball draws out along its way.
+    float ballStretch = drawnOutScale(uStretch.z, 0.35);
+    float ball =
+      sdCircle(drawnOut((px - uBall.xy) / unit, uStretch.xy, uStretch.z, 0.35), uBall.z / unit) /
+      ballStretch;
     // On the water sheet the ball is drawn as its own layer (below), so the
     // sheet's edge never reaches for it: no union, no shared ripple.
     float sheet = step(0.5, uLiquidEdge);
@@ -232,7 +275,9 @@ export const FRAGMENT_SRC = /* glsl */ `#version 300 es
     // edge and shading.
     if (uLiquidEdge > 0.5 && uBall.z > 0.0) {
       vec2 heroUv = (px - uViewport * 0.5) / unit;
-      float ballD = sdCircle((px - uBall.xy) / unit, uBall.z / unit);
+      float ballD =
+        sdCircle(drawnOut((px - uBall.xy) / unit, uStretch.xy, uStretch.z, 0.35), uBall.z / unit) /
+        drawnOutScale(uStretch.z, 0.35);
       ballD += snoise(heroUv * 1.5 + uTime * 0.15) * 0.04 * uScale * (1.0 + uFlow) * uDetail;
       float ballAlpha = smoothstep(0.04, -0.04, ballD);
       // Over text the ball fades back into the water as a whole.

@@ -7,6 +7,12 @@ import { usePrefersReducedMotion } from '@/hooks/use-media'
 import { gsap } from '@/lib/gsap-core'
 
 import {
+  type CharacterState,
+  createCharacterState,
+  stepCharacter,
+  TUNED,
+} from './viscous-puddle/character'
+import {
   choreograph,
   HEADING_AT,
   mix,
@@ -121,6 +127,8 @@ interface PuddleState {
   ballSink: number
   /** The smoothed scroll position the story runs on; null until the first frame. */
   timeY: number | null
+  /** How the free blob carries itself (its lean, its gulp, its wandering outline). */
+  character: CharacterState
 }
 
 function createInitialState(): PuddleState {
@@ -154,6 +162,7 @@ function createInitialState(): PuddleState {
     ballVY: 0,
     ballSink: 0,
     timeY: null,
+    character: createCharacterState(),
   }
 }
 
@@ -471,6 +480,22 @@ export function ViscousPuddle() {
       state.lastBallX = ballX
       state.lastBallY = ballY - stageTop
 
+      // The free blob's character: it leans after the pointer, takes a gulp
+      // when the ball goes in, its outline wanders, and the ball draws out
+      // along its way. All of it fades as the body clings to the name.
+      const character = stepCharacter(state.character, {
+        delta: reduced ? 0 : delta,
+        unit: window.innerHeight / 2,
+        scale: state.scale,
+        loose: step.body ? step.loose : 0,
+        restX: step.centerX,
+        restY: step.centerY,
+        radius: step.halfWidth,
+        ball: { x: ballX, y: ballY, vx: state.ballVX, vy: state.ballVY, radius: ball.radius },
+        pointer: { x: state.targetMouseX, y: state.targetMouseY, active: followPointer },
+        character: TUNED,
+      })
+
       publishSignature({
         step,
         startColour: [state.colorR, state.colorG, state.colorB],
@@ -509,9 +534,16 @@ export function ViscousPuddle() {
       gl.uniform3f(uniforms.uTargetColor, ...state.targetColour)
       gl.uniform1f(uniforms.uSolid, step.solid)
       gl.uniform1f(uniforms.uBody, step.body ? 1 : 0)
-      gl.uniform2f(uniforms.uCenter, step.centerX, step.centerY)
-      gl.uniform2f(uniforms.uHalfSize, step.halfWidth, step.halfHeight)
-      gl.uniform1f(uniforms.uCorner, step.cornerRadius)
+      gl.uniform2f(uniforms.uCenter, step.centerX + character.leanX, step.centerY + character.leanY)
+      gl.uniform2f(
+        uniforms.uHalfSize,
+        step.halfWidth * character.grow,
+        step.halfHeight * character.grow
+      )
+      gl.uniform1f(uniforms.uCorner, step.cornerRadius * character.grow)
+      gl.uniform3f(uniforms.uSquash, character.squashX, character.squashY, character.squash)
+      gl.uniform3f(uniforms.uStretch, character.stretchX, character.stretchY, character.stretch)
+      gl.uniform2f(uniforms.uMutate, character.mutate, character.phase)
       gl.uniform1f(uniforms.uFluid, step.fluid)
       gl.uniform1f(uniforms.uFlow, state.flow)
       gl.uniform1f(uniforms.uHasImage, state.hasImage ? 1 : 0)

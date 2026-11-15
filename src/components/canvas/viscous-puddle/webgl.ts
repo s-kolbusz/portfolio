@@ -27,6 +27,9 @@ interface PuddleUniforms {
   uBallSink: WebGLUniformLocation | null
   uImageRadius: WebGLUniformLocation | null
   uBall: WebGLUniformLocation | null
+  uSquash: WebGLUniformLocation | null
+  uStretch: WebGLUniformLocation | null
+  uMutate: WebGLUniformLocation | null
   uDrain: WebGLUniformLocation | null
 }
 
@@ -157,6 +160,9 @@ export function setupPuddleWebGL(canvas: HTMLCanvasElement): PuddleWebGLContext 
     uBallSink: gl.getUniformLocation(program, 'uBallSink'),
     uImageRadius: gl.getUniformLocation(program, 'uImageRadius'),
     uBall: gl.getUniformLocation(program, 'uBall'),
+    uSquash: gl.getUniformLocation(program, 'uSquash'),
+    uStretch: gl.getUniformLocation(program, 'uStretch'),
+    uMutate: gl.getUniformLocation(program, 'uMutate'),
     uDrain: gl.getUniformLocation(program, 'uDrain'),
   }
 

@@ -140,6 +140,12 @@ export interface ChoreographyFrame {
   viscosity: number
   /** viscosity / 0.82: drives drift, breathing, cursor and ripple. */
   fluid: number
+  /**
+   * How much the body is still the free blob: 1 at rest in the hero, 0 once
+   * it clings to the name, and 0 as the water sheet. Its character (the
+   * wandering outline, the lean, the gulp) acts only on the free blob.
+   */
+  loose: number
   /** Colour shift from the blob green to the page's own colour, 0–1. */
   solid: number
   /** How much of the image shows through the matter, 0–1. */
@@ -383,6 +389,7 @@ function heroFrame(
     zoomY: zoomY + shiftY,
     viscosity: VISCOSITY_START,
     fluid: 1,
+    loose: 1 - cling,
     solid: 0,
     imageIn: 0,
     clarity: 0,
@@ -437,6 +444,7 @@ export function choreograph({
       zoomY: 0,
       viscosity: VISCOSITY_START,
       fluid: 1,
+      loose: 1,
       solid: 0,
       imageIn: 0,
       clarity: 0,
@@ -504,6 +512,7 @@ export function choreograph({
     zoomY: 0,
     viscosity,
     fluid: viscosity / VISCOSITY_START,
+    loose: 0,
     solid: glide(...BEATS.darken, progress),
     // The page surfaces and clears on the site's reveal ease.
     imageIn: power2Out(linear(...BEATS.image, progress)),
