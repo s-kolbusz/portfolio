@@ -7,7 +7,7 @@ bez zmian. Źródło faktów: `2026-11-14-historia-strony-koncept.md`, sekcje 5,
 ## Teksty (wersja Codexa po jednej rundzie poprawek)
 
 Drukarka: oznaczona przez właściciela 15.11 (punkty 1, 2, 4, 5 tak; zdanie z punktu 3 usunięte, reszta bez zmian).
-Dom: oznaczony 15.11 (punkty 6–11 tak); w trzeciej rundzie Codex dopisał fakt o starej pompie podłączonej przez Shelly, w czwartej poprawił kolejność (Home Assistant zaraz po płocie), w piątej dopisał, po co powstał Home Assistant.
+Dom: oznaczony 15.11 (punkty 6–11 tak); w trzeciej rundzie Codex dopisał fakt o starej pompie podłączonej przez Shelly, w czwartej poprawił kolejność (Home Assistant zaraz po płocie), w piątej dopisał, po co powstał Home Assistant, w szóstej poprawił krok o falownikach.
 
 **Tytuł**
 Przebudowa drukarki 3D
@@ -46,7 +46,7 @@ Zacząłem od płotu z paneli fotowoltaicznych.
 **Kroki**
 
 - Po płocie zająłem się Home Assistantem. Miałem urządzenia smart różnych dostawców, każde z własną aplikacją. Dzięki HA mam cały smart home w jednym miejscu i mogę dowolnie dobierać producentów urządzeń.
-- Następnie przyszła kolej na falowniki.
+- Miałem jeden falownik Fronius, potem doszedł drugi, innej firmy. Podłączyłem je do Home Assistanta. Zebranie danych od obu producentów było kolejnym powodem, żeby korzystać z HA.
 - Starą pompę ciepła podłączyłem do Home Assistanta przez przekaźnik Shelly. Dzięki temu dogrzewam ciepłą wodę na żądanie.
 - Potem zrobiłem własne panele, czyli ekrany z danymi o energii.
 
@@ -85,7 +85,7 @@ shelly (dogrzewanie ciepłej wody na żądanie)”. Nowe zdania do potwierdzenia
 
 12. **Tak.** Shelly to przekaźnik (tak nazywa go tekst; to moje dopowiedzenie).
 13. **Popraw:** „najpierw Home Assistant, potem reszta”. Punkt 8 był więc nieścisły; obowiązuje nowa kolejność.
-14. Falowniki przyszły po Home Assistancie, a nie razem z płotem (tak to rozumie tekst; to moja interpretacja słowa „reszta”).
+14. **Popraw:** falowniki zostały podłączone do Home Assistanta; najpierw był jeden Fronius, potem doszedł drugi innej firmy, a potrzeba zebrania danych od dwóch producentów uzasadniła HA.
 
 Uwaga do formy: obie historie mają ok. 100–115 słów, czyli trochę poniżej zamówionych 120. Krótsze wyszły
 po usunięciu dopowiedzeń; nie dopisywaliśmy niczego na siłę.
@@ -209,4 +209,14 @@ Dopisz jeden nowy fakt do poniższego tekstu „Dom pod kontrolą”, w kroku o 
 
 Nowy fakt (słowa autora): „HA też powstało jako rozwiązanie realnej potrzeby: różne urządzenia smart różnych dostawców i każde ze swoją własną aplikacją; dzięki HA w łatwy sposób mam cały smart home w jednym miejscu i mogę dowolnie dobierać producentów urządzeń”.
 Nie dodawaj nazw urządzeń, producentów ani liczb. Zasady jak wcześniej: rzeczowo, krótkie zdania, pierwsza osoba, bez myślników (—), bez marketingu, bez nowych faktów. Krok może mieć dwa, najwyżej trzy krótkie zdania.
+```
+
+### Runda 6 (dom: falowniki; wysłana razem z tekstem domu z rundy 5)
+
+```markdown
+Popraw krok o falownikach w poniższym tekście „Dom pod kontrolą”. Resztę zostaw bez zmian. Odpowiedz tylko poprawionym tekstem, w tym samym formacie, bez komentarzy.
+
+Nowe fakty (słowa autora): „falowniki zostały zintegrowane z Home Assistant; wcześniej był jeden od Fronius, po dołożeniu drugiego od innej firmy potrzeba miejsca integracji danych od dwóch producentów znów się pojawiła, co tylko uzasadniło HA”.
+Czyli: falowników nie instalowałem w tym kroku od zera, tylko podłączyłem je do Home Assistanta. Najpierw był jeden falownik Fronius. Potem doszedł drugi, innej firmy (nazwy nie podawaj, nie znam jej). Dane od dwóch producentów trzeba było zebrać w jednym miejscu, i to był kolejny powód dla Home Assistanta.
+Obecne „Następnie przyszła kolej na falowniki.” jest więc nieścisłe; zastąp je. Krok może mieć dwa, najwyżej trzy krótkie zdania. Nie powtarzaj słowo w słowo uzasadnienia z kroku o Home Assistancie; nawiąż do niego krótko. Zasady jak wcześniej: rzeczowo, krótkie zdania, pierwsza osoba, bez myślników (—), bez marketingu, bez nowych faktów.
 ```
