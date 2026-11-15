@@ -363,7 +363,7 @@ export function HeroBlobLab() {
                 Jak na stronie
               </button>
               <button type="button" className={button} onClick={() => apply(PROPOSAL)}>
-                Propozycja
+                Moje ustawienia
               </button>
               <button type="button" className={button} onClick={() => void copy()}>
                 {copied ? 'Skopiowane' : 'Kopiuj wartości'}

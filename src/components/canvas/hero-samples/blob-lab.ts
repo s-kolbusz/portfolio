@@ -41,16 +41,16 @@ export const PRODUCTION: BlobLabParams = {
   spring: 0.4,
 }
 
-/** A first proposal to correct. */
+/** The owner's own setting after his first sitting with the dials (2026-11-15). */
 export const PROPOSAL: BlobLabParams = {
-  mutate: 0.35,
-  mutateSpeed: 1,
-  reach: 0.6,
-  reachDistance: 0.6,
-  gulp: 0.6,
-  stretch: 0.5,
-  lean: 0.5,
-  spring: 0.4,
+  mutate: 0.7,
+  mutateSpeed: 1.5,
+  reach: 0,
+  reachDistance: 0.5,
+  gulp: 0.5,
+  stretch: 1,
+  lean: 0.25,
+  spring: 0,
 }
 
 export const PARAM_KEYS = Object.keys(PRODUCTION) as Array<keyof BlobLabParams>
@@ -243,9 +243,11 @@ export function stepBlobLab(state: BlobLabState, input: BlobLabInput): BlobLabFr
   const wants = 1 - smooth(0, reachPx, gap)
   state.bond += (wants - state.bond) * ease(wants > state.bond ? 0.12 : 0.5)
   // The bridge thins as it is drawn out, and is gone once the bond is.
+  // (Its radius includes the soft edge's width, which the shader takes off again.)
+  const full = (0.045 * unit + params.reach * ballRadius * 0.5) * state.bond
   const thread =
-    params.reach > 0 && gap > -ballRadius
-      ? (params.reach * ballRadius * 0.55 * state.bond) / (1 + Math.max(0, gap) / (ballRadius * 2))
+    params.reach > 0 && gap > -ballRadius && state.bond > 0.02
+      ? full / (1 + Math.max(0, gap) / (ballRadius * 2))
       : 0
 
   // --- The gulp: going in sets the body ringing; what it took in makes it larger. ---

@@ -100,19 +100,10 @@ export const BLOB_LAB_FRAGMENT = /* glsl */ `#version 300 es
     ) * 0.15;
 
     float body = drawnOut(uv - drift, uRadius / unit + breathe * uScale, uSquash.xy, uSquash.z, 0.6);
-    float ball = drawnOut((px - uBall.xy) / unit, uBall.z / unit, uStretch.xy, uStretch.z, 0.35);
-    float d = smin(body, ball, uBall.w / unit);
 
-    // The bridge: the body reaching for the ball, and the ball's thread as it leaves.
-    if (uThread > 0.0) {
-      float thread = sdSegment(px, uCenter + drift * unit, uBall.xy) / unit - uThread / unit;
-      d = smin(d, thread, 0.16 * uScale);
-    }
-
-    float ballness = smoothstep(-0.02, 0.02, body - ball);
-
-    // The outline wanders: slow, large, and never the same way twice. The
-    // ball keeps most of its own shape.
+    // The body's outline wanders: slow, large, and never the same way twice.
+    // Only the body's: the ball stays a drop, and the two still run together
+    // through the one smooth union below, so the join is as on the live site.
     if (uMutate.x > 0.0) {
       float t = uMutate.y;
       vec2 warp = vec2(
@@ -121,7 +112,19 @@ export const BLOB_LAB_FRAGMENT = /* glsl */ `#version 300 es
       );
       // One long wave, bent by a slower one: broad lobes, no corners.
       float wander = snoise(uv * 0.5 + warp * 0.35 + vec2(t * 0.05, -t * 0.04));
-      d += wander * uMutate.x * uScale * mix(1.0, 0.25, ballness);
+      body += wander * uMutate.x * uScale;
+    }
+
+    float ball = drawnOut((px - uBall.xy) / unit, uBall.z / unit, uStretch.xy, uStretch.z, 0.35);
+    float d = smin(body, ball, uBall.w / unit);
+
+    // The bridge: the body reaching for the ball, and the ball's thread as it
+    // leaves. The edge is soft, so a line of no width would still show as a
+    // faint streak: the bridge is held back by the edge's own width and is
+    // gone, not thin, when its radius runs out.
+    if (uThread > 0.0) {
+      float thread = sdSegment(px, uCenter + drift * unit, uBall.xy) / unit - uThread / unit + 0.045;
+      d = smin(d, thread, 0.16 * uScale * max(0.05, smoothstep(0.0, 0.05, uThread / unit)));
     }
 
     // Surface ripple, as on the live site.
