@@ -38,17 +38,15 @@ export function HeroAssembly() {
 
   const sectionRef = useRef<HTMLElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const coverRef = useRef<HTMLDivElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
   const captionRef = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
     const section = sectionRef.current
     const canvas = canvasRef.current
-    const cover = coverRef.current
     const stageElement = stageRef.current
     const caption = captionRef.current
-    if (!section || !canvas || !cover || !stageElement || !caption) return
+    if (!section || !canvas || !stageElement || !caption) return
 
     const lines = Array.from(section.querySelectorAll<HTMLElement>('[data-line]'))
     const rises = Array.from(section.querySelectorAll<HTMLElement>('[data-rise]'))
@@ -67,7 +65,6 @@ export function HeroAssembly() {
       })
     }
     const fallback = () => {
-      cover.style.display = 'none'
       showText(false)
       caption.textContent = THINGS[0]?.caption ?? ''
       caption.style.opacity = '1'
@@ -162,10 +159,9 @@ export function HeroAssembly() {
       if (section.dataset.phase !== step.phase) section.dataset.phase = step.phase
       if (section.dataset.thing !== String(step.thing)) section.dataset.thing = String(step.thing)
       renderer.draw({ ...step, stage: layout.stage, color })
-      if (cover.style.display !== 'none') cover.style.display = 'none'
 
       // The text is uncovered as the sheet drains past it; after that it does not move.
-      if (!textShown && time > 0.95) {
+      if (!textShown && time > 0.2) {
         textShown = true
         showText(true)
       }
@@ -215,7 +211,7 @@ export function HeroAssembly() {
       className="text-foreground relative h-svh w-full touch-pan-y overflow-hidden select-none"
     >
       <noscript>
-        <style>{`[data-hero-sample-cover] { display: none; } [data-line], [data-rise] { translate: none !important; opacity: 1 !important; }`}</style>
+        <style>{`[data-line], [data-rise] { translate: none !important; opacity: 1 !important; }`}</style>
       </noscript>
       <canvas
         ref={canvasRef}
@@ -230,10 +226,10 @@ export function HeroAssembly() {
         Spacing is on a 4 px scale: 12 around the object, 20 to the rule,
         12 between lines, 16 to the action.
       */}
-      <div className="pointer-events-none relative z-10 mx-auto flex h-full w-full max-w-[1440px] flex-col px-6 pt-[88px] pb-28 md:grid md:grid-cols-12 md:grid-rows-[auto_1fr_auto] md:gap-x-6 md:pt-24 md:pr-48 md:pb-20 md:pl-12">
+      <div className="pointer-events-none relative z-10 mx-auto flex h-full w-full max-w-[max(1440px,178svh)] flex-col px-6 pt-[88px] pb-28 md:grid md:grid-cols-12 md:grid-rows-[auto_1fr_auto] md:gap-x-6 md:pt-24 md:pr-48 md:pb-20 md:pl-12">
         <h1
           aria-label={name}
-          className="contents text-[15.5vw] leading-none font-normal tracking-[-0.015em] md:text-[min(8.6vw,7.75rem)]"
+          className="contents text-[15.5vw] leading-none font-normal tracking-[-0.015em] md:text-[min(8.6vw,16svh)]"
           style={{ fontFamily: 'var(--font-hero-display), var(--font-serif), serif' }}
         >
           <span
@@ -263,36 +259,27 @@ export function HeroAssembly() {
         <div className="order-4 mt-5 flex flex-col md:col-span-4 md:col-start-1 md:row-start-3 md:mt-0 md:self-end">
           <div
             data-rise
-            className="border-foreground/20 flex translate-y-3 items-baseline justify-between gap-4 border-t pt-3 text-[15px] leading-tight opacity-0 md:text-base"
+            className="border-foreground/20 flex translate-y-3 items-baseline justify-between gap-4 border-t pt-3 text-[15px] leading-tight opacity-0 md:text-[clamp(1rem,1.9svh,1.5rem)]"
           >
             <p className="font-medium">{t('role')}</p>
             <span ref={captionRef} className="text-right opacity-0" />
           </div>
           <p
             data-rise
-            className="text-muted-foreground mt-3 max-w-[38ch] translate-y-3 text-[15px] leading-snug opacity-0 md:text-base"
+            className="text-muted-foreground mt-3 max-w-[38ch] translate-y-3 text-[15px] leading-snug opacity-0 md:text-[clamp(1rem,1.9svh,1.5rem)]"
           >
             {t('tagline')}
           </p>
           <a
             data-rise
             href="#probki-hero"
-            className="border-foreground/25 hover:bg-foreground hover:text-background pointer-events-auto mt-4 inline-flex h-11 translate-y-3 items-center gap-2 self-start rounded-full border px-5 text-[15px] font-medium opacity-0 transition-colors"
+            className="border-foreground/25 hover:bg-foreground hover:text-background pointer-events-auto mt-4 inline-flex h-11 translate-y-3 items-center gap-2 self-start rounded-full border px-5 text-[15px] font-medium opacity-0 transition-colors md:mt-[clamp(1rem,2.2svh,1.75rem)] md:h-[clamp(2.75rem,5svh,3.75rem)] md:px-[clamp(1.25rem,2.4svh,2rem)] md:text-[clamp(0.95rem,1.8svh,1.4rem)]"
           >
             {t('cta')}
             <ArrowDownIcon aria-hidden="true" className="size-4" />
           </a>
         </div>
       </div>
-
-      {/* Server-rendered sheet: the page starts as matter, before any script runs. */}
-      <div
-        ref={coverRef}
-        data-hero-sample-cover
-        aria-hidden="true"
-        className="absolute inset-0 z-20 motion-reduce:hidden"
-        style={{ background: 'color(srgb var(--primary-rgb))' }}
-      />
     </section>
   )
 }

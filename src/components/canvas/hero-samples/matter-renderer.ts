@@ -79,13 +79,13 @@ const SURFACE_FRAGMENT = /* glsl */ `#version 300 es
     // the drop's outline to the drawing's instead of one fading over the other.
     // The liquid's level is read from a slightly coarser copy of the field:
     // the body is one smooth mass, and single drops never show.
-    float liquid = textureLod(uField, vUv, 2.5).r / 0.5;
+    float liquid = textureLod(uField, vUv, 1.6).r / 0.5;
     float level = mix(liquid, drawing.g * step(0.12, amount), set);
 
     // The blob as it has always been: flat, pastel, with a soft edge and a
     // slightly deeper middle. No light, no gloss, no shadow. As matter sets,
     // the edge tightens until the drawing is exact.
-    float soft = mix(0.2, 0.012, set);
+    float soft = mix(0.11, 0.012, set);
     float alpha = smoothstep(0.5 - soft, 0.5 + soft, level);
     float exact = smoothstep(0.9, 1.0, set);
     alpha = mix(alpha, drawing.a * step(0.12, amount), exact);

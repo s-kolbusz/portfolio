@@ -454,5 +454,25 @@ moje projekty”. Odstępy na skali 4 px. Na desktopie imię ramuje obiekt po pr
 dolny róg), a blok tekstu stoi w lewym dolnym rogu. Odrzucone: „kto, co, dowód, akcja” oraz „zdanie
 prowadzi”. Wdrożone w `src/components/sections/hero-assembly.tsx`; shader i ruch materii bez zmian.
 
+### Po ocenie układu (2026-11-15, wieczór)
+
+Właściciel: układ „dużo lepszy”, ale nie działał na ultrawide 1440p; blob z cząstek ciekawszy, lecz „zbyt
+luźny i lekki, bardziej jak kulki dymu niż ciecz”; przejścia blob ↔ rysunek i moment ładowania do
+dopracowania; **podoba mu się wiele blobów różnej wielkości, które zbiegają się i kondensują w jeden
+kształt** (efekt wyszedł przypadkiem, ma zostać jako zamierzony).
+
+Zrobione:
+
+- **Ultrawide:** kontener i pismo skalują się także z wysokością ekranu (`max(1440px, 178svh)`, imię
+  `min(8.6vw, 16svh)`, tekst i przycisk przez `clamp` w `svh`). Sprawdzone na 3440×1440.
+- **Ciecz zwarta:** sztywniejsze sprężyny i większe tłumienie kropel, węższa miękka krawędź, mniejsze
+  rozmycie pola. Wygląd bez zmian: płaski, pastelowy.
+- **Kondensacja jako mechanizm:** przy ładowaniu materia jest rozsiana po kadrze w 13 kroplach różnej
+  wielkości, które po kolei ruszają i zlewają się w bloba (zielona tafla na start usunięta). Większe części
+  rysunku przychodzą w dwóch–trzech nierównych kroplach, więc rzecz kondensuje się z kilkunastu kropel;
+  tak samo wraca do bloba.
+
+Nie sprawdzone: prawdziwy iPhone, czas klatki, interakcja palcem.
+
 Poza zakresem, zauważone przy okazji: etykieta w hero to nadal „Web Architect” (`src/i18n/messages/pl.json:38`),
 a dokument decyzji każe ją zastąpić.

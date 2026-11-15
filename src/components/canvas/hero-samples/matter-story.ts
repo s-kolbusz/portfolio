@@ -58,24 +58,11 @@ interface Group {
 
 const GOLDEN = 2.39996323
 
-/** Seconds: the sheet stands, then lets go from the far corners inwards. */
 /** How much wider than its share a liquid drop's spot is drawn. */
-const WIDE = 1.8
+const WIDE = 1.45
 
-const BIRTH_HOLD = 0
-const BIRTH_SPREAD = 0.42
-
-function halton(index: number, base: number) {
-  let result = 0
-  let fraction = 1 / base
-  let i = index
-  while (i > 0) {
-    result += fraction * (i % base)
-    i = Math.floor(i / base)
-    fraction /= base
-  }
-  return result
-}
+/** How many drops the matter is scattered into on load. */
+const BIRTH_DROPS = 13
 
 const random = (from: number, to: number) => from + Math.random() * (to - from)
 
@@ -101,7 +88,6 @@ export function createStory(options: {
   const groupOf = new Int16Array(total)
   const delays = new Float32Array(total)
   const seeds = new Float32Array(total)
-  const birthAt = new Float32Array(total)
 
   // Spacing of drops in each state; the spot each one draws follows it, so
   // the matter keeps the same density whether spread wide or packed tight.
@@ -138,27 +124,74 @@ export function createStory(options: {
     radius: 1,
   }
 
-  // The sheet: drops spread evenly over the whole frame.
-  const far = Math.hypot(
-    Math.max(blob.x, layout.width - blob.x),
-    Math.max(blob.y, layout.height - blob.y)
-  )
+  // On load the matter is scattered over the frame as drops of different
+  // sizes. They set off one after another and condense into the blob.
+  let groups: Group[] = []
+  {
+    const { width, height } = layout
+    const shares = Array.from({ length: BIRTH_DROPS }, () => 0.25 + Math.random() ** 2 * 2.4)
+    const whole = shares.reduce((sum, share) => sum + share, 0)
+    const centres: Array<{ x: number; y: number; r: number }> = []
+    let cursor = 0
+    shares.forEach((share, index) => {
+      const size =
+        index === BIRTH_DROPS - 1
+          ? count - cursor
+          : Math.max(8, Math.round((share / whole) * count))
+      const radius = spacing.drop * Math.sqrt(size / Math.PI)
+      let x = 0
+      let y = 0
+      for (let attempt = 0; attempt < 40; attempt++) {
+        x = random(0.04, 0.96) * width
+        y = random(0.04, 0.96) * height
+        const clear =
+          Math.hypot(x - blob.x, y - blob.y) > Math.min(width, height) * 0.32 &&
+          centres.every((other) => Math.hypot(x - other.x, y - other.y) > (radius + other.r) * 1.25)
+        if (clear) break
+      }
+      centres.push({ x, y, r: radius })
+      groups.push({
+        mode: 'melt',
+        start: cursor,
+        count: size,
+        x,
+        y,
+        vx: 0,
+        vy: 0,
+        toX: blob.x,
+        toY: blob.y,
+        homeX: 0.5,
+        homeY: 0.5,
+        // Negative: it waits its turn before it sets off (see `drive`).
+        clock: 0.45 - random(0, 0.42),
+        at: 0,
+        radius,
+      })
+      for (let j = 0; j < size && cursor + j < count; j++) {
+        const i = cursor + j
+        groupOf[i] = index
+        const r = Math.sqrt((j + 0.5) / size)
+        inDrop[i * 2] = r * Math.cos(j * GOLDEN)
+        inDrop[i * 2 + 1] = r * Math.sin(j * GOLDEN)
+        positions[i * 2] = x + inDrop[i * 2]! * radius
+        positions[i * 2 + 1] = y + inDrop[i * 2 + 1]! * radius
+        // Never "held on a spot": there is no drawing yet.
+        delays[i] = -10
+      }
+      cursor += size
+    })
+  }
   for (let i = 0; i < total; i++) {
-    const x = halton(i + 1, 2) * layout.width
-    const y = halton(i + 1, 3) * layout.height
-    positions[i * 2] = x
-    positions[i * 2 + 1] = y
     seeds[i] = Math.random()
     const radius = Math.sqrt((i + 0.5) / total)
     inBlob[i * 2] = radius * Math.cos(i * GOLDEN)
     inBlob[i * 2 + 1] = radius * Math.sin(i * GOLDEN)
-    const distance = Math.hypot(x - blob.x, y - blob.y) / far
-    // The far corners let go first, in ragged patches.
-    const patch = 0.5 + 0.5 * Math.sin(x * 0.013 + 1.7) * Math.cos(y * 0.011 - 0.6)
-    birthAt[i] = BIRTH_HOLD + (1 - distance) * BIRTH_SPREAD + patch * 0.3 + seeds[i]! * 0.08
-    states[i * 3] = spacing.sheet * 1.6 * WIDE
+    states[i * 3] = spacing.drop * 1.6 * WIDE
     states[i * 3 + 2] = 1 / (WIDE * WIDE)
-    groupOf[i] = -1
+    if (i >= count) {
+      positions[i * 2] = blob.x
+      positions[i * 2 + 1] = blob.y
+    }
   }
   for (let j = 0; j < ballCount; j++) {
     const i = count + j
@@ -167,11 +200,12 @@ export function createStory(options: {
     inDrop[i * 2 + 1] = radius * Math.sin(j * GOLDEN)
   }
 
-  let groups: Group[] = []
-  let phase: 'birth' | 'blob' | 'forming' | 'hold' | 'melting' = 'birth'
+  // The first act is the same as every return to the blob: drops heading home.
+  let phase: 'birth' | 'blob' | 'forming' | 'hold' | 'melting' = 'melting'
   let clock = 0
   let nextAt = 0
-  let thing = 0
+  // Advanced to the first thing when the scattered drops have gathered.
+  let thing = things.length - 1
   let formed = 0
   let changed = false
 
@@ -186,7 +220,51 @@ export function createStory(options: {
       const angleB = Math.atan2(positions[b * 2 + 1]! - blob.y, positions[b * 2]! - blob.x)
       return angleA - angleB
     })
-    const parts = raster.parts
+    // A part is not carried by one drop: the larger ones arrive as two or
+    // three drops of different sizes, each bound for its own stretch of the
+    // part. Many unequal drops converging is what makes the thing condense.
+    const chunks: Array<{ x: number; y: number; points: Float32Array }> = []
+    for (const part of raster.parts) {
+      const size = part.points.length / 2
+      const pieces = size > count * 0.2 ? 3 : size > count * 0.07 ? 2 : 1
+      if (pieces === 1) {
+        chunks.push(part)
+        continue
+      }
+      let minX = 1
+      let maxX = 0
+      let minY = 1
+      let maxY = 0
+      for (let j = 0; j < size; j++) {
+        minX = Math.min(minX, part.points[j * 2]!)
+        maxX = Math.max(maxX, part.points[j * 2]!)
+        minY = Math.min(minY, part.points[j * 2 + 1]!)
+        maxY = Math.max(maxY, part.points[j * 2 + 1]!)
+      }
+      const axis = maxX - minX > maxY - minY ? 0 : 1
+      const sorted = Array.from({ length: size }, (_, j) => j).sort(
+        (first, second) => part.points[first * 2 + axis]! - part.points[second * 2 + axis]!
+      )
+      // Unequal shares.
+      const cuts = pieces === 2 ? [random(0.28, 0.72)] : [random(0.18, 0.38), random(0.55, 0.8)]
+      let from = 0
+      for (let piece = 0; piece < pieces; piece++) {
+        const to = piece === pieces - 1 ? size : Math.round(size * cuts[piece]!)
+        const points = new Float32Array((to - from) * 2)
+        let sumX = 0
+        let sumY = 0
+        for (let j = from; j < to; j++) {
+          const source = sorted[j]!
+          points[(j - from) * 2] = part.points[source * 2]!
+          points[(j - from) * 2 + 1] = part.points[source * 2 + 1]!
+          sumX += part.points[source * 2]!
+          sumY += part.points[source * 2 + 1]!
+        }
+        chunks.push({ x: sumX / (to - from), y: sumY / (to - from), points })
+        from = to
+      }
+    }
+    const parts = chunks
       .map((part, index) => ({ part, index, angle: Math.atan2(part.y - 0.5, part.x - 0.5) }))
       .sort((a, b) => a.angle - b.angle)
 
@@ -198,7 +276,7 @@ export function createStory(options: {
     for (const place of order) {
       leaveAt[place] = at
       // Uneven on purpose: some leave together, some after a pause.
-      at += Math.random() < 0.3 ? random(0.05, 0.14) : random(0.3, 0.62)
+      at += Math.random() < 0.4 ? random(0.04, 0.12) : random(0.2, 0.42)
     }
     parts.forEach(({ part }, place) => {
       const size = part.points.length / 2
@@ -257,7 +335,7 @@ export function createStory(options: {
     const { stage } = layout
     const stageX = stage.x + stage.size / 2
     const stageY = stage.y + stage.size / 2
-    const born = clock > BIRTH_HOLD + BIRTH_SPREAD + 0.95
+    const born = clock > 1
 
     // The blob is never still: it drifts about the middle of the stage.
     const settledBlob = phase === 'forming' || phase === 'hold' ? 0.25 : 1
@@ -273,10 +351,6 @@ export function createStory(options: {
     blob.y += (stageY + driftY - blob.y) * (1 - Math.exp(-dt / 0.9))
 
     // --- What happens next (only decides where matter is pulled) ---
-    if (phase === 'birth' && born) {
-      phase = 'blob'
-      nextAt = clock + random(0.35, 0.6)
-    }
     if (phase === 'blob' && (clock >= nextAt || tapped)) {
       assign()
       phase = 'forming'
@@ -418,21 +492,13 @@ export function createStory(options: {
       let targetY = y
       let stiffness = 0
       let ratio = 0.6
-      let size = spacing.sheet * 1.6
+      let size = spacing.drop
       let liquid = 1
       let settling = false
 
       const isBall = i >= count
       const group = isBall ? ball : groups[groupOf[i]!]
-      const mode: Mode | 'sheet' = isBall
-        ? clock < birthAt[i]!
-          ? 'sheet'
-          : 'drop'
-        : clock < birthAt[i]!
-          ? 'sheet'
-          : group
-            ? group.mode
-            : 'blob'
+      const mode: Mode = isBall ? 'drop' : group ? group.mode : 'blob'
 
       if (mode === 'blob') {
         // A lobed, slowly turning body: the edge is never a circle.
@@ -449,8 +515,8 @@ export function createStory(options: {
         const r = radius * blobRadius * lobes
         targetX = blob.x + Math.cos(angle) * r
         targetY = blob.y + Math.sin(angle) * r
-        stiffness = 11 * (0.7 + 0.6 * seed)
-        ratio = 0.52
+        stiffness = 26 * (0.75 + 0.5 * seed)
+        ratio = 0.7
         size = spacing.blob
       } else if (mode === 'drop' || mode === 'fill' || mode === 'melt') {
         const g = group!
@@ -475,8 +541,8 @@ export function createStory(options: {
           const along = ox * dirX + oy * dirY
           targetX = g.x + ox + dirX * along * stretch - dirX * g.radius * stretch * 0.6
           targetY = g.y + oy + dirY * along * stretch - dirY * g.radius * stretch * 0.6
-          stiffness = (isBall ? 70 : 30) * (0.65 + 0.7 * seed)
-          ratio = isBall ? 0.75 : 0.6
+          stiffness = (isBall ? 80 : 56) * (0.75 + 0.5 * seed)
+          ratio = isBall ? 0.78 : 0.74
           size = spacing.drop
         }
       }
@@ -499,7 +565,7 @@ export function createStory(options: {
       if (stiffness > 0 && liquid > 0) {
         // Liquid is stirred: a slow field of currents, different everywhere.
         // Neighbours share the current, so the body moves as one and does not clump.
-        const stir = stage.size * 0.1 * liquid
+        const stir = stage.size * 0.07 * liquid
         ax += Math.sin(y * 0.012 + clock * 0.7) * stir
         ay += Math.cos(x * 0.011 - clock * 0.6) * stir
       }
