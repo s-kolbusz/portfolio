@@ -13,8 +13,7 @@ nowszy**), `2026-11-14-lusion-przepis.md` (zasady ruchu i ciągłości), `2026-1
 
 - **Przyjęte przez właściciela:** cel (1), zasady (2), trzy warstwy, hub i zniknięcie katalogu-książki (3),
   część osobista poza stroną główną, definicje i drogi (5), stan „zrozumiane i odłożone” (6), podstrony
-  notatki „dlaczego” i „Jak pracuję z agentami” (7), druk 3D w obu rolach, chęć posiadania easter eggów, linie „Jak pracuję” (7; 15.11, jedna czeka na
-  potwierdzenie brzmienia).
+  notatki „dlaczego” i „Jak pracuję z agentami” (7), druk 3D w obu rolach, chęć posiadania easter eggów, linie „Jak pracuję” (7; 15.11).
 - **Propozycje, które ogólnie się spodobały, ale nie mają decyzji w szczegółach:** akty strony głównej (4),
   ślady części osobistej na stronie głównej (3), narzędzia narracji (8),
   kandydaci na easter eggi (9), szablon drogi (5).
@@ -189,9 +188,8 @@ rozumieć). Stanu „porzucone” nie używamy. Jak dokładnie stan wygląda w m
 - „Pracuję sam. Projekt, kod, serwer i utrzymanie są w jednych rękach.” (przyjęte)
 - „Nie używam szablonów ani cudzych widgetów tam, gdzie decydują o wrażeniu.” (przyjęte bez dopisku
   „To trwa dłużej”; właściciel: „nie musimy od razu straszyć, że to trwa dłużej”)
-- „Do Twojego pomysłu dokładam własną wizję i wyczucie, żeby wyszedł jak najlepiej.” (**sformułowanie
-  do potwierdzenia**; sens od właściciela: „wykorzystam swoją wizję i wyczucie do tego, żeby jak najlepiej
-  zrealizować Twój pomysł”)
+- „Do Twojego pomysłu dokładam własną wizję i wyczucie, żeby wyszedł jak najlepiej.” (przyjęte 15.11;
+  zastępuje linię o pytaniach „dlaczego”)
 - „Potrzebujesz sprawdzonej strony w stałej cenie? Od tego jest stronypodhale.pl.” (przyjęte)
 
 Odrzucone: „Zadam więcej pytań »dlaczego«, niż się spodziewasz.” (właściciel: „nie jestem aż tak
@@ -254,7 +252,7 @@ Dwie nowe podstrony w warstwie pracy (przyjęte):
    rundzie (diagnoza, sekcja 5): hero ma opowiadać historię, prowadzi „Materia próbuje kształtów”
    (4–5 rzeczy, bez auta), układ plakatowy, tafla odpływa przy załadowaniu. Otwarte: wybór między trzema
    historiami po próbkach w kodzie i ostateczna lista kształtów.
-2. Linie z sekcji 7: rozstrzygnięte 15.11; zostaje potwierdzenie brzmienia jednej linii (wizja i wyczucie).
+2. Linie z sekcji 7: zamknięte 15.11 (cztery linie przyjęte, dwie odrzucone).
 3. Źródła pochwał pluginu.
 4. Które rzeczy z części osobistej mogą być publiczne i jakie są zdjęcia.
 5. Wybór easter eggów.
