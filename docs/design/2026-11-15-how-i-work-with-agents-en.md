@@ -41,8 +41,8 @@ and motion myself, in the browser and on my own phone.
 
 ## 2. Questions and a plan first, then code
 
-A larger change follows a fixed order: a round of questions that looks for the hole in the idea, then a
-spec, a plan, the work and verification. Small things (text, a colour, spacing) skip this path. I work
+A larger change follows a fixed order: a round of questions to pick holes in the idea, then a
+spec, a plan, the work and verification. Small things (text, a color, spacing) skip this path. I work
 the same way on client projects.
 
 Guessing ends in more rounds of fixes. One solid round of research at the start gives a better result.
@@ -105,8 +105,8 @@ comment what exactly it did. It doesn't create new tasks: it raises them in the 
 carry a “do not touch” label. They exist so that someone doesn't fix something.
 
 Also staying with me: the choice of tools, the moment of release, and every sentence that says something
-about me. Copy about myself comes to me as concrete proposals built from facts, and I correct them; open
-questions about myself don't work on me.
+about me. Copy about myself comes to me as concrete proposals built from facts, and I correct them. I'm no
+good at open-ended questions about myself.
 
 ## Where next
 
@@ -127,12 +127,14 @@ Not open questions about content; only places where English forced a choice.
    “safety”.
 3. **Changed (owner, 15.11: “executor” is not a good word):** “wykonawca” is now “one agent” in the
    heading of section 4 and “one agent does the work” in the text.
-4. “Seria pytań, która szuka dziury w pomyśle” is “a round of questions that looks for the hole in the
-   idea”. The internal name of that step is not used.
-5. “Testy sprawdzają, czy rzecz zrobiono dobrze, a nie, czy zrobiono właściwą rzecz” became “whether the
-   thing was built right, not whether the right thing was built”.
-6. “Otwarte pytania o siebie u mnie nie działają” is “open questions about myself don't work on me”.
-7. “Droga” in “Dokąd stąd” is “road”, matching the concept's vocabulary; the English names of roads and of
-   the “Why” notes are not decided anywhere yet.
-8. Spelling follows the current site's English, which writes “colour” but “optimized” and “specialized”:
-   so “colour” and “summarized” here.
+4. **Changed (owner, 15.11):** no literal translation of Polish sayings. “Seria pytań, która szuka dziury
+   w pomyśle” is now “a round of questions to pick holes in the idea”, his wording and the English idiom.
+5. **OK (owner, 15.11):** “whether the thing was built right, not whether the right thing was built”.
+6. **Changed (owner, 15.11: sounded odd):** “open questions about myself don't work on me” is now “I'm no
+   good at open-ended questions about myself”. Waiting for his reply on the new wording.
+7. **Open, context given to the owner:** “droga” is “road” and notatki „dlaczego” are “Why” notes, only in
+   the closing “Where next” list. Both are names used across the whole site, so they should be settled
+   once in the concept, not on this page. Candidates for “droga”: road, path, route.
+8. **Open, owner asked to unify (15.11):** this document now uses American spelling (“color”,
+   “summarized”). The current site mixes “optimized”, “specialized” with “colour”; aligning the site's
+   own English files is a separate small change in `src/`, not done here.
