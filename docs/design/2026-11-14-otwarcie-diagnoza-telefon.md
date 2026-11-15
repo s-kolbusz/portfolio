@@ -474,5 +474,32 @@ Zrobione:
 
 Nie sprawdzone: prawdziwy iPhone, czas klatki, interakcja palcem.
 
+### Wejście z choreografią ciążenia (2026-11-15, noc)
+
+Uwagi właściciela: całość ma być organiczna, nie sekwencyjna i „robotyczna”; wejście potrzebuje jednej
+choreografii; **blob jest cięższą materią: przyciąga i wchłania, nic przed nim nie ucieka**; imię ma być
+częścią całości z blobem: prawie wyśrodkowane, z niewielkim przesunięciem, bliżej bloba, który czasem je
+przykrywa i lekko zniekształca. Dwa pomysły na ładowanie: (1) ogromny blob spada, rozpryskuje się i zbiega
+z powrotem; (2) krople spoza ekranu, w różnym tempie i kształcie, część tworzy bloba, część buduje litery.
+
+Wdrożony pomysł 2 (pomysł 1 nie był próbowany):
+
+- Ruch nie jest już prowadzony po krzywych. Krople **spadają** ku celowi (stałe przyciąganie, opór, własny
+  boczny prąd), więc ruszają wolno i dolatują szybko, każda po swoim łuku; małe są szybsze, duże cięższe.
+  W locie się wydłużają, spłaszczają i wybrzuszają we własnym rytmie, a wolniejsze cząstki ciągną się za
+  nimi jak ogon.
+- **Blob wchłania:** przejmuje materię i pęd kropli, odbija i przez chwilę drga; rośnie z tym, co wchłonął.
+- **Litery z materii:** ok. 1/3 materii leci w miejsce liter (maska rysowana czcionką dokładnie tam, gdzie
+  stoi tekst), wlewa się w nie i tężeje na zielono; potem prawdziwy tekst przejmuje, materia zbiera się
+  z liter w krople i spada do bloba. Dopiero wtedy wchodzi blok tekstu i zaczyna się pierwsza rzecz.
+- **Wskaźnik:** luźna kropla przy blobie jest do niego wciągana, a płynna materia sięga po nią; nic się
+  nie rozstępuje. Gotowy rysunek pod wskaźnikiem tylko mięknie.
+- **Układ:** imię i obiekt w jednej kolumnie, słowa przesunięte o ok. 7% i 9% w przeciwne strony, tuż przy
+  obiekcie; canvas leży nad imieniem, więc blob je przykrywa, a litery w jego zasięgu lekko się ku niemu
+  przechylają.
+
+Nie sprawdzone: prawdziwy iPhone, czas klatki, wskaźnik i palec (zrzuty tego nie pokazują). Pierwsze ok.
+0,5 s jest puste (czekanie na czcionkę i dolot pierwszych kropel).
+
 Poza zakresem, zauważone przy okazji: etykieta w hero to nadal „Web Architect” (`src/i18n/messages/pl.json:38`),
 a dokument decyzji każe ją zastąpić.

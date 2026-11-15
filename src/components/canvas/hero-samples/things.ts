@@ -244,70 +244,84 @@ export const THINGS: Thing[] = [site, print]
 
 export interface RasterThing {
   /**
-   * The drawing as texture data (RGBA, size × size): red = tone, green = a
-   * softened copy of the outline (the liquid's contour is blended into it
+   * The drawing as texture data (RGBA, width × height): red = tone, green =
+   * a softened copy of the outline (the liquid's contour is blended into it
    * as the matter sets), alpha = the exact drawing.
    */
-  mask: { data: Uint8Array; size: number }
-  /** Share of the square the drawing covers, 0–1. */
+  mask: { data: Uint8Array; width: number; height: number }
+  /** Share of the rectangle the drawing covers, 0–1. */
   coverage: number
   /** Per part: centroid (0–1) and the points (0–1, xy pairs) its matter settles on. */
   parts: Array<{ x: number; y: number; points: Float32Array }>
 }
 
-function soften(alpha: Float32Array, size: number, radius: number) {
-  const pass = (source: Float32Array, target: Float32Array, stride: number, other: number) => {
-    for (let line = 0; line < size; line++) {
+function soften(alpha: Float32Array, width: number, height: number, radius: number) {
+  const scratch = new Float32Array(alpha.length)
+  const pass = (source: Float32Array, target: Float32Array, horizontal: boolean) => {
+    const lines = horizontal ? height : width
+    const length = horizontal ? width : height
+    for (let line = 0; line < lines; line++) {
+      const at = (index: number) => {
+        const clamped = Math.min(length - 1, Math.max(0, index))
+        return source[horizontal ? line * width + clamped : clamped * width + line]!
+      }
       let sum = 0
-      const at = (index: number) =>
-        source[line * other + Math.min(size - 1, Math.max(0, index)) * stride]!
       for (let k = -radius; k <= radius; k++) sum += at(k)
-      for (let index = 0; index < size; index++) {
-        target[line * other + index * stride] = sum / (radius * 2 + 1)
+      for (let index = 0; index < length; index++) {
+        target[horizontal ? line * width + index : index * width + line] = sum / (radius * 2 + 1)
         sum += at(index + radius + 1) - at(index - radius)
       }
     }
   }
-  const scratch = new Float32Array(alpha.length)
   // Two box passes each way: close to a Gaussian.
   for (let round = 0; round < 2; round++) {
-    pass(alpha, scratch, 1, size)
-    pass(scratch, alpha, size, 1)
+    pass(alpha, scratch, true)
+    pass(scratch, alpha, false)
   }
   return alpha
 }
 
-/** Rasterise a thing and lay `count` settling points over it, evenly. */
-export function rasterise(thing: Thing, count: number, size = 768): RasterThing {
+/**
+ * Rasterise parts drawn in texture pixels (after `prepare` has set the
+ * transform) and lay `count` settling points over them, evenly.
+ */
+export function rasteriseParts(options: {
+  width: number
+  height: number
+  parts: Draw[]
+  count: number
+  prepare?: (ctx: Context) => void
+}): RasterThing {
+  const { width, height, count } = options
   const whole = document.createElement('canvas')
-  whole.width = size
-  whole.height = size
+  whole.width = width
+  whole.height = height
   const wholeCtx = whole.getContext('2d', { willReadFrequently: true })!
   const scratch = document.createElement('canvas')
-  scratch.width = size
-  scratch.height = size
+  scratch.width = width
+  scratch.height = height
   const ctx = scratch.getContext('2d', { willReadFrequently: true })!
-  const ids = new Uint8Array(size * size)
+  const ids = new Uint8Array(width * height)
 
-  thing.parts.forEach((draw, index) => {
+  options.parts.forEach((draw, index) => {
     ctx.setTransform(1, 0, 0, 1, 0, 0)
     ctx.globalCompositeOperation = 'source-over'
-    ctx.clearRect(0, 0, size, size)
-    ctx.scale(size / 100, size / 100)
+    ctx.clearRect(0, 0, width, height)
+    options.prepare?.(ctx)
     draw(ctx)
     wholeCtx.drawImage(scratch, 0, 0)
-    const pixels = ctx.getImageData(0, 0, size, size).data
-    for (let pixel = 0; pixel < size * size; pixel++) {
+    const pixels = ctx.getImageData(0, 0, width, height).data
+    for (let pixel = 0; pixel < width * height; pixel++) {
       if (pixels[pixel * 4 + 3]! > 127) ids[pixel] = index + 1
     }
   })
 
-  const pixels = wholeCtx.getImageData(0, 0, size, size).data
-  const alpha = new Float32Array(size * size)
+  const pixels = wholeCtx.getImageData(0, 0, width, height).data
+  const alpha = new Float32Array(width * height)
   for (let pixel = 0; pixel < alpha.length; pixel++) alpha[pixel] = pixels[pixel * 4 + 3]! / 255
-  const soft = soften(alpha, size, Math.round(size / 190))
-  const data = new Uint8Array(size * size * 4)
-  for (let pixel = 0; pixel < size * size; pixel++) {
+  const soft = soften(alpha, width, height, Math.max(1, Math.round(Math.max(width, height) / 190)))
+  const data = new Uint8Array(width * height * 4)
+  for (let pixel = 0; pixel < width * height; pixel++) {
     data[pixel * 4] = pixels[pixel * 4]!
     data[pixel * 4 + 1] = Math.round(soft[pixel]! * 255)
     data[pixel * 4 + 3] = pixels[pixel * 4 + 3]!
@@ -321,30 +335,32 @@ export function rasterise(thing: Thing, count: number, size = 768): RasterThing 
   const collect = (pitch: number) => {
     const found: Array<{ x: number; y: number; part: number }> = []
     let row = 0
-    for (let y = pitch / 2; y < size; y += pitch * 0.866, row++) {
-      for (let x = row % 2 ? pitch : pitch / 2; x < size; x += pitch) {
+    for (let y = pitch / 2; y < height; y += pitch * 0.866, row++) {
+      for (let x = row % 2 ? pitch : pitch / 2; x < width; x += pitch) {
         const jx = x + (Math.random() - 0.5) * pitch * 0.5
         const jy = y + (Math.random() - 0.5) * pitch * 0.5
         const part =
           ids[
-            Math.min(size - 1, Math.max(0, Math.round(jy))) * size +
-              Math.min(size - 1, Math.max(0, Math.round(jx)))
+            Math.min(height - 1, Math.max(0, Math.round(jy))) * width +
+              Math.min(width - 1, Math.max(0, Math.round(jx)))
           ]
-        if (part) found.push({ x: jx / size, y: jy / size, part: part - 1 })
+        if (part) found.push({ x: jx / width, y: jy / height, part: part - 1 })
       }
     }
     return found
   }
-  let pitch = Math.sqrt((covered * 1.1547) / count)
+  let pitch = Math.sqrt((Math.max(covered, 1) * 1.1547) / count)
   let found = collect(pitch)
-  for (let attempt = 0; attempt < 6 && Math.abs(found.length - count) > count * 0.02; attempt++) {
-    pitch *= Math.sqrt(found.length / count)
+  for (let attempt = 0; attempt < 8 && Math.abs(found.length - count) > count * 0.02; attempt++) {
+    pitch *= Math.sqrt(Math.max(found.length, 1) / count)
     found = collect(pitch)
   }
   while (found.length > count) found.splice(Math.floor(Math.random() * found.length), 1)
-  while (found.length < count) found.push({ ...found[Math.floor(Math.random() * found.length)]! })
+  while (found.length && found.length < count) {
+    found.push({ ...found[Math.floor(Math.random() * found.length)]! })
+  }
 
-  const parts = thing.parts.map((_, index) => {
+  const parts = options.parts.map((_, index) => {
     const own = found.filter((point) => point.part === index)
     const points = new Float32Array(own.length * 2)
     let sumX = 0
@@ -357,5 +373,16 @@ export function rasterise(thing: Thing, count: number, size = 768): RasterThing 
     })
     return { x: sumX / Math.max(1, own.length), y: sumY / Math.max(1, own.length), points }
   })
-  return { mask: { data, size }, coverage, parts }
+  return { mask: { data, width, height }, coverage, parts }
+}
+
+/** Rasterise a thing (drawn on the 100 × 100 grid) into a square. */
+export function rasterise(thing: Thing, count: number, size = 768): RasterThing {
+  return rasteriseParts({
+    width: size,
+    height: size,
+    parts: thing.parts,
+    count,
+    prepare: (ctx) => ctx.scale(size / 100, size / 100),
+  })
 }

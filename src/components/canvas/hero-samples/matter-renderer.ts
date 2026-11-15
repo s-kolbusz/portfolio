@@ -56,8 +56,8 @@ const SURFACE_FRAGMENT = /* glsl */ `#version 300 es
   uniform sampler2D uField;
   uniform sampler2D uMask;
   uniform vec2 uViewport;
-  // The square the drawing sits in: xy top-left, z size (px).
-  uniform vec3 uStage;
+  // The rectangle the drawing sits in: xy top-left, zw size (px).
+  uniform vec4 uStage;
   uniform vec3 uColor;
   out vec4 fragColor;
 
@@ -69,7 +69,7 @@ const SURFACE_FRAGMENT = /* glsl */ `#version 300 es
     float set = smoothstep(0.2, 0.95, settled);
 
     vec2 px = vec2(vUv.x, 1.0 - vUv.y) * uViewport;
-    vec2 muv = (px - uStage.xy) / uStage.z;
+    vec2 muv = (px - uStage.xy) / uStage.zw;
     float inside = step(0.0, muv.x) * step(muv.x, 1.0) * step(0.0, muv.y) * step(muv.y, 1.0);
     vec4 drawing = texture(uMask, muv) * inside;
 
@@ -132,16 +132,16 @@ function link(gl: WebGL2RenderingContext, vertexSource: string, fragmentSource: 
 
 export interface MatterRenderer {
   resize: (width: number, height: number, dpr: number) => void
-  setMask: (mask: { data: Uint8Array; size: number }) => void
+  setMask: (mask: { data: Uint8Array; width: number; height: number }) => void
   /**
    * positions: xy pairs (CSS px); states: size, settled and weight triples.
-   * stage: the drawing's square, CSS px.
+   * stage: the drawing's rectangle, CSS px.
    */
   draw: (frame: {
     positions: Float32Array
     states: Float32Array
     count: number
-    stage: { x: number; y: number; size: number }
+    stage: { x: number; y: number; width: number; height: number }
     color: readonly [number, number, number]
   }) => void
   dispose: () => void
@@ -251,8 +251,8 @@ export function createMatterRenderer(canvas: HTMLCanvasElement): MatterRenderer 
         gl.TEXTURE_2D,
         0,
         gl.RGBA,
-        mask.size,
-        mask.size,
+        mask.width,
+        mask.height,
         0,
         gl.RGBA,
         gl.UNSIGNED_BYTE,
@@ -298,7 +298,7 @@ export function createMatterRenderer(canvas: HTMLCanvasElement): MatterRenderer 
       gl.uniform1i(uSurface.field, 0)
       gl.uniform1i(uSurface.mask, 1)
       gl.uniform2f(uSurface.viewport, size.width, size.height)
-      gl.uniform3f(uSurface.stage, stage.x, stage.y, stage.size)
+      gl.uniform4f(uSurface.stage, stage.x, stage.y, stage.width, stage.height)
       gl.uniform3f(uSurface.color, color[0], color[1], color[2])
       gl.bindVertexArray(quadVao)
       gl.drawArrays(gl.TRIANGLES, 0, 6)
