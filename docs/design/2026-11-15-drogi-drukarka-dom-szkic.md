@@ -7,7 +7,7 @@ bez zmian. Źródło faktów: `2026-11-14-historia-strony-koncept.md`, sekcje 5,
 ## Teksty (wersja Codexa po jednej rundzie poprawek)
 
 Drukarka: oznaczona przez właściciela 15.11 (punkty 1, 2, 4, 5 tak; zdanie z punktu 3 usunięte, reszta bez zmian).
-Dom: oznaczony 15.11 (punkty 6–11 tak); w trzeciej rundzie Codex dopisał fakt o starej pompie podłączonej przez Shelly.
+Dom: oznaczony 15.11 (punkty 6–11 tak); w trzeciej rundzie Codex dopisał fakt o starej pompie podłączonej przez Shelly, w czwartej poprawił kolejność (Home Assistant zaraz po płocie).
 
 **Tytuł**
 Przebudowa drukarki 3D
@@ -45,13 +45,13 @@ Zacząłem od płotu z paneli fotowoltaicznych.
 
 **Kroki**
 
-- Po płocie przyszła kolej na falowniki i pompę ciepła.
-- Następnie zająłem się Home Assistantem.
+- Po płocie zająłem się Home Assistantem.
+- Następnie przyszła kolej na falowniki.
 - Starą pompę ciepła podłączyłem do Home Assistanta przez przekaźnik Shelly. Dzięki temu dogrzewam ciepłą wodę na żądanie.
 - Potem zrobiłem własne panele, czyli ekrany z danymi o energii.
 
 **Co z tego zostało**
-Działają falowniki, pompa ciepła, Home Assistant i moje ekrany z danymi o energii. Całe to przedsięwzięcie mega mi się podobało. Część fizyczna i oprogramowanie znalazły się w jednym projekcie.
+Działają Home Assistant, falowniki, pompa ciepła i moje ekrany z danymi o energii. Całe to przedsięwzięcie mega mi się podobało. Część fizyczna i oprogramowanie znalazły się w jednym projekcie.
 
 **Definicja**
 Realizuję pomysł fizycznie, a potem ogarniam go programowo tak, żebym miał nad nim pełną kontrolę.
@@ -83,9 +83,9 @@ Dom (oznaczone 15.11):
 Dopisane przez właściciela przy punkcie 8: „stara pompa została sprytnie zintegrowana z home assistant przez
 shelly (dogrzewanie ciepłej wody na żądanie)”. Nowe zdania do potwierdzenia:
 
-12. Shelly to przekaźnik (tak nazywa go tekst; to moje dopowiedzenie).
-13. Kroki mogą zostać tak, jak są: najpierw „falowniki i pompa ciepła”, a osobno, po Home Assistancie,
-    podłączenie starej pompy przez Shelly.
+12. **Tak.** Shelly to przekaźnik (tak nazywa go tekst; to moje dopowiedzenie).
+13. **Popraw:** „najpierw Home Assistant, potem reszta”. Punkt 8 był więc nieścisły; obowiązuje nowa kolejność.
+14. Falowniki przyszły po Home Assistancie, a nie razem z płotem (tak to rozumie tekst; to moja interpretacja słowa „reszta”).
 
 Uwaga do formy: obie historie mają ok. 100–115 słów, czyli trochę poniżej zamówionych 120. Krótsze wyszły
 po usunięciu dopowiedzeń; nie dopisywaliśmy niczego na siłę.
@@ -193,4 +193,11 @@ Dopisz jeden nowy fakt do poniższego tekstu „Dom pod kontrolą”. Resztę zo
 
 Nowy fakt (słowa autora): „stara pompa została sprytnie zintegrowana z Home Assistant przez Shelly (dogrzewanie ciepłej wody na żądanie)”.
 Czyli: pompa ciepła była stara, nie nowa; podłączyłem ją do Home Assistant przez przekaźnik Shelly; dzięki temu ciepłą wodę dogrzewam na żądanie. Nie dodawaj innych szczegółów (modeli, liczb, oszczędności). Zasady jak wcześniej: rzeczowo, krótkie zdania, pierwsza osoba, bez poetyckiego opisu siebie, bez marketingu, bez myślników (—). Słowo „sprytnie” możesz pominąć albo oddać sucho; nie chwal się.
+```
+
+### Runda 4 (dom: kolejność; wysłana razem z tekstem domu z rundy 3)
+
+```markdown
+Popraw kolejność w poniższym tekście „Dom pod kontrolą”. Autor poprawił: po płocie najpierw był Home Assistant, a potem reszta. Kolejność kroków ma więc być: (początek) płot z paneli fotowoltaicznych → Home Assistant → falowniki → stara pompa ciepła podłączona do Home Assistanta przez przekaźnik Shelly (dogrzewanie ciepłej wody na żądanie) → własne ekrany z danymi o energii.
+Pompa ciepła była stara, więc nie pisz, że przyszła kolej na pompę, jakby była nowa; pojawia się tylko jako podłączenie przez Shelly. Resztę tekstu zostaw bez zmian, poza tym, co trzeba minimalnie dopasować do nowej kolejności (np. „Działają…” w „Co z tego zostało”). Zasady jak wcześniej: rzeczowo, krótkie zdania, pierwsza osoba, bez myślników (—), bez nowych faktów. Odpowiedz tylko poprawionym tekstem, w tym samym formacie, bez komentarzy.
 ```
