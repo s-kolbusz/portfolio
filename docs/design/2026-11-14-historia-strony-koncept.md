@@ -159,7 +159,8 @@ Drogi, potwierdzone i poprawione przez właściciela:
 2. **Dom.** Płot z paneli → falowniki i pompa ciepła → Home Assistant → własne panele z danymi o energii.
    Właściciel: „mega mi się podobało”.
 3. **Zakofy → plugin aspect-preview.** Strona turystyczna → potrzeba kadrowania zdjęć w CMS-ie → plugin
-   open source. Kilkukrotnie chwalony za pomysł i podejście. Źródła pochwał do wskazania; bez nich nie cytujemy.
+   open source. Pochwały za pomysł i podejście były tylko ustne, od właściciela Zakofy na spotkaniach; publicznych
+   źródeł nie ma, więc **pochwał na stronie nie cytujemy** (właściciel, 15.11).
 4. **Agenci AI → Airchos.** Agenci zgłaszali „gotowe”, gdy nie było gotowe. U modeli widać mnóstwo
    niekonsekwencji, a sprawdzanie jest najczęściej pomijane z lenistwa. Weryfikację przejmują więc
    narzędzia, które radziły sobie z nią jeszcze przed popularyzacją LLM. Airchos należy do **pracy**.
@@ -253,6 +254,8 @@ Dwie nowe podstrony w warstwie pracy (przyjęte):
    (4–5 rzeczy, bez auta), układ plakatowy, tafla odpływa przy załadowaniu. Otwarte: wybór między trzema
    historiami po próbkach w kodzie i ostateczna lista kształtów.
 2. Linie z sekcji 7: zamknięte 15.11 (cztery linie przyjęte, dwie odrzucone).
-3. Źródła pochwał pluginu.
+3. Źródła pochwał pluginu: zamknięte 15.11, publicznych źródeł nie ma, pochwał nie cytujemy (pomysł 7
+   z przeglądu jomor.design przez to odpada dla pluginu). Do wyjaśnienia: słownik nazywa Zakofy stroną
+   właściciela, a pochwały pochodzą „od właściciela zakofy”; czyja to strona.
 4. Które rzeczy z części osobistej mogą być publiczne i jakie są zdjęcia.
 5. Wybór easter eggów.
