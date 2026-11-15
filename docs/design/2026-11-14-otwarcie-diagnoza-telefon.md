@@ -617,4 +617,9 @@ nimi), most jako odcinek o malejącej grubości (miękka krawędź rysowała go 
 
 Sprawdzone: zrzuty z przeglądarki, spoczynek, kursor i całe przewijanie strony głównej na 1440×900 i 390×844
 (`cook/stills/home1/`). Nie sprawdzone: ruch na żywo oceniał tylko właściciel i tylko na próbce; prawdziwy
-iPhone i Safari; testy e2e. Na telefonie strona główna nadal nie ma kropli pod palcem (próbka ma).
+iPhone i Safari; testy e2e.
+
+Dotyk (ten sam dzień, na prośbę właściciela): na stronie głównej i w próbce kropla idzie za palcem, póki
+dotyka ekranu, i wraca do bloba po puszczeniu. Zdarzenia dotyku zamiast wskaźnika, bo te drugie przeglądarka
+przerywa w chwili, gdy palec zaczyna przewijać. Sprawdzone na emulowanym telefonie (`cook/stills/touch1/`),
+nie na prawdziwym.

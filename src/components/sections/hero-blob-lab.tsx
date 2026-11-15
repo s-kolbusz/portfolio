@@ -186,7 +186,7 @@ export function HeroBlobLab() {
 
     const reducedQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
     const view = { width: 1, height: 1, dpr: 1, mobile: false }
-    const pointer = { x: 0, y: 0, inside: false, pressed: false, touch: false }
+    const pointer = { x: 0, y: 0, inside: false, pressed: false }
     const state = createBlobLabState()
     const colour = readPrimaryRgb()
     let time = 0
@@ -206,28 +206,30 @@ export function HeroBlobLab() {
     const resizeObserver = new ResizeObserver(resize)
     resizeObserver.observe(section)
 
-    const onMove = (event: PointerEvent) => {
+    const place = (clientX: number, clientY: number) => {
       const rect = section.getBoundingClientRect()
-      pointer.x = event.clientX - rect.left
-      pointer.y = event.clientY - rect.top
-      pointer.touch = event.pointerType !== 'mouse'
+      pointer.x = clientX - rect.left
+      pointer.y = clientY - rect.top
+    }
+    const onMouseMove = (event: MouseEvent) => {
+      place(event.clientX, event.clientY)
       pointer.inside = true
     }
-    const onDown = (event: PointerEvent) => {
-      pointer.pressed = true
-      onMove(event)
-    }
-    const onUp = () => {
-      pointer.pressed = false
-    }
-    const onLeave = () => {
+    const onMouseLeave = () => {
       pointer.inside = false
     }
-    window.addEventListener('pointermove', onMove, { passive: true })
-    window.addEventListener('pointerdown', onDown, { passive: true })
-    window.addEventListener('pointerup', onUp, { passive: true })
-    window.addEventListener('pointercancel', onUp, { passive: true })
-    document.addEventListener('mouseleave', onLeave)
+    // Touch events, as on the live site: they keep coming while the finger scrolls.
+    const onTouch = (event: TouchEvent) => {
+      const finger = event.touches[0]
+      pointer.pressed = Boolean(finger)
+      if (finger) place(finger.clientX, finger.clientY)
+    }
+    window.addEventListener('mousemove', onMouseMove, { passive: true })
+    document.addEventListener('mouseleave', onMouseLeave)
+    window.addEventListener('touchstart', onTouch, { passive: true })
+    window.addEventListener('touchmove', onTouch, { passive: true })
+    window.addEventListener('touchend', onTouch, { passive: true })
+    window.addEventListener('touchcancel', onTouch, { passive: true })
 
     let frame = 0
     let last = performance.now()
@@ -242,10 +244,7 @@ export function HeroBlobLab() {
 
       // A mouse leads the ball while it is over the page; a finger while it is down.
       const active =
-        !reduced &&
-        !overPanelRef.current &&
-        pointer.inside &&
-        (pointer.touch ? pointer.pressed : true)
+        !reduced && !overPanelRef.current && (pointer.pressed || (pointer.inside && !view.mobile))
       const scale = view.mobile ? 0.6 : 1
       const step = stepBlobLab(state, {
         delta: reduced ? 0 : delta,
@@ -279,11 +278,12 @@ export function HeroBlobLab() {
     return () => {
       cancelAnimationFrame(frame)
       resizeObserver.disconnect()
-      window.removeEventListener('pointermove', onMove)
-      window.removeEventListener('pointerdown', onDown)
-      window.removeEventListener('pointerup', onUp)
-      window.removeEventListener('pointercancel', onUp)
-      document.removeEventListener('mouseleave', onLeave)
+      window.removeEventListener('mousemove', onMouseMove)
+      document.removeEventListener('mouseleave', onMouseLeave)
+      window.removeEventListener('touchstart', onTouch)
+      window.removeEventListener('touchmove', onTouch)
+      window.removeEventListener('touchend', onTouch)
+      window.removeEventListener('touchcancel', onTouch)
       gl.deleteBuffer(vbo)
       gl.deleteVertexArray(vao)
       gl.deleteProgram(program)

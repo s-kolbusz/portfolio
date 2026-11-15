@@ -102,6 +102,8 @@ interface PuddleState {
   targetMouseX: number
   targetMouseY: number
   pointerInside: boolean
+  /** A finger is on the screen: the ball goes to it, on any screen size. */
+  touching: boolean
   isMobile: boolean
   time: number
   colorR: number
@@ -139,6 +141,7 @@ function createInitialState(): PuddleState {
     targetMouseX: -1,
     targetMouseY: -1,
     pointerInside: false,
+    touching: false,
     isMobile: false,
     time: 0,
     colorR: 0.494,
@@ -337,9 +340,23 @@ export function ViscousPuddle() {
       state.pointerInside = true
     }
 
+    // Touch events, not pointer events: those are cancelled the moment the
+    // finger starts to scroll, and the ball should keep to it while it does.
+    const onTouch = (event: TouchEvent) => {
+      const finger = event.touches[0]
+      state.touching = Boolean(finger)
+      if (!finger) return
+      state.targetMouseX = finger.clientX
+      state.targetMouseY = finger.clientY
+    }
+
     window.addEventListener('mousemove', onMouseMove, { passive: true })
     document.addEventListener('mouseleave', onMouseLeave)
     document.addEventListener('mouseenter', onMouseEnter)
+    window.addEventListener('touchstart', onTouch, { passive: true })
+    window.addEventListener('touchmove', onTouch, { passive: true })
+    window.addEventListener('touchend', onTouch, { passive: true })
+    window.addEventListener('touchcancel', onTouch, { passive: true })
 
     const resizeObserver = new ResizeObserver(() => syncLayout())
     resizeObserver.observe(canvas)
@@ -449,8 +466,11 @@ export function ViscousPuddle() {
 
       // The cursor ball moves exactly as in the hero: it chases the pointer,
       // or rests (inside the blob, later beside the image) without one.
+      // A mouse leads the ball on wide screens; a finger leads it while it is down.
       const followPointer =
-        state.pointerInside && state.targetMouseX >= 0 && !state.isMobile && !reduced
+        !reduced &&
+        state.targetMouseX >= 0 &&
+        (state.touching || (state.pointerInside && !state.isMobile))
       const ball = step.ball
       const targetX = (followPointer ? state.targetMouseX : ball.restX) - step.box.left
       const targetY = (followPointer ? state.targetMouseY : ball.restY) - step.box.top
@@ -630,6 +650,10 @@ export function ViscousPuddle() {
       window.removeEventListener('mousemove', onMouseMove)
       document.removeEventListener('mouseleave', onMouseLeave)
       document.removeEventListener('mouseenter', onMouseEnter)
+      window.removeEventListener('touchstart', onTouch)
+      window.removeEventListener('touchmove', onTouch)
+      window.removeEventListener('touchend', onTouch)
+      window.removeEventListener('touchcancel', onTouch)
       if (texture) gl.deleteTexture(texture)
       disposePuddleWebGL(webgl)
     }
