@@ -7,6 +7,7 @@ bez zmian. Źródło faktów: `2026-11-14-historia-strony-koncept.md`, sekcje 5,
 ## Teksty (wersja Codexa po jednej rundzie poprawek)
 
 Drukarka: oznaczona przez właściciela 15.11 (punkty 1, 2, 4, 5 tak; zdanie z punktu 3 usunięte, reszta bez zmian).
+Dom: oznaczony 15.11 (punkty 6–11 tak); w trzeciej rundzie Codex dopisał fakt o starej pompie podłączonej przez Shelly.
 
 **Tytuł**
 Przebudowa drukarki 3D
@@ -46,6 +47,7 @@ Zacząłem od płotu z paneli fotowoltaicznych.
 
 - Po płocie przyszła kolej na falowniki i pompę ciepła.
 - Następnie zająłem się Home Assistantem.
+- Starą pompę ciepła podłączyłem do Home Assistanta przez przekaźnik Shelly. Dzięki temu dogrzewam ciepłą wodę na żądanie.
 - Potem zrobiłem własne panele, czyli ekrany z danymi o energii.
 
 **Co z tego zostało**
@@ -68,15 +70,22 @@ Drukarka (oznaczone 15.11):
 4. **Tak.** Obok tej drogi będzie kalkulator ceny wydruku.
 5. **Tak.** Tekst nie mówi, że chętnie byś drukarkę monetyzował; wystarczy „mogę wydrukować na zamówienie”.
 
-Dom:
+Dom (oznaczone 15.11):
 
-6. Panele w płocie to panele fotowoltaiczne (w źródle było samo „płot z paneli”; to moje dopowiedzenie).
-7. Stan domu to „działa” (to mój domysł z faktów: wszystkie kroki są zrobione i dziś działają).
-8. Kolejność była taka: płot, potem falowniki i pompa ciepła, potem Home Assistant, potem własne ekrany
+6. **Tak.** Panele w płocie to panele fotowoltaiczne (w źródle było samo „płot z paneli”; to moje dopowiedzenie).
+7. **Tak.** Stan domu to „działa” (to mój domysł z faktów: wszystkie kroki są zrobione i dziś działają).
+8. **Tak.** Kolejność była taka: płot, potem falowniki i pompa ciepła, potem Home Assistant, potem własne ekrany
    z danymi o energii.
-9. „Własne panele” to ekrany (dashboardy) z danymi o energii, które zrobiłeś sam w Home Assistant.
-10. Zdanie „Całe to przedsięwzięcie mega mi się podobało” może zostać w Twoich słowach.
-11. Tytuł „Dom pod kontrolą” jest w porządku.
+9. **Tak.** „Własne panele” to ekrany (dashboardy) z danymi o energii, które zrobiłeś sam w Home Assistant.
+10. **Tak.** Zdanie „Całe to przedsięwzięcie mega mi się podobało” może zostać w Twoich słowach.
+11. **Tak.** Tytuł „Dom pod kontrolą” jest w porządku.
+
+Dopisane przez właściciela przy punkcie 8: „stara pompa została sprytnie zintegrowana z home assistant przez
+shelly (dogrzewanie ciepłej wody na żądanie)”. Nowe zdania do potwierdzenia:
+
+12. Shelly to przekaźnik (tak nazywa go tekst; to moje dopowiedzenie).
+13. Kroki mogą zostać tak, jak są: najpierw „falowniki i pompa ciepła”, a osobno, po Home Assistancie,
+    podłączenie starej pompy przez Shelly.
 
 Uwaga do formy: obie historie mają ok. 100–115 słów, czyli trochę poniżej zamówionych 120. Krótsze wyszły
 po usunięciu dopowiedzeń; nie dopisywaliśmy niczego na siłę.
@@ -175,4 +184,13 @@ Drukarka:
 4. „Mega mi się podobało przejście przez te kolejne etapy” zmienia sens jego słów: podobało mu się całe to przedsięwzięcie, nie „przechodzenie przez etapy”. Użyj „mega mi się podobało” o całości.
 5. „Mam działającą realizację” brzmi urzędowo. Napisz prościej, co działa.
 6. Bez myślników (—) w tekście.
+```
+
+### Runda 3 (dom: nowy fakt od właściciela; wysłana razem z tekstem domu z rundy 2)
+
+```markdown
+Dopisz jeden nowy fakt do poniższego tekstu „Dom pod kontrolą”. Resztę zostaw bez zmian, chyba że jakieś zdanie trzeba minimalnie dopasować, żeby nowy fakt się zmieścił. Odpowiedz tylko poprawionym tekstem, w tym samym formacie, bez komentarzy.
+
+Nowy fakt (słowa autora): „stara pompa została sprytnie zintegrowana z Home Assistant przez Shelly (dogrzewanie ciepłej wody na żądanie)”.
+Czyli: pompa ciepła była stara, nie nowa; podłączyłem ją do Home Assistant przez przekaźnik Shelly; dzięki temu ciepłą wodę dogrzewam na żądanie. Nie dodawaj innych szczegółów (modeli, liczb, oszczędności). Zasady jak wcześniej: rzeczowo, krótkie zdania, pierwsza osoba, bez poetyckiego opisu siebie, bez marketingu, bez myślników (—). Słowo „sprytnie” możesz pominąć albo oddać sucho; nie chwal się.
 ```
