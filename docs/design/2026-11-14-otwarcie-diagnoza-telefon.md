@@ -671,3 +671,10 @@ Wnioski z budowy kadrów:
 - Na telefonie palec, który ciągnie bloba, jednocześnie przewija stronę; kadry tego nie rozstrzygają.
 
 Rekomendacja wykonawcy: kadr 2 (słowa). Wybór należy do właściciela; do tego czasu nie powstaje kod ruchu.
+
+**Wybór właściciela (2026-11-15): kadr 1, imię.** Szkielet „imię ramuje obiekt” zostaje; trzy zdania są
+blokiem przy imieniu, a nie plakatem. Powodu nie podał. Kadry 2 i 3 nie idą dalej; ich kod zostaje na
+trasie próbek do czasu, aż ruch dla kadru 1 będzie gotowy. Następny krok: scenariusz ruchu dla kadru 1,
+krok po kroku i z przyczyną każdego ruchu, do poprawienia przez właściciela, zanim powstanie kod. Do
+rozstrzygnięcia w scenariuszu: małe części bloba, które dymią; gest rozrywania a przewijanie na telefonie;
+to, że w tym kadrze trzy zdania są najmniejszym elementem.
