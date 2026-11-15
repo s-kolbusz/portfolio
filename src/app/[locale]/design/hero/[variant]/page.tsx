@@ -1,4 +1,5 @@
 import { setRequestLocale } from 'next-intl/server'
+import { Bona_Nova } from 'next/font/google'
 import { notFound } from 'next/navigation'
 
 import {
@@ -10,6 +11,14 @@ import { HeroSample } from '@/components/sections/hero-sample'
 import { requireRoutingLocale } from '@/i18n/locale'
 import { Link } from '@/i18n/navigation'
 import { routing } from '@/i18n/routing'
+
+// Candidate display face for the hero (the owner's pick to try); loaded only on this route.
+const bonaNova = Bona_Nova({
+  subsets: ['latin', 'latin-ext'],
+  weight: ['400', '700'],
+  variable: '--font-hero-display',
+  display: 'swap',
+})
 
 interface Props {
   params: Promise<{ locale: string; variant: string }>
@@ -43,7 +52,7 @@ export default async function HeroSamplePage({ params }: Props) {
   if (!variant) notFound()
 
   return (
-    <main id="main-content" className="flex min-h-screen flex-col">
+    <main id="main-content" className={`flex min-h-screen flex-col ${bonaNova.variable}`}>
       {variant === 'zlozenie' ? <HeroAssembly /> : <HeroSample key={variant} variant={variant} />}
       <nav
         aria-label="Próbki hero"
