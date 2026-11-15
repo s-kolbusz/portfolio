@@ -83,4 +83,34 @@ describe('createMould', () => {
     far.thirst(0.5, 0.45)
     expect(near.pull).toBeLessThan(far.pull)
   })
+
+  it('opens part by part: a closed part neither draws matter nor counts as room', () => {
+    const { data, width, height } = mask()
+    const ids = new Uint8Array(width * height)
+    for (let p = 0; p < ids.length; p++) {
+      if (data[p * 4 + 3]) ids[p] = (p % width) / width < 0.5 ? 1 : 2
+    }
+    const mould = createMould({ data, width, height }, { detail: 64, coarse: 16, ids, parts: 2 })
+    expect(mould.shares[0]! + mould.shares[1]!).toBeCloseTo(1, 5)
+    // The wall says which part is nearest, inside it and beside it.
+    mould.wall(0.22, 0.25)
+    const left = mould.part
+    mould.wall(0.78, 0.25)
+    expect(mould.part).not.toBe(left)
+    // Only the right part open: matter in the middle is drawn to the right.
+    const open = [0, 0]
+    open[1 - left] = 1
+    mould.open(open)
+    mould.count()
+    mould.settle(200)
+    mould.thirst(0.5, 0.25)
+    expect(mould.pull).toBeGreaterThan(0)
+    expect(mould.towardsX).toBeGreaterThan(0.5)
+    expect(mould.filled()).toBe(0)
+    // A drawing without parts ignores it.
+    const plain = createMould(mask(), { detail: 64, coarse: 16 })
+    plain.open([0])
+    plain.wall(0.22, 0.25)
+    expect(plain.part).toBe(-1)
+  })
 })

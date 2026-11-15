@@ -15,8 +15,14 @@ import type { RasterThing } from './things'
  *   spread inside, and holds it. Matter that has come to rest in a full part
  *   of the mould sets: it thickens until it stands still, and the renderer
  *   swaps it for the exact drawing.
- * - Letting go is the mould's hold running out from the blob outwards; the
- *   matter beads up by itself and falls back.
+ * - A thing is made part by part, in the order it is made in life (a page
+ *   from the top, a print from the bed). A part that has not been started
+ *   holds nothing; the next is started when the one before has begun to set.
+ *   The matter not yet in the thing stays one body and waits over what the
+ *   thing still lacks, so what is finished is left behind in the open.
+ * - Letting go is the mould's hold running out from one place outwards: from
+ *   the blob for the letters, from the part made last for a thing. The matter
+ *   draws together by itself and the blob's weight takes it back.
  *
  * All chaos lives in the liquid. What it sets into is precise.
  */
@@ -67,12 +73,18 @@ const LOOSEN = 1.08
 /** Matter in a mould is given a little more room than it has, so it presses outwards and fills. */
 const SWELL = 1.06
 
+/**
+ * Share of the matter a thing's parts end up holding; the rest stays in the
+ * gaps between them. Each part is given room for that much, so the parts made
+ * first do not take what the last ones need.
+ */
+const HELD = 0.85
+
 /** Forces, as multiples of the stage size per second squared (so every screen moves alike). */
 const WEIGHT = 4.6
 const THIRST = 9
 const WALL = 14
 const CURRENT = 0.4
-const SEED = 12
 /** Drag (1/s): the air, the blob's own thickness, a mould, and matter that has set. */
 const AIR = 1.5
 const BODY = 2.2
@@ -133,7 +145,26 @@ export function createStory(options: {
         reach: 0.16,
       })
     : null
-  const thingMoulds = things.map((thing) => createMould(thing.mask, { detail: 256, coarse: 36 }))
+  const thingMoulds = things.map((thing) =>
+    createMould(thing.mask, {
+      detail: 256,
+      coarse: 36,
+      ids: thing.ids,
+      parts: thing.parts.length,
+    })
+  )
+  /** The order each thing's parts are made in: its own, or as a page is read (rows, then left to right). */
+  const orders = things.map((thing, index) => {
+    const shares = thingMoulds[index]!.shares
+    const row = (part: number) => Math.round(thing.parts[part]!.y / 0.1)
+    const made =
+      thing.order ??
+      thing.parts
+        .map((_, part) => part)
+        .sort((a, b) => row(a) - row(b) || thing.parts[a]!.x - thing.parts[b]!.x)
+    return made.filter((part) => (shares[part] ?? 0) > 0)
+  })
+  const mostParts = Math.max(1, ...things.map((thing) => thing.parts.length))
 
   // Lengths that follow the layout.
   const stageRect = (): Rect => ({
@@ -152,7 +183,7 @@ export function createStory(options: {
       scale.name = Math.sqrt(area / (count * NAME_SHARE))
     }
     thingMoulds.forEach((mould, index) => {
-      scale.things[index] = layout.stage.size * Math.sqrt(mould.coverage / total)
+      scale.things[index] = layout.stage.size * Math.sqrt(mould.coverage / (total * HELD))
     })
   }
   measure()
@@ -184,70 +215,59 @@ export function createStory(options: {
   /** How much the blob's weight counts (0 while a thing has the matter). */
   let weight = 1
   let calmFor = 0
-  /** How much matter is in the middle of the stage (from the last frame). */
+  /** How much matter is in the middle of the blob (from the last frame), and how much of it is loose. */
   let inCore = 0
+  let inPool = 0
   /**
-   * Where each part of the thing being formed gathers its matter first: a
-   * point out on its own side of the blob, pulling as hard as it still needs
-   * matter. The blob is drawn apart into as many unequal drops as the thing
-   * has parts; a drop that has its fill is let go and falls into the mould.
+   * A thing is made part by part, in the order it is made in life. `opened`
+   * is how far each part takes matter; `turn` is how many have been started.
+   * The next part opens when the one before has begun to set.
    */
-  interface Seed {
-    x: number
-    y: number
-    /** Share of the matter its part holds, and how many particles that is. */
-    share: number
-    /** Radius within which matter counts as gathered (px). */
-    reach: number
-    need: number
-    have: number
-    done: boolean
-    /** How hard it draws; no two alike, so the drops leave at their own pace. */
-    vigour: number
-  }
-  let seeds: Seed[] = []
-  let sownAt = 0
-  const sow = (far = 1) => {
-    const parts = things[thing]?.parts ?? []
-    const whole = parts.reduce((sum, part) => sum + part.points.length, 0)
-    seeds = []
-    if (!whole) return
-    for (const part of parts) {
-      const share = part.points.length / whole
-      if (share < 0.02) continue
-      let dx = part.x - 0.5
-      let dy = part.y - 0.5
-      let distance = Math.hypot(dx, dy)
-      if (distance < 0.04) {
-        const turn = random(0, 6.2831853)
-        dx = Math.cos(turn)
-        dy = Math.sin(turn)
-        distance = 1
-      }
-      // Out on its own side, but never beyond the frame.
-      const ux = dx / distance
-      const uy = dy / distance
-      const centre = home()
-      const room = scale.spacing * Math.sqrt((share * total) / Math.PI)
-      const toEdge = Math.min(
-        ux > 0 ? (layout.width - centre.x) / ux : ux < 0 ? -centre.x / ux : Infinity,
-        uy > 0 ? (layout.height - centre.y) / uy : uy < 0 ? -centre.y / uy : Infinity
-      )
-      const out = Math.min(random(0.5, 0.72) * far, Math.max(0.3, (toEdge - room) / scale.unit))
-      seeds.push({
-        x: ux * out,
-        y: uy * out,
-        share,
-        reach: 0,
-        need: 1,
-        have: 0,
-        done: false,
-        vigour: random(0.55, 1.5),
-      })
-    }
-    sownAt = clock
-  }
+  const opened = new Float32Array(mostParts)
+  const partHas = new Float32Array(mostParts)
+  const partSet = new Float32Array(mostParts)
+  /** How much more each part will take from outside it (1 all it is offered, 0 it has its share). */
+  const partRoom = new Float32Array(mostParts).fill(1)
+  let turn = 0
+  let turnAt = 0
+  let nextGap = 0
+  /**
+   * Before it gives its matter to a thing that needs more room than the blob
+   * takes, the blob loosens to that thing's density (0 its own, 1 the thing's),
+   * so no part is handed more than it can hold.
+   */
+  let slack = 0
+  /**
+   * Where the matter that is not yet part of the thing waits: over what the
+   * thing still lacks, so what is finished is left behind in the open.
+   */
+  const pool = { x: 0, y: 0 }
   const blob = { ...home(), radius: 0 }
+  Object.assign(pool, home())
+  /** The middle of what the thing still lacks: the parts not started, and what is missing in those being made. */
+  const waiting = () => {
+    const order = orders[thing] ?? []
+    const parts = things[thing]?.parts ?? []
+    const shares = thingMoulds[thing]?.shares
+    let sum = 0
+    let x = 0
+    let y = 0
+    for (let k = 0; k < order.length; k++) {
+      const part = order[k]!
+      // A part being made counts for as much as it still lacks.
+      const lacks =
+        k < turn ? clamp01(1 - partHas[part]! / ((shares?.[part] ?? 0) * total * HELD)) : 1
+      const share = (shares?.[part] ?? 0) * lacks
+      sum += share
+      x += parts[part]!.x * share
+      y += parts[part]!.y * share
+    }
+    if (sum <= 0.02) return null
+    return {
+      x: layout.stage.x + (x / sum) * layout.stage.size,
+      y: layout.stage.y + (y / sum) * layout.stage.size,
+    }
+  }
 
   // --- Load: the matter comes in from beyond the frame as unequal drops,
   // each already moving, each on a course of its own. ---
@@ -365,9 +385,9 @@ export function createStory(options: {
 
   const rectOf = (which: 'name' | 'thing') => (which === 'name' ? layout.name : stageRect())
 
-  /** The mould lets go: its hold runs out from the blob outwards. */
-  const letGo = () => {
-    const centre = home()
+  /** The mould lets go: its hold runs out from one place outwards (from the blob, if none is given). */
+  const letGo = (from?: { x: number; y: number }) => {
+    const centre = from ?? home()
     const pace = scale.unit * 1.5
     for (let i = 0; i < total; i++) {
       const distance = Math.hypot(positions[i * 2]! - centre.x, positions[i * 2 + 1]! - centre.y)
@@ -380,6 +400,11 @@ export function createStory(options: {
     draw = 0
     releasing = false
     letGoAt.fill(Infinity)
+    opened.fill(0)
+    turn = 0
+    turnAt = clock
+    nextGap = random(0.35, 0.5)
+    next.open(opened)
     next.count()
     next.settle(0)
   }
@@ -389,17 +414,19 @@ export function createStory(options: {
     pointer: { x: number; y: number; active: boolean },
     rounds: number
   ) => {
-    const centre = home()
+    const centre = pool
     const { unit, spacing, radius } = scale
     const rect = rectOf(drawing)
     const mouldSpacing = drawing === 'name' ? scale.name : (scale.things[thing] ?? spacing)
     const isName = drawing === 'name'
+    const roomy = isName ? 1 : Math.max(1, (mouldSpacing * SWELL * 1.03) / (spacing * LOOSEN))
+    const liquidSpacing = spacing * (1 + (roomy - 1) * slack)
     const perWidth = 1 / rect.width
 
     // What the mould holds, and where it is still empty.
     if (mould && draw > 0) {
       mould.count()
-      const share = 1 / (isName ? count * NAME_SHARE : total)
+      const share = 1 / (isName ? count * NAME_SHARE : total * HELD)
       for (let i = 0; i < total; i++) {
         // Only matter that answers to this mould counts as filling it.
         if (isName && !lettered[i]) continue
@@ -420,17 +447,23 @@ export function createStory(options: {
     const drawnIn = pointer.active ? smooth(radius * 1.6, radius * 0.95, pointerToBlob) : 0
     const reach = Math.max(unit * 0.16, spacing * 9)
 
-    // Seeds count what they have gathered afresh every frame.
-    const sowing = (phase === 'forming' || phase === 'melting') && seeds.some((seed) => !seed.done)
-    for (const seed of seeds) {
-      seed.reach = 1.3 * spacing * Math.sqrt((seed.share * total) / Math.PI)
-      seed.have = 0
+    if (mould && !isName) {
+      // A part that has its share stops drawing in what lies beside it: that stays the blob's.
+      for (let part = 0; part < mould.shares.length; part++) {
+        const share = mould.shares[part]! * total * HELD
+        partRoom[part] = 1 - smooth(1, 1.15, partHas[part]! / Math.max(share, 1))
+      }
     }
+    partHas.fill(0)
+    partSet.fill(0)
 
     // The blob's weight is nil only inside the body it already is: an empty
     // middle draws matter all the way in.
-    const hollow = radius * Math.sqrt(clamp01(inCore / (0.36 * total)))
+    const hollow =
+      radius *
+      Math.min(Math.sqrt(clamp01(inCore / (0.36 * total))), Math.sqrt(inPool / total) * 1.05)
     let core = 0
+    let loosely = 0
 
     let resting = 0
     let gathered = 0
@@ -457,67 +490,44 @@ export function createStory(options: {
       /** How much it answers to the mould rather than to the blob (while the mould is still thirsty). */
       let answering = 0
 
-      // --- The parts of a thing gather their matter out on their own sides first. ---
-      let gathering = 0
-      if (sowing && !called) {
-        // It answers to the one part that draws it hardest, so the pulls never cancel
-        // and the blob comes apart cleanly; as a part gets its fill, the others take over.
-        let best = 0
-        let bestX = 0
-        let bestY = 0
-        let vigour = 1
-        let nearness = 1
-        for (const seed of seeds) {
-          if (seed.done) continue
-          const sx = centre.x + seed.x * unit - x
-          const sy = centre.y + seed.y * unit - y
-          const distance = Math.hypot(sx, sy) || 1
-          if (distance < seed.reach) {
-            seed.have++
-            drag += 6
-          }
-          const pull = (seed.need * Math.min(1, seed.reach / distance)) / distance
-          if (pull > best) {
-            best = pull
-            bestX = sx / distance
-            bestY = sy / distance
-            vigour = seed.vigour
-            nearness = Math.min(1, seed.reach / distance)
-          }
-        }
-        if (best > 0) {
-          gathering = 1
-          // What is nearest goes first: drops are drawn off the rim, the middle thins last.
-          const pull = SEED * unit * vigour * (0.25 + 0.75 * nearness * nearness)
-          ax += bestX * pull
-          ay += bestY * pull
-        }
-      }
-
       // --- The mould: its thirst, its wall, its hold. ---
       if (mould && draw > 0 && !called && (!isName || lettered[i])) {
-        grip = draw * (1 - gathering) * (releasing ? 1 - clamp01((clock - letGoAt[i]!) / 0.3) : 1)
+        const u = (x - rect.x) * perWidth
+        const v = (y - rect.y) * perWidth
+        mould.wall(u, v)
+        // A part that has not been started holds nothing: matter lying on it is still the blob's.
+        const here = mould.part < 0 ? 1 : opened[mould.part]!
+        const drawn = draw * (releasing ? 1 - clamp01((clock - letGoAt[i]!) / 0.3) : 1)
+        grip = drawn * here
+        if (drawn > 0) mould.thirst(u, v)
+        if (drawn > 0 && !releasing) {
+          // The letters answer to small gaps too; a thing draws more evenly.
+          const pull =
+            (mould.pull / (mould.pull + (isName ? 0.3 : 1))) *
+            THIRST *
+            unit *
+            drawn *
+            (1 - settled[i]!)
+          ax += mould.towardsX * pull
+          ay += mould.towardsY * pull
+        }
         if (grip > 0) {
-          const u = (x - rect.x) * perWidth
-          const v = (y - rect.y) * perWidth
-          mould.wall(u, v)
           const distance = mould.distance * rect.width
           inMould = distance < mouldSpacing * 0.4
-          mould.thirst(u, v)
           const fill = mould.fill
           answering = grip * (releasing || !hungry ? 0 : 1)
-          const still = 1 - settled[i]!
-          if (!releasing) {
-            // The letters answer to small gaps too; a thing draws more evenly.
-            const pull =
-              (mould.pull / (mould.pull + (isName ? 0.3 : 1))) * THIRST * unit * grip * still
-            ax += mould.towardsX * pull
-            ay += mould.towardsY * pull
+          if (inMould && mould.part >= 0) {
+            partHas[mould.part] = partHas[mould.part]! + 1
+            if (settled[i]! > 0.5) partSet[mould.part] = partSet[mould.part]! + 1
           }
           if (distance > 0) {
             // Just outside: drawn in. The letters only take what they have room for.
             const near = isName ? 1 - smooth(mouldSpacing * 2, mouldSpacing * 5, distance) : 1
-            const room = isName ? 1 - smooth(1, 1.3, fill) : 1
+            const room = isName
+              ? 1 - smooth(1, 1.3, fill)
+              : mould.part < 0
+                ? 1
+                : partRoom[mould.part]!
             const pull =
               WALL * unit * Math.min(1, distance / (mouldSpacing * 0.8)) * grip * near * room
             ax -= mould.awayX * pull
@@ -535,7 +545,11 @@ export function createStory(options: {
           settled[i] = clamp01(settled[i]! + (rests ? dt / 0.4 : -dt / 0.3))
           // The drawing is a surface: what lands on it stays on it.
           // (Only what arrives fast is braked; what creeps along it to an empty part is not.)
-          drag += inMould ? MOULD * grip : LANDING * landing * smooth(unit * 0.3, unit * 0.9, speed)
+          // (And a part that is still mostly empty lets it run along to where it is missing.)
+          const thick = isName ? 1 : 0.25 + 0.75 * smooth(0.4, 0.95, fill)
+          drag += inMould
+            ? MOULD * grip * thick
+            : LANDING * landing * smooth(unit * 0.3, unit * 0.9, speed)
         }
       }
       if (grip <= 0) settled[i] = clamp01(settled[i]! - dt / 0.25)
@@ -597,10 +611,11 @@ export function createStory(options: {
       // (The pointer's drop is held by the pointer, not by itself, until the blob draws it in.)
       fluid.loose[i] = called ? drawnIn : Math.min(liquid, 1 - wetting, 1 - answering)
       fluid.sizes[i] =
-        girth[i]! * (mouldSpacing * SWELL + (spacing * LOOSEN - mouldSpacing * SWELL) * liquid)
+        girth[i]! *
+        (mouldSpacing * SWELL + (liquidSpacing * LOOSEN - mouldSpacing * SWELL) * liquid)
 
       // What the renderer draws: a wide soft spot when liquid, a tight one in a mould.
-      const own = girth[i]! * (mouldSpacing + (spacing - mouldSpacing) * liquid)
+      const own = girth[i]! * (mouldSpacing + (liquidSpacing - mouldSpacing) * liquid)
       const wide = 1 + (WIDE - 1) * liquid
       states[i * 3] = own * 1.6 * wide
       states[i * 3 + 1] = set
@@ -608,6 +623,7 @@ export function createStory(options: {
 
       if (set > 0.5) resting++
       if (far < radius * 0.6) core++
+      if (far < radius * 1.3 && grip < 0.5) loosely++
       if (far < radius * 1.3) {
         gathered++
         sumX += x
@@ -615,21 +631,8 @@ export function createStory(options: {
       }
       energy += speed
     }
-
-    if (sowing) {
-      for (const seed of seeds) {
-        if (seed.done) continue
-        seed.need = clamp01(1 - seed.have / (seed.share * total))
-        // It has its fill (or has waited long enough): the drop is let go.
-        if (
-          seed.need < (phase === 'melting' ? 0.35 : 0.15) ||
-          clock > sownAt + (phase === 'melting' ? 0.9 : 1.8)
-        )
-          seed.done = true
-      }
-    }
-
     inCore = core
+    inPool = loosely
     for (let round = 0; round < rounds; round++) fluid.step(dt / rounds)
 
     return {
@@ -653,11 +656,36 @@ export function createStory(options: {
     const { spacing } = scale
 
     // A mould draws harder as it opens; the blob's weight returns as a thing lets go.
-    const thingHasIt = phase === 'forming' || phase === 'hold'
+    const order = orders[thing] ?? []
+    // A thing has all the matter once its last part has been started; until
+    // then what is not yet in it stays one body, over the parts still to come.
+    const thingHasIt = (phase === 'forming' && turn >= order.length) || phase === 'hold'
     draw = Math.min(1, draw + (mould ? dt / 0.35 : 0))
-    // (While a thing comes apart into drops, the blob waits for them.)
-    const apart = phase === 'melting' && seeds.some((seed) => !seed.done)
-    weight += ((thingHasIt || apart ? 0 : 1) - weight) * (1 - Math.exp(-dt / 0.2))
+    weight += ((thingHasIt ? 0 : 1) - weight) * (1 - Math.exp(-dt / 0.2))
+    if (phase === 'forming') {
+      // The next part is started when a good part of the one before has set.
+      const before = order[turn - 1]
+      const shares = mould?.shares
+      const fed =
+        before === undefined ||
+        partSet[before]! > (shares?.[before] ?? 0) * total * HELD * 0.3 ||
+        clock > turnAt + 0.7
+      if (turn < order.length && fed && clock > turnAt + nextGap) {
+        turn++
+        turnAt = clock
+        nextGap = random(0.05, 0.3)
+      }
+      for (let k = 0; k < turn; k++) {
+        const part = order[k]!
+        opened[part] = Math.min(1, opened[part]! + dt / 0.3)
+      }
+      mould?.open(opened)
+    }
+    slack += ((phase === 'forming' || phase === 'hold' ? 1 : 0) - slack) * (1 - Math.exp(-dt / 0.3))
+    const rest = (phase === 'forming' && waiting()) || home()
+    const drift = 1 - Math.exp(-dt / 0.5)
+    pool.x += (rest.x - pool.x) * drift
+    pool.y += (rest.y - pool.y) * drift
 
     fluid.cohere(
       {
@@ -708,11 +736,11 @@ export function createStory(options: {
         drawing = 'thing'
         changed = true
         open(thingMoulds[thing]!)
-        sow()
       }
     } else if (phase === 'forming') {
       formed = clamp01(now.resting / total)
-      if (formed > 0.93 || (calmFor > 0.6 && clock > phaseAt + 1.5) || clock > phaseAt + 9) {
+      const started = turn >= order.length && clock > turnAt + 0.5
+      if ((started && (formed > 0.9 || calmFor > 0.7)) || clock > phaseAt + 14) {
         phase = 'hold'
         phaseAt = clock
         nextAt = clock + random(2.3, 3)
@@ -722,8 +750,14 @@ export function createStory(options: {
       if (clock >= nextAt || tapped) {
         phase = 'melting'
         phaseAt = clock
-        letGo()
-        sow(0.8)
+        // It comes undone from the part that was made last.
+        const last = things[thing]?.parts[order[order.length - 1] ?? -1]
+        letGo(
+          last && {
+            x: layout.stage.x + last.x * layout.stage.size,
+            y: layout.stage.y + last.y * layout.stage.size,
+          }
+        )
       }
     } else if (phase === 'melting') {
       formed = clamp01(now.resting / total)

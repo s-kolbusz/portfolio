@@ -548,3 +548,44 @@ Wciąż nie tak: początek podziału bloba rozchyla się w zbyt regularną gwiaz
 w cienkich kreskach (wypełnienie ok. 75–85%), które przykrywa dopiero prawdziwy tekst; rzecz przed
 stężeniem przechodzi przez fazę jednolitej „płyty” nad rysunkiem; blob bywa na chwilę sklejony ze słowami,
 gdy litery puszczają; kropla wskaźnika dolatuje do niego rozproszona i zbiera się dopiero na miejscu.
+
+### Rzecz budowana po kolei, tak jak powstaje naprawdę (2026-11-15)
+
+Po ocenie na żywo właściciel uznał, że hero „nie opowiada historii, daje tylko popis umiejętności”, i poprosił
+o scenariusz przed szlifowaniem. Przyjęty punkt wyjścia: jedna materia, a z niej rzeczy w trzech stanach
+(działa, w realizacji, zrozumiane i odłożone); opowieść dzieje się w dwóch przejściach: krople → obraz
+i obraz → blob. Pierwsza zmiana w kodzie dotyczy budowania.
+
+Jak to działa:
+
+- **Części otwierają się po kolei.** Rysunek ma etykietę części dla każdego piksela (`ids` w `things.ts`),
+  a forma (`matter-moulds.ts`) umie otwierać się częściami: zamknięta część nie ciągnie materii i nie liczy
+  się jako miejsce. Kolejność to kolejność powstawania: strona jak się ją czyta (rzędami od góry, w rzędzie
+  od lewej), wydruk od stołu przez ramę i naczynie do szpuli i głowicy (`order` przy rzeczy).
+- **Przyczyna zamiast zegara.** Następna część zaczyna się, gdy ok. 30% poprzedniej stężało (albo po 0,7 s,
+  żeby cienka belka nie wstrzymywała reszty).
+- **Zapas materii zostaje jednym ciałem** i czeka nad tym, czego rzeczy jeszcze brakuje, więc gotowe części
+  zostają odsłonięte, a blob maleje i przesuwa się w stronę ostatnich.
+- **Blob przed oddaniem materii się rozluźnia** do gęstości rzeczy. Bez tego części leżące pod blobem
+  dostawały więcej, niż mieszczą, tężały z nadmiarem i ostatnim częściom brakowało materii.
+- **Powrót zaczyna się od części zrobionej na końcu** i idzie przez rzecz; materia sama się ściąga
+  i wraca do środka. Wyrzucanie kropel na boki zostało usunięte (punkty przyciągania z poprzedniej wersji
+  zniknęły z kodu).
+
+Odrzucone po drodze: ograniczenie tężenia progiem lokalnego wypełnienia (wycięcia w rysunku zawyżają odczyt
+i nic nie tężało), odbieranie chwytu nadmiarowej materii (luźna ciecz skleja się do gęstości bloba, więc
+nadmiar nigdy nie znikał), uwolnienie materii z obrzeża pełnych części (części wychodziły niepełne).
+
+Świadome odstępstwo od rozpisu: rzecz nie powstaje z osobnych kropel z szyjkami, tylko wyłania się spod
+bloba, który ją odsłania. Powód: blob jest prawie tak duży jak rzecz i leży na jej miejscu, więc krople nie
+mają dokąd lecieć.
+
+Sprawdzone na paskach 60 kl./s z prawdziwej strony (`cook/stills/g02/`) na 390×844, 1440×900 i 3440×1440.
+Budowa trwa ok. 4,2 s, powrót ok. 1,4 s. Krok symulacji w Node: średnio 2,1 ms (1734 cząstki) i 3,7 ms
+(2860 cząstek), bez zmiany względem poprzedniej wersji.
+
+Wciąż nie tak: ostatnia część strony (stopka) dostaje ok. 65–80% materii i bywa krótsza na końcach, bo
+ok. 15% materii zostaje w szczelinach między częściami; belka powstaje jako „pokrywka” na blobie, zanim
+rozleje się na całą szerokość; rozluźniony blob jest o ok. 10% większy i na chwilę dotyka liter imienia.
+Nie zrobione z rozpisu: tężenie frontem od miejsca dotknięcia, „ostatnia kropla” jako najciemniejszy
+element, różnice między trzema stanami rzeczy, zdanie przy obiekcie (układ).

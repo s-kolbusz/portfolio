@@ -29,6 +29,15 @@ export interface Mould {
   distance: number
   awayX: number
   awayY: number
+  /** The part of the drawing nearest to where the wall was last read (−1 if it has no parts). */
+  part: number
+  /** Share of the drawing each part holds. */
+  readonly shares: Float32Array
+  /**
+   * Open the drawing part by part: `open[part]` from 0 (takes no matter) to
+   * 1. A closed part neither draws matter nor counts as room for it.
+   */
+  open: (open: ArrayLike<number>) => void
   /** Start counting the matter for this frame. */
   count: () => void
   /** One particle at (u, v) holding `share` of the drawing's capacity. */
@@ -57,7 +66,8 @@ function nearest(
   d: Float32Array,
   length: number,
   hull: Int32Array,
-  bounds: Float32Array
+  bounds: Float32Array,
+  from: Int32Array
 ) {
   let k = 0
   hull[0] = 0
@@ -81,29 +91,42 @@ function nearest(
     while (bounds[k + 1]! < q) k++
     const p = hull[k]!
     d[q] = (q - p) * (q - p) + f[p]!
+    from[q] = p
   }
 }
 
-/** Distance (in cells) from every cell to the nearest cell where `inside` is set. */
+/**
+ * Distance (in cells) from every cell to the nearest cell where `inside` is
+ * set, and which cell that is.
+ */
 function distances(inside: Uint8Array, cols: number, rows: number) {
   const FAR = 1e12
   const field = new Float32Array(cols * rows)
+  const source = new Int32Array(cols * rows)
+  const inColumn = new Int32Array(cols * rows)
   const longest = Math.max(cols, rows)
   const f = new Float32Array(longest)
   const d = new Float32Array(longest)
   const hull = new Int32Array(longest)
   const bounds = new Float32Array(longest + 1)
+  const from = new Int32Array(longest)
   for (let x = 0; x < cols; x++) {
     for (let y = 0; y < rows; y++) f[y] = inside[y * cols + x] ? 0 : FAR
-    nearest(f, d, rows, hull, bounds)
-    for (let y = 0; y < rows; y++) field[y * cols + x] = d[y]!
+    nearest(f, d, rows, hull, bounds, from)
+    for (let y = 0; y < rows; y++) {
+      field[y * cols + x] = d[y]!
+      inColumn[y * cols + x] = from[y]!
+    }
   }
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) f[x] = field[y * cols + x]!
-    nearest(f, d, cols, hull, bounds)
-    for (let x = 0; x < cols; x++) field[y * cols + x] = Math.sqrt(d[x]!)
+    nearest(f, d, cols, hull, bounds, from)
+    for (let x = 0; x < cols; x++) {
+      field[y * cols + x] = Math.sqrt(d[x]!)
+      source[y * cols + x] = inColumn[y * cols + from[x]!]! * cols + from[x]!
+    }
   }
-  return field
+  return { field, source }
 }
 
 export function createMould(
@@ -119,6 +142,12 @@ export function createMould(
      * each empty part pulls only on what is near it.
      */
     reach?: number
+    /**
+     * The drawing's parts, if it can be opened part by part: which part each
+     * pixel of the mask belongs to (0 none, otherwise index + 1), and how many.
+     */
+    ids?: Uint8Array
+    parts?: number
   }
 ): Mould {
   const aspect = mask.height / mask.width
@@ -128,12 +157,17 @@ export function createMould(
   // The drawing at the wall's resolution: a cell is inside if enough of it is covered.
   const sums = new Float32Array(cols * rows)
   const hits = new Uint16Array(cols * rows)
+  const partCount = options.ids ? Math.max(1, options.parts ?? 1) : 0
+  /** The part a cell of the wall's grid belongs to (index, or −1). */
+  const label = new Int16Array(cols * rows).fill(-1)
   for (let y = 0; y < mask.height; y++) {
     const cy = Math.min(rows - 1, Math.floor((y / mask.height) * rows))
     for (let x = 0; x < mask.width; x++) {
       const cx = Math.min(cols - 1, Math.floor((x / mask.width) * cols))
       sums[cy * cols + cx] = sums[cy * cols + cx]! + mask.data[(y * mask.width + x) * 4 + 3]!
       hits[cy * cols + cx] = hits[cy * cols + cx]! + 1
+      const id = options.ids?.[y * mask.width + x]
+      if (id) label[cy * cols + cx] = Math.min(partCount, id) - 1
     }
   }
   const inside = new Uint8Array(cols * rows)
@@ -146,12 +180,20 @@ export function createMould(
     if (inside[at]) insideCells.push(at)
   }
   const coverage = insideCells.length / inside.length
-  const toInside = distances(inside, cols, rows)
-  const toOutside = distances(outside, cols, rows)
+  const { field: toInside, source } = distances(inside, cols, rows)
+  const { field: toOutside } = distances(outside, cols, rows)
   // Signed, in widths, zero on the edge between an inside and an outside cell.
   const signed = new Float32Array(cols * rows)
   for (let at = 0; at < signed.length; at++) {
     signed[at] = (inside[at] ? 0.5 - toOutside[at]! : toInside[at]! - 0.5) / cols
+  }
+  // Every cell answers to the part nearest to it.
+  const nearestPart = new Int16Array(cols * rows).fill(-1)
+  if (partCount) {
+    for (const at of insideCells) if (label[at]! < 0) label[at] = 0
+    for (let at = 0; at < nearestPart.length; at++) {
+      nearestPart[at] = inside[at] ? label[at]! : (label[source[at]!] ?? -1)
+    }
   }
 
   // The thirst's grid reaches beyond the rectangle (as far as the thirst itself
@@ -180,10 +222,18 @@ export function createMould(
     grid[at + wide] = grid[at + wide]! + share * (1 - fx) * fy
     grid[at + wide + 1] = grid[at + wide + 1]! + share * fx * fy
   }
+  /** Each part's own room, so the drawing can be opened part by part. */
+  const rooms = Array.from({ length: partCount }, () => new Float32Array(wide * tall))
+  const shares = new Float32Array(partCount)
   for (const at of insideCells) {
     const u = ((at % cols) + 0.5) / cols
     const v = (Math.floor(at / cols) + 0.5) / cols
     lay(capacity, u, v, 1 / insideCells.length)
+    const room = rooms[label[at]!]
+    if (room) {
+      lay(room, u, v, 1 / insideCells.length)
+      shares[label[at]!] = shares[label[at]!]! + 1 / insideCells.length
+    }
   }
   let capacitySum = 0
   for (let at = 0; at < capacity.length; at++) capacitySum += capacity[at]!
@@ -198,6 +248,20 @@ export function createMould(
     towardsX: 0,
     towardsY: 0,
     fill: 0,
+    part: -1,
+    shares,
+    open(open) {
+      if (!partCount) return
+      capacity.fill(0)
+      capacitySum = 0
+      rooms.forEach((room, part) => {
+        const share = Math.min(1, Math.max(0, open[part] ?? 0))
+        if (share <= 0) return
+        for (let at = 0; at < capacity.length; at++)
+          capacity[at] = capacity[at]! + room[at]! * share
+      })
+      for (let at = 0; at < capacity.length; at++) capacitySum += capacity[at]!
+    },
     wall(u, v) {
       // Beyond the rectangle the nearest edge is read at the rim, plus the way there.
       const cu = Math.min(1, Math.max(0, u))
@@ -209,6 +273,7 @@ export function createMould(
       const fx = gx - cx
       const fy = gy - cy
       const at = cy * cols + cx
+      mould.part = nearestPart[Math.round(gy) * cols + Math.round(gx)]!
       const a = signed[at]!
       const b = signed[at + 1]!
       const c = signed[at + cols]!

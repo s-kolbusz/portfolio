@@ -13,6 +13,8 @@ type Draw = (ctx: Context) => void
 export interface Thing {
   caption: string
   parts: Draw[]
+  /** The order its parts are made in, when that is not simply top to bottom. */
+  order?: number[]
 }
 
 /** Tones are stored in the mask's red channel: 255 the matter's green, lower is deeper. */
@@ -165,6 +167,8 @@ function vessel(t: number) {
  */
 const print: Thing = {
   caption: 'wydruk 3D',
+  // As a print is made: the bed, the frame, the vessel, then what feeds it.
+  order: [4, 0, 3, 1, 2],
   parts: [
     // Frame: two posts and the beam the head rides.
     (ctx) => {
@@ -253,6 +257,10 @@ export interface RasterThing {
   coverage: number
   /** Per part: centroid (0–1) and the points (0–1, xy pairs) its matter settles on. */
   parts: Array<{ x: number; y: number; points: Float32Array }>
+  /** Which part each pixel of the mask belongs to: 0 none, otherwise the part's index + 1. */
+  ids: Uint8Array
+  /** The order the parts are made in (indices into `parts`); top to bottom if not given. */
+  order?: number[]
 }
 
 function soften(alpha: Float32Array, width: number, height: number, radius: number) {
@@ -373,16 +381,17 @@ export function rasteriseParts(options: {
     })
     return { x: sumX / Math.max(1, own.length), y: sumY / Math.max(1, own.length), points }
   })
-  return { mask: { data, width, height }, coverage, parts }
+  return { mask: { data, width, height }, coverage, parts, ids }
 }
 
 /** Rasterise a thing (drawn on the 100 × 100 grid) into a square. */
 export function rasterise(thing: Thing, count: number, size = 768): RasterThing {
-  return rasteriseParts({
+  const raster = rasteriseParts({
     width: size,
     height: size,
     parts: thing.parts,
     count,
     prepare: (ctx) => ctx.scale(size / 100, size / 100),
   })
+  return thing.order ? { ...raster, order: thing.order } : raster
 }

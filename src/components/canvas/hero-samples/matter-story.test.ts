@@ -4,14 +4,16 @@ import { createStory, type StoryLayout } from './matter-story'
 import type { RasterThing } from './things'
 
 /** A drawing of two bars (two parts), as the rasteriser would hand it over. */
-function thing(): RasterThing {
+function thing(order?: number[]): RasterThing {
   const size = 64
   const data = new Uint8Array(size * size * 4)
+  const ids = new Uint8Array(size * size)
   for (let y = 0; y < size; y++) {
     for (let x = 4; x < 60; x++) {
       if ((y >= 6 && y < 26) || (y >= 38 && y < 58)) {
         data[(y * size + x) * 4] = 255
         data[(y * size + x) * 4 + 3] = 255
+        ids[y * size + x] = y < 32 ? 1 : 2
       }
     }
   }
@@ -22,6 +24,8 @@ function thing(): RasterThing {
       { x: 0.5, y: 0.25, points: new Float32Array(200) },
       { x: 0.5, y: 0.75, points: new Float32Array(200) },
     ],
+    ids,
+    ...(order ? { order } : {}),
   }
 }
 
@@ -84,6 +88,33 @@ describe('createStory', () => {
     expect(mostFormed).toBeGreaterThan(0.5)
     expect(frame.drawing).toBe('thing')
     expect(frame.rect).toEqual({ x: 250, y: 150, width: 300, height: 300 })
+  })
+
+  it('makes a thing part by part, in the order it is made in', () => {
+    // Bottom bar first: when the first matter sets, it sets there.
+    const story = createStory({
+      count: 300,
+      ballCount: 12,
+      things: [thing([1, 0])],
+      name: null,
+      layout,
+    })
+    let frame = story.step(1 / 60, { x: 0, y: 0, active: false }, false)
+    let top = 0
+    let bottom = 0
+    for (let n = 0; n < 25 * 60 && top + bottom < 20; n++) {
+      frame = story.step(1 / 60, { x: 0, y: 0, active: false }, false)
+      if (frame.phase !== 'forming') continue
+      top = 0
+      bottom = 0
+      for (let i = 0; i < frame.count; i++) {
+        if (frame.states[i * 3 + 1]! < 0.5) continue
+        if (frame.positions[i * 2 + 1]! < 300) top++
+        else bottom++
+      }
+    }
+    expect(frame.phase).toBe('forming')
+    expect(bottom).toBeGreaterThan(top * 3)
   })
 
   it('builds the letters first, then lets the real text take over', () => {
