@@ -7,7 +7,7 @@ bez zmian. Źródło faktów: `2026-11-14-historia-strony-koncept.md`, sekcje 5,
 ## Teksty (wersja Codexa po jednej rundzie poprawek)
 
 Drukarka: oznaczona przez właściciela 15.11 (punkty 1, 2, 4, 5 tak; zdanie z punktu 3 usunięte, reszta bez zmian).
-Dom: oznaczony 15.11 (punkty 6–11 tak); w trzeciej rundzie Codex dopisał fakt o starej pompie podłączonej przez Shelly, w czwartej poprawił kolejność (Home Assistant zaraz po płocie).
+Dom: oznaczony 15.11 (punkty 6–11 tak); w trzeciej rundzie Codex dopisał fakt o starej pompie podłączonej przez Shelly, w czwartej poprawił kolejność (Home Assistant zaraz po płocie), w piątej dopisał, po co powstał Home Assistant.
 
 **Tytuł**
 Przebudowa drukarki 3D
@@ -45,7 +45,7 @@ Zacząłem od płotu z paneli fotowoltaicznych.
 
 **Kroki**
 
-- Po płocie zająłem się Home Assistantem.
+- Po płocie zająłem się Home Assistantem. Miałem urządzenia smart różnych dostawców, każde z własną aplikacją. Dzięki HA mam cały smart home w jednym miejscu i mogę dowolnie dobierać producentów urządzeń.
 - Następnie przyszła kolej na falowniki.
 - Starą pompę ciepła podłączyłem do Home Assistanta przez przekaźnik Shelly. Dzięki temu dogrzewam ciepłą wodę na żądanie.
 - Potem zrobiłem własne panele, czyli ekrany z danymi o energii.
@@ -200,4 +200,13 @@ Czyli: pompa ciepła była stara, nie nowa; podłączyłem ją do Home Assistant
 ```markdown
 Popraw kolejność w poniższym tekście „Dom pod kontrolą”. Autor poprawił: po płocie najpierw był Home Assistant, a potem reszta. Kolejność kroków ma więc być: (początek) płot z paneli fotowoltaicznych → Home Assistant → falowniki → stara pompa ciepła podłączona do Home Assistanta przez przekaźnik Shelly (dogrzewanie ciepłej wody na żądanie) → własne ekrany z danymi o energii.
 Pompa ciepła była stara, więc nie pisz, że przyszła kolej na pompę, jakby była nowa; pojawia się tylko jako podłączenie przez Shelly. Resztę tekstu zostaw bez zmian, poza tym, co trzeba minimalnie dopasować do nowej kolejności (np. „Działają…” w „Co z tego zostało”). Zasady jak wcześniej: rzeczowo, krótkie zdania, pierwsza osoba, bez myślników (—), bez nowych faktów. Odpowiedz tylko poprawionym tekstem, w tym samym formacie, bez komentarzy.
+```
+
+### Runda 5 (dom: po co Home Assistant; wysłana razem z tekstem domu z rundy 4)
+
+```markdown
+Dopisz jeden nowy fakt do poniższego tekstu „Dom pod kontrolą”, w kroku o Home Assistancie. Resztę zostaw bez zmian. Odpowiedz tylko poprawionym tekstem, w tym samym formacie, bez komentarzy.
+
+Nowy fakt (słowa autora): „HA też powstało jako rozwiązanie realnej potrzeby: różne urządzenia smart różnych dostawców i każde ze swoją własną aplikacją; dzięki HA w łatwy sposób mam cały smart home w jednym miejscu i mogę dowolnie dobierać producentów urządzeń”.
+Nie dodawaj nazw urządzeń, producentów ani liczb. Zasady jak wcześniej: rzeczowo, krótkie zdania, pierwsza osoba, bez myślników (—), bez marketingu, bez nowych faktów. Krok może mieć dwa, najwyżej trzy krótkie zdania.
 ```
