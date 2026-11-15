@@ -215,17 +215,17 @@ Dwie nowe podstrony w warstwie pracy (przyjęte):
 
 ## 10. Co wzięte z referencji
 
-| Strona                 | Wrażenie właściciela                                                                                             | Jak to u nas                                                              |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Lusion                 | Najbliżej tego, co kocha: ciągłość, prowadzenie uwagi, dopracowanie.                                             | Zasady w `2026-11-14-lusion-przepis.md`.                                  |
-| jomor.design           | (15.11) Jedna z najfajniejszych i najciekawszych, jakie widział: mnóstwo pomysłów, z humorem. Nie do kopiowania. | Jeszcze nierozpisane; źródło pomysłów i tonu (humor), nie wzorzec układu. |
-| leonlin.de             | Całościowo przemyślana historia i ruch.                                                                          | Hub; rzecz dowodzi siebie sama.                                           |
-| Locomotive             | Lista projektów.                                                                                                 | Wzorzec dla krótkiego indeksu, jeśli będzie potrzebny.                    |
-| Aristide Benoist       | Tylko pomysł na otwieranie projektów; działa wyłącznie na desktopie.                                             | Sceny jako drzwi, ale działające na telefonie.                            |
-| Joffrey Spitzer, Zajno | Przejścia między stronami (u Zajno zniekształcenia).                                                             | Sekcja 8, punkt 4.                                                        |
-| 14islands              | Całkiem ciekawa.                                                                                                 | Bez konkretnego zapożyczenia.                                             |
-| Hello Monday           | Rysunki i falowanie, nic poza tym.                                                                               | Falowanie mamy w materii.                                                 |
-| wodniack.dev           | Ciekawy, ale boli w oczy; za dużo karuzeli.                                                                      | Granica, której nie przekraczamy.                                         |
+| Strona                 | Wrażenie właściciela                                                                                             | Jak to u nas                                                                                    |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Lusion                 | Najbliżej tego, co kocha: ciągłość, prowadzenie uwagi, dopracowanie.                                             | Zasady w `2026-11-14-lusion-przepis.md`.                                                        |
+| jomor.design           | (15.11) Jedna z najfajniejszych i najciekawszych, jakie widział: mnóstwo pomysłów, z humorem. Nie do kopiowania. | Źródło pomysłów i tonu (humor), nie wzorzec układu. Rozpisane w `2026-11-15-jomor-przeglad.md`. |
+| leonlin.de             | Całościowo przemyślana historia i ruch.                                                                          | Hub; rzecz dowodzi siebie sama.                                                                 |
+| Locomotive             | Lista projektów.                                                                                                 | Wzorzec dla krótkiego indeksu, jeśli będzie potrzebny.                                          |
+| Aristide Benoist       | Tylko pomysł na otwieranie projektów; działa wyłącznie na desktopie.                                             | Sceny jako drzwi, ale działające na telefonie.                                                  |
+| Joffrey Spitzer, Zajno | Przejścia między stronami (u Zajno zniekształcenia).                                                             | Sekcja 8, punkt 4.                                                                              |
+| 14islands              | Całkiem ciekawa.                                                                                                 | Bez konkretnego zapożyczenia.                                                                   |
+| Hello Monday           | Rysunki i falowanie, nic poza tym.                                                                               | Falowanie mamy w materii.                                                                       |
+| wodniack.dev           | Ciekawy, ale boli w oczy; za dużo karuzeli.                                                                      | Granica, której nie przekraczamy.                                                               |
 
 ## 11. Co to zmienia w planie z września
 
