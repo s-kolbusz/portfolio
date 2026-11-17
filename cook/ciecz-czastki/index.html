@@ -22,28 +22,34 @@
   #sel { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
   #sel span { position: absolute; white-space: pre; color: transparent; pointer-events: auto; cursor: text; }
   #sel span::selection { background: rgba(15,157,99,.28); color: transparent; }
-  #scene { position: fixed; z-index: 1; color: #f3efe6; visibility: hidden; }
-  #scene ::selection { background: rgba(240,150,100,.35); }
-  #scene header { display: flex; flex-direction: column; gap: 14px; }
-  #scene .lead { display: flex; flex-direction: column; gap: 12px; }
+  #scene { position: fixed; z-index: 1; color: #f3efe6; visibility: hidden; pointer-events: none; }
+  #scene ::selection, #pins ::selection { background: rgba(240,150,100,.35); }
   #scene p, #scene h2 { margin: 0; }
-  #scene .m { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .12em; margin-bottom: -.12em; }  /* maska: wiersz wyjeżdża spod krawędzi */
+  #scene .m { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .14em; margin-bottom: -.14em; }  /* maska: wiersz wyjeżdża spod krawędzi */
   #scene .i { display: inline-block; will-change: transform; }
-  #scene .tag { font: 12px ui-monospace, Menlo, monospace; letter-spacing: .2em; text-transform: uppercase; color: rgba(243,239,230,.6); }
-  /* tytuł = logo stronypodhale.pl: Cabinet Grotesk, „strony” i „.pl” w akcencie (500), „podhale” w kolorze tekstu (800) */
-  #scene .wm { font: 500 64px/1 "Cabinet Grotesk", system-ui, sans-serif; letter-spacing: -0.02em; white-space: nowrap; }
+  /* znak = logo stronypodhale.pl: Cabinet Grotesk, „strony” i „.pl” w akcencie (500), „podhale” w kolorze tekstu (800); na całą szerokość bloku */
+  #scene .wm { position: absolute; left: 0; font: 500 64px/0.86 "Cabinet Grotesk", system-ui, sans-serif; letter-spacing: -0.035em; white-space: nowrap; pointer-events: auto; }
   #scene .wm .acc { color: oklch(0.8 0.125 47); font-weight: 500; }
   #scene .wm .str { font-weight: 800; }
-  #scene .wm .ch { display: inline-block; }
-  #scene .desc { font: 400 clamp(15px, 1.15vw, 18px)/1.5 "Cabinet Grotesk", system-ui, sans-serif; color: rgba(243,239,230,.74); max-width: 30em; }
-  #scene a { display: inline-block; font: 13px ui-monospace, Menlo, monospace; letter-spacing: .2em; text-transform: uppercase; color: #f3efe6; text-decoration: none; }
-  #scene a b { display: inline-block; font-weight: 400; color: oklch(0.8 0.125 47); transition: transform .3s cubic-bezier(.22,1,.36,1); }
-  #scene a:hover b { transform: translate(2px, -2px); }
-  @media (min-width: 900px) {
-    #scene header { flex-direction: row; align-items: flex-end; justify-content: space-between; gap: 40px; }
-    #scene .desc { text-align: right; }
-    #scene a { position: absolute; right: 0; }
-  }
+  #scene .row { position: absolute; left: 0; right: 0; display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; }
+  #scene .say { font: 500 clamp(16px, 1.4vw, 21px)/1.35 "Cabinet Grotesk", system-ui, sans-serif; color: #f3efe6; pointer-events: auto; }
+  #scene a { font: 700 clamp(15px, 1.2vw, 18px)/1.35 "Cabinet Grotesk", system-ui, sans-serif; color: oklch(0.8 0.125 47); text-decoration: none; white-space: nowrap; pointer-events: auto; }
+  #scene a b { display: inline-block; font-weight: 400; transition: transform .3s cubic-bezier(.22,1,.36,1); }
+  #scene a:hover b { transform: translate(3px, -3px); }
+  /* pinezki na zrzucie: notatka rozwija się, gdy podpłynie do niej kursor (z kroplą) albo po stuknięciu */
+  #pins { position: fixed; inset: 0; z-index: 2; pointer-events: none; }
+  .pin { position: absolute; width: 0; height: 0; pointer-events: auto; }
+  .pin i { position: absolute; left: -7px; top: -7px; width: 14px; height: 14px; border-radius: 50%; background: oklch(0.8 0.125 47); box-shadow: 0 0 0 4px rgba(240,150,100,.25); transform: scale(0); transition: transform .5s cubic-bezier(.34,1.56,.64,1); cursor: pointer; }
+  .pin.on i { transform: scale(1); }
+  .pin i::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; border: 1px solid oklch(0.8 0.125 47); animation: ping 2.4s cubic-bezier(.22,1,.36,1) infinite; }
+  @keyframes ping { from { transform: scale(1); opacity: .8 } to { transform: scale(2.6); opacity: 0 } }
+  .pin p { position: absolute; top: -12px; left: 18px; width: max-content; max-width: 25ch; margin: 0; padding: 10px 14px; border-radius: 12px;
+    background: rgba(10,22,15,.86); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(243,239,230,.14);
+    font: 500 15px/1.35 "Cabinet Grotesk", system-ui, sans-serif; color: #f3efe6; opacity: 0; transform: translateY(6px) scale(.97); transform-origin: 0 0;
+    transition: opacity .35s ease, transform .45s cubic-bezier(.22,1,.36,1); pointer-events: none; }
+  .pin.left p { left: auto; right: 18px; transform-origin: 100% 0; }
+  .pin p b { display: block; font: 600 11px ui-monospace, Menlo, monospace; letter-spacing: .16em; text-transform: uppercase; color: oklch(0.8 0.125 47); margin-bottom: 4px; }
+  .pin.open p { opacity: 1; transform: none; pointer-events: auto; }
   #info { position: fixed; top: 10px; right: 12px; font: 12px ui-monospace, monospace; color: rgba(43,38,32,.62); }
 </style>
 </head>
@@ -58,15 +64,13 @@
   <a href="#work">See the work</a>
 </div>
  <div id="scene">
-  <header>
-    <div class="lead">
-      <p class="tag"><span class="m"><span class="i">01 · Product · Websites for Podhale businesses</span></span></p>
-      <h2 class="wm" aria-label="stronypodhale.pl"><span class="acc">strony</span><span class="str">podhale</span><span class="acc">.pl</span></h2>
-    </div>
-    <p class="desc">A product with public pricing: websites for local businesses, with domain, hosting and care included.</p>
-  </header>
-  <a href="https://stronypodhale.pl" target="_blank" rel="noopener"><span class="m"><span class="i">Visit the site <b>↗</b></span></span></a>
+  <h2 class="wm" aria-label="stronypodhale.pl"><span class="acc">strony</span><span class="str">podhale</span><span class="acc">.pl</span></h2>
+  <div class="row">
+    <p class="say"><span class="m"><span class="i">Websites for Podhale businesses.</span></span><br><span class="m"><span class="i">Public prices, domain, hosting and care included.</span></span></p>
+    <a href="https://stronypodhale.pl" target="_blank" rel="noopener"><span class="m"><span class="i">Visit the site <b>↗</b></span></span></a>
+  </div>
 </div>
+<div id="pins"></div>
 <button id="tilt" type="button" aria-pressed="false"><i></i>TILT</button>
 <div id="info" aria-hidden="true">ruch, szybki ruch, klik, przytrzymanie · scroll: poziomice</div>
 <script type="module">
@@ -584,44 +588,56 @@ let signed = false
 }
 gl.uniform3f(U('uDarkCol'), 21 / 255, 48 / 255, 31 / 255)
 // --- scena stronypodhale. Póki zrzut jest sam, stoi na środku; gdy woda się uspokoi, rusza akt (w czasie, jak
-// reveal na reszcie strony, a przy cofnięciu scrolla odtwarzany wstecz): kadr jedzie na miejsce, odczyty gasną,
-// potem wyjeżdżają spod maski etykieta, litery tytułu, wiersze opisu i link.
+// reveal na reszcie strony, a przy cofnięciu scrolla wstecz): kadr jedzie na miejsce, wielki znak marki wyjeżdża
+// litera po literze, potem zdanie i link, a na końcu w zrzut wbijają się pinezki z notatkami.
 const VIS = VH - INSET
-const scene = document.getElementById('scene')
+const scene = document.getElementById('scene'), wm = scene.querySelector('.wm'), row = scene.querySelector('.row'), link = scene.querySelector('a')
 const pad = Math.max(24, 0.0667 * VW)
-const wm = scene.querySelector('.wm'), descEl = scene.querySelector('.desc')
-const wmHTML = wm.innerHTML, descText = descEl.textContent
-// składa nagłówek na danej szerokości: tytuł (litery w maskach) i opis (wiersze w maskach); zwraca wysokość
-function build(width) {
-  scene.style.width = width + 'px'; scene.style.left = (VW - width) / 2 + 'px'
-  wm.innerHTML = wmHTML; wm.style.fontSize = '64px'
-  const room = VW >= 900 ? width * 0.56 : width
-  wm.style.fontSize = Math.min(Math.max(34, 0.05 * VW), 76, 64 * room / wm.scrollWidth) + 'px'
-  for (const part of wm.children) { const t = part.textContent; part.textContent = ''; for (const c of t) part.insertAdjacentHTML('beforeend', `<span class="m"><span class="i ch">${c}</span></span>`) }
-  descEl.innerHTML = descText.split(' ').map((w) => `<span class="w">${w}</span>`).join(' ')
-  const rows = []; let top = null
-  for (const w of descEl.querySelectorAll('.w')) { if (w.offsetTop !== top) { rows.push([]); top = w.offsetTop } rows.at(-1).push(w.textContent) }
-  descEl.innerHTML = rows.map((r) => `<span class="m" style="display:block"><span class="i">${r.join(' ')}</span></span>`).join('')
-  return scene.querySelector('header').offsetHeight
-}
-const linkH = 40, gapY = PORTRAIT ? 20 : 30, vpad = 2 * Math.min(pad, 40)
-// kadr i nagłówek mają jedną szerokość (jeden blok); gdy brakuje wysokości, cały blok się zwęża
-let cw = Math.min(VW - 2 * pad, 1180), headH = build(cw)
-let fw = Math.min(cw, (VIS - headH - linkH - 2 * gapY - vpad) * 16 / 9)
-if (fw < cw - 1) { cw = fw; headH = build(cw); fw = Math.min(cw, (VIS - headH - linkH - 2 * gapY - vpad) * 16 / 9) }
-const fh = fw * 9 / 16
-const stackTop = (VIS - (headH + gapY + fh + gapY + linkH)) / 2
-const placed = { x: (VW - fw) / 2, y: stackTop + headH + gapY }
+const cw = Math.min(VW - 2 * pad, 1240)
+scene.style.left = (VW - cw) / 2 + 'px'; scene.style.width = cw + 'px'
+// znak na całą szerokość bloku (to marka, która ma zostać w pamięci)
+wm.style.fontSize = '100px'; wm.style.fontSize = Math.min(100 * cw / wm.scrollWidth, 0.3 * VIS) + 'px'
+for (const part of wm.children) { const t = part.textContent; part.textContent = ''; for (const c of t) part.insertAdjacentHTML('beforeend', `<span class="m"><span class="i ch">${c}</span></span>`) }
+if (VW < 700) { row.style.flexDirection = 'column'; row.style.gap = '14px' }
+const wmH = wm.offsetHeight, rowH = row.offsetHeight
+const overlap = wmH * 0.16                 // kadr wsuwa się lekko pod znak: znak leży na wierzchu, jak naklejony na wodę
+const gapY = PORTRAIT ? 18 : 26, vpad = 2 * Math.min(pad, 36)
+const fw = Math.min(cw, (VIS - (wmH - overlap) - gapY - rowH - vpad) * 16 / 9), fh = fw * 9 / 16
+const stackTop = (VIS - (wmH - overlap + fh + gapY + rowH)) / 2
+const placed = { x: (VW - fw) / 2, y: stackTop + wmH - overlap }
 scene.style.top = stackTop + 'px'
-const link = scene.querySelector('a'); link.style.top = (headH + gapY + fh + gapY) + 'px'; if (VW < 900) link.style.marginTop = (fh + 2 * gapY) + 'px'
+row.style.top = (wmH - overlap + fh + gapY) + 'px'
+if (fw < cw) { row.style.left = (cw - fw) / 2 + 'px'; row.style.right = (cw - fw) / 2 + 'px' }
+
+// pinezki: miejsca na zrzucie (ułamki szerokości i wysokości) i notatki o decyzjach w tym projekcie
+const PINS = [
+  [0.125, 0.05, 'The mark', 'A folk rosette from the parzenica, cut down to what still reads at 16 px.'],
+  [0.275, 0.05, 'The name', 'Written as an address, with no spaces, so you can read it out over the phone.'],
+  [0.165, 0.655, 'Prices', 'Public, on the first screen: from 300 zł to start and 50 zł a month.'],
+  [0.21, 0.765, 'Configurator', 'Pick what goes on your site and see the price at once. The design is free.'],
+  [0.66, 0.47, 'A real project', 'zakofy.com, private tours from Zakopane, shown where a mockup would usually go.'],
+]
+const pinsEl = document.getElementById('pins')
+const pins = PINS.map(([u, v, t, txt]) => {
+  const el = document.createElement('div'); el.className = 'pin' + (u > 0.55 ? ' left' : '')
+  el.style.left = placed.x + u * fw + 'px'; el.style.top = placed.y + v * fh + 'px'
+  el.innerHTML = `<i role="button" tabindex="0" aria-label="${t}"></i><p><b>${t}</b>${txt}</p>`
+  pinsEl.append(el)
+  const x = placed.x + u * fw, y = placed.y + v * fh
+  el.querySelector('i').addEventListener('click', () => { pinTap = pinTap === el ? null : el })
+  return { el, x, y }
+})
+let pinTap = null, mouse = null
+addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') mouse = { x: e.clientX, y: e.clientY } })
 
 let actT = 0, actOn = false   // sekundy aktu (0…ACT_LEN), w przód albo wstecz
-const ACT_LEN = 2.1
+const ACT_LEN = 2.8
 const ease3 = (x) => 1 - (1 - x) ** 3
-const masks = [scene.querySelector('.tag .i'), ...wm.querySelectorAll('.ch'), ...scene.querySelectorAll('.desc .i'), link.querySelector('.i')]
-const startAt = masks.map((el, i) => el.classList.contains('ch') ? 0.62 + (i - 1) * 0.032 : el.closest('.tag') ? 0.5 : el.closest('a') ? 1.25 : 0.9 + (i - 1 - wm.querySelectorAll('.ch').length) * 0.08)
+const chars = [...wm.querySelectorAll('.ch')], rest = [...row.querySelectorAll('.i')]
+const masks = [...chars, ...rest]
+const startAt = [...chars.map((_, i) => 0.45 + i * 0.035), ...rest.map((_, i) => 1.15 + i * 0.1)]
 function imgRect(zoom) {
-  const mv = ease3(cl01(actT / 1.0)) * (actT > 0 ? 1 : 0)   // kadr jedzie na miejsce przez pierwszą sekundę aktu
+  const mv = ease3(cl01(actT / 1.0))   // kadr jedzie na miejsce przez pierwszą sekundę aktu
   const cx0 = VW / 2, cy0 = VIS / 2, cx1 = placed.x + fw / 2, cy1 = placed.y + fh / 2
   const cx = cx0 + (cx1 - cx0) * mv, cy = cy0 + (cy1 - cy0) * mv
   const w = fw * zoom, h = w * 9 / 16
@@ -633,7 +649,14 @@ function act(dt, P) {
   actOn = P > 0.86 ? true : P < 0.84 ? false : actOn
   actT = Math.min(Math.max(actT + (actOn ? dt : -dt * 1.4), 0), ACT_LEN)
   scene.style.visibility = actT > 0 ? 'visible' : 'hidden'
-  masks.forEach((el, i) => { const k = ease3(cl01((actT - startAt[i]) / 0.75)); el.style.transform = `translateY(${(1 - k) * 110}%)` })
+  masks.forEach((el, i) => { const k = ease3(cl01((actT - startAt[i]) / 0.8)); el.style.transform = `translateY(${(1 - k) * 135}%)` })
+  // pinezki wbijają się po kolei, gdy wszystko stoi; notatka przy tej, do której podpłynął kursor (albo stukniętej)
+  let near = null, best = 70
+  if (mouse) for (const p of pins) { const d = Math.hypot(p.x - mouse.x, p.y - mouse.y); if (d < best) { best = d; near = p.el } }
+  pins.forEach((p, i) => {
+    p.el.classList.toggle('on', actT > 1.9 + i * 0.12)
+    p.el.classList.toggle('open', actT >= ACT_LEN - 0.05 && (near ? near === p.el : pinTap === p.el))
+  })
 }
 
 const quad = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, quad)
@@ -696,7 +719,7 @@ addEventListener('pointermove', (e) => {
 })
 // --- mysz: jak dotąd (najechanie, ruch, klik, przytrzymanie)
 let selecting = false
-const onText = (e) => !!e.target.closest?.('#sel span, #scene header, #scene a')
+const onText = (e) => !!e.target.closest?.('#sel span, #scene .wm, #scene .say, #scene a, .pin')
 addEventListener('pointerdown', (e) => {
   if (e.pointerType !== 'mouse') return
   if (onText(e)) { selecting = true; return }   // zaznaczanie tekstu ma pierwszeństwo przed rozbijaniem kropli
