@@ -49,10 +49,16 @@ export interface LiquidStageOptions {
  * section scrolls in (owner, 2026-11-17: it left too soon).
  */
 export const TRACK_SCREENS = 5
+/** The scroll transition into the water sheet: where it starts and how long it runs, in screen heights. */
+const TRANSITION_FROM = 0.1,
+  TRANSITION_LEN = 2.4
+/** The transition's progress at which the scene's act starts (it stops below ACT_OFF_P: hysteresis). */
+const ACT_ON_P = 0.86,
+  ACT_OFF_P = 0.84
 /** Where the act has started for sure: anchor for "See the work" (scroll in screen heights). */
-export const WORK_AT = 0.1 + 2.4
-/** Where the act starts (transition P = 0.86), in screen heights: the hold runs from here to the unpin. */
-export const HOLD_FROM = 0.1 + 0.86 * 2.4
+export const WORK_AT = TRANSITION_FROM + TRANSITION_LEN
+/** Where the act starts, in screen heights: the hold runs from here to the unpin. */
+export const HOLD_FROM = TRANSITION_FROM + ACT_ON_P * TRANSITION_LEN
 
 const FG = '#2b2620'
 const ADAPT_THEME_SELECTOR = '[data-adapt-theme]'
@@ -575,6 +581,11 @@ async function run(els: LiquidStageElements, opts: LiquidStageOptions, life: Lif
       life.listen(el, 'mouseleave', () => el.classList.remove('peek'))
     }
     life.listen(btn, 'click', toggle)
+    // on a narrow screen an open note covers the pins under it: a tap on the note closes it
+    if (VW < 700)
+      life.listen(note, 'click', () => {
+        if (el.classList.contains('open')) toggle()
+      })
     return { el, btn }
   })
   life.cleanup(() => {
@@ -608,7 +619,7 @@ async function run(els: LiquidStageElements, opts: LiquidStageOptions, life: Lif
     gl.uniform1f(U('uImgR'), (16 * zoom) / VH)
   }
   function act(dt: number, P: number) {
-    actOn = P > 0.86 ? true : P < 0.84 ? false : actOn
+    actOn = P > ACT_ON_P ? true : P < ACT_OFF_P ? false : actOn
     actT = Math.min(Math.max(actT + (actOn ? dt : -dt * 1.4), 0), ACT_LEN)
     scene.style.visibility = actT > 0 ? 'visible' : 'hidden'
     masks.forEach((el, i) => {
@@ -971,7 +982,7 @@ async function run(els: LiquidStageElements, opts: LiquidStageOptions, life: Lif
   const p2out = (x: number) => 1 - (1 - x) ** 2
   let sentSpread = -1
   function transition(scroll: number) {
-    const P = cl01((scroll - 0.1 * VH) / (2.4 * VH))
+    const P = cl01((scroll - TRANSITION_FROM * VH) / (TRANSITION_LEN * VH))
     tr.spread = ss(0, 0.42, P)
     tr.dark = ss(0.08, 0.42, P)
     tr.imageIn = p2out(cl01((P - 0.4) / 0.28))

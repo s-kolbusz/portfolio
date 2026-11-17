@@ -295,6 +295,8 @@
 .lq-stage .pin .ln {
   position: absolute;
   background: #fbf9f4;
+  /* an ink edge, so the line also reads over the light screenshot */
+  box-shadow: 0 0 0 1px rgba(43, 38, 32, 0.45);
   transform-origin: 0 0;
   transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }

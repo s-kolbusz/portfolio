@@ -38,6 +38,7 @@ const PINS = [
 
 const SITE_URL = 'https://stronypodhale.pl'
 const SCREENSHOT = '/images/projects/stronypodhale.avif'
+const SCREENSHOT_PHONE = '/images/projects/stronypodhale-mobile.avif'
 
 const FONT_FILES = [
   '/fonts/mattone/Mattone-Black.woff2',
@@ -265,7 +266,17 @@ export function Hero() {
               <h2 className="lq-wm" aria-label="stronypodhale.pl">
                 {wordmark(false)}
               </h2>
-              <div className="relative aspect-video w-full overflow-hidden rounded-2xl">
+              {/* on phones the site as seen on a phone, as in the live scene */}
+              <div className="relative mx-auto aspect-[390/844] w-[min(100%,20rem)] overflow-hidden rounded-2xl sm:hidden">
+                <Image
+                  src={SCREENSHOT_PHONE}
+                  alt={tScene('alt')}
+                  fill
+                  sizes="20rem"
+                  className="object-cover"
+                />
+              </div>
+              <div className="relative hidden aspect-video w-full overflow-hidden rounded-2xl sm:block">
                 <Image
                   src={SCREENSHOT}
                   alt={tScene('alt')}
@@ -289,13 +300,17 @@ export function Hero() {
                   {link} <span aria-hidden="true">↗</span>
                 </a>
               </div>
-              <ol className="grid gap-8 pt-8 sm:grid-cols-2 lg:grid-cols-3">
+              {/* the notes are what kolbusz.xyz adds: paper and ink, as on the live scene's pins */}
+              <ol className="grid gap-4 pt-8 sm:grid-cols-2 lg:grid-cols-3">
                 {pins.map((pin, index) => (
-                  <li key={pin.key} className="flex gap-4">
-                    <span className="lq-fact lq-accent opacity-60">{index + 1}</span>
+                  <li
+                    key={pin.key}
+                    className="flex gap-4 rounded-[2px] bg-[#fbf9f4] px-[18px] py-4 text-[#2b2620]"
+                  >
+                    <span className="lq-fact opacity-50">{index + 1}</span>
                     <div>
-                      <p className="lq-fact lq-accent mb-2.5">{pin.title}</p>
-                      <p className="lq-note max-w-[24ch]">{pin.note}</p>
+                      <p className="lq-fact mb-2.5">{pin.title}</p>
+                      <p className="lq-note max-w-[24ch] opacity-80">{pin.note}</p>
                     </div>
                   </li>
                 ))}
