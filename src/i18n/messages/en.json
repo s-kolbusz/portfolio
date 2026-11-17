@@ -39,16 +39,44 @@
     "tagline": "Building high-performance digital products with a focus on visual polish and technical excellence.",
     "cta": "Explore My Work"
   },
+  "liquidHero": {
+    "role": "I design and build websites and web apps.",
+    "lines": {
+      "shelf": "Nothing off the shelf.",
+      "apart": "I take things apart.",
+      "together": "I put them back together myself."
+    },
+    "cta": "See the work",
+    "tilt": "TILT"
+  },
   "signature": {
-    "tagline": "01 · Product · Websites for Podhale businesses",
-    "title": "stronypodhale.pl",
-    "description": "A product with public pricing: websites for local businesses, with domain, hosting and care included.",
+    "lines": {
+      "first": "Websites for Podhale businesses.",
+      "second": "The design and the price before you pay."
+    },
     "link": "Visit the site",
     "alt": "stronypodhale.pl home page showing the piczura.com project preview",
-    "readouts": {
-      "viscosity": "viscosity",
-      "colour": "color",
-      "clarity": "clarity"
+    "pins": {
+      "rosette": {
+        "title": "16 px",
+        "note": "The parzenica rosette still reads at this size. The name is an address you can say over the phone."
+      },
+      "price": {
+        "title": "369 zł",
+        "note": "to start, then 85 zł a month, or 1835 zł to own it outright. Every price is on the site."
+      },
+      "upfront": {
+        "title": "z góry",
+        "note": "Upfront, and from the mountains: you see the design and the price before you pay."
+      },
+      "piczura": {
+        "title": "piczura.com",
+        "note": "A model's portfolio built with no template, every animation on it written from scratch."
+      },
+      "free": {
+        "title": "0 zł",
+        "note": "if the design is not for you. You pay only once you approve it."
+      }
     }
   },
   "about": {

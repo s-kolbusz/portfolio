@@ -39,16 +39,44 @@
     "tagline": "Buduję wysokowydajne produkty cyfrowe z naciskiem na dopracowanie wizualne i doskonałość techniczną.",
     "cta": "Zobacz moje projekty"
   },
+  "liquidHero": {
+    "role": "I design and build websites and web apps.",
+    "lines": {
+      "shelf": "Nothing off the shelf.",
+      "apart": "I take things apart.",
+      "together": "I put them back together myself."
+    },
+    "cta": "Zobacz moje projekty",
+    "tilt": "TILT"
+  },
   "signature": {
-    "tagline": "01 · Produkt · Strony dla firm z Podhala",
-    "title": "stronypodhale.pl",
-    "description": "Produkt z jawnym cennikiem: strony dla lokalnych firm z domeną, hostingiem i opieką w cenie.",
+    "lines": {
+      "first": "Strony dla firm z Podhala.",
+      "second": "The design and the price before you pay."
+    },
     "link": "Zobacz stronę",
     "alt": "Strona główna stronypodhale.pl z podglądem realizacji piczura.com",
-    "readouts": {
-      "viscosity": "lepkość",
-      "colour": "kolor",
-      "clarity": "przejrzystość"
+    "pins": {
+      "rosette": {
+        "title": "16 px",
+        "note": "The parzenica rosette still reads at this size. The name is an address you can say over the phone."
+      },
+      "price": {
+        "title": "369 zł",
+        "note": "to start, then 85 zł a month, or 1835 zł to own it outright. Every price is on the site."
+      },
+      "upfront": {
+        "title": "z góry",
+        "note": "Upfront, and from the mountains: you see the design and the price before you pay."
+      },
+      "piczura": {
+        "title": "piczura.com",
+        "note": "A model's portfolio built with no template, every animation on it written from scratch."
+      },
+      "free": {
+        "title": "0 zł",
+        "note": "if the design is not for you. You pay only once you approve it."
+      }
     }
   },
   "about": {

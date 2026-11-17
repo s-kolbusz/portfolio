@@ -1,291 +1,286 @@
 'use client'
 
-import { useMemo, useRef, useEffect, useState, lazy, Suspense } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { preload } from 'react-dom'
 
 import { useTranslations } from 'next-intl'
+import Image from 'next/image'
 
-import { ArrowDownIcon } from '@phosphor-icons/react'
-
-import { smoothstep } from '@/components/canvas/viscous-puddle/choreography'
 import {
-  HERO_CHAR_SELECTOR,
-  HERO_STAGE_SELECTOR,
-  SIGNATURE_STATIC_ATTR,
-  SIGNATURE_TRACK_SELECTOR,
-  subscribeSignature,
-} from '@/components/canvas/viscous-puddle/signature-bus'
-import { Button } from '@/components/ui/button'
-import { useHeroAnimation } from '@/hooks/use-hero-animation'
+  startLiquidStage,
+  supportsLiquid,
+  TRACK_SCREENS,
+  WORK_AT,
+} from '@/components/canvas/liquid-hero/liquid-stage'
 import { usePrefersReducedMotion } from '@/hooks/use-media'
-import { useScrollStore } from '@/lib/stores'
 
-const HeroScene = lazy(() =>
-  import('@/components/canvas/hero-scene').then((mod) => ({ default: mod.HeroScene }))
-)
+import '@/components/canvas/liquid-hero/liquid-hero.css'
 
-/** Layout offset of an element within an ancestor (ignores transforms). */
-function offsetWithin(element: HTMLElement, ancestor: HTMLElement) {
-  let left = 0
-  let top = 0
-  let current: HTMLElement | null = element
-  while (current && current !== ancestor) {
-    left += current.offsetLeft
-    top += current.offsetTop
-    current = current.offsetParent as HTMLElement | null
-  }
-  return { left, top }
-}
+/** The stronypodhale.pl logo: "strony" and ".pl" in the accent, "podhale" heavier in the text colour. */
+const WORDMARK = [
+  ['acc', 'strony'],
+  ['str', 'podhale'],
+  ['acc', '.pl'],
+] as const
 
+/** Pins on the screenshot: where (fractions of its width and height) and which way the note opens. */
+const PINS = [
+  { key: 'rosette', u: 0.13, v: 0.05, d: 'b' },
+  { key: 'price', u: 0.372, v: 0.05, d: 'r' },
+  { key: 'upfront', u: 0.39, v: 0.43, d: 'r' },
+  { key: 'piczura', u: 0.66, v: 0.4, d: 'r' },
+  { key: 'free', u: 0.215, v: 0.745, d: 'b' },
+] as const
+
+const SITE_URL = 'https://stronypodhale.pl'
+const SCREENSHOT = '/images/projects/stronypodhale.avif'
+
+const FONT_FILES = [
+  '/fonts/mattone/Mattone-Black.woff2',
+  '/fonts/mattone/Mattone-Bold.woff2',
+  '/fonts/mattone/Mattone-Regular.woff2',
+  '/fonts/cabinet/cabinet-grotesk-variable.woff2',
+]
+
+const noop = () => () => {}
+let liquidSupport: boolean | null = null
+const canRunLiquid = () => (liquidSupport ??= supportsLiquid())
+
+/**
+ * The home hero and the first scene after it, as accepted on the test page
+ * (cook/ciecz-czastki): a loader, the liquid hero, a scroll transition where
+ * the liquid spreads into a dark water sheet and the stronypodhale.pl
+ * screenshot surfaces, and a timed act (wordmark, copy, link, pinned notes).
+ *
+ * Until the client knows what it can run, both versions are in the page and
+ * CSS picks one (reduced motion: static). With reduced motion, without
+ * WebGL2 or if setup fails, the static version is a plain readable section.
+ */
 export function Hero() {
-  const t = useTranslations('hero')
-  const containerRef = useRef<HTMLElement>(null)
-  const headerRef = useRef<HTMLDivElement>(null)
-  const ctaRef = useRef<HTMLDivElement>(null)
-  const ctaIconRef = useRef<SVGSVGElement>(null)
-  const caretRef = useRef<HTMLSpanElement>(null)
-  const contentRef = useRef<HTMLDivElement>(null)
-  const prefersReducedMotion = usePrefersReducedMotion()
+  const t = useTranslations('liquidHero')
+  const tHero = useTranslations('hero')
+  const tScene = useTranslations('signature')
+  const hydrated = useSyncExternalStore(
+    noop,
+    () => true,
+    () => false
+  )
+  const reducedMotion = usePrefersReducedMotion()
+  const webgl = useSyncExternalStore(noop, canRunLiquid, () => true)
+  const [failed, setFailed] = useState(false)
+  const [generation, setGeneration] = useState(0)
+  const mode = !hydrated ? 'pending' : reducedMotion || !webgl || failed ? 'static' : 'live'
 
-  // Delay the loading of the heavy 3D scene to free up main thread during hydration
-  const [showScene, setShowScene] = useState(false)
+  for (const href of FONT_FILES) preload(href, { as: 'font', type: 'font/woff2', crossOrigin: '' })
+
+  const name = tHero('name')
+  const space = name.indexOf(' ')
+  const first = space > 0 ? name.slice(0, space) : name
+  const last = space > 0 ? name.slice(space + 1) : ''
+  const role = t('role')
+  const lines = [t('lines.shelf'), t('lines.apart'), t('lines.together')] as const
+  const cta = t('cta')
+  const sceneLines = [tScene('lines.first'), tScene('lines.second')] as const
+  const link = tScene('link')
+  const pins = PINS.map((pin) => ({
+    ...pin,
+    title: tScene(`pins.${pin.key}.title`),
+    note: tScene(`pins.${pin.key}.note`),
+  }))
+
+  const trackRef = useRef<HTMLDivElement>(null)
+  const stageRef = useRef<HTMLDivElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const loaderRef = useRef<HTMLCanvasElement>(null)
+  const selRef = useRef<HTMLDivElement>(null)
+  const sceneRef = useRef<HTMLDivElement>(null)
+  const pinsRef = useRef<HTMLDivElement>(null)
+  const tiltRef = useRef<HTMLButtonElement>(null)
+
+  const [line0, line1, line2] = lines
   useEffect(() => {
-    if (prefersReducedMotion) return
-    const timer = setTimeout(() => {
-      setShowScene(true)
-    }, 900)
-    return () => clearTimeout(timer)
-  }, [prefersReducedMotion])
-
-  useHeroAnimation({
-    containerRef,
-    caretRef,
-    ctaRef,
-    ctaIconRef,
-    prefersReducedMotion,
-  })
-
-  // The hero scroll (docs/design/2026-09-25-scroll-hero-scenariusz.md): the
-  // blob canvas reports each frame and the DOM side is written here. The
-  // name stays real text throughout, as crisp as the rest of the page at any
-  // zoom: each letter turns from ink to the blob's green, the cursor ball
-  // pulls the green towards it, and the camera's fly-in is a CSS transform.
-  useEffect(() => {
-    const name = headerRef.current
-    const content = contentRef.current
-    const caret = caretRef.current
-    const stage = name?.closest<HTMLElement>(HERO_STAGE_SELECTOR)
-    if (!name || !content || !caret || !stage) return
-    const chars = Array.from(name.querySelectorAll<HTMLElement>(HERO_CHAR_SELECTOR))
-
-    // Layout positions (stage px) are unaffected by transforms, so they can
-    // be read at any time; refreshed when the layout changes.
-    let nameRest = { left: 0, top: 0 }
-    let charRest: Array<{ left: number; top: number; width: number; height: number }> = []
-    const measure = () => {
-      nameRest = offsetWithin(name, stage)
-      charRest = chars.map((char) => ({
-        ...offsetWithin(char, stage),
-        width: char.offsetWidth,
-        height: char.offsetHeight,
-      }))
-    }
-    measure()
-    const resizeObserver = new ResizeObserver(measure)
-    resizeObserver.observe(stage)
-
-    const clearLetters = () => {
-      for (const char of chars) {
-        char.style.color = ''
-        char.style.backgroundImage = ''
-        char.style.backgroundClip = ''
-        char.style.webkitBackgroundClip = ''
+    if (mode !== 'live') return
+    const track = trackRef.current
+    const stage = stageRef.current
+    const canvas = canvasRef.current
+    const loaderCanvas = loaderRef.current
+    const sel = selRef.current
+    const scene = sceneRef.current
+    const pinsEl = pinsRef.current
+    const tilt = tiltRef.current
+    if (!track || !stage || !canvas || !loaderCanvas || !sel || !scene || !pinsEl || !tilt) return
+    return startLiquidStage(
+      { track, stage, canvas, loaderCanvas, sel, scene, pins: pinsEl, tilt },
+      {
+        copy: { first, last, role, lines: [line0, line1, line2], cta },
+        onFail: () => setFailed(true),
+        onRemount: () => setGeneration((g) => g + 1),
       }
-    }
-    const reset = () => {
-      name.style.opacity = ''
-      name.style.transform = ''
-      name.style.transformOrigin = ''
-      content.style.opacity = ''
-      caret.style.visibility = ''
-      clearLetters()
-    }
+    )
+  }, [mode, generation, first, last, role, line0, line1, line2, cta])
 
-    const unsubscribe = subscribeSignature((frame) => {
-      if (!frame) {
-        reset()
-        return
-      }
-      const { hero, name: soaking } = frame.step
-      // Past the hero the stroke that filled the frame is the water sheet.
-      name.style.opacity = hero ? '' : '0'
-      content.style.opacity = hero ? hero.contentOpacity.toFixed(3) : '0'
-      caret.style.visibility = hero && hero.progress < 0.04 ? '' : 'hidden'
-      if (!hero || !soaking) return
-
-      const { originX, originY, shiftX, shiftY, zoom, soak, letters } = soaking
-      name.style.transformOrigin = `${(originX - nameRest.left).toFixed(2)}px ${(originY - nameRest.top).toFixed(2)}px`
-      name.style.transform =
-        zoom === 1 && shiftX === 0 && shiftY === 0
-          ? ''
-          : `translate(${shiftX.toFixed(2)}px, ${shiftY.toFixed(2)}px) scale(${zoom.toFixed(5)})`
-
-      const started = smoothstep(0, 0.06, Math.min(soak, 1))
-      if (started === 0) {
-        clearLetters()
-        return
-      }
-
-      // The ball in stage px, and in the name's own (unzoomed) space.
-      const stageTop = stage.getBoundingClientRect().top
-      const ballX = frame.ball.x
-      const ballY = frame.ball.y - stageTop
-      const localX = originX + (ballX - shiftX - originX) / zoom
-      const localY = originY + (ballY - shiftY - originY) / zoom
-      const reach = frame.ball.radius * 2.2
-      const [r, g, b] = frame.startColour
-      const green = `rgb(${r * 255} ${g * 255} ${b * 255})`
-      const glow = (a: number) =>
-        `rgb(${Math.min(255, r * 293 + 8)} ${Math.min(255, g * 293 + 8)} ${Math.min(255, b * 293 + 8)} / ${a.toFixed(3)})`
-
-      chars.forEach((char, index) => {
-        const rest = charRest[index]
-        if (!rest) return
-        // The ball is a second source of water: letters near it drink ahead
-        // of the scroll…
-        const centreX = originX + shiftX + (rest.left + rest.width / 2 - originX) * zoom
-        const centreY = originY + shiftY + (rest.top + rest.height / 2 - originY) * zoom
-        const near = smoothstep(
-          reach,
-          frame.ball.radius * 0.2,
-          Math.hypot(ballX - centreX, ballY - centreY)
-        )
-        const wet = Math.min(1, (letters[index] ?? 0) + near * 0.45 * started)
-        const colour = `color-mix(in srgb, ${green} ${(wet * 100).toFixed(1)}%, var(--foreground))`
-        // …and the green in them gathers towards it, denser and brighter.
-        const radius = (reach / zoom).toFixed(1)
-        const x = (localX - rest.left).toFixed(1)
-        const y = (localY - rest.top).toFixed(1)
-        char.style.backgroundImage = `radial-gradient(circle ${radius}px at ${x}px ${y}px, ${glow(0.55 * started * wet)}, transparent), linear-gradient(${colour}, ${colour})`
-        char.style.backgroundClip = 'text'
-        char.style.webkitBackgroundClip = 'text'
-        char.style.color = 'transparent'
-      })
-    })
-
-    return () => {
-      unsubscribe()
-      resizeObserver.disconnect()
-      reset()
-    }
-  }, [])
-
-  const name = t('name')
-  const splitName = useMemo(() => {
-    return name.split(' ').map((word, wordIndex) => (
-      <span key={wordIndex} className="inline-block whitespace-nowrap">
-        {word.split('').map((char, charIndex) => (
-          // opacity: 0.01 (not 0) is intentional — Lighthouse treats opacity: 0 as
-          // invisible and excludes it from LCP. At 0.01 the element is technically
-          // visible to LCP measurement but imperceptible to users until GSAP animates it.
-          <span key={charIndex} className="char inline-block" style={{ opacity: 0.01 }}>
-            {/* Inner span: typing animates the outer one; the soak colours this one. */}
-            <span data-hero-char className="inline-block">
-              {char}
-            </span>
-          </span>
-        ))}
-        {wordIndex < name.split(' ').length - 1 && (
-          <span className="char inline-block whitespace-pre" style={{ opacity: 0.01 }}>
-            {' '}
-          </span>
-        )}
+  const wordmark = (letters: boolean) =>
+    WORDMARK.map(([cls, text]) => (
+      <span key={text} className={cls}>
+        {letters
+          ? Array.from(text).map((char, index) => (
+              <span key={index} className="m">
+                <span className="i ch">{char}</span>
+              </span>
+            ))
+          : text}
       </span>
     ))
-  }, [name])
-
-  const handleCtaClick = () => {
-    // Land where the signature scene has finished forming, so the whole
-    // sequence (hero and transformation) plays on the way like a film.
-    // Without the pin, just go to the scene.
-    const pinned =
-      !prefersReducedMotion &&
-      !document.querySelector(`${SIGNATURE_TRACK_SELECTOR}[${SIGNATURE_STATIC_ATTR}]`)
-    const target = pinned ? '#work-formed' : '#work'
-    const lenis = useScrollStore.getState().lenis
-    if (lenis) {
-      lenis.scrollTo(target, { duration: pinned ? 5 : 1.2 })
-    } else {
-      document.querySelector(target)?.scrollIntoView({ behavior: 'smooth' })
-    }
-  }
 
   return (
-    <section
-      id="hero"
-      ref={containerRef}
-      data-hero-track
-      data-scroll-heavy
-      className="text-foreground relative h-[330svh] w-full data-hero-static:h-auto motion-reduce:h-auto"
-    >
+    <section id="hero" className="lq w-full" data-mode={mode}>
       <noscript>
-        <style>{`
-          .char, .hero-cta { opacity: 1 !important; }
-        `}</style>
+        <style>{`.lq-track { display: none !important; } .lq-static { display: block !important; }`}</style>
       </noscript>
-      {/* Blob: fixed canvas behind the page, carried into the first scene on scroll */}
-      {showScene && (
-        <Suspense fallback={null}>
-          <HeroScene />
-        </Suspense>
-      )}
-      {/* Pinned for two screens while the hero plays, plus a short hold so the
-          smoothed story can hand over (static without motion or WebGL). */}
-      <div
-        data-hero-stage
-        className="sticky top-0 flex h-svh w-full flex-col items-center justify-center overflow-hidden px-6 pt-20 in-data-hero-static:static in-data-hero-static:h-auto in-data-hero-static:min-h-screen motion-reduce:static motion-reduce:h-auto motion-reduce:min-h-screen"
-      >
-        <div className="relative flex max-w-6xl flex-col items-center gap-8 text-center">
-          <div ref={headerRef} data-hero-name className="relative inline-block">
-            {' '}
-            {/* Name with Typewriter */}
-            <h1
-              className="font-serif text-6xl leading-[0.9] font-semibold tracking-tight text-balance md:text-8xl lg:text-9xl"
-              aria-label={name}
-            >
-              <span aria-hidden="true">{splitName}</span>
-            </h1>
-            {/* Caret */}
-            <span
-              ref={caretRef}
-              className="bg-foreground absolute top-0 left-0 h-14 w-0.5 md:h-20 md:w-0.75 lg:h-32 lg:w-1"
-              style={{ translate: '0 0.15em' }}
-            />
-          </div>
 
-          <div ref={contentRef} className="flex flex-col items-center gap-8">
-            {/* Role & Tagline */}
-            <div className="flex max-w-3xl flex-col gap-4">
-              <h2 className="font-mono text-xl font-medium md:text-3xl">{t('role')}</h2>
-              <p className="text-muted-foreground font-serif text-xl italic md:text-3xl">
-                {t('tagline')}
-              </p>
+      {mode !== 'static' && (
+        <div
+          key={generation}
+          ref={trackRef}
+          className="lq-track"
+          style={{ height: `${TRACK_SCREENS * 100}lvh` }}
+        >
+          {/* "See the work" lands where the act has started */}
+          <div
+            id={mode === 'live' ? 'work' : undefined}
+            aria-hidden="true"
+            className="pointer-events-none absolute left-0 h-px w-px"
+            style={{ top: `${(WORK_AT / TRACK_SCREENS) * 100}%` }}
+          />
+          <div ref={stageRef} className="lq-stage">
+            <canvas ref={canvasRef} aria-hidden="true" />
+            <canvas ref={loaderRef} className="ld" aria-hidden="true" />
+            <div ref={selRef} className="sel" aria-hidden="true" />
+            <div className="sr-only">
+              <h1>{name}</h1>
+              <p>{role}</p>
+              <p>{lines.join(' ')}</p>
+              <a href="#work">{cta}</a>
             </div>
+            <div ref={sceneRef} className="scene">
+              <h2 className="wm" aria-label="stronypodhale.pl">
+                {wordmark(true)}
+              </h2>
+              <div className="row">
+                <p className="say">
+                  <span className="m">
+                    <span className="i">{sceneLines[0]}</span>
+                  </span>
+                  <br />
+                  <span className="m">
+                    <span className="i">{sceneLines[1]}</span>
+                  </span>
+                </p>
+                <a href={SITE_URL} target="_blank" rel="noopener">
+                  <span className="m">
+                    <span className="i">
+                      {link} <b aria-hidden="true">↗</b>
+                    </span>
+                  </span>
+                </a>
+              </div>
+            </div>
+            <div ref={pinsRef} className="pins">
+              {pins.map((pin, index) => (
+                <div key={pin.key} className="pin" data-d={pin.d} data-u={pin.u} data-v={pin.v}>
+                  <button
+                    type="button"
+                    aria-expanded="false"
+                    aria-label={`${pin.title}: ${pin.note}`}
+                  >
+                    {index + 1}
+                  </button>
+                  <span className="ln" />
+                  <p>
+                    <strong>{pin.title}</strong>
+                    <span>{pin.note}</span>
+                  </p>
+                </div>
+              ))}
+            </div>
+            <button ref={tiltRef} type="button" className="tilt" aria-pressed="false">
+              <i />
+              {t('tilt')}
+            </button>
+          </div>
+        </div>
+      )}
 
-            {/* CTA */}
-            <div ref={ctaRef} className="hero-cta opacity-0">
-              <Button
-                onClick={handleCtaClick}
-                size="lg"
-                variant="ghost"
-                className="group flex flex-col gap-2 hover:bg-transparent"
+      {mode !== 'live' && (
+        <div className="lq-static">
+          <div className="flex min-h-svh flex-col justify-between gap-16 bg-[#fbf9f4] px-[6.67vw] pt-[6vh] pb-[7vh] text-[#2b2620]">
+            <h1 className="lq-name">
+              <span className="block">{first}</span> <span className="block">{last}</span>
+            </h1>
+            <div className="flex max-w-[34rem] flex-col gap-4">
+              <p className="lq-role opacity-70">{role}</p>
+              <p className="lq-lines">
+                {lines[0]}
+                <br />
+                {lines[1]}
+                <br />
+                {lines[2]}
+              </p>
+              <a
+                href="#work"
+                className="mt-4 font-mono text-xs tracking-[0.3em] uppercase underline-offset-4 hover:underline"
               >
-                <span className="font-mono text-xs tracking-widest uppercase">{t('cta')}</span>
-                <ArrowDownIcon ref={ctaIconRef} className="text-accent-foreground mx-auto size-5" />
-              </Button>
+                {cta} ↓
+              </a>
+            </div>
+          </div>
+          <div
+            id={mode === 'static' ? 'work' : undefined}
+            className="bg-[#15301f] px-[6.67vw] py-24 text-[#f3efe6]"
+          >
+            <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-8">
+              <h2 className="lq-wm" aria-label="stronypodhale.pl">
+                {wordmark(false)}
+              </h2>
+              <div className="relative aspect-video w-full overflow-hidden rounded-2xl">
+                <Image
+                  src={SCREENSHOT}
+                  alt={tScene('alt')}
+                  fill
+                  sizes="(min-width: 1400px) 1240px, 88vw"
+                  className="object-cover"
+                />
+              </div>
+              <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
+                <p className="lq-say">
+                  {sceneLines[0]}
+                  <br />
+                  {sceneLines[1]}
+                </p>
+                <a
+                  href={SITE_URL}
+                  target="_blank"
+                  rel="noopener"
+                  className="lq-say lq-accent font-bold whitespace-nowrap"
+                >
+                  {link} <span aria-hidden="true">↗</span>
+                </a>
+              </div>
+              <ol className="grid gap-8 pt-8 sm:grid-cols-2 lg:grid-cols-3">
+                {pins.map((pin, index) => (
+                  <li key={pin.key} className="flex gap-4">
+                    <span className="lq-fact lq-accent opacity-60">{index + 1}</span>
+                    <div>
+                      <p className="lq-fact lq-accent mb-2.5">{pin.title}</p>
+                      <p className="lq-note max-w-[24ch]">{pin.note}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </section>
   )
 }

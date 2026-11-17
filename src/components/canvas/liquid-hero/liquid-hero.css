@@ -1,0 +1,432 @@
+/* The liquid hero and the stronypodhale.pl scene. Ported from cook/ciecz-czastki/index.html:
+   the same values; fixed layers became absolute layers of the sticky stage. */
+
+@font-face {
+  font-family: 'Mattone';
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/mattone/Mattone-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Mattone';
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/mattone/Mattone-Bold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Mattone';
+  font-weight: 900;
+  font-display: swap;
+  src: url('/fonts/mattone/Mattone-Black.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Cabinet Grotesk';
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/cabinet/cabinet-grotesk-variable.woff2') format('woff2');
+}
+
+.lq-track {
+  position: relative;
+  width: 100%;
+  height: 400lvh;
+}
+.lq-stage {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100lvh;
+  overflow: hidden;
+  isolation: isolate;
+  background: #fbf9f4;
+  color: #2b2620;
+}
+.lq-stage canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+/* the loading board from the very first moment */
+.lq-stage .ld {
+  z-index: 1;
+  pointer-events: none;
+  background: #2b2620;
+}
+/* tilt: touch only, turned on with a button (iOS asks for consent anyway, and on its own it was unreadable) */
+.lq-stage .tilt {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  right: 16px;
+  z-index: 2;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid rgba(43, 38, 32, 0.35);
+  border-radius: 999px;
+  background: rgba(251, 249, 244, 0.7);
+  font:
+    11px ui-monospace,
+    monospace;
+  letter-spacing: 0.2em;
+  color: #2b2620;
+  -webkit-tap-highlight-color: transparent;
+}
+.lq-stage .tilt i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+}
+.lq-stage .tilt[aria-pressed='true'] i {
+  background: #0f9d63;
+  border-color: #0f9d63;
+}
+.lq-stage .sel {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.lq-stage .sel span {
+  position: absolute;
+  white-space: pre;
+  color: transparent;
+  pointer-events: auto;
+  cursor: text;
+}
+.lq-stage .sel span::selection {
+  background: rgba(15, 157, 99, 0.28);
+  color: transparent;
+}
+.lq-stage .scene {
+  position: absolute;
+  z-index: 1;
+  color: #f3efe6;
+  visibility: hidden;
+  pointer-events: none;
+}
+.lq-stage .scene ::selection,
+.lq-stage .pins ::selection {
+  background: rgba(240, 150, 100, 0.35);
+}
+.lq-stage .scene p,
+.lq-stage .scene h2 {
+  margin: 0;
+}
+/* mask: the line slides out from under the edge */
+.lq-stage .scene .m {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+.lq-stage .scene .i {
+  display: inline-block;
+  will-change: transform;
+}
+/* the mark = the stronypodhale.pl logo: Cabinet Grotesk, "strony" and ".pl" in the accent (500),
+   "podhale" in the text colour (800); across the whole block */
+.lq-stage .scene .wm {
+  position: absolute;
+  left: 0;
+  font:
+    500 64px/0.86 'Cabinet Grotesk',
+    system-ui,
+    sans-serif;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+  pointer-events: auto;
+}
+.lq-stage .scene .wm .acc {
+  color: oklch(0.8 0.125 47);
+  font-weight: 500;
+}
+.lq-stage .scene .wm .str {
+  font-weight: 800;
+}
+.lq-stage .scene .row {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+}
+.lq-stage .scene .say {
+  font:
+    500 clamp(16px, 1.4vw, 21px) / 1.35 'Cabinet Grotesk',
+    system-ui,
+    sans-serif;
+  color: #f3efe6;
+  pointer-events: auto;
+}
+.lq-stage .scene a {
+  font:
+    700 clamp(15px, 1.2vw, 18px) / 1.35 'Cabinet Grotesk',
+    system-ui,
+    sans-serif;
+  color: oklch(0.8 0.125 47);
+  text-decoration: none;
+  white-space: nowrap;
+  pointer-events: auto;
+}
+.lq-stage .scene a b {
+  display: inline-block;
+  font-weight: 400;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.lq-stage .scene a:hover b {
+  transform: translate(3px, -3px);
+}
+/* pins on the screenshot: numbered, in the brand's accent. A click pins the note for good (a second
+   click unpins it), hovering previews it. The note speaks our language: a thin line from the pin, the
+   fact large and heavy, the hero's typeface, on a piece of the same water. */
+.lq-stage .pins {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.lq-stage .pin {
+  position: absolute;
+  width: 0;
+  height: 0;
+  z-index: 1;
+}
+.lq-stage .pin.open {
+  z-index: 3;
+}
+.lq-stage .pin button {
+  position: absolute;
+  left: -15px;
+  top: -15px;
+  width: 30px;
+  height: 30px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: oklch(0.8 0.125 47);
+  color: var(--scene, #15301f);
+  font:
+    900 14px/1 'Mattone',
+    system-ui,
+    sans-serif;
+  font-style: normal;
+  box-shadow:
+    0 0 0 3px var(--scene, #15301f),
+    0 0 0 4.5px rgba(251, 249, 244, 0.85),
+    0 8px 22px rgba(0, 0, 0, 0.45);
+  transform: scale(0);
+  cursor: pointer;
+  pointer-events: auto;
+  transition:
+    transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background 0.25s ease;
+}
+.lq-stage .pin.on button {
+  transform: scale(1);
+}
+.lq-stage .pin.on button:hover {
+  transform: scale(1.18);
+}
+.lq-stage .pin.open button {
+  background: #f3efe6;
+}
+.lq-stage .pin button::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1.5px solid oklch(0.8 0.125 47);
+  animation: lq-ping 2.6s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  pointer-events: none;
+}
+.lq-stage .pin.open button::after {
+  animation: none;
+  opacity: 0;
+}
+@keyframes lq-ping {
+  from {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+.lq-stage .pin .ln {
+  position: absolute;
+  background: oklch(0.8 0.125 47);
+  transform-origin: 0 0;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.lq-stage .pin p {
+  position: absolute;
+  margin: 0;
+  width: max-content;
+  padding: 14px 16px 15px;
+  background: var(--scene, #15301f);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5);
+  border-radius: 3px;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.3s ease 0.1s,
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.06s;
+}
+/* the fact: large, heavy, in the accent, it is what should stay in the head; the line under it light and calm */
+.lq-stage .pin p strong {
+  display: block;
+  font:
+    900 clamp(26px, 2.3vw, 36px) / 0.95 'Mattone',
+    system-ui,
+    sans-serif;
+  letter-spacing: -0.02em;
+  color: oklch(0.8 0.125 47);
+  margin: 0 0 10px;
+  white-space: nowrap;
+}
+/* the note's width = the larger of the fact and the line */
+.lq-stage .pin p span {
+  display: block;
+  max-width: 24ch;
+  font:
+    400 15px/1.45 'Mattone',
+    system-ui,
+    sans-serif;
+  color: #fbf9f4;
+}
+.lq-stage .pin.open p,
+.lq-stage .pin.peek p {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.lq-stage .pin.open .ln,
+.lq-stage .pin.peek .ln {
+  transform: none;
+}
+.lq-stage .pin.peek {
+  z-index: 4;
+}
+/* directions: l (left), r (right), b (down) */
+.lq-stage .pin[data-d='r'] .ln {
+  left: 15px;
+  top: 0;
+  width: 34px;
+  height: 1px;
+  transform: scaleX(0);
+}
+.lq-stage .pin[data-d='r'] p {
+  left: 49px;
+  top: -24px;
+  transform: translateX(-8px);
+}
+.lq-stage .pin[data-d='l'] .ln {
+  right: 15px;
+  top: 0;
+  width: 34px;
+  height: 1px;
+  transform: scaleX(0);
+  transform-origin: 100% 0;
+}
+.lq-stage .pin[data-d='l'] p {
+  right: 49px;
+  top: -24px;
+  text-align: right;
+  transform: translateX(8px);
+}
+.lq-stage .pin[data-d='b'] .ln {
+  left: 0;
+  top: 15px;
+  width: 1px;
+  height: 28px;
+  transform: scaleY(0);
+}
+.lq-stage .pin[data-d='b'] p {
+  left: -15px;
+  top: 43px;
+  transform: translateY(-8px);
+}
+.lq-stage .pin.open .ln {
+  transform: none;
+}
+
+/* Which version shows before the client has decided: the static page for reduced motion
+   (and without JavaScript, see the noscript style in the component), the stage otherwise. */
+.lq[data-mode='pending'] .lq-static {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lq[data-mode='pending'] .lq-static {
+    display: block;
+  }
+  .lq[data-mode='pending'] .lq-track {
+    display: none;
+  }
+}
+
+/* The static version (reduced motion, no WebGL2): the same words, readable, nothing moves. */
+.lq-static .lq-name {
+  font:
+    900 clamp(56px, 11.4vw, 200px) / 0.9 'Mattone',
+    system-ui,
+    sans-serif;
+  letter-spacing: -0.02em;
+}
+.lq-static .lq-role {
+  font:
+    400 clamp(13px, 1.55vh, 20px) / 1.4 'Mattone',
+    system-ui,
+    sans-serif;
+}
+.lq-static .lq-lines {
+  font:
+    700 clamp(15px, 1.37vw, 22px) / 1.3 'Mattone',
+    system-ui,
+    sans-serif;
+}
+.lq-static .lq-wm {
+  font:
+    500 clamp(44px, 12vw, 180px) / 0.86 'Cabinet Grotesk',
+    system-ui,
+    sans-serif;
+  letter-spacing: -0.035em;
+  overflow-wrap: anywhere;
+}
+.lq-static .lq-wm .acc,
+.lq-static .lq-accent {
+  color: oklch(0.8 0.125 47);
+}
+.lq-static .lq-wm .str {
+  font-weight: 800;
+}
+.lq-static .lq-say {
+  font:
+    500 clamp(16px, 1.4vw, 21px) / 1.35 'Cabinet Grotesk',
+    system-ui,
+    sans-serif;
+}
+.lq-static .lq-fact {
+  font:
+    900 clamp(26px, 2.3vw, 36px) / 0.95 'Mattone',
+    system-ui,
+    sans-serif;
+  letter-spacing: -0.02em;
+}
+.lq-static .lq-note {
+  font:
+    400 15px/1.45 'Mattone',
+    system-ui,
+    sans-serif;
+}
