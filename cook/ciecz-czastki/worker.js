@@ -12,7 +12,7 @@ onmessage = ({ data }) => {
     light = data.light
     if (light) { sim.P.light = true; sim.P.drag = 0.988 }   // lekki tryb: bez osobnej lepkości i XSPH, w zamian mocniejsze tłumienie
     Object.assign(sim.cur, data.cur || {})
-    postMessage({ ready: true, N: sim.N })
+    postMessage({ ready: true, N: sim.N, rebelN: sim.rebelN })
     tPrev = performance.now()
     tick()
     return

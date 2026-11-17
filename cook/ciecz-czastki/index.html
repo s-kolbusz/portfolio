@@ -145,6 +145,12 @@ uniform float uBoardT;  // plansza ładowania: <0 pełna, potem sekundy chudnię
 uniform vec2 uHRange;   // wysokości terenu w kadrze (najniższa, najwyższa): plansza schodzi od dolin w górę
 uniform vec2 uDomeSize;
 uniform float uBlockRight;
+// przejście do stronypodhale: ciecz rozlewa się w taflę, ciemnieje do koloru strony, spod tafli wyłania się zrzut
+uniform float uSpread, uDark, uImageIn, uClarity;
+uniform vec3 uDarkCol;
+uniform vec4 uImgRect;   // x, y (dół), szerokość, wysokość w jednostkach q
+uniform float uImgR;
+uniform sampler2D uImg;
 out vec4 o;
 
 const vec3 BG = vec3(0.984,0.976,0.957);
@@ -166,19 +172,21 @@ vec3 page(vec2 q){
   float line = clamp(1. - dist/(0.8*uDpr), 0., 1.) * (major ? 0.15 : 0.065);
   vec2 fd = max(max(uFade.xy - q, q - uFade.zw), 0.);
   line *= smoothstep(0.0, 0.05, length(fd));
-  vec3 col = mix(BG, INK, line);
+  float sink = 1. - uDark;   // pod ciemniejącą taflą hero tonie: poziomice i tekst gasną
+  vec3 col = mix(BG, INK, line*sink);
   // stały tekst (R) i imię (G bez R), imię dopiero po przekazaniu z loadera
   vec4 st = texture(uStatic, suv(q));
-  col = mix(col, INK, clamp(st.r + max(st.g - st.r, 0.)*uNameOn, 0., 1.));
+  col = mix(col, INK, clamp(st.r + max(st.g - st.r, 0.)*uNameOn, 0., 1.)*sink);
   const vec2 iw = vec2(0.); const float ia = 1.;
   // zdania: każde z falą, która przechodzi przez nie w chwili zdarzenia
   vec2 w0 = vec2(sin(q.y*260.+uTime*18.)*0.004*uWave.x, 0.);
   vec2 w1 = vec2(sin(q.y*260.+uTime*18.)*0.004*uWave.y, 0.);
   vec2 w2 = vec2(sin(q.y*260.+uTime*18.)*0.004*uWave.z, 0.);
   float a = (texture(uLines, suv(q+w0+iw)).r*uInk.x + texture(uLines, suv(q+w1+iw)).g*uInk.y + texture(uLines, suv(q+w2+iw)).b*uInk.z)*ia;
-  return mix(col, INK, a);
+  return mix(col, INK, a*sink);
 }
 float dens(vec2 q){ return texture(uDens, suv(q)).r; }
+float boxD(vec2 q){ vec2 h = uImgRect.zw*0.5, d = abs(q - uImgRect.xy - h) - h + uImgR; return length(max(d,0.)) + min(max(d.x,d.y),0.) - uImgR; }
 // plansza ładowania: ciemne tło chudnie do linii poziomic, najpierw w dolinach, na końcu na grzbietach;
 // grube poziomice (co 250 m) zostają ciemne najdłużej. Te same poziomice co na stronie (to samo odkształcenie).
 float boardMask(vec2 q){
@@ -252,6 +260,10 @@ void main(){
   float fw = fwidth(f);
   // miękki brzeg: przejście na kilka pikseli zamiast jednego
   float cover = smoothstep(ISO - max(fw*2., 0.02), ISO + max(fw*2., 0.02), f);
+  float dU = texture(uDist, suv(q)).r / uDH;
+  if (uSpread > 0.) cover = max(cover, smoothstep(0.0015, 0.005, dU));
+  float rebelF = texture(uDens, suv(q)).g;
+  float rebelness = smoothstep(ISO*0.7, ISO*1.3, rebelF);
   if (cover <= 0.) { o = vec4(mix(wall, INK, boardMask(q)),1.); return; }
 
   // wysokość cieczy z gęstości: przy brzegu stromo, w środku płasko
@@ -263,7 +275,7 @@ void main(){
   // brzeg podwija się pod spód: w wąskim pasie przy krawędzi powierzchnia schodzi do pionu i dalej,
   // więc odbija otoczenie (jasno od strony światła, ciemniej od cienia) zamiast leżeć płasko.
   // Szerokość pasa lekko się zmienia wzdłuż brzegu, żeby nie był jednolitą obwódką.
-  float dE = texture(uDist, suv(q)).r / uDH;
+  float dE = dU;
   float wE = 0.011*(0.65 + 0.7*vnoise(q*7. + vec2(uTime*0.07, -uTime*0.05)));
   float curl = 1. - smoothstep(0., wE, dE);
   curl *= curl;
@@ -274,7 +286,17 @@ void main(){
   float k = min(0.04 + 0.1*pow(1.-max(n.z,0.),1.6), 0.08);
   vec3 refr = vec3(page(q - n.xy*k*0.97).r, page(q - n.xy*k).g, page(q - n.xy*k*1.03).b);
   refr *= 1. - 0.12*smoothstep(0.3,0.0,n.z);
-  vec3 body = refr*(TINT/BG) + TINT*0.04;
+  vec3 tint = mix(mix(TINT, uDarkCol, uDark), TINT, rebelness*uDark);
+  vec3 body = refr*(tint/BG) + tint*0.04;
+  // zrzut strony spod tafli: najpierw mętny, wygięty i bez krawędzi, potem coraz czystszy, na końcu dokładnie taki, jak jest
+  if (uImageIn > 0.) {
+    vec2 bq = q - n.xy*k*(1. - uClarity*0.98);
+    vec2 iuv = clamp((bq - uImgRect.xy)/uImgRect.zw, 0., 1.);
+    vec3 seen = texture(uImg, iuv).rgb;
+    float soft = mix(0.0015, 0.06, (1. - uClarity)*(1. - uClarity));
+    float inBox = smoothstep(soft, -soft, boxD(bq))*uImageIn*(1. - rebelness);
+    body = mix(body, mix(seen, body, (1. - uClarity)*0.7), inBox);
+  }
   body *= 1. - 0.35*curl;   // przy podwiniętym brzegu mniej światła przechodzi na wprost
   float F = 0.02 + 0.98*pow(1.-max(n.z,0.),5.);
   vec3 rd = vec3(0.,0.,-1.), r = reflect(rd, n);
@@ -282,7 +304,7 @@ void main(){
   vec3 col = body*(1.-F) + env(r,q)*F*0.7;
   vec3 L = normalize(vec3(-0.55 + 0.12*sin(q.y*7.+uTime*0.21), 0.62 + 0.08*cos(q.x*5.3-uTime*0.17), 0.56));
   float sp = max(dot(r, L), 0.);
-  col += vec3(1.)*(pow(sp, 5.)*0.07 + pow(sp, 24.)*0.08 + pow(sp, 220.)*0.6);  // szeroki połysk pokazuje fale jako jaśniejsze pasma  // odblask okna: miękka poświata + ostre jądro jak na szkle
+  col += vec3(1.)*(pow(sp, 5.)*0.07 + pow(sp, 24.)*0.08 + pow(sp, 220.)*0.6)*(1. - 0.85*uClarity*(1. - rebelness));  // szeroki połysk pokazuje fale jako jaśniejsze pasma  // odblask okna: miękka poświata + ostre jądro jak na szkle
   o = vec4(mix(mix(wall, col, cover), INK, boardMask(q)),1.);
 }`
 
@@ -333,8 +355,18 @@ gl.bindFramebuffer(gl.FRAMEBUFFER, null)
 
 // pole odległości od brzegu cieczy (jump flooding) w rozdzielczości gęstości, potem rozmycie, żeby grzbiet w środku nie robił kantu
 const jfaInit = program(vs, `#version 300 es
-precision highp float; uniform sampler2D uD; uniform float uIso; out vec2 o;
-uniform vec2 uJ; void main(){ float f = texture(uD, gl_FragCoord.xy/uJ).r; o = f < uIso ? gl_FragCoord.xy : vec2(-1.); }`)
+precision highp float; uniform sampler2D uD; uniform float uIso, uInv; out vec2 o;
+uniform vec2 uJ; void main(){ float f = texture(uD, gl_FragCoord.xy/uJ).r; o = (uInv > 0.5 ? f >= uIso : f < uIso) ? gl_FragCoord.xy : vec2(-1.); }`)
+// front tafli: rozlewa się od brzegu cieczy, nierówno (płaty idą szybciej, inne zostają w tyle), więc zalewa kadr jak rozlana woda
+const flood = program(vs, `#version 300 es
+precision highp float; uniform sampler2D uIn, uOut; uniform float uR, uTime; uniform vec2 uJ; out vec4 o;
+float hsh(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453); }
+float vnoise(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f*f*(3.-2.*f);
+  return mix(mix(hsh(i), hsh(i+vec2(1,0)), u.x), mix(hsh(i+vec2(0,1)), hsh(i+vec2(1,1)), u.x), u.y); }
+void main(){ vec2 uv = gl_FragCoord.xy/uJ; vec2 q = vec2(uv.x*uJ.x/uJ.y, uv.y);
+  float n = vnoise(q*2.3 + vec2(uTime*0.06, -uTime*0.05))*0.65 + vnoise(q*5.7 - vec2(uTime*0.09))*0.35;
+  float front = uR*(0.62 + 0.76*n) - texture(uOut, uv).r;
+  o = vec4(max(texture(uIn, uv).r, front), 0., 0., 1.); }`)
 const jfaStep = program(vs, `#version 300 es
 precision highp float; uniform sampler2D uS; uniform int uStep; uniform ivec2 uSize; out vec2 o;
 void main(){ vec2 p = gl_FragCoord.xy; vec2 best = vec2(-1.); float bd = 1e20;
@@ -361,10 +393,11 @@ const mkTarget = (unit, fmt, filter) => {
 }
 const jA = mkTarget(6, f32 ? gl.RG32F : gl.RG16F, gl.NEAREST), jB = mkTarget(6, f32 ? gl.RG32F : gl.RG16F, gl.NEAREST)
 const dRaw = mkTarget(6, f32 ? gl.R32F : gl.R16F, gl.NEAREST), dTmp = mkTarget(6, f32 ? gl.R32F : gl.R16F, gl.NEAREST)
-const dOut = mkTarget(5, f32 ? gl.R32F : gl.R16F, gl.LINEAR)
+const dOut = mkTarget(5, f32 ? gl.R32F : gl.R16F, gl.LINEAR), dU = mkTarget(5, f32 ? gl.R32F : gl.R16F, gl.LINEAR)
+let floodR = 0
 gl.bindFramebuffer(gl.FRAMEBUFFER, null)
 const hgtPass = program(vs, `#version 300 es
-precision highp float; uniform sampler2D uDist; uniform float uDH, uTime; uniform vec2 uJ, uRes; out vec4 o;
+precision highp float; uniform sampler2D uDist, uDens; uniform float uDH, uTime, uSpread, uClarity; uniform vec2 uJ, uRes; out vec4 o;
 float hsh(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453); }
 float vnoise(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f*f*(3.-2.*f);
   return mix(mix(hsh(i), hsh(i+vec2(1,0)), u.x), mix(hsh(i+vec2(0,1)), hsh(i+vec2(1,1)), u.x), u.y); }
@@ -383,27 +416,44 @@ float hgt(vec2 q){
   float waves = 0.26*waveField(q, uTime);
   // drobniejsze fale dla małych kropli (duże fale są większe niż one same i dawały tylko pochylenie)
   float fine = 0.05*(vnoise(q*26. + vec2(uTime*0.5, -uTime*0.4)) - 0.5)*m*(1. - smoothstep(0.035, 0.09, d));
-  return 0.5*sqrt(d) + waves*m + fine;
+  float rebel = smoothstep(0.25, 0.6, texture(uDens, gl_FragCoord.xy/uJ).g);
+  return (0.5*sqrt(d) + fine)*(1. - uSpread) + waves*m*(1. + 0.7*uSpread)*(1. - uClarity) + 0.06*uSpread*rebel;
 }
 void main(){ vec2 uv = gl_FragCoord.xy/uJ; vec2 q = vec2(uv.x*uRes.x/uRes.y, uv.y); o = vec4(hgt(q), 0., 0., 1.); }`)
 const hOut = mkTarget(7, f32 ? gl.R32F : gl.R16F, gl.LINEAR)
 function distanceField() {
   gl.disable(gl.BLEND); gl.viewport(0, 0, JW, JH); gl.bindVertexArray(vao)
   const pass = (prog, target, src, setup) => { gl.useProgram(prog); gl.bindFramebuffer(gl.FRAMEBUFFER, target.f); gl.activeTexture(gl.TEXTURE6); gl.bindTexture(gl.TEXTURE_2D, src); gl.uniform1i(gl.getUniformLocation(prog, prog === jfaInit ? 'uD' : 'uS'), 6); setup && setup(prog); gl.drawArrays(gl.TRIANGLES, 0, 3) }
-  pass(jfaInit, jA, dTex, (p) => { gl.uniform1f(gl.getUniformLocation(p, 'uIso'), 0.38); gl.uniform2f(gl.getUniformLocation(p, 'uJ'), JW, JH) })
-  let src = jA, dst = jB
-  for (let st = 1 << Math.ceil(Math.log2(Math.max(JW, JH))) - 1; st >= 1; st >>= 1) {
-    pass(jfaStep, dst, src.t, (p) => { gl.uniform1i(gl.getUniformLocation(p, 'uStep'), st); gl.uniform2i(gl.getUniformLocation(p, 'uSize'), JW, JH) })
-    ;[src, dst] = [dst, src]
+  const jfa = (inv) => {
+    pass(jfaInit, jA, dTex, (p) => { gl.uniform1f(gl.getUniformLocation(p, 'uIso'), 0.38); gl.uniform1f(gl.getUniformLocation(p, 'uInv'), inv); gl.uniform2f(gl.getUniformLocation(p, 'uJ'), JW, JH) })
+    let src = jA, dst = jB
+    for (let st = 1 << Math.ceil(Math.log2(Math.max(JW, JH))) - 1; st >= 1; st >>= 1) {
+      pass(jfaStep, dst, src.t, (p) => { gl.uniform1i(gl.getUniformLocation(p, 'uStep'), st); gl.uniform2i(gl.getUniformLocation(p, 'uSize'), JW, JH) })
+      ;[src, dst] = [dst, src]
+    }
+    pass(jfaDist, dRaw, src.t)
   }
-  pass(jfaDist, dRaw, src.t)
+  jfa(0)
   pass(blur, dTmp, dRaw.t, (p) => gl.uniform2f(gl.getUniformLocation(p, 'uDir'), 1, 0))
   pass(blur, dOut, dTmp.t, (p) => gl.uniform2f(gl.getUniformLocation(p, 'uDir'), 0, 1))
-  gl.activeTexture(gl.TEXTURE5); gl.bindTexture(gl.TEXTURE_2D, dOut.t)
+  let dist = dOut
+  if (floodR > 0) {
+    // tafla: odległość od cieczy na zewnątrz, a z niej front, który zalewa kadr
+    jfa(1)
+    gl.useProgram(flood); gl.bindFramebuffer(gl.FRAMEBUFFER, dU.f)
+    gl.activeTexture(gl.TEXTURE5); gl.bindTexture(gl.TEXTURE_2D, dOut.t); gl.uniform1i(gl.getUniformLocation(flood, 'uIn'), 5)
+    gl.activeTexture(gl.TEXTURE9); gl.bindTexture(gl.TEXTURE_2D, dRaw.t); gl.uniform1i(gl.getUniformLocation(flood, 'uOut'), 9)
+    gl.uniform1f(gl.getUniformLocation(flood, 'uR'), floodR); gl.uniform1f(gl.getUniformLocation(flood, 'uTime'), time); gl.uniform2f(gl.getUniformLocation(flood, 'uJ'), JW, JH)
+    gl.drawArrays(gl.TRIANGLES, 0, 3)
+    dist = dU
+  }
+  gl.activeTexture(gl.TEXTURE5); gl.bindTexture(gl.TEXTURE_2D, dist.t)
   // wysokość cieczy raz na klatkę, w rozdzielczości pola odległości
   gl.useProgram(hgtPass); gl.bindFramebuffer(gl.FRAMEBUFFER, hOut.f)
   gl.uniform1i(gl.getUniformLocation(hgtPass, 'uDist'), 5); gl.uniform1f(gl.getUniformLocation(hgtPass, 'uDH'), JH)
-  gl.uniform1f(gl.getUniformLocation(hgtPass, 'uTime'), time); gl.uniform2f(gl.getUniformLocation(hgtPass, 'uJ'), JW, JH); gl.uniform2f(gl.getUniformLocation(hgtPass, 'uRes'), W, H)
+  gl.uniform1f(gl.getUniformLocation(hgtPass, 'uTime'), time)
+  gl.uniform1f(gl.getUniformLocation(hgtPass, 'uSpread'), tr.spread); gl.uniform1f(gl.getUniformLocation(hgtPass, 'uClarity'), tr.clarity)
+  gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D, dTex); gl.uniform1i(gl.getUniformLocation(hgtPass, 'uDens'), 3); gl.uniform2f(gl.getUniformLocation(hgtPass, 'uJ'), JW, JH); gl.uniform2f(gl.getUniformLocation(hgtPass, 'uRes'), W, H)
   gl.drawArrays(gl.TRIANGLES, 0, 3)
   gl.activeTexture(gl.TEXTURE7); gl.bindTexture(gl.TEXTURE_2D, hOut.t)
 }
@@ -428,6 +478,19 @@ gl.uniform4f(U('uFade'), ...T.fade)
 gl.uniform1f(U('uBlockRight'), T.fade[2] + 0.02)
 gl.uniform1f(U('uNameOn'), 0)
 let signed = false
+// zrzut stronypodhale.pl: na środku kadru, 16:9, tam gdzie potem stanie w scenie
+{
+  const img = new Image(); img.src = './stronypodhale.avif'
+  img.decode().then(() => {
+    tex(8); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false)
+    gl.useProgram(main); gl.uniform1i(U('uImg'), 8)
+  })
+  const vis = VH - INSET
+  const iw = Math.min(0.8 * VW, 0.6 * vis * 16 / 9), ih = iw * 9 / 16
+  gl.uniform4f(U('uImgRect'), (VW - iw) / 2 / VH, 1 - (vis / 2 + ih / 2) / VH, iw / VH, ih / VH)
+  gl.uniform1f(U('uImgR'), 16 / VH)
+  gl.uniform3f(U('uDarkCol'), 21 / 255, 48 / 255, 31 / 255)   // tło stronypodhale.pl (mediana krawędzi zrzutu)
+}
 const quad = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, quad)
 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW)
 const vao = gl.createVertexArray(); gl.bindVertexArray(vao)
@@ -444,10 +507,11 @@ const physics = new Worker(new URL('./worker.js', import.meta.url), { type: 'mod
 const cur = { x: -99, y: -99, vx: 0, vy: 0, inside: false, down: false, impulse: 0 }
 let snapA = null, snapB = null, tA = 0, tB = 0, gapMs = 1000 / 60, physMs = 0, physSteps = 0, physN = 0
 const simState = { mainMass: 0, pieces: 0, pieceList: [] }
+let rebelN = 0
 const N = await new Promise((ok) => {
   let n = 0
   physics.onmessage = ({ data }) => {
-    if (data.ready) { n = data.N; return }
+    if (data.ready) { n = data.N; rebelN = data.rebelN; return }
     const now = performance.now()
     if (snapA && snapA !== snapB) physics.postMessage({ buf: snapA }, [snapA.buffer])   // stary bufor wraca do wątku
     snapA = snapB || data.pos; snapB = data.pos
@@ -586,6 +650,22 @@ const ink = [1, DIM, DIM], wave = [0, 0, 0]
 let active = 0, prevPieces = 0, wholeSince = 0, lastTear = -9, lastFast = -9
 function setLine(i) { if (i === active) return; active = i; wave[i] = 1 }
 
+// --- przejście: wszystko jest funkcją przewinięcia (P 0…1 przez 2,4 ekranu), więc działa tak samo wstecz i po przerwaniu
+const cl01 = (x) => Math.min(Math.max(x, 0), 1)
+const ss = (a, b, x) => { const t = cl01((x - a) / (b - a)); return t * t * (3 - 2 * t) }
+const p2out = (x) => 1 - (1 - x) ** 2
+const tr = { spread: 0, dark: 0, imageIn: 0, clarity: 0 }
+let sentSpread = -1
+function transition(scroll) {
+  const P = cl01((scroll - 0.1 * VH) / (2.4 * VH))
+  tr.spread = ss(0, 0.42, P)
+  tr.dark = ss(0.1, 0.5, P)
+  tr.imageIn = p2out(cl01((P - 0.36) / 0.3))
+  tr.clarity = p2out(cl01((P - 0.5) / 0.34))
+  // front tafli w pikselach pola odległości: do przekątnej kadru (z zapasem na nierówny front)
+  floodR = Math.hypot(JW, JH) * 1.25 * ss(0.1, 0.56, P) ** 1.7
+  if (Math.abs(tr.spread - sentSpread) > 0.003) { sentSpread = tr.spread; physics.postMessage({ P: { spread: tr.spread } }) }
+}
 let tPrev = performance.now(), time = 0
 function frame(now) {
   const dt = Math.min((now - tPrev) / 1000, 0.05); tPrev = now; time += dt
@@ -615,11 +695,14 @@ function frame(now) {
   gl.useProgram(splat); gl.bindVertexArray(pVao)
   gl.bindBuffer(gl.ARRAY_BUFFER, pBuf); gl.bufferSubData(gl.ARRAY_BUFFER, 0, pos)
   gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE)
-  gl.uniform2f(sMask, 1, 0); gl.uniform1f(sSize, splatR * 2 * DH); gl.uniform1f(sNorm, norm1)
-  gl.drawArrays(gl.POINTS, 0, N)
+  gl.uniform1f(sSize, splatR * 2 * DH); gl.uniform1f(sNorm, norm1)
+  // kropla kursora (ostatnie rebelN cząstek) także w kanale G: na tafli zostaje zielona i wypukła
+  gl.uniform2f(sMask, 1, 0); gl.drawArrays(gl.POINTS, 0, N - rebelN)
+  if (rebelN) { gl.uniform2f(sMask, 1, 1); gl.drawArrays(gl.POINTS, N - rebelN, rebelN) }
   // kopuła uśredniana w czasie (75% poprzedniej klatki + 25% nowej): światło nie migocze od pojedynczych cząstek
   // (stara kopuła z szerokich plamek wyłączona: wysokość daje teraz pole odległości)
   gl.disable(gl.BLEND)
+  transition(shift)
   distanceField()
   // 2) obraz
   gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, W, H)
@@ -628,6 +711,7 @@ function frame(now) {
   terrainView(shift); gl.uniform1f(U('uMorph'), shift * 0.0015); gl.uniform1f(U('uTime'), time)
   gl.uniform3f(U('uInk'), ...ink); gl.uniform3f(U('uWave'), ...wave); gl.uniform1f(U('uNameOn'), loader.handoff ? 1 : 0)
   gl.uniform1f(U('uBoardT'), loader.boardT); gl.uniform2f(U('uHRange'), ...loader.hRange)
+  gl.uniform1f(U('uSpread'), floodR > 0 ? 1 : 0); gl.uniform1f(U('uDark'), tr.dark); gl.uniform1f(U('uImageIn'), tr.imageIn); gl.uniform1f(U('uClarity'), tr.clarity)
   gl.drawArrays(gl.TRIANGLES, 0, 3)
   loader.glFrame()                       // w tej samej klatce: loader znika dokładnie, gdy strona pokaże imię
   document.documentElement.dataset.ready = '1'

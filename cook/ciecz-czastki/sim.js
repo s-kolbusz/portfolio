@@ -171,12 +171,13 @@ export function createSim({ width, height, center, radius, spacing = 0.42, rebel
         vx[i] += ((cur.inside ? cur.vx : 0) - vx[i]) * m; vy[i] += ((cur.inside ? cur.vy : 0) - vy[i]) * m
       } else if (state.inMain[i]) {
         // hamowanie całego ciała (P.anchorDamp): przy przechylaniu słabsze, żeby ciecz płynęła tym szybciej, im mocniej przechylona
-        const ad = P.anchorDamp ?? 0.02
-        ax += (center.x - state.mainX) * P.anchor - state.mainVX * ad
-        ay += (center.y - state.mainY) * P.anchor - state.mainVY * ad
+        // rozlewanie w taflę (P.spread 0…1): ciało przestaje wracać na środek i trzymać się w kupie
+        const ad = P.anchorDamp ?? 0.02, free = 1 - (P.spread || 0)
+        ax += ((center.x - state.mainX) * P.anchor - state.mainVX * ad) * free
+        ay += ((center.y - state.mainY) * P.anchor - state.mainVY * ad) * free
         // własny ciężar ciała: rozciągnięte części ściągają się z powrotem do środka masy
         const ox = x[i] - state.mainX, oy = y[i] - state.mainY, od = Math.hypot(ox, oy)
-        if (od > restR * 0.45) { const g = P.self * (od - restR * 0.45) / od; ax -= ox * g; ay -= oy * g }
+        if (od > restR * 0.45) { const g = P.self * free * (od - restR * 0.45) / od; ax -= ox * g; ay -= oy * g }
         // życie: płynne, duże zawirowania wewnątrz ciała
         const s = P.life
         ax += s * Math.sin(y[i] * 0.16 + t * 0.011) * Math.cos(x[i] * 0.11 - t * 0.008)
@@ -269,7 +270,9 @@ export function createSim({ width, height, center, radius, spacing = 0.42, rebel
         rhoA[i] += a2; rhoA[j] += a2; rhoNA[i] += a3; rhoNA[j] += a3
       }
     }
-    for (let i = 0; i < N; i++) { pA[i] = P.k * (rhoA[i] - P.rho0); pNA[i] = P.kNear * rhoNA[i] }
+        // przy rozlewaniu ciecz chce rzadszego upakowania, więc sama się rozpycha równo na wszystkie strony (do ~3× powierzchni)
+    const rho0 = P.rho0 * (1 - 0.7 * (P.spread || 0))
+    for (let i = 0; i < N; i++) { pA[i] = P.k * (rhoA[i] - (rebel[i] ? P.rho0 : rho0)); pNA[i] = P.kNear * rhoNA[i] }
     for (let i = 0; i < N; i++) {
       const o = i * MAXN
       for (let k = 0; k < nbc[i]; k++) {
