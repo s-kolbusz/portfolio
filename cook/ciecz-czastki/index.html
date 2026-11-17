@@ -18,32 +18,57 @@
     font: 11px ui-monospace, monospace; letter-spacing: .2em; color: #2b2620; -webkit-tap-highlight-color: transparent; }
   #tilt i { width: 7px; height: 7px; border-radius: 50%; border: 1px solid currentColor; }
   #tilt[aria-pressed="true"] i { background: #0f9d63; border-color: #0f9d63; }
-  #scene { position: fixed; z-index: 1; color: #f3efe6; pointer-events: none; }
-  #scene header { display: flex; flex-direction: column; gap: 10px; }
-  #scene header > *, #scene a { opacity: 0; margin: 0; }
-  #scene .tag { font: 12px ui-monospace, Menlo, monospace; letter-spacing: .2em; text-transform: uppercase; color: rgba(243,239,230,.62); }
-  #scene h2 { font: 900 min(clamp(34px, 4.6vw, 64px), 8.6vw)/1 "Mattone"; letter-spacing: -0.02em; }
-  #scene .desc { font: 400 clamp(14px, 1.15vw, 18px)/1.5 "Mattone"; color: rgba(243,239,230,.72); max-width: 40em; }
-  #scene a { display: inline-block; pointer-events: auto; font: 13px ui-monospace, Menlo, monospace; letter-spacing: .2em; text-transform: uppercase; color: #f3efe6; text-decoration: none; }
+  @font-face { font-family: "Cabinet Grotesk"; src: url("../fonts/cabinet/cabinet-grotesk-variable.woff2") format("woff2"); font-weight: 100 900; }
+  #sel { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  #sel span { position: absolute; white-space: pre; color: transparent; pointer-events: auto; cursor: text; }
+  #sel span::selection { background: rgba(15,157,99,.28); color: transparent; }
+  #scene { position: fixed; z-index: 1; color: #f3efe6; visibility: hidden; }
+  #scene ::selection { background: rgba(240,150,100,.35); }
+  #scene header { display: flex; flex-direction: column; gap: 14px; }
+  #scene .lead { display: flex; flex-direction: column; gap: 12px; }
+  #scene p, #scene h2 { margin: 0; }
+  #scene .m { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .12em; margin-bottom: -.12em; }  /* maska: wiersz wyjeżdża spod krawędzi */
+  #scene .i { display: inline-block; will-change: transform; }
+  #scene .tag { font: 12px ui-monospace, Menlo, monospace; letter-spacing: .2em; text-transform: uppercase; color: rgba(243,239,230,.6); }
+  /* tytuł = logo stronypodhale.pl: Cabinet Grotesk, „strony” i „.pl” w akcencie (500), „podhale” w kolorze tekstu (800) */
+  #scene .wm { font: 500 64px/1 "Cabinet Grotesk", system-ui, sans-serif; letter-spacing: -0.02em; white-space: nowrap; }
+  #scene .wm .acc { color: oklch(0.8 0.125 47); font-weight: 500; }
+  #scene .wm .str { font-weight: 800; }
+  #scene .wm .ch { display: inline-block; }
+  #scene .desc { font: 400 clamp(15px, 1.15vw, 18px)/1.5 "Cabinet Grotesk", system-ui, sans-serif; color: rgba(243,239,230,.74); max-width: 30em; }
+  #scene a { display: inline-block; font: 13px ui-monospace, Menlo, monospace; letter-spacing: .2em; text-transform: uppercase; color: #f3efe6; text-decoration: none; }
+  #scene a b { display: inline-block; font-weight: 400; color: oklch(0.8 0.125 47); transition: transform .3s cubic-bezier(.22,1,.36,1); }
+  #scene a:hover b { transform: translate(2px, -2px); }
+  @media (min-width: 900px) {
+    #scene header { flex-direction: row; align-items: flex-end; justify-content: space-between; gap: 40px; }
+    #scene .desc { text-align: right; }
+    #scene a { position: absolute; right: 0; }
+  }
+  #readouts { position: fixed; z-index: 1; display: flex; gap: 22px; flex-wrap: wrap; font: 11px ui-monospace, Menlo, monospace; letter-spacing: .16em; text-transform: uppercase; color: rgba(243,239,230,.66); opacity: 0; pointer-events: none; }
+  #readouts .to { color: oklch(0.8 0.125 47); margin-right: auto; }
   #info { position: fixed; top: 10px; right: 12px; font: 12px ui-monospace, monospace; color: rgba(43,38,32,.62); }
 </style>
 </head>
 <body>
 <canvas id="gl" aria-hidden="true"></canvas>
 <canvas id="ld" aria-hidden="true"></canvas>
+<div id="sel" aria-hidden="true"></div>
 <div class="sr">
   <h1>Sebastian Kolbusz</h1>
   <p>I design and build websites and web apps.</p>
   <p>Nothing off the shelf. I take things apart. I put them back together myself.</p>
   <a href="#work">See the work</a>
 </div>
- <div id="scene" aria-label="stronypodhale.pl">
+ <div id="readouts" aria-hidden="true"><span class="to">→ stronypodhale.pl</span><span data-r="v"></span><span data-r="c"></span><span data-r="k"></span></div>
+<div id="scene">
   <header>
-    <p class="tag">01 · Product · Websites for Podhale businesses</p>
-    <h2>stronypodhale.pl</h2>
+    <div class="lead">
+      <p class="tag"><span class="m"><span class="i">01 · Product · Websites for Podhale businesses</span></span></p>
+      <h2 class="wm" aria-label="stronypodhale.pl"><span class="acc">strony</span><span class="str">podhale</span><span class="acc">.pl</span></h2>
+    </div>
     <p class="desc">A product with public pricing: websites for local businesses, with domain, hosting and care included.</p>
   </header>
-  <a href="https://stronypodhale.pl" target="_blank" rel="noopener">Visit the site ↗</a>
+  <a href="https://stronypodhale.pl" target="_blank" rel="noopener"><span class="m"><span class="i">Visit the site <b>↗</b></span></span></a>
 </div>
 <button id="tilt" type="button" aria-pressed="false"><i></i>TILT</button>
 <div id="info" aria-hidden="true">ruch, szybki ruch, klik, przytrzymanie · scroll: poziomice</div>
@@ -77,7 +102,7 @@ const LIGHT = qs.has('lekko') || jitMs > 24
 // w lekkim trybie cząstki są większe (promień 0.03 zamiast 0.021), więc jest ich około połowa, a ciecz ma ten sam kształt
 const Hq = LIGHT ? 0.03 : 0.021, SPACING = 0.42  // promień oddziaływania cząstek w jednostkach wysokości ekranu
 
-await Promise.all([document.fonts.load('900 40px "Mattone"'), document.fonts.load('700 20px "Mattone"'), document.fonts.load('400 20px "Mattone"')])
+await Promise.all([document.fonts.load('500 40px "Cabinet Grotesk"'), document.fonts.load('800 40px "Cabinet Grotesk"'), document.fonts.load('900 40px "Mattone"'), document.fonts.load('700 20px "Mattone"'), document.fonts.load('400 20px "Mattone"')])
 
 // --- Cały tekst w obrazie (żeby ciecz go załamywała). Dwie tekstury-maski na czarnym tle:
 // stała: imię, rola, kreska, przycisk (R); zdania: każde w swoim kanale (R, G, B), bo podświetlenie się zmienia.
@@ -131,7 +156,14 @@ function textures() {
   // prostokąt bloku (pod nim poziomice gasną), w jednostkach q (y od dołu)
   const fade = [(bx - 20 * dpr) / H, (H - ctaY - 16 * dpr) / H, (bx + bw + 10 * dpr) / H, (H - ruleY + 24 * dpr) / H]
   // skala fali: imię jest tyle razy większe od zdania (fala ma mieć na literze ten sam rytm)
-  return { s, l, fade, name }
+  // te same napisy jako tekst DOM (przezroczysty, do zaznaczania): czcionka i linia bazowa z tego samego pomiaru
+  const sel = []
+  const put = (text, font, ls, x, y) => { g.font = font; g.letterSpacing = ls; const m = g.measureText(text); sel.push({ text, font, ls, x, y, a: m.fontBoundingBoxAscent, d: m.fontBoundingBoxDescent }) }
+  put('Sebastian', name.font, name.ls, name.sx, name.sy)
+  put('Kolbusz', name.font, name.ls, name.kx, name.ky)
+  put('I design and build websites and web apps.', `400 ${role}px "Mattone"`, '0px', bx, roleBase)
+  ;(PORTRAIT ? lines.slice(0, 1) : lines).forEach((t, i) => put(t, `700 ${big}px "Mattone"`, '0px', bx, firstBase + i * big * 1.3))
+  return { s, l, fade, name, sel }
 }
 
 const vs = `#version 300 es
@@ -204,6 +236,18 @@ vec3 page(vec2 q){
   return mix(col, INK, a*sink);
 }
 float dens(vec2 q){ return texture(uDens, suv(q)).r; }
+float boxD(vec2 q);
+// to, co leży pod powierzchnią tafli: ciemna woda z wytłoczonymi poziomicami, a w kadrze zrzut (mętny, aż się sklaruje)
+vec3 sheetBase(vec2 q){
+  vec3 c = page(q)*(uDarkCol/BG);
+  if (uImageIn > 0.) {
+    vec2 iuv = clamp((q - uImgRect.xy)/uImgRect.zw, 0., 1.);
+    float soft = mix(0.0015, 0.06, (1. - uClarity)*(1. - uClarity));
+    float inBox = smoothstep(soft, -soft, boxD(q))*uImageIn;
+    c = mix(c, mix(texture(uImg, iuv).rgb, c, (1. - uClarity)*0.7), inBox);
+  }
+  return c;
+}
 float boxD(vec2 q){ vec2 h = uImgRect.zw*0.5, d = abs(q - uImgRect.xy - h) - h + uImgR; return length(max(d,0.)) + min(max(d.x,d.y),0.) - uImgR; }
 // plansza ładowania: ciemne tło chudnie do linii poziomic, najpierw w dolinach, na końcu na grzbietach;
 // grube poziomice (co 250 m) zostają ciemne najdłużej. Te same poziomice co na stronie (to samo odkształcenie).
@@ -300,14 +344,14 @@ void main(){
   n = normalize(vec3(n.xy*(1. + curl*7.), n.z*(1. - curl*0.92)));
   if (uDark > 0. && rebelness > 0.) {
     // na tafli kropla nie ma własnego brzegu w polu odległości (tafla jest wszędzie), więc kształt bierze z własnego pola
-    float eg = 3.0/uRes.y;
+    float eg = 7.0/uRes.y;
     float gx = texture(uDens, suv(q+vec2(eg,0.))).g - texture(uDens, suv(q-vec2(eg,0.))).g;
     float gy = texture(uDens, suv(q+vec2(0.,eg))).g - texture(uDens, suv(q-vec2(0.,eg))).g;
-    vec3 nd = normalize(vec3(-gx/(2.*eg)*0.03, -gy/(2.*eg)*0.03, 1.));
-    float rim = 1. - smoothstep(ISO, ISO*2.6, rebelF); rim *= rim;
-    nd = normalize(vec3(nd.xy*(1. + rim*6.), nd.z*(1. - rim*0.9)));
+    vec3 nd = normalize(vec3(-gx/(2.*eg)*0.022, -gy/(2.*eg)*0.022, 1.));
+    float rim = 1. - smoothstep(ISO, ISO*1.8, rebelF); rim *= rim;
+    nd = normalize(vec3(nd.xy*(1. + rim*4.), nd.z*(1. - rim*0.75)));
     n = normalize(mix(n, nd, rebelness*uDark));
-    curl = mix(curl, rim, rebelness*uDark);
+    curl = mix(curl, rim*0.6, rebelness*uDark);
   }
 
   // przesunięcie załamania ograniczone: kropla wygina to, co pod nią, zamiast pokazywać puste tło z daleka
@@ -327,6 +371,12 @@ void main(){
     body = mix(body, mix(seen, body, (1. - uClarity)*0.7), inBox);
   }
   body *= 1. - 0.35*curl;   // przy podwiniętym brzegu mniej światła przechodzi na wprost
+  // kropla na tafli to szkło nad wodą: widać przez nią poziomice i zrzut, wygięte i lekko zabarwione na zielono
+  if (uDark > 0. && rebelness > 0.) {
+    vec3 seen = sheetBase(q - n.xy*0.028);
+    vec3 glass = seen*vec3(0.55, 1.0, 0.76) + TINT*0.2;   // zielone szkło: to, co pod spodem, zabarwione jak przez kroplę na hero
+    body = mix(body, glass*(1. - 0.25*curl), rebelness*uDark);
+  }
   float F = 0.02 + 0.98*pow(1.-max(n.z,0.),5.);
   vec3 rd = vec3(0.,0.,-1.), r = reflect(rd, n);
   // bez cieniowania rozproszonego: to ono robiło z cieczy plastelinę; szkło pokazuje fale załamaniem i odbiciem
@@ -356,6 +406,13 @@ let firstFrame = true
 const tex = (unit, filter = gl.LINEAR) => { const t = gl.createTexture(); gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, t); for (const [p, v] of [[gl.TEXTURE_MIN_FILTER, filter], [gl.TEXTURE_MAG_FILTER, filter], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, p, v); return t }
 
 const T = textures()
+const selLayer = document.getElementById('sel')
+for (const t of T.sel) {
+  const el = document.createElement('span'); el.textContent = t.text
+  const px = (v) => v / dpr + 'px'
+  el.style.cssText = `left:${px(t.x)};top:${px(t.y - t.a)};line-height:${px(t.a + t.d)};font:${t.font.replace(/([\d.]+)px/, (_, n) => n / dpr + 'px')};letter-spacing:${parseFloat(t.ls) / dpr}px`
+  selLayer.append(el)
+}
 gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
 tex(0); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, T.s)
 tex(1); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, T.l)
@@ -522,37 +579,77 @@ let signed = false
     for (let y = 0; y < 36; y++) for (const x of [1, 2, 61, 62]) take(x, y)
     for (let x = 0; x < 64; x++) take(x, 34)
     const med = (v) => v.sort((a, b) => a - b)[v.length >> 1] / 255
-    gl.useProgram(main); gl.uniform3f(U('uDarkCol'), med(ch[0]), med(ch[1]), med(ch[2]))
+    gl.useProgram(main); gl.uniform3f(U('uDarkCol'), med(ch[0]), med(ch[1]), med(ch[2])); window.__darkCol = ch.map(med)
     document.documentElement.style.setProperty('--scene', `rgb(${ch.map((v) => Math.round(med(v) * 255)).join(' ')})`)
   })
 }
 gl.uniform3f(U('uDarkCol'), 21 / 255, 48 / 255, 31 / 255)
-// --- scena stronypodhale: na środku, póki zrzut jest sam; potem nagłówek nad nim, link pod nim (jak w obecnej scenie)
+// --- scena stronypodhale. Póki zrzut jest sam, stoi na środku; gdy woda się uspokoi, rusza akt (w czasie, jak
+// reveal na reszcie strony, a przy cofnięciu scrolla odtwarzany wstecz): kadr jedzie na miejsce, odczyty gasną,
+// potem wyjeżdżają spod maski etykieta, litery tytułu, wiersze opisu i link.
 const VIS = VH - INSET
-const scene = document.getElementById('scene')
-const pad = Math.max(24, 0.0667 * VW), cw = Math.min(VW - 2 * pad, 1180)
-scene.style.width = cw + 'px'
-{ const h2 = scene.querySelector('h2'); h2.style.whiteSpace = 'nowrap'; const fs = parseFloat(getComputedStyle(h2).fontSize); h2.style.fontSize = Math.min(fs, fs * cw / h2.scrollWidth) + 'px' }   // tytuł zawsze w jednej linii, w szerokości
-const headH = scene.querySelector('header').offsetHeight, linkH = 48, gapY = PORTRAIT ? 20 : 28
-const fw = Math.min(cw, (VIS - headH - linkH - 2 * gapY - 2 * Math.min(pad, 36)) * 16 / 9), fh = fw * 9 / 16
+const scene = document.getElementById('scene'), readouts = document.getElementById('readouts')
+const pad = Math.max(24, 0.0667 * VW)
+const wm = scene.querySelector('.wm'), descEl = scene.querySelector('.desc')
+const wmHTML = wm.innerHTML, descText = descEl.textContent
+// składa nagłówek na danej szerokości: tytuł (litery w maskach) i opis (wiersze w maskach); zwraca wysokość
+function build(width) {
+  scene.style.width = width + 'px'; scene.style.left = (VW - width) / 2 + 'px'
+  wm.innerHTML = wmHTML; wm.style.fontSize = '64px'
+  const room = VW >= 900 ? width * 0.56 : width
+  wm.style.fontSize = Math.min(Math.max(34, 0.05 * VW), 76, 64 * room / wm.scrollWidth) + 'px'
+  for (const part of wm.children) { const t = part.textContent; part.textContent = ''; for (const c of t) part.insertAdjacentHTML('beforeend', `<span class="m"><span class="i ch">${c}</span></span>`) }
+  descEl.innerHTML = descText.split(' ').map((w) => `<span class="w">${w}</span>`).join(' ')
+  const rows = []; let top = null
+  for (const w of descEl.querySelectorAll('.w')) { if (w.offsetTop !== top) { rows.push([]); top = w.offsetTop } rows.at(-1).push(w.textContent) }
+  descEl.innerHTML = rows.map((r) => `<span class="m" style="display:block"><span class="i">${r.join(' ')}</span></span>`).join('')
+  return scene.querySelector('header').offsetHeight
+}
+const linkH = 40, gapY = PORTRAIT ? 20 : 30, vpad = 2 * Math.min(pad, 40)
+// kadr i nagłówek mają jedną szerokość (jeden blok); gdy brakuje wysokości, cały blok się zwęża
+let cw = Math.min(VW - 2 * pad, 1180), headH = build(cw)
+let fw = Math.min(cw, (VIS - headH - linkH - 2 * gapY - vpad) * 16 / 9)
+if (fw < cw - 1) { cw = fw; headH = build(cw); fw = Math.min(cw, (VIS - headH - linkH - 2 * gapY - vpad) * 16 / 9) }
+const fh = fw * 9 / 16
 const stackTop = (VIS - (headH + gapY + fh + gapY + linkH)) / 2
-const placed = { x: (VW - cw) / 2, y: stackTop + headH + gapY, w: fw }
-scene.style.left = placed.x + 'px'; scene.style.width = cw + 'px'; scene.style.top = stackTop + 'px'
-scene.querySelector('a').style.marginTop = (fh + 2 * gapY) + 'px'
-function imgRect(zoom, act) {
-  // środek kadru → miejsce w scenie; po drodze rośnie z głębi
+const placed = { x: (VW - fw) / 2, y: stackTop + headH + gapY }
+scene.style.top = stackTop + 'px'
+const link = scene.querySelector('a'); link.style.top = (headH + gapY + fh + gapY) + 'px'; if (VW < 900) link.style.marginTop = (fh + 2 * gapY) + 'px'
+readouts.style.left = (VW - cw) / 2 + 'px'; readouts.style.width = cw + 'px'; readouts.style.top = (stackTop + 4) + 'px'
+const rv = readouts.querySelector('[data-r="v"]'), rc = readouts.querySelector('[data-r="c"]'), rk = readouts.querySelector('[data-r="k"]')
+
+let actT = 0, actOn = false   // sekundy aktu (0…ACT_LEN), w przód albo wstecz
+const ACT_LEN = 2.1
+const ease3 = (x) => 1 - (1 - x) ** 3
+const masks = [scene.querySelector('.tag .i'), ...wm.querySelectorAll('.ch'), ...scene.querySelectorAll('.desc .i'), link.querySelector('.i')]
+const startAt = masks.map((el, i) => el.classList.contains('ch') ? 0.62 + (i - 1) * 0.032 : el.closest('.tag') ? 0.5 : el.closest('a') ? 1.25 : 0.9 + (i - 1 - wm.querySelectorAll('.ch').length) * 0.08)
+function imgRect(zoom) {
+  const mv = ease3(cl01(actT / 1.0)) * (actT > 0 ? 1 : 0)   // kadr jedzie na miejsce przez pierwszą sekundę aktu
   const cx0 = VW / 2, cy0 = VIS / 2, cx1 = placed.x + fw / 2, cy1 = placed.y + fh / 2
-  const cx = cx0 + (cx1 - cx0) * act, cy = cy0 + (cy1 - cy0) * act
+  const cx = cx0 + (cx1 - cx0) * mv, cy = cy0 + (cy1 - cy0) * mv
   const w = fw * zoom, h = w * 9 / 16
   gl.useProgram(main)
   gl.uniform4f(U('uImgRect'), (cx - w / 2) / VH, 1 - (cy + h / 2) / VH, w / VH, h / VH)
   gl.uniform1f(U('uImgR'), 16 * zoom / VH)
 }
-const sceneParts = [...scene.querySelectorAll('header > *, a')]
-function heading(t) {
-  // ruch revealu z reszty strony: wjazd od dołu i pojawienie, co 0,1 przebiegu, sterowane scrollem
-  sceneParts.forEach((el, i) => { const k = p2out(cl01(t * 1.6 - i * 0.18)); el.style.opacity = k; el.style.transform = `translateY(${(1 - k) * 24}px)` })
+function act(dt, P) {
+  actOn = P > 0.86 ? true : P < 0.84 ? false : actOn
+  actT = Math.min(Math.max(actT + (actOn ? dt : -dt * 1.4), 0), ACT_LEN)
+  scene.style.visibility = actT > 0 ? 'visible' : 'hidden'
+  masks.forEach((el, i) => { const k = ease3(cl01((actT - startAt[i]) / 0.75)); el.style.transform = `translateY(${(1 - k) * 110}%)` })
+  // odczyty: prawdziwe liczby przemiany, póki trwa; gasną, gdy wjeżdża nagłówek
+  const show = ss(0.1, 0.2, P) * (1 - ease3(cl01(actT / 0.4)))
+  readouts.style.opacity = show; readouts.style.transform = `translateY(${-(1 - (1 - ease3(cl01(actT / 0.4)))) * 8}px)`
+  if (show > 0) {
+    const vis = 0.82 - 0.52 * tr.dark - 0.25 * tr.imageIn - 0.05 * tr.clarity
+    const hex = (c) => '#' + c.map((v) => Math.round(v * 255).toString(16).padStart(2, '0')).join('')
+    const dc = window.__darkCol || [21 / 255, 48 / 255, 31 / 255], gc = [0.03, 0.575, 0.363]
+    rv.textContent = `viscosity ${Math.max(vis, 0).toFixed(2)}`
+    rc.textContent = `color ${hex(gc.map((g, i) => g + (dc[i] - g) * tr.dark))}`
+    rk.textContent = `clarity ${Math.round(tr.clarity * 100)}%`
+  }
 }
+
 const quad = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, quad)
 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW)
 const vao = gl.createVertexArray(); gl.bindVertexArray(vao)
@@ -726,9 +823,8 @@ function transition(scroll) {
   tr.clarity = p2out(cl01((P - 0.52) / 0.32))
   // zrzut wypływa z głębi: rośnie, gdy się wyłania, a potem przesuwa na swoje miejsce w scenie, gdy wjeżdża nagłówek
   const zoom = 0.62 + 0.38 * p2out(cl01((P - 0.4) / 0.44))
-  const act = ss(0.84, 0.93, P)
-  imgRect(zoom, act)
-  heading(cl01((P - 0.9) / 0.1))
+  tr.P = P
+  imgRect(zoom)
   // front tafli w pikselach pola odległości: do przekątnej kadru (z zapasem na nierówny front)
   floodR = Math.hypot(JW, JH) * 1.25 * ss(0.1, 0.56, P) ** 1.7
   if (Math.abs(tr.spread - sentSpread) > 0.003) { sentSpread = tr.spread; physics.postMessage({ P: { spread: tr.spread } }) }
@@ -770,6 +866,9 @@ function frame(now) {
   // (stara kopuła z szerokich plamek wyłączona: wysokość daje teraz pole odległości)
   gl.disable(gl.BLEND)
   transition(shift)
+  act(dt, tr.P)
+  // warstwa zaznaczania hero tylko wtedy, gdy hero jest widoczne
+  selLayer.style.visibility = loader.handoff && tr.dark < 0.5 ? 'visible' : 'hidden'
   distanceField()
   // 2) obraz
   gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, W, H)
