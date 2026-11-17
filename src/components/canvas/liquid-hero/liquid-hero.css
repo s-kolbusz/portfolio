@@ -135,7 +135,9 @@
 /* mask: the line slides out from under the edge */
 .lq-stage .scene .m {
   display: inline-block;
-  overflow: hidden;
+  /* clipped only where the line rises from: a letter's overhang (the r's arm) and descender (the y's tail)
+     reach past its box, and overflow: hidden cut them off */
+  clip-path: inset(-1em -0.5em -0.12em -0.5em);
   vertical-align: top;
   padding-bottom: 0.14em;
   margin-bottom: -0.14em;
@@ -292,28 +294,43 @@
     opacity: 0;
   }
 }
+/* A note opens in one gesture: the line draws out of the pin, the paper unrolls from the line's end,
+   then the fact and the sentence rise into it. It closes in reverse, in the same time (0.9 s each way). */
+.lq-stage .pin {
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
 .lq-stage .pin .ln {
   position: absolute;
   background: #fbf9f4;
   /* an ink edge, so the line also reads over the light screenshot */
   box-shadow: 0 0 0 1px rgba(43, 38, 32, 0.45);
   transform-origin: 0 0;
-  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  /* closing: the line goes last */
+  transition: transform 0.3s var(--ease) 0.6s;
 }
 .lq-stage .pin p {
   position: absolute;
+  isolation: isolate;
   margin: 0;
   width: max-content;
   padding: 16px 18px 17px;
-  background: #fbf9f4;
   color: #2b2620;
+  pointer-events: none;
+  visibility: hidden;
+  transition: visibility 0s linear 0.9s;
+}
+/* the paper: its own layer, so it can unroll without squashing the text */
+.lq-stage .pin p::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: #fbf9f4;
   box-shadow: 0 18px 44px rgba(0, 0, 0, 0.42);
   border-radius: 2px;
-  opacity: 0;
-  pointer-events: none;
-  transition:
-    opacity 0.3s ease 0.1s,
-    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.06s;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 0.45s var(--ease) 0.2s;
 }
 /* the fact: large, heavy, in ink, it is what should stay in the head; the line under it light and calm */
 .lq-stage .pin p strong {
@@ -337,20 +354,51 @@
     sans-serif;
   color: rgba(43, 38, 32, 0.78);
 }
+.lq-stage .pin p strong,
+.lq-stage .pin p span {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 0.25s ease,
+    transform 0.3s var(--ease);
+}
+.lq-stage .pin p strong {
+  transition-delay: 0.05s;
+}
 .lq-stage .pin.open p,
 .lq-stage .pin.peek p {
+  pointer-events: auto;
+  visibility: visible;
+  transition: visibility 0s;
+}
+.lq-stage .pin.open p::before,
+.lq-stage .pin.peek p::before {
+  transform: none;
+  transition: transform 0.45s var(--ease) 0.15s;
+}
+.lq-stage .pin.open p strong,
+.lq-stage .pin.peek p strong,
+.lq-stage .pin.open p span,
+.lq-stage .pin.peek p span {
   opacity: 1;
   transform: none;
-  pointer-events: auto;
+  transition:
+    opacity 0.35s ease 0.4s,
+    transform 0.5s var(--ease) 0.4s;
+}
+.lq-stage .pin.open p span,
+.lq-stage .pin.peek p span {
+  transition-delay: 0.48s;
 }
 .lq-stage .pin.open .ln,
 .lq-stage .pin.peek .ln {
   transform: none;
+  transition: transform 0.3s var(--ease);
 }
 .lq-stage .pin.peek {
   z-index: 4;
 }
-/* directions: l (left), r (right), b (down) */
+/* directions: l (left), r (right), b (down); the paper unrolls away from the pin */
 .lq-stage .pin[data-d='r'] .ln {
   left: 18px;
   top: 0;
@@ -361,7 +409,6 @@
 .lq-stage .pin[data-d='r'] p {
   left: 52px;
   top: -24px;
-  transform: translateX(-8px);
 }
 .lq-stage .pin[data-d='l'] .ln {
   right: 18px;
@@ -375,7 +422,9 @@
   right: 52px;
   top: -24px;
   text-align: right;
-  transform: translateX(8px);
+}
+.lq-stage .pin[data-d='l'] p::before {
+  transform-origin: 100% 50%;
 }
 .lq-stage .pin[data-d='b'] .ln {
   left: 0;
@@ -387,9 +436,13 @@
 .lq-stage .pin[data-d='b'] p {
   left: -18px;
   top: 46px;
-  transform: translateY(-8px);
 }
-.lq-stage .pin.open .ln {
+.lq-stage .pin[data-d='b'] p::before {
+  transform: scaleY(0);
+  transform-origin: 50% 0;
+}
+.lq-stage .pin.open[data-d] p::before,
+.lq-stage .pin.peek[data-d] p::before {
   transform: none;
 }
 

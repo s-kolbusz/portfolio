@@ -26,7 +26,7 @@
   #scene ::selection { background: rgba(240,150,100,.35); }
   #pins ::selection { background: rgba(15,157,99,.28); }
   #scene p, #scene h2 { margin: 0; }
-  #scene .m { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .14em; margin-bottom: -.14em; }  /* maska: wiersz wyjeżdża spod krawędzi */
+  #scene .m { display: inline-block; clip-path: inset(-1em -.5em -.12em -.5em); vertical-align: top; padding-bottom: .14em; margin-bottom: -.14em; }  /* maska: wiersz wyjeżdża spod krawędzi */
   #scene .i { display: inline-block; will-change: transform; }
   /* znak = logo stronypodhale.pl: Cabinet Grotesk, „strony” i „.pl” w akcencie (500), „podhale” w kolorze tekstu (800); na całą szerokość bloku */
   #scene .wm { position: absolute; left: 0; font: 500 64px/0.86 "Cabinet Grotesk", system-ui, sans-serif; letter-spacing: -0.035em; white-space: nowrap; pointer-events: auto; }
