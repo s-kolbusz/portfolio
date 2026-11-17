@@ -42,9 +42,9 @@
   #pins { position: fixed; inset: 0; z-index: 2; pointer-events: none; }
   .pin { position: absolute; width: 0; height: 0; z-index: 1; }
   .pin.open { z-index: 3; }
-  .pin i { position: absolute; left: -13px; top: -13px; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
-    background: oklch(0.8 0.125 47); color: var(--scene, #15301f); font: 800 13px/1 "Cabinet Grotesk", system-ui, sans-serif; font-style: normal;
-    box-shadow: 0 0 0 3px var(--scene, #15301f), 0 6px 18px rgba(0,0,0,.35); transform: scale(0); cursor: pointer; pointer-events: auto;
+  .pin i { position: absolute; left: -15px; top: -15px; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+    background: oklch(0.8 0.125 47); color: var(--scene, #15301f); font: 900 14px/1 "Mattone", system-ui, sans-serif; font-style: normal;
+    box-shadow: 0 0 0 3px var(--scene, #15301f), 0 0 0 4.5px rgba(251,249,244,.85), 0 8px 22px rgba(0,0,0,.45); transform: scale(0); cursor: pointer; pointer-events: auto;
     transition: transform .5s cubic-bezier(.34,1.56,.64,1), background .25s ease; }
   .pin.on i { transform: scale(1); }
   .pin.on i:hover { transform: scale(1.18); }
@@ -53,18 +53,22 @@
   .pin.open i::after { animation: none; opacity: 0; }
   @keyframes ping { from { transform: scale(1); opacity: .9 } to { transform: scale(2.4); opacity: 0 } }
   .pin .ln { position: absolute; background: oklch(0.8 0.125 47); transform-origin: 0 0; transition: transform .45s cubic-bezier(.22,1,.36,1); }
-  .pin p { position: absolute; margin: 0; width: max-content; max-width: 23ch; padding: 10px 13px 11px; background: var(--scene, #15301f);
-    font: 400 15px/1.42 "Mattone", system-ui, sans-serif; color: #f3efe6; opacity: 0; transition: opacity .35s ease .12s, transform .5s cubic-bezier(.22,1,.36,1) .08s;
-    pointer-events: none; }
-  .pin p b { display: block; font: 400 11px ui-monospace, Menlo, monospace; letter-spacing: .2em; text-transform: uppercase; color: oklch(0.8 0.125 47); margin-bottom: 6px; }
-  .pin.open p { opacity: 1; transform: none; pointer-events: auto; }
+  .pin p { position: absolute; margin: 0; width: max-content; padding: 14px 16px 15px; background: var(--scene, #15301f);
+    box-shadow: 0 14px 40px rgba(0,0,0,.5); border-radius: 3px; opacity: 0; pointer-events: none;
+    transition: opacity .3s ease .1s, transform .5s cubic-bezier(.22,1,.36,1) .06s; }
+  /* fakt: duży, ciężki, w akcencie — to on ma zostać w głowie; zdanie pod nim jasne i spokojne */
+  .pin p strong { display: block; font: 900 clamp(26px, 2.3vw, 36px)/0.95 "Mattone", system-ui, sans-serif; letter-spacing: -0.02em; color: oklch(0.8 0.125 47); margin: 0 0 10px; white-space: nowrap; }
+  .pin p span { display: block; max-width: 24ch; font: 400 15px/1.45 "Mattone", system-ui, sans-serif; color: #fbf9f4; }   /* szerokość notatki = większe z: fakt albo zdanie */
+  .pin.open p, .pin.peek p { opacity: 1; transform: none; pointer-events: auto; }
+  .pin.open .ln, .pin.peek .ln { transform: none; }
+  .pin.peek { z-index: 4; }
   /* kierunki: l (w lewo), r (w prawo), b (w dół) */
-  .pin[data-d="r"] .ln { left: 13px; top: 0; width: 34px; height: 1px; transform: scaleX(0); }
-  .pin[data-d="r"] p { left: 47px; top: -20px; transform: translateX(-8px); }
-  .pin[data-d="l"] .ln { right: 13px; top: 0; width: 34px; height: 1px; transform: scaleX(0); transform-origin: 100% 0; }
-  .pin[data-d="l"] p { right: 47px; top: -20px; text-align: right; transform: translateX(8px); }
-  .pin[data-d="b"] .ln { left: 0; top: 13px; width: 1px; height: 28px; transform: scaleY(0); }
-  .pin[data-d="b"] p { left: -13px; top: 41px; transform: translateY(-8px); }
+  .pin[data-d="r"] .ln { left: 15px; top: 0; width: 34px; height: 1px; transform: scaleX(0); }
+  .pin[data-d="r"] p { left: 49px; top: -24px; transform: translateX(-8px); }
+  .pin[data-d="l"] .ln { right: 15px; top: 0; width: 34px; height: 1px; transform: scaleX(0); transform-origin: 100% 0; }
+  .pin[data-d="l"] p { right: 49px; top: -24px; text-align: right; transform: translateX(8px); }
+  .pin[data-d="b"] .ln { left: 0; top: 15px; width: 1px; height: 28px; transform: scaleY(0); }
+  .pin[data-d="b"] p { left: -15px; top: 43px; transform: translateY(-8px); }
   .pin.open .ln { transform: none; }
   #info { position: fixed; top: 10px; right: 12px; font: 12px ui-monospace, monospace; color: rgba(43,38,32,.62); }
 </style>
@@ -627,17 +631,17 @@ if (fw < cw) { row.style.left = (cw - fw) / 2 + 'px'; row.style.right = (cw - fw
 
 // pinezki: miejsca na zrzucie (ułamki szerokości i wysokości) i notatki o decyzjach w tym projekcie
 const PINS = [   // u, v, tytuł, notatka, kierunek notatki
-  [0.13, 0.05, 'The mark', 'A rosette from the parzenica that still reads at 16 px, and a name written as an address you can read out over the phone.', 'b'],
-  [0.165, 0.655, 'Prices', 'Public, on the first screen: from 300 zł to start and 50 zł a month.', 'l'],
-  [0.21, 0.765, 'Configurator', 'Pick what goes on your site and see the price at once. The design is free.', 'b'],
-  [0.66, 0.47, 'A real project', 'zakofy.com, private tours from Zakopane, shown where a mockup would usually go.', 'r'],
+  [0.13, 0.05, '16 px', 'The parzenica rosette still reads at this size. The name is an address you can say over the phone.', 'b'],
+  [0.165, 0.655, '300 zł', 'to start, then 50 zł a month. Public, on the first screen.', 'l'],
+  [0.21, 0.765, '0 zł', 'for the design. Pick what goes on the site and the price shows at once.', 'b'],
+  [0.66, 0.47, 'zakofy.com', 'A real client where a mockup would usually go: private tours from Zakopane.', 'r'],
 ]
 const pinsEl = document.getElementById('pins')
 const pins = PINS.map(([u, v, t, txt, dir], n) => {
   const el = document.createElement('div'); el.className = 'pin'; el.dataset.d = dir
   const x = placed.x + u * fw, y = placed.y + v * fh
   el.style.left = x + 'px'; el.style.top = y + 'px'
-  el.innerHTML = `<i role="button" tabindex="0" aria-expanded="false" aria-label="${t}">${n + 1}</i><span class="ln"></span><p><b>${String(n + 1).padStart(2, '0')} · ${t}</b>${txt}</p>`
+  el.innerHTML = `<i role="button" tabindex="0" aria-expanded="false" aria-label="${t}: ${txt}">${n + 1}</i><span class="ln"></span><p><strong>${t}</strong><span>${txt}</span></p>`
   pinsEl.append(el)
   // notatka nie może wyjść poza ekran: wtedy idzie w dół i przesuwa się do środka
   const fit = () => { const r = el.querySelector('p').getBoundingClientRect(); return r.left >= 12 && r.right <= VW - 12 }
@@ -649,6 +653,10 @@ const pins = PINS.map(([u, v, t, txt, dir], n) => {
     // na wąskim ekranie notatka zasłania sąsiednie pinezki, więc otwarta jest jedna naraz (dalej zostaje, aż ją zamkniesz)
     if (open && VW < 700) for (const o of pinsEl.querySelectorAll('.pin.open')) { o.classList.remove('open'); o.querySelector('i').setAttribute('aria-expanded', 'false') }
     el.classList.toggle('open', open); btn.setAttribute('aria-expanded', open)
+  }
+  if (!matchMedia('(hover: none)').matches) {
+    el.addEventListener('mouseenter', () => el.classList.add('peek'))
+    el.addEventListener('mouseleave', () => el.classList.remove('peek'))
   }
   btn.addEventListener('click', toggle); btn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle() } })
   return { el }
