@@ -9,6 +9,7 @@ import Image from 'next/image'
 import {
   startLiquidStage,
   supportsLiquid,
+  HOLD_FROM,
   TRACK_SCREENS,
   WORK_AT,
 } from '@/components/canvas/liquid-hero/liquid-stage'
@@ -23,13 +24,16 @@ const WORDMARK = [
   ['acc', '.pl'],
 ] as const
 
-/** Pins on the screenshot: where (fractions of its width and height) and which way the note opens. */
+/**
+ * Pins on the screenshot: where (fractions of its width and height) and which way the note opens.
+ * mu/mv: the same facts on the phone screenshot (stronypodhale.pl as seen on a phone), used on phones.
+ */
 const PINS = [
-  { key: 'rosette', u: 0.13, v: 0.05, d: 'b' },
-  { key: 'price', u: 0.372, v: 0.05, d: 'r' },
-  { key: 'upfront', u: 0.39, v: 0.43, d: 'r' },
-  { key: 'piczura', u: 0.66, v: 0.4, d: 'r' },
-  { key: 'free', u: 0.215, v: 0.745, d: 'b' },
+  { key: 'rosette', u: 0.13, v: 0.05, mu: 0.1, mv: 0.057, d: 'b' },
+  { key: 'price', u: 0.372, v: 0.05, mu: 0.88, mv: 0.057, d: 'r' },
+  { key: 'upfront', u: 0.39, v: 0.43, mu: 0.95, mv: 0.36, d: 'r' },
+  { key: 'piczura', u: 0.66, v: 0.4, mu: 0.49, mv: 0.78, d: 'r' },
+  { key: 'free', u: 0.215, v: 0.745, mu: 0.93, mv: 0.505, d: 'b' },
 ] as const
 
 const SITE_URL = 'https://stronypodhale.pl'
@@ -152,6 +156,17 @@ export function Hero() {
             className="pointer-events-none absolute left-0 h-px w-px"
             style={{ top: `${(WORK_AT / TRACK_SCREENS) * 100}%` }}
           />
+          {/* the finished scene holds: wheel scroll is braked from the act's start until the stage unpins */}
+          <div
+            aria-hidden="true"
+            data-scroll-heavy="0.45"
+            data-scroll-range="box"
+            className="pointer-events-none absolute left-0 w-px"
+            style={{
+              top: `${(HOLD_FROM / TRACK_SCREENS) * 100}%`,
+              height: `${((TRACK_SCREENS - 1 - HOLD_FROM) / TRACK_SCREENS) * 100}%`,
+            }}
+          />
           <div ref={stageRef} className="lq-stage">
             <canvas ref={canvasRef} aria-hidden="true" />
             <canvas ref={loaderRef} className="ld" aria-hidden="true" />
@@ -187,7 +202,15 @@ export function Hero() {
             </div>
             <div ref={pinsRef} className="pins">
               {pins.map((pin, index) => (
-                <div key={pin.key} className="pin" data-d={pin.d} data-u={pin.u} data-v={pin.v}>
+                <div
+                  key={pin.key}
+                  className="pin"
+                  data-d={pin.d}
+                  data-u={pin.u}
+                  data-v={pin.v}
+                  data-mu={pin.mu}
+                  data-mv={pin.mv}
+                >
                   <button
                     type="button"
                     aria-expanded="false"

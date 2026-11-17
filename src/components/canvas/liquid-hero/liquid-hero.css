@@ -29,7 +29,7 @@
 .lq-track {
   position: relative;
   width: 100%;
-  height: 400lvh;
+  height: 500lvh;
 }
 .lq-stage {
   position: sticky;
@@ -75,6 +75,19 @@
   color: #2b2620;
   -webkit-tap-highlight-color: transparent;
 }
+.lq-stage .tilt {
+  transition:
+    opacity 0.3s ease,
+    visibility 0s linear 0s;
+}
+.lq-stage .tilt[data-away] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.3s ease,
+    visibility 0s linear 0.3s;
+}
 .lq-stage .tilt i {
   width: 7px;
   height: 7px;
@@ -109,9 +122,11 @@
   visibility: hidden;
   pointer-events: none;
 }
-.lq-stage .scene ::selection,
-.lq-stage .pins ::selection {
+.lq-stage .scene ::selection {
   background: rgba(240, 150, 100, 0.35);
+}
+.lq-stage .pins ::selection {
+  background: rgba(15, 157, 99, 0.28);
 }
 .lq-stage .scene p,
 .lq-stage .scene h2 {
@@ -184,9 +199,10 @@
 .lq-stage .scene a:hover b {
   transform: translate(3px, -3px);
 }
-/* pins on the screenshot: numbered, in the brand's accent. A click pins the note for good (a second
-   click unpins it), hovering previews it. The note speaks our language: a thin line from the pin, the
-   fact large and heavy, the hero's typeface, on a piece of the same water. */
+/* pins on the screenshot: numbered. A click pins the note for good (a second click unpins it), hovering
+   previews it. Pins and notes are what kolbusz.xyz adds on top of stronypodhale.pl, so they speak the
+   site's own language (paper #fbf9f4, ink #2b2620, Mattone and mono as in the hero), not the brand's
+   green and orange (owner, 2026-11-17). */
 .lq-stage .pins {
   position: absolute;
   inset: 0;
@@ -204,26 +220,27 @@
 }
 .lq-stage .pin button {
   position: absolute;
-  left: -15px;
-  top: -15px;
-  width: 30px;
-  height: 30px;
+  left: -18px;
+  top: -18px;
+  width: 36px;
+  height: 36px;
   margin: 0;
   padding: 0;
   border: 0;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: oklch(0.8 0.125 47);
-  color: var(--scene, #15301f);
+  background: #fbf9f4;
+  color: #2b2620;
   font:
-    900 14px/1 'Mattone',
+    900 16px/1 'Mattone',
     system-ui,
     sans-serif;
   font-style: normal;
+  /* a bullseye (paper, ink ring, paper ring) reads on both the dark sheet and the light screenshot */
   box-shadow:
-    0 0 0 3px var(--scene, #15301f),
-    0 0 0 4.5px rgba(251, 249, 244, 0.85),
+    0 0 0 3px #2b2620,
+    0 0 0 5px #fbf9f4,
     0 8px 22px rgba(0, 0, 0, 0.45);
   transform: scale(0);
   cursor: pointer;
@@ -239,17 +256,28 @@
   transform: scale(1.18);
 }
 .lq-stage .pin.open button {
-  background: #f3efe6;
+  background: #2b2620;
+  color: #fbf9f4;
+  box-shadow:
+    0 0 0 3px #fbf9f4,
+    0 0 0 5px #2b2620,
+    0 8px 22px rgba(0, 0, 0, 0.45);
 }
+/* two rings ripple out of a closed pin, so it is found at a glance */
+.lq-stage .pin button::before,
 .lq-stage .pin button::after {
   content: '';
   position: absolute;
-  inset: -3px;
+  inset: -5px;
   border-radius: 50%;
-  border: 1.5px solid oklch(0.8 0.125 47);
-  animation: lq-ping 2.6s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  border: 2.5px solid #fbf9f4;
+  animation: lq-ping 2.2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
   pointer-events: none;
 }
+.lq-stage .pin button::before {
+  animation-delay: 0.55s;
+}
+.lq-stage .pin.open button::before,
 .lq-stage .pin.open button::after {
   animation: none;
   opacity: 0;
@@ -260,13 +288,13 @@
     opacity: 0.9;
   }
   to {
-    transform: scale(2.4);
+    transform: scale(2.2);
     opacity: 0;
   }
 }
 .lq-stage .pin .ln {
   position: absolute;
-  background: oklch(0.8 0.125 47);
+  background: #fbf9f4;
   transform-origin: 0 0;
   transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -274,17 +302,18 @@
   position: absolute;
   margin: 0;
   width: max-content;
-  padding: 14px 16px 15px;
-  background: var(--scene, #15301f);
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5);
-  border-radius: 3px;
+  padding: 16px 18px 17px;
+  background: #fbf9f4;
+  color: #2b2620;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.42);
+  border-radius: 2px;
   opacity: 0;
   pointer-events: none;
   transition:
     opacity 0.3s ease 0.1s,
     transform 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.06s;
 }
-/* the fact: large, heavy, in the accent, it is what should stay in the head; the line under it light and calm */
+/* the fact: large, heavy, in ink, it is what should stay in the head; the line under it light and calm */
 .lq-stage .pin p strong {
   display: block;
   font:
@@ -292,7 +321,7 @@
     system-ui,
     sans-serif;
   letter-spacing: -0.02em;
-  color: oklch(0.8 0.125 47);
+  color: #2b2620;
   margin: 0 0 10px;
   white-space: nowrap;
 }
@@ -304,7 +333,7 @@
     400 15px/1.45 'Mattone',
     system-ui,
     sans-serif;
-  color: #fbf9f4;
+  color: rgba(43, 38, 32, 0.78);
 }
 .lq-stage .pin.open p,
 .lq-stage .pin.peek p {
@@ -321,19 +350,19 @@
 }
 /* directions: l (left), r (right), b (down) */
 .lq-stage .pin[data-d='r'] .ln {
-  left: 15px;
+  left: 18px;
   top: 0;
   width: 34px;
   height: 1px;
   transform: scaleX(0);
 }
 .lq-stage .pin[data-d='r'] p {
-  left: 49px;
+  left: 52px;
   top: -24px;
   transform: translateX(-8px);
 }
 .lq-stage .pin[data-d='l'] .ln {
-  right: 15px;
+  right: 18px;
   top: 0;
   width: 34px;
   height: 1px;
@@ -341,21 +370,21 @@
   transform-origin: 100% 0;
 }
 .lq-stage .pin[data-d='l'] p {
-  right: 49px;
+  right: 52px;
   top: -24px;
   text-align: right;
   transform: translateX(8px);
 }
 .lq-stage .pin[data-d='b'] .ln {
   left: 0;
-  top: 15px;
+  top: 18px;
   width: 1px;
   height: 28px;
   transform: scaleY(0);
 }
 .lq-stage .pin[data-d='b'] p {
-  left: -15px;
-  top: 43px;
+  left: -18px;
+  top: 46px;
   transform: translateY(-8px);
 }
 .lq-stage .pin.open .ln {

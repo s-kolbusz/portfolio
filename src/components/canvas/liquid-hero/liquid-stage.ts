@@ -43,10 +43,16 @@ export interface LiquidStageOptions {
   onRemount: () => void
 }
 
-/** The scroll the stage stays pinned for, in screen heights (the test page's body was 400vh). */
-export const TRACK_SCREENS = 4
+/**
+ * The scroll the stage stays pinned for, in screen heights. The test page's body was 400vh; here one
+ * screen more, so the finished scene (wordmark, line, pins) holds for 1.5 screens before the next
+ * section scrolls in (owner, 2026-11-17: it left too soon).
+ */
+export const TRACK_SCREENS = 5
 /** Where the act has started for sure: anchor for "See the work" (scroll in screen heights). */
 export const WORK_AT = 0.1 + 2.4
+/** Where the act starts (transition P = 0.86), in screen heights: the hold runs from here to the unpin. */
+export const HOLD_FROM = 0.1 + 0.86 * 2.4
 
 const FG = '#2b2620'
 const ADAPT_THEME_SELECTOR = '[data-adapt-theme]'
@@ -167,6 +173,14 @@ async function run(els: LiquidStageElements, opts: LiquidStageOptions, life: Lif
   check()
 
   const T = heroTextures(opts.copy, { W, H, dpr, INSET, PORTRAIT })
+  // where the name's S and K stand (CSS px in the stage, baselines): the site bar's initials leave the name from there
+  stage.dataset.name = JSON.stringify({
+    s: [T.name.sx / dpr, T.name.sy / dpr],
+    k: [T.name.kx / dpr, T.name.ky / dpr],
+    size: T.name.S / dpr,
+    ls: parseFloat(T.name.ls) / dpr,
+  })
+  life.cleanup(() => delete stage.dataset.name)
 
   const glc = canvas.getContext('webgl2', { antialias: false, premultipliedAlpha: false })
   if (!glc) throw new Error('no WebGL2')
@@ -423,10 +437,15 @@ async function run(els: LiquidStageElements, opts: LiquidStageOptions, life: Lif
   gl.uniform1f(U('uBlockRight'), T.fade[2] + 0.02)
   gl.uniform1f(U('uNameOn'), 0)
   let signed = false
-  // the stronypodhale.pl screenshot: in the middle of the frame, 16:9, where it will later stand in the scene
+  // the stronypodhale.pl screenshot: in the middle of the frame, where it will later stand in the scene.
+  // On phones it is the site as seen on a phone (portrait, owner 2026-11-14); elsewhere the desktop view, 16:9.
+  const PHONE_SHOT = VW < 700
+  const IA = PHONE_SHOT ? 390 / 844 : 16 / 9 // the screenshot's width / height
   {
     const img = new Image()
-    img.src = '/images/projects/stronypodhale.avif'
+    img.src = PHONE_SHOT
+      ? '/images/projects/stronypodhale-mobile.avif'
+      : '/images/projects/stronypodhale.avif'
     img
       .decode()
       .then(() => {
@@ -501,13 +520,18 @@ async function run(els: LiquidStageElements, opts: LiquidStageOptions, life: Lif
   const overlap = wmH * 0.16 // the frame slides a little under the wordmark: the wordmark lies on top, as if stuck onto the water
   const gapY = PORTRAIT ? 18 : 26,
     vpad = 2 * Math.min(pad, 36)
-  const fw = Math.min(cw, ((VIS - (wmH - overlap) - gapY - rowH - vpad) * 16) / 9),
-    fh = (fw * 9) / 16
+  // the portrait phone screenshot is capped at 60% of the visible height: the scene must not run under the site's bar
+  const fw = Math.min(
+      cw,
+      (VIS - (wmH - overlap) - gapY - rowH - vpad) * IA,
+      PHONE_SHOT ? 0.6 * VIS * IA : Infinity
+    ),
+    fh = fw / IA
   const stackTop = (VIS - (wmH - overlap + fh + gapY + rowH)) / 2
   const placed = { x: (VW - fw) / 2, y: stackTop + wmH - overlap }
   scene.style.top = stackTop + 'px'
   row.style.top = wmH - overlap + fh + gapY + 'px'
-  if (fw < cw) {
+  if (fw < cw && !PHONE_SHOT) {
     row.style.left = (cw - fw) / 2 + 'px'
     row.style.right = (cw - fw) / 2 + 'px'
   }
@@ -515,8 +539,8 @@ async function run(els: LiquidStageElements, opts: LiquidStageOptions, life: Lif
   // pins: places on the screenshot (fractions of width and height) with notes about decisions in this project
   const hoverNone = matchMedia('(hover: none)').matches
   const pins = Array.from(pinsEl.querySelectorAll<HTMLElement>('.pin')).map((el) => {
-    const u = +(el.dataset.u ?? 0),
-      v = +(el.dataset.v ?? 0)
+    const u = +((PHONE_SHOT ? el.dataset.mu : el.dataset.u) ?? 0),
+      v = +((PHONE_SHOT ? el.dataset.mv : el.dataset.v) ?? 0)
     const x = placed.x + u * fw,
       y = placed.y + v * fh
     el.style.left = x + 'px'
@@ -578,7 +602,7 @@ async function run(els: LiquidStageElements, opts: LiquidStageOptions, life: Lif
     const cx = cx0 + (cx1 - cx0) * mv,
       cy = cy0 + (cy1 - cy0) * mv
     const w = fw * zoom,
-      h = (w * 9) / 16
+      h = w / IA
     gl.useProgram(main)
     gl.uniform4f(U('uImgRect'), (cx - w / 2) / VH, 1 - (cy + h / 2) / VH, w / VH, h / VH)
     gl.uniform1f(U('uImgR'), (16 * zoom) / VH)
@@ -1062,6 +1086,12 @@ async function run(els: LiquidStageElements, opts: LiquidStageOptions, life: Lif
     act(dt, tr.P)
     // the hero's selection layer only while the hero is visible
     selLayer.style.visibility = loader.handoff && tr.dark < 0.5 ? 'visible' : 'hidden'
+    // tilt means something only in the hero: past it the button goes and tilt switches off (owner, 2026-11-17)
+    const away = tr.dark >= 0.5
+    if (tiltBtn.hasAttribute('data-away') !== away) {
+      tiltBtn.toggleAttribute('data-away', away)
+      if (away && tiltOn) setTilt(false)
+    }
     adaptChrome(stageRect)
     distanceField()
     // 2) the picture
