@@ -86,7 +86,7 @@
  <div id="scene">
   <h2 class="wm" aria-label="stronypodhale.pl"><span class="acc">strony</span><span class="str">podhale</span><span class="acc">.pl</span></h2>
   <div class="row">
-    <p class="say"><span class="m"><span class="i">Websites for Podhale businesses.</span></span><br><span class="m"><span class="i">Public prices, domain, hosting and care included.</span></span></p>
+    <p class="say"><span class="m"><span class="i">Websites for Podhale businesses.</span></span><br><span class="m"><span class="i">The design and the price before you pay.</span></span></p>
     <a href="https://stronypodhale.pl" target="_blank" rel="noopener"><span class="m"><span class="i">Visit the site <b>↗</b></span></span></a>
   </div>
 </div>
@@ -632,9 +632,10 @@ if (fw < cw) { row.style.left = (cw - fw) / 2 + 'px'; row.style.right = (cw - fw
 // pinezki: miejsca na zrzucie (ułamki szerokości i wysokości) i notatki o decyzjach w tym projekcie
 const PINS = [   // u, v, tytuł, notatka, kierunek notatki
   [0.13, 0.05, '16 px', 'The parzenica rosette still reads at this size. The name is an address you can say over the phone.', 'b'],
-  [0.165, 0.655, '300 zł', 'to start, then 50 zł a month. Public, on the first screen.', 'l'],
-  [0.21, 0.765, '0 zł', 'for the design. Pick what goes on the site and the price shows at once.', 'b'],
-  [0.66, 0.47, 'zakofy.com', 'A real client where a mockup would usually go: private tours from Zakopane.', 'r'],
+  [0.372, 0.05, '369 zł', 'to start, then 85 zł a month, or 1835 zł to own it outright. Every price is on the site.', 'r'],
+  [0.39, 0.43, 'z góry', 'Upfront, and from the mountains: you see the design and the price before you pay.', 'r'],
+  [0.66, 0.4, 'wellezza.pl', 'A real client where a mockup would usually go: a hair salon in Wieliczka.', 'r'],
+  [0.215, 0.745, '0 zł', 'if the design is not for you. You pay only once you approve it.', 'b'],
 ]
 const pinsEl = document.getElementById('pins')
 const pins = PINS.map(([u, v, t, txt, dir], n) => {
