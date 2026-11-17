@@ -15,6 +15,7 @@ import { routing } from '@/i18n/routing'
 import { SITE_DESCRIPTION, SITE_ORIGIN, SITE_ROLE, SITE_TWITTER_HANDLE } from '@/lib/site'
 
 import '../globals.css'
+import '../system.css'
 
 type Props = {
   children: React.ReactNode
@@ -144,7 +145,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
-          enableSystem
+          forcedTheme="light"
           disableTransitionOnChange
         >
           <NextIntlClientProvider locale={locale} messages={messages}>

@@ -7,9 +7,7 @@
     "description": "Creative developer and full-stack engineer based in Zakopane, Poland. Animated websites (GSAP, WebGL), Next.js applications and Payload CMS. Founder of stronypodhale.pl."
   },
   "actions": {
-    "skip_to_main": "Skip to main content",
-    "toggle_theme": "Toggle theme",
-    "switch_language": "Switch language"
+    "skip_to_main": "Skip to main content"
   },
   "nav": {
     "main_navigation": "Main Navigation",
@@ -19,7 +17,12 @@
     "services": "Services",
     "calculator": "3D Print",
     "contact": "Contact",
-    "cv": "CV"
+    "cv": "CV",
+    "menu": "Menu",
+    "close": "Close",
+    "elsewhere": "Elsewhere",
+    "in_progress": "in progress",
+    "screens": "{n} screens"
   },
   "HomePage": {
     "title": "Sebastian Kolbusz",
@@ -334,5 +337,14 @@
     "subtitle": "Page Not Found",
     "description": "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
     "returnHome": "Return to Home"
+  },
+  "navFacts": {
+    "hero": "Liquid on paper, simulated live in your browser.",
+    "work": "My web studio: websites for businesses in Podhale, with the design and the price agreed up front.",
+    "about": "Frontend engineer and designer in Zakopane. Building websites since 2016.",
+    "projects": "Cut a POS platform’s production bundle in half at ready2order.",
+    "services": "Design, code, server and upkeep, in one pair of hands.",
+    "calculator": "A rebuilt Creality K1. I print on request.",
+    "contact": "Zakopane, Poland. Working remotely."
   }
 }

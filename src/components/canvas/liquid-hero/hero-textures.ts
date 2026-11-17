@@ -95,8 +95,28 @@ export function heroTextures(copy: HeroCopy, { W, H, dpr, INSET, PORTRAIT }: Fra
     kw: g.measureText(copy.last).width,
     k1: g.measureText(copy.last[0]).width,
   }
+  // the initials once more in channel B: their exact shapes, so the page can hide just them when they fly off to
+  // the site bar (site-nav/sk-flight.tsx); the name keeps every other pixel, even where the letters overlap
+  const initial = (word: string, x: number, y: number) => {
+    const fs = g.fillStyle,
+      op = g.globalCompositeOperation
+    g.globalCompositeOperation = 'lighter'
+    g.fillStyle = '#00f'
+    g.fillText(word[0], x, y)
+    // where the next letter overlaps the initial, the pixels stay the next letter's: redraw the rest of the word
+    // over it (same positions as in the whole word, kerning and tracking included)
+    g.globalCompositeOperation = 'source-over'
+    g.fillStyle = '#0f0'
+    g.fillText(word.slice(1), x + g.measureText(word).width - g.measureText(word.slice(1)).width, y)
+    g.fillStyle = fs
+    g.globalCompositeOperation = op
+  }
   g.fillText(copy.first, name.sx, name.sy)
-  if (!PORTRAIT) g.fillText(copy.last, name.kx, name.ky) // in portrait only above the block, once its height is known
+  initial(copy.first, name.sx, name.sy)
+  if (!PORTRAIT) {
+    g.fillText(copy.last, name.kx, name.ky) // in portrait only above the block, once its height is known
+    initial(copy.last, name.kx, name.ky)
+  }
   g.fillStyle = '#fff'
   g.letterSpacing = '0px'
 
@@ -121,6 +141,7 @@ export function heroTextures(copy: HeroCopy, { W, H, dpr, INSET, PORTRAIT }: Fra
     g.letterSpacing = name.ls
     g.fillStyle = '#0f0'
     g.fillText(copy.last, name.kx, name.ky)
+    initial(copy.last, name.kx, name.ky)
     g.font = f
     g.letterSpacing = ls
     g.fillStyle = fs

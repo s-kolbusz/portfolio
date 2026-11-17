@@ -38,10 +38,11 @@ export function CustomCursor() {
     }
   }, [isEnabled])
 
+  // The ring wraps the element's whole box exactly where the keyboard focus ring sits (2 px at an 8 px offset,
+  // so 10 px out on each side), measured every frame: elements move (menus reveal, pages scroll, Lenis eases).
   const updateTargetRect = () => {
-    if (magneticTargetRef.current && magneticTargetRef.current.isConnected) {
-      targetRectRef.current = magneticTargetRef.current.getBoundingClientRect()
-    }
+    const el = magneticTargetRef.current
+    if (el && el.isConnected) targetRectRef.current = el.getBoundingClientRect()
   }
 
   useEffect(() => {
@@ -68,15 +69,20 @@ export function CustomCursor() {
 
         if (state.magneticTarget && ringRef.current) {
           const style = window.getComputedStyle(state.magneticTarget)
-          const targetRadius = parseInt(style.borderRadius)
-          const targetHeight = parseInt(style.height)
+          const targetRadius = parseFloat(style.borderRadius) || 0
+          const targetHeight = state.magneticTarget.getBoundingClientRect().height || 1
 
           const isPill = targetRadius >= targetHeight / 2
           const newRadius = isPill ? '9999px' : `${targetRadius + 10}px`
 
           gsap.to(ringRef.current, { borderRadius: newRadius, duration: 0.2 })
+          // on a target the ring is the focus ring: same colour, same weight
+          ringRef.current.style.borderColor = 'var(--color-ring)'
+          ringRef.current.style.borderWidth = '2px'
         } else if (ringRef.current) {
           gsap.to(ringRef.current, { borderRadius: '50%', duration: 0.2 })
+          ringRef.current.style.borderColor = ''
+          ringRef.current.style.borderWidth = ''
         }
       }
 
@@ -175,6 +181,7 @@ export function CustomCursor() {
         }
 
         if (magneticTargetRef.current) {
+          updateTargetRect()
           const rect = targetRectRef.current
           hasTarget = rect.width > 0
           let centerX = rect.left + rect.width / 2

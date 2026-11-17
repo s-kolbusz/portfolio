@@ -7,9 +7,7 @@
     "description": "Creative developer i full-stack engineer z Zakopanego. Animowane strony (GSAP, WebGL), aplikacje w Next.js i panele w Payload CMS. Strony dla małych firm z Podhala robię w stronypodhale.pl."
   },
   "actions": {
-    "skip_to_main": "Przejdź do treści",
-    "toggle_theme": "Zmień motyw",
-    "switch_language": "Zmień język"
+    "skip_to_main": "Przejdź do treści"
   },
   "nav": {
     "main_navigation": "Menu główne",
@@ -19,7 +17,12 @@
     "services": "Usługi",
     "calculator": "Druk 3D",
     "contact": "Kontakt",
-    "cv": "CV"
+    "cv": "CV",
+    "menu": "Menu",
+    "close": "Close",
+    "elsewhere": "Elsewhere",
+    "in_progress": "in progress",
+    "screens": "{n} screens"
   },
   "HomePage": {
     "title": "Sebastian Kolbusz",
@@ -330,5 +333,14 @@
     "subtitle": "Strona nie znaleziona",
     "description": "Strona, której szukasz, mogła zostać usunięta lub jest tymczasowo niedostępna.",
     "returnHome": "Powrót do strony głównej"
+  },
+  "navFacts": {
+    "hero": "Liquid on paper, simulated live in your browser.",
+    "work": "My web studio: websites for businesses in Podhale, with the design and the price agreed up front.",
+    "about": "Frontend engineer and designer in Zakopane. Building websites since 2016.",
+    "projects": "Cut a POS platform’s production bundle in half at ready2order.",
+    "services": "Design, code, server and upkeep, in one pair of hands.",
+    "calculator": "A rebuilt Creality K1. I print on request.",
+    "contact": "Zakopane, Poland. Working remotely."
   }
 }

@@ -1036,6 +1036,9 @@ async function run(els: LiquidStageElements, opts: LiquidStageOptions, life: Lif
       raf = requestAnimationFrame(frame)
       return
     }
+    // in this very frame, before the page is drawn: the site bar places its flying S and K and says whether
+    // the name should still draw its own (sk-flight.tsx reads the frame time, so both agree; no flicker)
+    stage.dispatchEvent(new CustomEvent('lq-frame', { bubbles: true, detail: now }))
     const dt = Math.min((now - tPrev) / 1000, 0.05)
     tPrev = now
     time += dt
@@ -1117,6 +1120,7 @@ async function run(els: LiquidStageElements, opts: LiquidStageOptions, life: Lif
     gl.uniform3f(U('uInk'), ink[0], ink[1], ink[2])
     gl.uniform3f(U('uWave'), wave[0], wave[1], wave[2])
     gl.uniform1f(U('uNameOn'), loader.handoff ? 1 : 0)
+    gl.uniform1f(U('uSkCut'), +(stage.dataset.skCut ?? 0))
     gl.uniform1f(U('uBoardT'), loader.boardT)
     gl.uniform2f(U('uHRange'), loader.hRange[0], loader.hRange[1])
     gl.uniform1f(U('uSpread'), floodR > 0 ? 1 : 0)

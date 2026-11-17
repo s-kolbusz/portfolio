@@ -21,7 +21,8 @@ export default defineConfig({
       exclude: [
         'src/**/*.test.{ts,tsx}',
         // GSAP animation components — side-effects only, no testable branches in jsdom
-        'src/components/ui/dock-tooltip.tsx',
+        // WebGL: no GL context in jsdom
+        'src/components/ui/site-nav/menu-water.ts',
         'src/components/ui/custom-cursor.tsx',
         'src/components/ui/smooth-scroller.tsx',
         // Non-JS assets, type declarations, and entry points that export no logic

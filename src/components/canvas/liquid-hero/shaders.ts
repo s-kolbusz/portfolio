@@ -26,6 +26,7 @@ uniform vec4 uFade;
 uniform vec3 uInk;   // zdania: ile tuszu ma każde (0.28…1)
 uniform vec3 uWave;  // zdania: fala w chwili zdarzenia
 uniform float uNameOn; // imię na stronie: 0, dopóki pokazuje je loader (inicjały), potem 1
+uniform float uSkCut; // 0…1: S and K have left the name for the site bar's corner (site-nav/sk-flight.tsx)
 uniform float uBoardT;  // plansza ładowania: <0 pełna, potem sekundy chudnięcia do poziomic, >3 nie ma jej
 uniform vec2 uHRange;   // wysokości terenu w kadrze (najniższa, najwyższa): plansza schodzi od dolin w górę
 uniform vec2 uDomeSize;
@@ -64,7 +65,9 @@ vec3 page(vec2 q){
   vec3 col = mix(BG, lineCol, line*(1. + 0.6*uDark));
   // stały tekst (R) i imię (G bez R), imię dopiero po przekazaniu z loadera
   vec4 st = texture(uStatic, suv(q));
-  col = mix(col, INK, clamp(st.r + max(st.g - st.r, 0.)*uNameOn, 0., 1.)*sink);
+  // once the initials leave for the bar, the name keeps no copy of them: channel B holds their exact shapes
+  float cut = uSkCut*smoothstep(0.02, 0.12, st.b - st.r);   // the whole soft edge too, so no outline stays behind
+  col = mix(col, INK, clamp(st.r + max(st.g - st.r, 0.)*uNameOn*(1. - cut), 0., 1.)*sink);
   const vec2 iw = vec2(0.); const float ia = 1.;
   // zdania: każde z falą, która przechodzi przez nie w chwili zdarzenia
   vec2 w0 = vec2(sin(q.y*260.+uTime*18.)*0.004*uWave.x, 0.);
