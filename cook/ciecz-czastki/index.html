@@ -44,8 +44,6 @@
     #scene .desc { text-align: right; }
     #scene a { position: absolute; right: 0; }
   }
-  #readouts { position: fixed; z-index: 1; display: flex; gap: 22px; flex-wrap: wrap; font: 11px ui-monospace, Menlo, monospace; letter-spacing: .16em; text-transform: uppercase; color: rgba(243,239,230,.66); opacity: 0; pointer-events: none; }
-  #readouts .to { color: oklch(0.8 0.125 47); margin-right: auto; }
   #info { position: fixed; top: 10px; right: 12px; font: 12px ui-monospace, monospace; color: rgba(43,38,32,.62); }
 </style>
 </head>
@@ -59,8 +57,7 @@
   <p>Nothing off the shelf. I take things apart. I put them back together myself.</p>
   <a href="#work">See the work</a>
 </div>
- <div id="readouts" aria-hidden="true"><span class="to">→ stronypodhale.pl</span><span data-r="v"></span><span data-r="c"></span><span data-r="k"></span></div>
-<div id="scene">
+ <div id="scene">
   <header>
     <div class="lead">
       <p class="tag"><span class="m"><span class="i">01 · Product · Websites for Podhale businesses</span></span></p>
@@ -380,7 +377,9 @@ void main(){
   float F = 0.02 + 0.98*pow(1.-max(n.z,0.),5.);
   vec3 rd = vec3(0.,0.,-1.), r = reflect(rd, n);
   // bez cieniowania rozproszonego: to ono robiło z cieczy plastelinę; szkło pokazuje fale załamaniem i odbiciem
-  vec3 col = body*(1.-F) + env(r,q)*F*0.7*(1. - 0.9*uClarity*(1. - rebelness));
+  vec3 envC = env(r,q);
+  envC = mix(envC, envC*vec3(0.42, 0.8, 0.6), uDark*rebelness);   // na ciemnej wodzie kropla odbija zielono, nie szaro
+  vec3 col = body*(1.-F*(1. - 0.55*uDark*rebelness)) + envC*F*0.7*(1. - 0.9*uClarity*(1. - rebelness))*(1. - 0.45*uDark*rebelness);
   vec3 L = normalize(vec3(-0.55 + 0.12*sin(q.y*7.+uTime*0.21), 0.62 + 0.08*cos(q.x*5.3-uTime*0.17), 0.56));
   float sp = max(dot(r, L), 0.);
   col += vec3(1.)*(pow(sp, 5.)*0.07 + pow(sp, 24.)*0.08 + pow(sp, 220.)*0.6)*(1. - 0.85*uClarity*(1. - rebelness));  // szeroki połysk pokazuje fale jako jaśniejsze pasma  // odblask okna: miękka poświata + ostre jądro jak na szkle
@@ -588,7 +587,7 @@ gl.uniform3f(U('uDarkCol'), 21 / 255, 48 / 255, 31 / 255)
 // reveal na reszcie strony, a przy cofnięciu scrolla odtwarzany wstecz): kadr jedzie na miejsce, odczyty gasną,
 // potem wyjeżdżają spod maski etykieta, litery tytułu, wiersze opisu i link.
 const VIS = VH - INSET
-const scene = document.getElementById('scene'), readouts = document.getElementById('readouts')
+const scene = document.getElementById('scene')
 const pad = Math.max(24, 0.0667 * VW)
 const wm = scene.querySelector('.wm'), descEl = scene.querySelector('.desc')
 const wmHTML = wm.innerHTML, descText = descEl.textContent
@@ -615,8 +614,6 @@ const stackTop = (VIS - (headH + gapY + fh + gapY + linkH)) / 2
 const placed = { x: (VW - fw) / 2, y: stackTop + headH + gapY }
 scene.style.top = stackTop + 'px'
 const link = scene.querySelector('a'); link.style.top = (headH + gapY + fh + gapY) + 'px'; if (VW < 900) link.style.marginTop = (fh + 2 * gapY) + 'px'
-readouts.style.left = (VW - cw) / 2 + 'px'; readouts.style.width = cw + 'px'; readouts.style.top = (stackTop + 4) + 'px'
-const rv = readouts.querySelector('[data-r="v"]'), rc = readouts.querySelector('[data-r="c"]'), rk = readouts.querySelector('[data-r="k"]')
 
 let actT = 0, actOn = false   // sekundy aktu (0…ACT_LEN), w przód albo wstecz
 const ACT_LEN = 2.1
@@ -637,17 +634,6 @@ function act(dt, P) {
   actT = Math.min(Math.max(actT + (actOn ? dt : -dt * 1.4), 0), ACT_LEN)
   scene.style.visibility = actT > 0 ? 'visible' : 'hidden'
   masks.forEach((el, i) => { const k = ease3(cl01((actT - startAt[i]) / 0.75)); el.style.transform = `translateY(${(1 - k) * 110}%)` })
-  // odczyty: prawdziwe liczby przemiany, póki trwa; gasną, gdy wjeżdża nagłówek
-  const show = ss(0.1, 0.2, P) * (1 - ease3(cl01(actT / 0.4)))
-  readouts.style.opacity = show; readouts.style.transform = `translateY(${-(1 - (1 - ease3(cl01(actT / 0.4)))) * 8}px)`
-  if (show > 0) {
-    const vis = 0.82 - 0.52 * tr.dark - 0.25 * tr.imageIn - 0.05 * tr.clarity
-    const hex = (c) => '#' + c.map((v) => Math.round(v * 255).toString(16).padStart(2, '0')).join('')
-    const dc = window.__darkCol || [21 / 255, 48 / 255, 31 / 255], gc = [0.03, 0.575, 0.363]
-    rv.textContent = `viscosity ${Math.max(vis, 0).toFixed(2)}`
-    rc.textContent = `color ${hex(gc.map((g, i) => g + (dc[i] - g) * tr.dark))}`
-    rk.textContent = `clarity ${Math.round(tr.clarity * 100)}%`
-  }
 }
 
 const quad = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, quad)
@@ -704,15 +690,19 @@ addEventListener('pointermove', (e) => {
   if (e.pointerType !== 'mouse') return
   const p = toSim(e); cur.inside = true
   // przeskok (np. kursor wraca do okna w innym miejscu) to nie ruch
+  if (selecting) { cur.vx = 0; cur.vy = 0; cur.x = p.x; cur.y = p.y; last = p; return }   // przy zaznaczaniu kursor nie porywa cieczy
   if (last && Math.hypot(p.x - last.x, p.y - last.y) < 8) { const dt = Math.max((p.t - last.t) / 1000 * STEPS_PER_SECOND, 0.5); cur.vx = cur.vx * 0.5 + (p.x - last.x) / dt * 0.5; cur.vy = cur.vy * 0.5 + (p.y - last.y) / dt * 0.5 }
   cur.x = p.x; cur.y = p.y; last = p
 })
 // --- mysz: jak dotąd (najechanie, ruch, klik, przytrzymanie)
+let selecting = false
+const onText = (e) => !!e.target.closest?.('#sel span, #scene header, #scene a')
 addEventListener('pointerdown', (e) => {
   if (e.pointerType !== 'mouse') return
+  if (onText(e)) { selecting = true; return }   // zaznaczanie tekstu ma pierwszeństwo przed rozbijaniem kropli
   const p = toSim(e); cur.x = p.x; cur.y = p.y; cur.inside = true; cur.down = true; cur.impulse = 1.1 * 0.021 / Hq
 })
-addEventListener('pointerup', (e) => { if (e.pointerType === 'mouse') cur.down = false })
+addEventListener('pointerup', (e) => { if (e.pointerType === 'mouse') { cur.down = false; selecting = false } })
 
 // --- dotyk: własne zasady. Palec poza cieczą przewija stronę i nie rusza cieczy.
 // Palec na cieczy chwyta ją (strona się wtedy nie przewija): przeciągnięcie ciągnie, szybkie machnięcie odrywa,
@@ -729,7 +719,7 @@ let touchId = null, touchStart = null
 addEventListener('touchstart', (e) => {
   if (touchId !== null) return
   const t = e.changedTouches[0]
-  if (!onLiquid(t.clientX, t.clientY)) return            // poza cieczą: zwykłe przewijanie
+  if (onText(e) || !onLiquid(t.clientX, t.clientY)) return   // na tekście: zaznaczanie; poza cieczą: zwykłe przewijanie
   e.preventDefault()                                     // na cieczy: palec należy do cieczy
   touchId = t.identifier
   const p = { x: t.clientX / VH / Hq, y: (1 - t.clientY / VH) / Hq, t: performance.now() }
