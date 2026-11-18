@@ -242,6 +242,14 @@ scope.onmessage = ({ data }) => {
       tx[g] = data.targets[g * 2]
       ty[g] = data.targets[g * 2 + 1]
     }
+    // the page sends targets every frame: each one also drives the steps due by now. In Low Power
+    // Mode Safari throttles this thread's own timers, and the liquid got 12 of its 120 steps a second
+    // (owner's iPad, 2026-11-18); frames still come at 30 a second.
+    if (!paused) {
+      if (timer) clearTimeout(timer)
+      timer = null
+      tick()
+    }
   }
   if (data.pointer) {
     const hit = Math.max(ptr.hit, data.pointer.hit)
@@ -271,13 +279,14 @@ function tick() {
   acc += Math.min((now - tPrev) / 1000, 0.1) * STEPS_PER_SECOND
   tPrev = now
   let n = 0
-  while (acc >= 1 && n < 4) {
+  // up to 8 steps at a time: at 30 frames a second each frame owes 4
+  while (acc >= 1 && n < 8) {
     steer()
     sim.step()
     acc -= 1
     n++
   }
-  if (n === 4) acc = Math.min(acc, 1)
+  if (n === 8) acc = Math.min(acc, 1)
   stepped += n
   if (n) send()
   timer = setTimeout(tick, acc >= 1 ? 0 : Math.max(0, ((1 - acc) / STEPS_PER_SECOND) * 1000))

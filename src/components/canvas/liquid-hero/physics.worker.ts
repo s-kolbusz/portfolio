@@ -67,6 +67,13 @@ scope.onmessage = ({ data }) => {
     for (const k of CUR_KEYS) if (k in data.cur) cur[k] = data.cur[k]
     // a hit (click, tap) is one-shot: it must not get lost when it arrives between steps
     if (data.cur.impulse) sim.cur.impulse = Math.max(sim.cur.impulse, data.cur.impulse)
+    // the page sends the cursor every frame: each one also drives the steps due by now, since Low
+    // Power Mode throttles this thread's own timers (as seen on ready2order's worker, 2026-11-18)
+    if (!paused) {
+      if (timer) clearTimeout(timer)
+      timer = null
+      tick()
+    }
   }
   if (data.P) Object.assign(sim.P, data.P)
   if (data.buf) buf = data.buf // the page hands a buffer back for reuse
@@ -103,13 +110,14 @@ function tick() {
     }
     if (acc > 4) acc = 0
   } else {
-    while (acc >= 1 && n < 4) {
+    // up to 8 steps at a time: at 30 frames a second each frame owes 4
+    while (acc >= 1 && n < 8) {
       sim.step()
       acc -= 1
       n++
     }
     steps = n
-    if (n === 4) acc = Math.min(acc, 1)
+    if (n === 8) acc = Math.min(acc, 1)
   }
   if (n) send(performance.now() - t0, steps)
   // next step: right away if overdue; otherwise wait until its time comes
