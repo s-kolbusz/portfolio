@@ -34,6 +34,8 @@ export function CustomCursor() {
 
   const cursorRef = useRef<HTMLDivElement>(null)
   const ringRef = useRef<HTMLDivElement>(null)
+  const blendLayerRef = useRef<HTMLDivElement>(null)
+  const focusLayerRef = useRef<HTMLDivElement>(null)
 
   const magneticTargetRef = useRef<HTMLElement | null>(null)
   const targetRectRef = useRef({ left: 0, top: 0, width: 0, height: 0 })
@@ -96,12 +98,13 @@ export function CustomCursor() {
           // on a target the ring is the focus ring: same colour, same weight
           ringRef.current.style.borderColor = 'var(--color-ring)'
           ringRef.current.style.borderWidth = '2px'
-          ringRef.current.style.mixBlendMode = 'normal'
+          // into the layer without blending, so it keeps the focus ring's own colour
+          if (focusLayerRef.current) focusLayerRef.current.append(ringRef.current)
         } else if (ringRef.current) {
           gsap.to(ringRef.current, { borderRadius: '50%', duration: 0.2 })
           ringRef.current.style.borderColor = ''
           ringRef.current.style.borderWidth = ''
-          ringRef.current.style.mixBlendMode = ''
+          if (blendLayerRef.current) blendLayerRef.current.append(ringRef.current)
         }
       }
 
@@ -327,26 +330,36 @@ export function CustomCursor() {
 
   if (!isEnabled) return null
 
+  // Two top-level layers, so the blend reaches the page: a blend inside a fixed container only
+  // mixes with that container. The dot and the free ring blend (always visible); the ring on a
+  // link moves to the second layer, which does not, and stays the keyboard focus ring.
   return (
-    <div
-      data-testid="custom-cursor"
-      data-adapt-theme="pointer"
-      className="pointer-events-none fixed inset-0 z-9998 overflow-hidden print:hidden"
-    >
-      {/* the dot is two bars that morph: both round = a dot, both tall = a text bar, crossed = a crosshair */}
+    <>
       <div
-        ref={cursorRef}
-        data-shape="dot"
-        className="cc-dot pointer-events-none fixed top-0 left-0 opacity-0 will-change-transform"
+        ref={blendLayerRef}
+        data-testid="custom-cursor"
+        data-adapt-theme="pointer"
+        className="cc-blend pointer-events-none fixed inset-0 z-9998 overflow-hidden print:hidden"
       >
-        <i data-bar="h" />
-        <i data-bar="v" />
+        {/* the dot is two bars that morph: both round = a dot, both tall = a text bar, crossed = a crosshair */}
+        <div
+          ref={cursorRef}
+          data-shape="dot"
+          className="cc-dot pointer-events-none fixed top-0 left-0 opacity-0 will-change-transform"
+        >
+          <i data-bar="h" />
+          <i data-bar="v" />
+        </div>
+        <div
+          ref={ringRef}
+          className="cc-ring pointer-events-none fixed top-0 left-0 h-11 w-11 -translate-x-1/2 -translate-y-1/2 rounded-full border opacity-0 transition-colors will-change-transform"
+        />
       </div>
-
       <div
-        ref={ringRef}
-        className="cc-ring pointer-events-none fixed top-0 left-0 h-11 w-11 -translate-x-1/2 -translate-y-1/2 rounded-full border opacity-0 transition-colors will-change-transform"
+        ref={focusLayerRef}
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-9998 overflow-hidden print:hidden"
       />
-    </div>
+    </>
   )
 }

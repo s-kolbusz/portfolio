@@ -1,8 +1,9 @@
-/* Always visible: the dot and the free ring are white with a difference blend, so they turn dark
-   on paper and light on ink, the dark sheet or a photo. On a link the ring is the keyboard focus
-   ring instead (custom-cursor.tsx switches the blend off there). */
-.cc-dot,
-.cc-ring {
+/* Always visible: the dot and the free ring are white in a layer with a difference blend, so they
+   turn dark on paper and light on ink, the dark sheet or a photo. The blend sits on the layer, not
+   on the dot: the cursor's fixed container is its own stacking context, and a blend inside it only
+   mixes with the container. On a link the ring moves to a layer without blending and is the
+   keyboard focus ring (custom-cursor.tsx). */
+.cc-blend {
   mix-blend-mode: difference;
 }
 .cc-dot {
