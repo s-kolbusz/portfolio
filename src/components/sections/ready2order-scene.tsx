@@ -13,6 +13,7 @@ import {
 } from '@/components/canvas/liquid-hero/drops-stage'
 import { usePrefersReducedMotion } from '@/hooks/use-media'
 import { Link } from '@/i18n/navigation'
+import { useScrollStore } from '@/lib/stores/scroll'
 
 import './ready2order-scene.css'
 
@@ -57,6 +58,8 @@ const T = {
   fates: [0.4, 0.6],
   half: [0.66, 0.8],
   step: [0, 0.2, 0.42, 0.68],
+  /** where a step holds still: a click on it scrolls there */
+  hold: [0.06, 0.34, 0.62, 0.9],
 }
 
 /** where everything stands at a stage size (CSS px) */
@@ -65,8 +68,8 @@ function geometry(W: number, H: number) {
   const M = W * 0.0667
   let box: Box, shelf: Box
   if (phone) {
-    box = { x: M, y: 96, w: W - 2 * M, h: H * 0.38 }
-    shelf = { x: M, y: box.y + box.h + 40, w: box.w, h: H * 0.15 }
+    box = { x: M, y: 96, w: W - 2 * M, h: H * 0.32 }
+    shelf = { x: M, y: box.y + box.h + 36, w: box.w, h: H * 0.1 }
   } else {
     const x0 = W * 0.42
     const full = W - M - x0
@@ -82,7 +85,7 @@ function geometry(W: number, H: number) {
   }
   const mid = (b: Box, u = 0.5, v = 0.5) => ({ x: b.x + b.w * u, y: b.y + b.h * v })
   // the one body fills the map; each part's drop has its share of that body's area
-  const R = Math.min(box.w, box.h) * (phone ? 0.28 : 0.34)
+  const R = Math.min(box.w, box.h) * (phone ? 0.25 : 0.34)
   const radius = GROUPS.map((g) => R * Math.sqrt(g.share))
   // the labels sit in each block's top-left corner, so the drops sit a little below the middle
   const inBlock = (b: BlockKey) => mid(block(b), 0.5, 0.56)
@@ -174,6 +177,9 @@ export function Ready2orderScene() {
     if (!track || !stage || !holder) return
     const q = <E extends HTMLElement>(s: string) => Array.from(stage.querySelectorAll<E>(s))
     const steps = q('[data-step]')
+    const fills = q('[data-fill]')
+    const rows = q('[data-print]')
+    const ticks = q('[data-tick]')
     const fades = q('[data-show]')
     const placed = q('[data-at]')
     const drops = q<HTMLImageElement>('[data-drop]')
@@ -281,6 +287,18 @@ export function Ready2orderScene() {
       steps.forEach((el, i) => {
         el.dataset.state = i === now ? 'now' : i < now ? 'past' : 'next'
       })
+      // each step's stretch of the path fills as the scroll goes through it
+      fills.forEach((el, i) => {
+        const a = T.step[i],
+          b = T.step[i + 1] ?? 1
+        el.style.transform = `scaleX(${span(p, a, b)})`
+      })
+      ticks.forEach((el, i) => el.toggleAttribute('aria-current', i === now))
+      // the receipt prints line by line, and takes its lines back when the page scrolls up
+      rows.forEach((el) => {
+        const on = now + 1 >= Number(el.dataset.print)
+        if ((el.dataset.on === '1') !== on) el.dataset.on = on ? '1' : '0'
+      })
       if (door) door.tabIndex = now === 3 ? 0 : -1
       // labels fade in and out over their own stretch of the scroll
       for (const el of fades) {
@@ -336,11 +354,23 @@ export function Ready2orderScene() {
       clearTimeout(restart)
       restart = window.setTimeout(start, 250)
     }
+    // a step on the path takes the page to that step
+    const go = (e: MouseEvent) => {
+      const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-tick]')
+      if (!btn) return
+      const top = track.getBoundingClientRect().top + window.scrollY
+      const y = top + (track.offsetHeight - window.innerHeight) * T.hold[Number(btn.dataset.tick)]
+      const lenis = useScrollStore.getState().lenis
+      if (lenis) lenis.scrollTo(y, { duration: 1.4 })
+      else window.scrollTo({ top: y, behavior: 'smooth' })
+    }
+    stage.addEventListener('click', go)
     draw()
     window.addEventListener('scroll', request, { passive: true })
     window.addEventListener('resize', onResize)
     return () => {
       liquid?.stop()
+      stage.removeEventListener('click', go)
       holder.replaceChildren()
       clearTimeout(restart)
       adapt(false)
@@ -359,6 +389,20 @@ export function Ready2orderScene() {
   )
   const intro = (
     <>
+      <a
+        className="r2o-logo"
+        href="https://ready2order.com"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element -- a small static mark; next/image adds nothing here */}
+        <img
+          src="/images/r2o/ready2order-logo-on-ink.webp"
+          alt={t('logo')}
+          width={640}
+          height={108}
+        />
+      </a>
       <p className="r2o-label">{t('label')}</p>
       <h2 id="r2o-title" className="r2o-ask">
         {t('question')}
@@ -370,6 +414,39 @@ export function Ready2orderScene() {
         </a>
       </p>
     </>
+  )
+  // the till's own receipt: it prints the story as it goes, and ends with the sum
+  const line = (print: number, name: string, value?: string, gone = false, valueFrom = print) => (
+    <div className={gone ? 'r2o-row r2o-gone' : 'r2o-row'} data-print={print} data-on="0">
+      <span>{name}</span>
+      <i />
+      {value ? (
+        <span data-print={valueFrom} data-on="0">
+          {value}
+        </span>
+      ) : null}
+    </div>
+  )
+  const receipt = (
+    <div className="r2o-receipt" aria-hidden="true">
+      <div className="r2o-paper">
+        <p className="r2o-hd">{t('receipt.head')}</p>
+        <p className="r2o-sub">{t('receipt.sub')}</p>
+        {line(1, t('receipt.all'), '100%')}
+        {line(2, t('receipt.app'), t('receipt.kept'), false, 3)}
+        {line(2, t('receipt.deps'), t('receipt.updated'), false, 3)}
+        {line(2, t('receipt.screens'), t('receipt.later'), false, 3)}
+        {line(2, t('receipt.redux'), t('receipt.removed'), true, 3)}
+        {line(3, t('receipt.webpack'), t('receipt.rewritten'))}
+        <div className="r2o-tot" data-print={4} data-on="0">
+          <span>{t('receipt.total')}</span>
+          <strong>{t('result')}</strong>
+        </div>
+        <p className="r2o-thx" data-print={4} data-on="0">
+          {t('receipt.thanks')}
+        </p>
+      </div>
+    </div>
   )
 
   if (reduced) {
@@ -421,20 +498,35 @@ export function Ready2orderScene() {
 
         <div className="r2o-left">
           <div className="r2o-intro">{intro}</div>
-          <ol className="r2o-steps">
+          {/* the story's path: four stretches that fill with the scroll; each one takes you to its step */}
+          <nav className="r2o-path" aria-label={t('stepsLabel')}>
+            <ol>
+              {STEP_KEYS.map((key, i) => (
+                <li key={key}>
+                  <button type="button" data-tick={i}>
+                    <span className="r2o-track">
+                      <span data-fill />
+                    </span>
+                    <span className="r2o-tick">
+                      {String(i + 1).padStart(2, '0')} {t(`steps.${key}.short`)}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ol>
+          </nav>
+          <div className="r2o-now">
             {STEP_KEYS.map((key, i) => (
-              <li key={key} data-step data-state={i === 0 ? 'now' : 'next'}>
-                <span className="r2o-micro">{String(i + 1).padStart(2, '0')}</span>
-                <div>
-                  <b>{t(`steps.${key}.title`)}</b>
-                  <span className="r2o-text">
-                    {t(`steps.${key}.text`)}
-                    {key === 'half' ? <> {door}</> : null}
-                  </span>
-                </div>
-              </li>
+              <div key={key} className="r2o-step" data-step data-state={i === 0 ? 'now' : 'next'}>
+                <b>{t(`steps.${key}.title`)}</b>
+                <p>
+                  {t(`steps.${key}.text`)}
+                  {key === 'half' ? <> {door}</> : null}
+                </p>
+              </div>
             ))}
-          </ol>
+          </div>
+          {receipt}
         </div>
 
         <div className="r2o-map" aria-hidden="true">

@@ -357,26 +357,30 @@
     "stays": "It stays in your browser."
   },
   "ready2order": {
-    "label": "ready2order · 2019–2025",
+    "label": "Front end · 2019–2025",
     "question": "Why did a till app take so long to start on a shop’s tablet?",
-    "who": "ready2order is the till system of 10,000+ cafés, shops and salons in Austria and Germany. I built its web front end for six years.",
+    "who": "The till system of 10,000+ cafés, shops and salons in Austria and Germany.",
     "site": "ready2order.com",
     "steps": {
       "one": {
         "title": "One heavy download",
-        "text": "Every tablet loaded the whole app before it showed the first screen."
+        "text": "Every tablet loaded the whole app before it showed the first screen.",
+        "short": "Whole"
       },
       "apart": {
         "title": "Taken apart",
-        "text": "What was actually in there."
+        "text": "Four parts. Only one of them had to be there at the start.",
+        "short": "Apart"
       },
       "fates": {
         "title": "Slimmed, split off, thrown out",
-        "text": "Webpack config rewritten · code split, dead code out · Redux out, Apollo already cached the data · dependencies updated."
+        "text": "Webpack config rewritten · screens split off · Redux out, Apollo already cached the data · dependencies updated.",
+        "short": "Fates"
       },
       "half": {
         "title": "Half the size",
-        "text": "Four changes that added up."
+        "text": "Four changes that added up.",
+        "short": "Half"
       }
     },
     "map": {
@@ -415,6 +419,25 @@
       }
     },
     "result": "−50%",
-    "door": "The whole story"
+    "door": "The whole story",
+    "logo": "ready2order",
+    "stepsLabel": "The story in four steps",
+    "receipt": {
+      "head": "ready2order",
+      "sub": "production build · JavaScript at start",
+      "all": "Everything, before the first screen",
+      "app": "App’s own code",
+      "deps": "Dependencies",
+      "screens": "Screens",
+      "redux": "Redux",
+      "webpack": "Webpack config",
+      "kept": "kept",
+      "updated": "updated",
+      "later": "later",
+      "removed": "removed",
+      "rewritten": "rewritten",
+      "total": "JS at start",
+      "thanks": "Danke!"
+    }
   }
 }

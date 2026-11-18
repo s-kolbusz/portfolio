@@ -64,27 +64,43 @@
   user-select: none;
 }
 
-/* left: who ready2order is, the question, and the four steps; the current one opens */
+/* left: who ready2order is and the question, always; the story's path; the step it is on; the receipt */
 .r2o-left {
   position: absolute;
   z-index: 1;
   left: var(--sys-margin);
   top: var(--sys-s8);
+  bottom: var(--sys-s7);
   width: 28vw;
+  display: flex;
+  flex-direction: column;
+}
+.r2o-logo {
+  display: block;
+  width: fit-content;
+}
+.r2o-logo img {
+  display: block;
+  width: auto;
+  height: 24px;
+}
+.r2o-left .r2o-label {
+  margin-top: var(--sys-s2);
+  color: var(--r2o-soft);
 }
 .r2o-ask {
   margin: var(--sys-s3) 0 0;
+  max-width: 24ch;
   font:
     700 var(--sys-lead) / 1.3 'Mattone',
     system-ui,
     sans-serif;
 }
 .r2o-who {
-  max-width: 40ch;
-  margin: var(--sys-s3) 0 0;
+  max-width: 42ch;
+  margin: var(--sys-s2) 0 0;
   font: 13px / 1.55 var(--sys-mono);
   color: var(--r2o-soft);
-  transition: opacity 0.4s var(--sys-out);
 }
 .r2o-who a {
   white-space: nowrap;
@@ -92,65 +108,110 @@
   text-decoration: none;
   border-bottom: var(--sys-line) solid var(--r2o-faint);
 }
-.r2o-stage:not([data-step='1']) .r2o-who {
-  opacity: 0;
-  visibility: hidden;
-}
-.r2o-steps {
-  margin: var(--sys-s6) 0 0;
+
+/* the path: four stretches that fill as the scroll goes through them. Every one is a button with its
+   name always showing (touch screens have no hover), at least as tall as a finger */
+.r2o-path ol {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--sys-s1);
+  margin: var(--sys-s5) 0 0;
   padding: 0;
   list-style: none;
 }
-.r2o-steps li {
-  display: grid;
-  grid-template-columns: var(--sys-s5) 1fr;
-  padding: var(--sys-s2) 0;
-  border-top: var(--sys-line) solid var(--r2o-faint);
-  color: var(--r2o-faint);
+.r2o-path button {
+  display: block;
+  width: 100%;
+  min-height: var(--sys-touch);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--r2o-soft);
+  text-align: left;
+  cursor: pointer;
+}
+.r2o-track {
+  position: relative;
+  display: block;
+  height: var(--sys-line-2);
+  background: var(--r2o-faint);
+  overflow: hidden;
+}
+.r2o-track [data-fill] {
+  position: absolute;
+  inset: 0;
+  background: var(--sys-paper);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.r2o-tick {
+  display: block;
+  margin-top: var(--sys-s1);
+  font: var(--sys-micro) / 1.3 var(--sys-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   transition: color 0.4s var(--sys-out);
 }
-.r2o-steps li:last-child {
-  border-bottom: var(--sys-line) solid var(--r2o-faint);
-}
-.r2o-steps li > .r2o-micro {
-  padding-top: 0.45em;
-  color: inherit;
-}
-.r2o-steps b {
-  display: block;
-  font:
-    700 var(--sys-lead) / 1.25 'Mattone',
-    system-ui,
-    sans-serif;
-}
-.r2o-steps li[data-state='now'] {
+.r2o-path button[aria-current] {
   color: var(--sys-paper);
 }
-.r2o-steps li[data-state='past'] {
-  color: var(--r2o-soft);
+@media (hover: hover) {
+  .r2o-path button:hover .r2o-tick {
+    color: var(--sys-paper);
+  }
 }
-/* the open step's text unfolds; the others keep only their titles */
-.r2o-text {
-  overflow: hidden;
-  max-width: 42ch;
+
+/* the step it is on: the title rises from under its line, the old one leaves upward */
+.r2o-now {
+  display: grid;
+  margin-top: var(--sys-s3);
+}
+.r2o-step {
+  grid-area: 1 / 1;
+  visibility: hidden;
+}
+.r2o-step b,
+.r2o-step p {
+  display: block;
+  opacity: 0;
+  transform: translateY(0.6em);
+  clip-path: inset(0 0 100% 0);
+  transition:
+    opacity 0.45s var(--sys-out),
+    transform 0.6s var(--sys-out),
+    clip-path 0.6s var(--sys-out),
+    visibility 0s 0.6s;
+}
+.r2o-step b {
+  font:
+    700 clamp(22px, 2.2vw, 32px) / 1.08 'Mattone',
+    system-ui,
+    sans-serif;
+  letter-spacing: -0.01em;
+}
+.r2o-step p {
+  max-width: 40ch;
+  margin: var(--sys-s1) 0 0;
   font: 13px / 1.55 var(--sys-mono);
   color: var(--r2o-soft);
-  opacity: 0;
 }
-.r2o-steps li[data-state='now'] .r2o-text {
-  margin-top: var(--sys-s1);
+.r2o-step[data-state='now'] {
+  visibility: visible;
+}
+.r2o-step[data-state='now'] b,
+.r2o-step[data-state='now'] p {
   opacity: 1;
+  transform: none;
+  clip-path: inset(-0.2em 0 -0.4em 0);
+  transition-delay: 0.12s;
 }
-.r2o-text {
-  display: block;
-  max-height: 0;
-  transition:
-    max-height 0.5s var(--sys-out),
-    margin 0.5s var(--sys-out),
-    opacity 0.4s var(--sys-out);
+.r2o-step[data-state='now'] p {
+  transition-delay: 0.2s;
 }
-.r2o-steps li[data-state='now'] .r2o-text {
-  max-height: 12em;
+.r2o-step[data-state='past'] b,
+.r2o-step[data-state='past'] p {
+  transform: translateY(-0.6em);
+  clip-path: inset(100% 0 0 0);
 }
 .r2o-door {
   display: inline-flex;
@@ -160,6 +221,104 @@
   color: var(--sys-paper);
   text-decoration: none;
   border-bottom: var(--sys-line) solid var(--sys-paper);
+}
+
+/* the receipt: paper from the till, fed up from the bottom of the column. Lines print one by one;
+   the oldest ones go up and out of sight under the column's edge when there is no room */
+.r2o-receipt {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  flex: 1 1 0;
+  min-height: 0;
+  max-width: 300px;
+  margin-top: var(--sys-s3);
+  overflow: hidden;
+  mask: linear-gradient(transparent, #000 var(--sys-s4));
+}
+.r2o-paper {
+  padding: var(--sys-s2) 18px 14px;
+  background: var(--sys-paper);
+  color: var(--sys-ink);
+  font: 11px / 1.6 var(--sys-mono);
+  /* the torn top edge of a till roll */
+  mask: radial-gradient(circle 5px at 50% -1px, transparent 98%, #000) 0 0 / 12px 100% repeat-x;
+}
+.r2o-hd {
+  margin: 0;
+  text-align: center;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.r2o-sub {
+  margin: 0 0 var(--sys-s1);
+  padding-bottom: var(--sys-s1);
+  border-bottom: var(--sys-line) dashed rgba(43, 38, 32, 0.45);
+  text-align: center;
+  font-size: 10px;
+  opacity: 0.72;
+}
+/* a line prints: it opens downward, then its text comes in */
+.r2o-row,
+.r2o-tot,
+.r2o-thx {
+  display: grid;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition:
+    max-height 0.5s var(--sys-out),
+    opacity 0.3s var(--sys-out) 0.15s;
+}
+.r2o-row {
+  grid-template-columns: auto 1fr auto;
+  gap: var(--sys-s1);
+}
+.r2o-row i {
+  border-bottom: var(--sys-line) dotted rgba(43, 38, 32, 0.35);
+  transform: translateY(-0.45em);
+}
+.r2o-row > [data-print] {
+  opacity: 0;
+  transition: opacity 0.4s var(--sys-out) 0.2s;
+}
+.r2o-row > [data-print][data-on='1'] {
+  opacity: 1;
+}
+[data-print][data-on='1'].r2o-row,
+.r2o-tot[data-on='1'],
+.r2o-thx[data-on='1'] {
+  max-height: 3em;
+  opacity: 1;
+}
+.r2o-gone:has(> [data-on='1'][data-print]) > span {
+  text-decoration: line-through;
+  opacity: 0.55;
+}
+.r2o-tot {
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  margin-top: 6px;
+  border-top: var(--sys-line) dashed rgba(43, 38, 32, 0.45);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.r2o-tot[data-on='1'] {
+  padding-top: 6px;
+}
+.r2o-tot strong {
+  font:
+    900 26px / 1 'Mattone',
+    system-ui,
+    sans-serif;
+  letter-spacing: -0.02em;
+}
+.r2o-thx {
+  margin: 0;
+  text-align: center;
+  font-size: 10px;
+  opacity: 0.7;
 }
 
 /* right: the map's captions and the parts' names, placed against the blocks by the script */
@@ -209,33 +368,52 @@
 }
 
 @media (max-width: 700px) {
-  /* on a phone the map is the top of the screen and the open step sits under it */
+  /* on a phone the map is the top of the screen; under it the path, the step and the receipt.
+     The question and the line about ready2order show on the first step, the logo always */
   .r2o-left {
-    top: auto;
+    /* right under the map; once the shelf of split-off screens is there, under the shelf */
+    top: calc(var(--sys-s7) + 32svh + var(--sys-s6));
+    transition: top 0.7s var(--sys-out);
     right: var(--sys-margin);
-    bottom: var(--sys-s4);
+    bottom: var(--sys-s3);
     width: auto;
   }
-  .r2o-stage:not([data-step='1']) .r2o-intro {
+  .r2o-stage[data-step='3'] .r2o-left,
+  .r2o-stage[data-step='4'] .r2o-left {
+    top: calc(var(--sys-s7) + 42svh + 52px);
+  }
+  .r2o-logo img {
+    height: 18px;
+  }
+  .r2o-stage:not([data-step='1']) .r2o-ask,
+  .r2o-stage:not([data-step='1']) .r2o-who,
+  .r2o-stage:not([data-step='1']) .r2o-left .r2o-label {
     display: none;
+  }
+  .r2o-ask {
+    margin-top: var(--sys-s2);
   }
   .r2o-who {
     font-size: 12px;
   }
-  .r2o-steps {
-    margin-top: var(--sys-s3);
+  .r2o-path ol {
+    margin-top: var(--sys-s2);
   }
-  .r2o-steps li {
-    grid-template-columns: var(--sys-s4) 1fr;
-  }
-  .r2o-steps li:not([data-state='now']) {
+  .r2o-stage[data-step='1'] .r2o-receipt {
     display: none;
   }
-  .r2o-steps li[data-state='now'] {
-    border-bottom: var(--sys-line) solid var(--r2o-faint);
+  .r2o-now {
+    margin-top: var(--sys-s1);
   }
-  .r2o-text {
+  .r2o-step b {
+    font-size: 20px;
+  }
+  .r2o-step p {
     font-size: 12px;
+  }
+  .r2o-receipt {
+    max-width: none;
+    margin-top: var(--sys-s2);
   }
   .r2o-tag {
     font-size: 11px;
@@ -250,14 +428,26 @@
   padding: var(--sys-s8) var(--sys-margin) var(--sys-s7);
 }
 .r2o--still .r2o-steps {
-  margin: 0;
   max-width: 40rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 .r2o--still .r2o-steps li {
-  color: var(--sys-paper);
+  display: grid;
+  grid-template-columns: var(--sys-s5) 1fr;
+  padding: var(--sys-s2) 0;
+  border-top: var(--sys-line) solid var(--r2o-faint);
+}
+.r2o--still .r2o-steps b {
+  font:
+    700 var(--sys-lead) / 1.25 'Mattone',
+    system-ui,
+    sans-serif;
 }
 .r2o--still .r2o-text {
-  max-height: none;
+  display: block;
   margin-top: var(--sys-s1);
-  opacity: 1;
+  font: 13px / 1.55 var(--sys-mono);
+  color: var(--r2o-soft);
 }
