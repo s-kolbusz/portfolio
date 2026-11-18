@@ -221,12 +221,28 @@ export function Ready2orderScene() {
     let intro = stage.hasAttribute('data-in') ? INTRO.len : 0
     let introOn = intro > 0
 
-    // the real liquid; without WebGL2 cut-out drops and drawn boxes do the same, plainer
+    // the real liquid; without WebGL2 cut-out drops and drawn boxes do the same, plainer.
+    // It exists only while the scene is near: built a screen before it shows, freed (context, buffers,
+    // physics thread) once the page is more than 1.5 screens away (owner, 2026-11-18: only the scene
+    // being read may cost memory)
     let liquid: DropsStage | null = null
+    const canDrops = supportsDrops()
+    const near = () => {
+      const r = track.getBoundingClientRect()
+      const vh = window.innerHeight
+      const m = liquid ? 1.5 : 1
+      return r.top < vh * (1 + m) && r.bottom > -vh * m
+    }
+    const free = () => {
+      liquid?.stop()
+      liquid = null
+      holder.replaceChildren()
+      delete stage.dataset.liquid
+    }
     const start = () => {
       liquid?.stop()
       liquid = null
-      if (!supportsDrops()) return
+      if (!canDrops || !near()) return
       // a fresh canvas each time: a stopped stage has given up its WebGL context for good
       const canvas = document.createElement('canvas')
       canvas.className = 'r2o-liquid'
@@ -304,6 +320,9 @@ export function Ready2orderScene() {
     const draw = () => {
       frame = 0
       const rect = track.getBoundingClientRect()
+      const isNear = near()
+      if (isNear && !liquid && canDrops) start()
+      else if (!isNear && liquid) free()
       const inView = rect.top < window.innerHeight && rect.bottom > 0
       if (inView || wasIn) adapt(inView)
       wasIn = inView

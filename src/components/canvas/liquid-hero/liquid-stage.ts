@@ -132,7 +132,10 @@ async function run(els: LiquidStageElements, opts: LiquidStageOptions, life: Lif
   }
   // measurement on devices: ?dpr=1 forces the render resolution; ?lekko forces light mode
   const qs = new URLSearchParams(location.search)
-  const dpr = +(qs.get('dpr') ?? '') || Math.min(window.devicePixelRatio || 1, 2)
+  // on touch screens (phones, tablets) the liquid is drawn at 1.5x at most: the GPU there paid for
+  // every pixel of a 2x canvas and the page went slow (owner, iPhone 11 Pro and iPad, 2026-11-18)
+  const dprCap = matchMedia('(pointer: coarse)').matches ? 1.5 : 2
+  const dpr = +(qs.get('dpr') ?? '') || Math.min(window.devicePixelRatio || 1, dprCap)
   // height captured on load: on a phone the address bar hides while scrolling and changes innerHeight,
   // and the page must stay the same then (no recalculation, no rebuild).
   // The canvas is as tall as the screen with the bar hidden (100lvh); text sits in the part that is
@@ -966,6 +969,9 @@ async function run(els: LiquidStageElements, opts: LiquidStageOptions, life: Lif
       const next = scrollNow()
       if (Math.abs(next - shiftTarget) > VH) shift = next
       shiftTarget = next
+      // drawing stops as soon as the stage is off the screen: the observer also counts a stage whose
+      // edge only touches the screen, and the hero kept drawing under the next section
+      setRunning(onScreen())
     },
     { passive: true }
   )
@@ -1162,9 +1168,16 @@ async function run(els: LiquidStageElements, opts: LiquidStageOptions, life: Lif
       post({ pause: true })
     }
   }
-  const visibility = new IntersectionObserver(([entry]) => setRunning(entry.isIntersecting))
+  // (a stage whose edge only touches the screen counts as off: nothing of it shows)
+  const onScreen = () => {
+    const r = stage.getBoundingClientRect()
+    return r.bottom > 1 && r.top < innerHeight - 1
+  }
+  const visibility = new IntersectionObserver(([entry]) =>
+    setRunning(entry.isIntersecting && entry.intersectionRect.height > 1)
+  )
   visibility.observe(stage)
-  setRunning(true)
+  setRunning(onScreen())
   life.cleanup(() => {
     visibility.disconnect()
     cancelAnimationFrame(raf)

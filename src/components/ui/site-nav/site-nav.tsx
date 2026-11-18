@@ -128,7 +128,13 @@ export function SiteNav() {
     const start = performance.now()
     const check = () => {
       const board = document.querySelector<HTMLElement>('.lq-stage canvas.ld')
-      if (!board || board.style.display === 'none' || performance.now() - start > 9000) {
+      // (a page opened further down never shows the board: the hero is not even built there)
+      if (
+        !board ||
+        board.style.display === 'none' ||
+        board.getBoundingClientRect().bottom <= 0 ||
+        performance.now() - start > 9000
+      ) {
         setReady(true)
         return
       }
@@ -138,18 +144,26 @@ export function SiteNav() {
     return () => cancelAnimationFrame(raf)
   }, [isHome])
 
-  // --- the liquid
-  useEffect(() => {
+  // --- the liquid: made the first time the menu opens, so a visit that never opens it holds no
+  // WebGL for it (only the current scene should cost memory, owner 2026-11-18)
+  const waterTried = useRef(false)
+  const ensureWater = () => {
     const canvas = canvasRef.current
-    if (!canvas) return
+    if (waterTried.current || !canvas) return waterRef.current
+    waterTried.current = true
     const water = createMenuWater(canvas, () => setPhase('closed'))
     if (!water) setFlat(true)
     waterRef.current = water
-    return () => {
-      water?.destroy()
+    return water
+  }
+  useEffect(
+    () => () => {
+      waterRef.current?.destroy()
       waterRef.current = null
-    }
-  }, [])
+      waterTried.current = false
+    },
+    []
+  )
 
   // S and K leave the hero name for the corner: with the scroll, or with the menu opened on the hero
   const sk = useSkFlight({ enabled: isHome, cornerRef: skRef, menuOpen: phase === 'open' })
@@ -171,7 +185,7 @@ export function SiteNav() {
   const openMenu = () => {
     const o = buttonCentre()
     openFrom.current = o
-    const water = waterRef.current
+    const water = ensureWater()
     // measured while the menu is still closed (laid out, invisible), so the transitions start with these delays:
     // every part surfaces once the liquid has left clean paper over all of it
     menuRef.current?.querySelectorAll<HTMLElement>('[data-surface]').forEach((el) => {

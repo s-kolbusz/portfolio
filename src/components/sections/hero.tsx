@@ -102,9 +102,43 @@ export function Hero() {
   const pinsRef = useRef<HTMLDivElement>(null)
   const tiltRef = useRef<HTMLButtonElement>(null)
 
-  const [line0, line1, line2] = lines
+  // Only the scene being read holds WebGL: once the page is 1.5 screens past the hero, its stage is
+  // stopped (context, textures and physics thread freed) and a fresh canvas waits; it is built again
+  // a screen before the hero comes back (owner, iPhone 11 Pro, 2026-11-18). The rebuilt stage starts
+  // where the page is, with no loader show (liquid-stage skip / shift).
+  const [far, setFar] = useState(false)
   useEffect(() => {
     if (mode !== 'live') return
+    let was = false
+    let frame = 0
+    const check = () => {
+      frame = 0
+      const track = trackRef.current
+      if (!track) return
+      const bottom = track.getBoundingClientRect().bottom
+      const next = was ? bottom < -window.innerHeight : bottom < -1.5 * window.innerHeight
+      if (next === was) return
+      was = next
+      setFar(next)
+      // a stopped stage has lost its WebGL context for good: the next one gets a new canvas
+      if (next) setGeneration((g) => g + 1)
+    }
+    const request = () => {
+      if (!frame) frame = requestAnimationFrame(check)
+    }
+    check()
+    window.addEventListener('scroll', request, { passive: true })
+    window.addEventListener('resize', request)
+    return () => {
+      cancelAnimationFrame(frame)
+      window.removeEventListener('scroll', request)
+      window.removeEventListener('resize', request)
+    }
+  }, [mode])
+
+  const [line0, line1, line2] = lines
+  useEffect(() => {
+    if (mode !== 'live' || far) return
     const track = trackRef.current
     const stage = stageRef.current
     const canvas = canvasRef.current
@@ -114,6 +148,8 @@ export function Hero() {
     const pinsEl = pinsRef.current
     const tilt = tiltRef.current
     if (!track || !stage || !canvas || !loaderCanvas || !sel || !scene || !pinsEl || !tilt) return
+    // a page opened far below the hero does not build it at all (the check above flips `far` next)
+    if (track.getBoundingClientRect().bottom < -1.5 * window.innerHeight) return
     return startLiquidStage(
       { track, stage, canvas, loaderCanvas, sel, scene, pins: pinsEl, tilt },
       {
@@ -122,7 +158,7 @@ export function Hero() {
         onRemount: () => setGeneration((g) => g + 1),
       }
     )
-  }, [mode, generation, first, last, role, line0, line1, line2, cta])
+  }, [mode, far, generation, first, last, role, line0, line1, line2, cta])
 
   const wordmark = (letters: boolean) =>
     WORDMARK.map(([cls, text]) => (

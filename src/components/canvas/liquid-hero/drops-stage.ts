@@ -201,7 +201,10 @@ export function startDropsStage(opts: DropsStageOptions): DropsStage {
 }
 
 function run({ canvas, groups, start, frame: read }: DropsStageOptions): DropsStage {
-  const dpr = Math.min(window.devicePixelRatio || 1, 2)
+  // on touch screens the scene is drawn at 1.25x at most: an iPad drew 4 million pixels a frame and
+  // lagged, worst in low power mode (owner, 2026-11-18). There is no text in this canvas to blur.
+  const dprCap = matchMedia('(pointer: coarse)').matches ? 1.25 : 2
+  const dpr = Math.min(window.devicePixelRatio || 1, dprCap)
   const CW = canvas.clientWidth,
     CH = canvas.clientHeight
   const W = Math.round(CW * dpr),
@@ -402,14 +405,12 @@ function run({ canvas, groups, start, frame: read }: DropsStageOptions): DropsSt
 
   let raf = 0,
     visible = true
-  const io = new IntersectionObserver(
-    (entries) => {
-      visible = entries.some((e) => e.isIntersecting)
-      physics.postMessage({ pause: !visible } satisfies DropsInMessage)
-      if (visible && !raf) raf = requestAnimationFrame(frame)
-    },
-    { rootMargin: '50% 0px' }
-  )
+  const io = new IntersectionObserver((entries) => {
+    // a canvas whose edge only touches the screen shows nothing: it does not draw
+    visible = entries.some((e) => e.isIntersecting && e.intersectionRect.height > 1)
+    physics.postMessage({ pause: !visible } satisfies DropsInMessage)
+    if (visible && !raf) raf = requestAnimationFrame(frame)
+  })
   io.observe(canvas)
 
   // as distanceField() in liquid-stage.ts, without the sheet's flood
