@@ -626,6 +626,10 @@ async function run(els: LiquidStageElements, opts: LiquidStageOptions, life: Lif
     // once the stage leaves upwards the scene is simply finished: a fast scroll or a reload further down
     // must not play its entrance while it slides away (or when it comes back down from above)
     if (actOn && stageTop < -1) actT = ACT_LEN
+    // a fast scroll back up gets ahead of the 1.4x rewind: going back, the scene can be no further
+    // in than the scroll allows, so it is gone by the time the sheet clears (it lingered over the
+    // hero, owner 2026-11-18); a slow scroll back still rewinds in time
+    if (!actOn) actT = Math.min(actT, ACT_LEN * cl01((P - (ACT_OFF_P - 0.24)) / 0.24))
     scene.style.visibility = actT > 0 ? 'visible' : 'hidden'
     masks.forEach((el, i) => {
       const k = ease3(cl01((actT - startAt[i]) / 0.8))
