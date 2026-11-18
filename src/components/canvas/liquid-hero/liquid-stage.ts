@@ -147,8 +147,11 @@ async function run(els: LiquidStageElements, opts: LiquidStageOptions, life: Lif
   // squeezed for a moment, and then it is not trusted
   const VW = document.documentElement.clientWidth,
     VH0 = Math.max(innerHeight, lvhProbe.offsetHeight)
+  // On a tablet the layout sits midway between the bar shown and hidden: laid out for the bar shown,
+  // a hidden bar left an empty band under it (owner's iPad, 2026-11-18); now each state is off by
+  // half the bar. Phones keep the full inset: their bottom row would slide under the bar.
   const VH = VH0 - innerHeight > 0.15 * VH0 ? innerHeight : VH0,
-    INSET = VH - innerHeight
+    INSET = (VH - innerHeight) * (VW >= 700 ? 0.5 : 1)
   lvhProbe.remove()
   const W = Math.round(VW * dpr),
     H = Math.round(VH * dpr)

@@ -228,7 +228,8 @@
 .r2o-slot {
   position: relative;
   flex: 1 1 0;
-  min-height: 0;
+  /* at least three lines of the receipt: on a short screen the column left it a sliver (iPad) */
+  min-height: 7.5rem;
   max-width: 300px;
   margin-top: var(--sys-s3);
 }
@@ -496,7 +497,8 @@
   .r2o-path ol {
     margin-top: var(--sys-s2);
   }
-  .r2o-stage[data-step='1'] .r2o-slot {
+  /* no receipt on a phone: the steps tell the story, and the screen was overloaded (owner, 2026-11-18) */
+  .r2o-slot {
     display: none;
   }
   .r2o-now {
@@ -508,12 +510,22 @@
   .r2o-step p {
     font-size: 12px;
   }
-  .r2o-slot {
-    max-width: none;
-    margin-top: var(--sys-s2);
-  }
   .r2o-tag {
     font-size: 11px;
+  }
+}
+
+/* a short screen across (a tablet held sideways): the column's gaps tighten so the receipt has room */
+@media (min-width: 701px) and (max-height: 900px) {
+  .r2o-left {
+    top: var(--sys-s7);
+    bottom: var(--sys-s5);
+  }
+  .r2o-path ol {
+    margin-top: var(--sys-s3);
+  }
+  .r2o-now {
+    margin-top: var(--sys-s2);
   }
 }
 
