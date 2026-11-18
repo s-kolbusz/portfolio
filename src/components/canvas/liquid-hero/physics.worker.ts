@@ -44,6 +44,7 @@ let tPrev = 0
 let buf: Float32Array | null = null
 let paused = false
 let timer: ReturnType<typeof setTimeout> | null = null
+let tEnd = 0
 const CUR_KEYS = ['x', 'y', 'vx', 'vy', 'inside', 'down', 'grabR', 'grabK'] as const
 
 scope.onmessage = ({ data }) => {
@@ -68,8 +69,9 @@ scope.onmessage = ({ data }) => {
     // a hit (click, tap) is one-shot: it must not get lost when it arrives between steps
     if (data.cur.impulse) sim.cur.impulse = Math.max(sim.cur.impulse, data.cur.impulse)
     // the page sends the cursor every frame: each one also drives the steps due by now, since Low
-    // Power Mode throttles this thread's own timers (as seen on ready2order's worker, 2026-11-18)
-    if (!paused) {
+    // Power Mode throttles this thread's own timers (as seen on ready2order's worker, 2026-11-18).
+    // Only after a breather, so cursor messages queued during a long step don't build a backlog.
+    if (!paused && performance.now() - tEnd > 2) {
       if (timer) clearTimeout(timer)
       timer = null
       tick()
@@ -120,6 +122,7 @@ function tick() {
     if (n === 8) acc = Math.min(acc, 1)
   }
   if (n) send(performance.now() - t0, steps)
+  tEnd = performance.now()
   // next step: right away if overdue; otherwise wait until its time comes
   const need = light ? 0.5 : 1
   timer = setTimeout(tick, acc >= need ? 0 : Math.max(0, ((need - acc) / STEPS_PER_SECOND) * 1000))

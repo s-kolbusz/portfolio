@@ -242,6 +242,7 @@ function run({ canvas, groups, start, frame: read, paper }: DropsStageOptions): 
       spacing: SPACING,
       share: groups.map((r) => r * r),
     },
+    light: new URLSearchParams(location.search).has('lekko'),
   } satisfies DropsInMessage)
   let used = 0
   let snapA: Float32Array | null = null,
@@ -253,7 +254,7 @@ function run({ canvas, groups, start, frame: read, paper }: DropsStageOptions): 
   const probe = new URLSearchParams(location.search).has('pomiar')
     ? document.createElement('p')
     : null
-  const count = { steps: 0, frames: 0, ms: 0, since: performance.now() }
+  const count = { steps: 0, calls: 0, frames: 0, ms: 0, since: performance.now() }
   if (probe) {
     probe.style.cssText =
       'position:fixed;left:8px;bottom:8px;z-index:99;margin:0;padding:6px 8px;background:#000;color:#0f0;font:12px ui-monospace,monospace'
@@ -262,31 +263,24 @@ function run({ canvas, groups, start, frame: read, paper }: DropsStageOptions): 
   const report = (now: number) => {
     if (!probe || now - count.since < 1000) return
     const s = (now - count.since) / 1000
-    const pace = still
-      ? `drops without physics (physics was ${watch.rate} steps/s, ${watch.msEach} ms each)`
-      : `physics ${Math.round(count.steps / s)}/120 steps/s, ${(count.ms / Math.max(1, count.steps)).toFixed(1)} ms each`
+    const pace = `${light ? 'light ' : ''}physics ${Math.round(count.steps / s)}/120 steps/s, ${(count.ms / Math.max(1, light ? count.calls : count.steps)).toFixed(1)} ms a step`
     probe.textContent = `r2o · ${pace} · ${Math.round(count.frames / s)} fps · ${used} particles · ${W}x${H}`
     count.steps = 0
+    count.calls = 0
     count.ms = 0
     count.frames = 0
     count.since = now
   }
-  // Where the physics can't keep up (an iPad whose Safari runs JavaScript without a JIT managed 12 of
-  // its 120 steps a second, and the liquid lagged and smeared, owner 2026-11-18), the scene switches to
-  // drops without physics after its first 1.5 s on screen: the same particles and the same drawing,
-  // each part a disc of particles around its target, parts that touch laid out as one disc of their
-  // summed area (so a merge keeps the volume), every particle easing to its place and swaying a little.
-  // ?bezfizyki forces it, to check it on a fast machine.
-  const watch = { since: 0, steps: 0, ms: 0, done: false, rate: 0, msEach: '' }
-  const forceStill = new URLSearchParams(location.search).has('bezfizyki')
-  let still: ReturnType<typeof makeStill> | null = null
+  // Where full physics can't keep up (the owner's iPad: 84.5 ms a step, 2026-11-18), the worker
+  // switches itself to light physics: still the real liquid. Round discs without physics that stood
+  // in for it there were rejected by the owner the same day. ?lekko forces light physics.
+  let light = false
   physics.onmessage = ({ data }: MessageEvent<DropsOutMessage>) => {
-    if (still) return
     if (data.ready) used = data.used ?? 0
+    if (data.light) light = true
     count.steps += data.steps ?? 0
     count.ms += data.ms ?? 0
-    watch.steps += data.steps ?? 0
-    watch.ms += data.ms ?? 0
+    if (data.steps) count.calls++
     if (!data.pos) return
     const now = performance.now()
     if (snapB) gap = gap * 0.9 + Math.min(now - snapAt, 100) * 0.1
@@ -303,109 +297,7 @@ function run({ canvas, groups, start, frame: read, paper }: DropsStageOptions): 
       targets[g * 2] = t.x
       targets[g * 2 + 1] = t.y
     }
-    if (!still) physics.postMessage({ targets } satisfies DropsInMessage)
-  }
-
-  function makeStill() {
-    const shares = groups.map((r) => r * r)
-    const sum = shares.reduce((a, b) => a + b, 0)
-    // as many particles as the physics used (or as its hexagonal start would hold)
-    const n =
-      used || Math.round((Math.PI * totalR * totalR) / ((SPACING * SPACING * Math.sqrt(3)) / 2))
-    const of = new Int16Array(n)
-    let given = 0
-    for (let g = 0; g < G; g++) {
-      const k = g === G - 1 ? n - given : Math.round((n * shares[g]) / sum)
-      of.fill(g, given, given + k)
-      given += k
-    }
-    const R = shares.map((v) => totalR * Math.sqrt(v / sum))
-    // the groups start as one body where the liquid is now
-    let mx = c0.x,
-      my = c0.y
-    if (snapB && used) {
-      mx = 0
-      my = 0
-      for (let i = 0; i < used; i++) {
-        mx += snapB[i * 2]
-        my += snapB[i * 2 + 1]
-      }
-      mx /= used
-      my /= used
-    }
-    const cx = new Float32Array(G).fill(mx),
-      cy = new Float32Array(G).fill(my)
-    const px = new Float32Array(n),
-      py = new Float32Array(n)
-    for (let i = 0; i < n; i++) {
-      px[i] = snapB && i < used ? snapB[i * 2] : mx
-      py[i] = snapB && i < used ? snapB[i * 2 + 1] : my
-    }
-    const phase = Float32Array.from({ length: n }, (_, i) => (i * 2.399963) % (2 * Math.PI))
-    const out = new Float32Array(n * 2)
-    const root = new Int8Array(G)
-    const find = (g: number): number => (root[g] === g ? g : (root[g] = find(root[g])))
-    const slot = new Int32Array(G)
-    let last = 0
-    return {
-      n,
-      step(now: number) {
-        const dt = last ? Math.min((now - last) / 1000, 0.05) : 0
-        last = now
-        const t = now / 1000
-        const ease = 1 - Math.exp(-dt * 3.2)
-        for (let g = 0; g < G; g++) {
-          cx[g] += (targets[g * 2] - cx[g]) * ease
-          cy[g] += (targets[g * 2 + 1] - cy[g]) * ease
-          root[g] = g
-        }
-        // parts that touch are one body (they run together as soon as their edges meet)
-        for (let g = 0; g < G; g++)
-          for (let h = g + 1; h < G; h++)
-            if (Math.hypot(cx[g] - cx[h], cy[g] - cy[h]) < 1.1 * (R[g] + R[h]))
-              root[find(g)] = find(h)
-        // each body: its centre (by area), its radius (summed area), its particles in a sunflower
-        const bx = new Float32Array(G),
-          by = new Float32Array(G),
-          ba = new Float32Array(G),
-          bn = new Int32Array(G)
-        for (let g = 0; g < G; g++) {
-          const r = find(g)
-          bx[r] += cx[g] * shares[g]
-          by[r] += cy[g] * shares[g]
-          ba[r] += shares[g]
-        }
-        for (let i = 0; i < n; i++) bn[find(of[i])]++
-        slot.fill(0)
-        const k = 1 - Math.exp(-dt * 6)
-        for (let i = 0; i < n; i++) {
-          const r = find(of[i])
-          const m = bn[r]
-          const j = slot[r]++
-          const rad = totalR * Math.sqrt(ba[r] / sum) * Math.sqrt((j + 0.5) / m)
-          const a = j * 2.399963
-          const sway = 1 + 0.05 * Math.sin(t * 1.1 + phase[i])
-          const tx =
-            bx[r] / ba[r] +
-            Math.cos(a) * rad * sway +
-            0.12 * SPACING * Math.sin(t * 0.8 + phase[i] * 3)
-          const ty =
-            by[r] / ba[r] +
-            Math.sin(a) * rad * sway +
-            0.12 * SPACING * Math.cos(t * 0.7 + phase[i] * 2)
-          px[i] += (tx - px[i]) * k
-          py[i] += (ty - py[i]) * k
-          out[i * 2] = px[i]
-          out[i * 2 + 1] = py[i]
-        }
-        return out
-      },
-    }
-  }
-  const goStill = () => {
-    physics.terminate()
-    still = makeStill()
-    used = still.n
+    physics.postMessage({ targets } satisfies DropsInMessage)
   }
 
   // the pointer, in sim units: it pushes the liquid it moves through, and a click splashes it
@@ -631,25 +523,6 @@ function run({ canvas, groups, start, frame: read, paper }: DropsStageOptions): 
     report(now)
     const f = read()
     sendTargets(f)
-    if (!still && !watch.done) {
-      // the physics' pace over its first 1.5 s on screen (a gap in the drawing starts the count again)
-      if (!watch.since || now - watch.since > 3000) {
-        watch.since = now
-        watch.steps = 0
-        watch.ms = 0
-      } else if (now - watch.since > 1500) {
-        const rate = watch.steps / ((now - watch.since) / 1000)
-        // kept for the ?pomiar readout: how the physics did before the switch
-        watch.rate = Math.round(rate)
-        watch.msEach = (watch.ms / Math.max(1, watch.steps)).toFixed(1)
-        if (rate < 60 || forceStill) goStill()
-        else watch.done = true
-      }
-    }
-    if (still) {
-      snapA = snapB = still.step(now)
-      snapAt = now
-    }
     if (!snapA || !snapB || !used) {
       raf = requestAnimationFrame(frame)
       return

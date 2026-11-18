@@ -23,6 +23,8 @@ export interface DropsInMessage {
   pointer?: { x: number; y: number; vx: number; vy: number; on: boolean; hit: number }
   buf?: Float32Array
   pause?: boolean
+  /** ?lekko: light physics from the start (to check it on a fast machine) */
+  light?: boolean
 }
 
 export interface DropsOutMessage {
@@ -32,6 +34,8 @@ export interface DropsOutMessage {
   /** physics steps since the last positions, and the ms they took (for the ?pomiar readout) */
   steps?: number
   ms?: number
+  /** the physics runs light: fewer, bigger steps (see `light` below) */
+  light?: boolean
 }
 
 interface WorkerScope {
@@ -77,6 +81,13 @@ let acc = 0,
   paused = false,
   timer: ReturnType<typeof setTimeout> | null = null,
   buf: Float32Array | null = null
+// Light physics, as the hero's on slow devices: one bigger step covering up to 4 base steps, without the
+// separate viscosity and smoothing passes. Same particles, same drawing, still real liquid. It switches
+// on when full steps cost too much compute to keep 120 a second: the owner's iPad took 84.5 ms a step
+// (Mac WebKit 2 ms), and the round discs that stood in for the liquid there were rejected (2026-11-18).
+let light = false
+const timing = { skip: 0, n: 0, ms: 0 }
+const LIGHT_MS = 6.5 // ms a full step may cost: 120 of them take 780 ms of every second
 
 function init(d: DropsInit) {
   const dy = (d.spacing * Math.sqrt(3)) / 2
@@ -89,12 +100,14 @@ function init(d: DropsInit) {
     width: d.width,
     height: d.height,
     center: d.start,
-    radius: r * 1.08,
+    // the sim lays out the same lattice: exactly the particles used, none parked on one point
+    radius: r,
     spacing: d.spacing,
   })
   // only the liquid's own forces: no pull to a main body, no return to the middle, no own weight;
   // the slow swirling stays, so the liquid never stands dead still
   Object.assign(sim.P, { pull: 0, anchor: 0, self: 0, cursorPull: 0, life: 0.0003 })
+  if (light) goLight()
   used = pts.length
   G = d.share.length
   const N = sim.N
@@ -161,7 +174,16 @@ function regroup() {
   }
 }
 
-function steer() {
+function goLight() {
+  light = true
+  if (!sim) return
+  // no separate viscosity and XSPH, stronger damping instead (as the hero's light mode)
+  sim.P.light = true
+  sim.P.drag = 0.988
+}
+
+// d = how many base steps this step covers: the steering forces scale with it
+function steer(d: number) {
   if (!sim) return
   // re-dividing only while the targets move: at rest each drop keeps its own particles, so a drop whose
   // share differs a little from its size never draws a tail out of its neighbour
@@ -205,32 +227,33 @@ function steer() {
       gm = GATHER_MAX * (grip[g] > 1 ? 2 : 1)
     const gx = Math.max(-gm, Math.min(gm, (tx[g] - sim.x[i]) * gk)),
       gy = Math.max(-gm, Math.min(gm, (ty[g] - sim.y[i]) * gk))
-    sim.vx[i] += ax[g] + gx
-    sim.vy[i] += ay[g] + gy
+    sim.vx[i] += (ax[g] + gx) * d
+    sim.vy[i] += (ay[g] + gy) * d
     if (ptr.on) {
       const ddx = sim.x[i] - ptr.x,
         ddy = sim.y[i] - ptr.y
       const d2 = ddx * ddx + ddy * ddy
       if (d2 < 16) {
-        const d = Math.sqrt(d2) + 1e-3,
-          fall = 1 - d / 4
+        const dd = Math.sqrt(d2) + 1e-3,
+          fall = 1 - dd / 4
         // the pointer drags the liquid along and parts it a little
-        sim.vx[i] += ptr.vx * 0.06 * fall + (ddx / d) * 0.0025 * fall
-        sim.vy[i] += ptr.vy * 0.06 * fall + (ddy / d) * 0.0025 * fall
+        sim.vx[i] += (ptr.vx * 0.06 * fall + (ddx / dd) * 0.0025 * fall) * d
+        sim.vy[i] += (ptr.vy * 0.06 * fall + (ddy / dd) * 0.0025 * fall) * d
         if (ptr.hit) {
-          sim.vx[i] += (ddx / d) * ptr.hit * fall
-          sim.vy[i] += (ddy / d) * ptr.hit * fall
+          sim.vx[i] += (ddx / dd) * ptr.hit * fall
+          sim.vy[i] += (ddy / dd) * ptr.hit * fall
         }
       }
     }
   }
   ptr.hit = 0
-  ptr.vx *= 0.9
-  ptr.vy *= 0.9
+  ptr.vx *= Math.pow(0.9, d)
+  ptr.vy *= Math.pow(0.9, d)
 }
 
 scope.onmessage = ({ data }) => {
   if (data.init) {
+    if (data.light) light = true
     init(data.init)
     scope.postMessage({ ready: true, used })
     tPrev = performance.now()
@@ -246,7 +269,10 @@ scope.onmessage = ({ data }) => {
     // the page sends targets every frame: each one also drives the steps due by now. In Low Power
     // Mode Safari throttles this thread's own timers, and the liquid got 12 of its 120 steps a second
     // (owner's iPad, 2026-11-18); frames still come at 30 a second.
-    if (!paused) {
+    // Only a message that arrives after the thread has had a breather steps: when a step takes long
+    // (84.5 ms on the owner's iPad), the messages that queued up meanwhile only update the targets.
+    // Stepping on each of them built a backlog, and the liquid chased targets seconds old.
+    if (!paused && performance.now() - tEnd > 2) {
       if (timer) clearTimeout(timer)
       timer = null
       tick()
@@ -272,7 +298,8 @@ scope.onmessage = ({ data }) => {
 }
 
 let stepped = 0,
-  spent = 0
+  spent = 0,
+  tEnd = 0
 
 function tick() {
   timer = null
@@ -280,20 +307,52 @@ function tick() {
   const now = performance.now()
   acc += Math.min((now - tPrev) / 1000, 0.1) * STEPS_PER_SECOND
   tPrev = now
-  let n = 0
+  let n = 0,
+    steps = 0
   const t0 = performance.now()
-  // up to 8 steps at a time: at 30 frames a second each frame owes 4
-  while (acc >= 1 && n < 8) {
-    steer()
-    sim.step()
-    acc -= 1
-    n++
+  if (light) {
+    // one step covering all the time that passed (up to 4 base steps), so the liquid does not slow down
+    if (acc >= 0.5) {
+      const d = Math.min(acc, 4)
+      steer(d)
+      sim.step(d)
+      acc -= d
+      n = 1
+      steps = d
+    }
+    if (acc > 4) acc = 0
+  } else {
+    // up to 8 steps at a time: at 30 frames a second each frame owes 4
+    while (acc >= 1 && n < 8) {
+      steer(1)
+      sim.step()
+      acc -= 1
+      n++
+    }
+    steps = n
+    if (n === 8) acc = Math.min(acc, 1)
   }
-  if (n === 8) acc = Math.min(acc, 1)
-  stepped += n
-  spent += performance.now() - t0
+  const ms = performance.now() - t0
+  stepped += steps
+  spent += ms
+  // the cost of a full step, measured on compute time (not on how often this thread is woken up),
+  // after the first 10 steps (the code is still being compiled then), over the next 20 or one second
+  // of compute, whichever comes first (a slow device decides in about a second, not in eight)
+  if (!light && n) {
+    if (timing.skip < 10) timing.skip += n
+    else {
+      timing.n += n
+      timing.ms += ms
+      if (timing.n >= 20 || (timing.ms > 1000 && timing.n >= 4)) {
+        if (timing.ms / timing.n > LIGHT_MS) goLight()
+        timing.n = timing.ms = 0
+      }
+    }
+  }
   if (n) send()
-  timer = setTimeout(tick, acc >= 1 ? 0 : Math.max(0, ((1 - acc) / STEPS_PER_SECOND) * 1000))
+  tEnd = performance.now()
+  const need = light ? 0.5 : 1
+  timer = setTimeout(tick, acc >= need ? 0 : Math.max(0, ((need - acc) / STEPS_PER_SECOND) * 1000))
 }
 
 function send() {
@@ -304,7 +363,7 @@ function send() {
     pos[i * 2] = sim.x[i]
     pos[i * 2 + 1] = sim.y[i]
   }
-  scope.postMessage({ pos, steps: stepped, ms: spent }, [pos.buffer])
+  scope.postMessage({ pos, steps: stepped, ms: spent, light }, [pos.buffer])
   stepped = 0
   spent = 0
 }
