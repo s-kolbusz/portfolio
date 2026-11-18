@@ -1,26 +1,25 @@
-/* Act 3, ready2order: drops that run into one body. Size system v1 only (system.css).
-   The scene is on ink, like the hero's dark water sheet: after the paper of the plugin demo it is
-   plainly a new part, and the green liquid reads as glass over a dark ground. */
+/* Act 3, ready2order: the production bundle as liquid on a map of its blocks. Size system v1 only
+   (system.css). The scene is on ink, like the hero's dark water sheet: after the paper of the plugin
+   demo it is plainly a new part, and the green liquid reads as glass over a dark ground. */
 
 .r2o {
   position: relative;
   width: 100%;
-  height: 260svh;
+  height: 420svh;
   background: var(--sys-ink);
   color: var(--sys-paper);
-  --r2o-soft: rgba(251, 249, 244, 0.62);
+  --r2o-soft: rgba(251, 249, 244, 0.72);
+  --r2o-faint: rgba(251, 249, 244, 0.26);
 }
 .r2o-stage {
   position: sticky;
   top: 0;
   height: 100svh;
   overflow: hidden;
-  --ask: 1;
-  --done: 0;
 }
 
-.r2o-label,
-.r2o-door {
+.r2o-label {
+  margin: 0;
   font: var(--sys-label) / 1 var(--sys-mono);
   letter-spacing: 0.3em;
   text-transform: uppercase;
@@ -31,179 +30,178 @@
   color: var(--r2o-soft);
 }
 
-/* the question, while the causes are still apart */
-.r2o-ask {
-  position: absolute;
-  left: var(--sys-margin);
-  top: calc(var(--sys-s8) + 2vh);
-  max-width: 26ch;
-  margin: 0;
-  font:
-    700 var(--sys-lead) / 1.3 'Mattone',
-    system-ui,
-    sans-serif;
-  opacity: var(--ask);
-}
-.r2o-ask .r2o-label {
-  display: block;
-  margin-bottom: var(--sys-s3);
-  white-space: nowrap;
-  font-weight: 400;
-}
-.r2o-name {
-  position: absolute;
-  left: var(--sys-margin);
-  bottom: var(--sys-s6);
-  margin: 0;
-  font:
-    900 var(--sys-l) / 0.86 'Mattone',
-    system-ui,
-    sans-serif;
-  letter-spacing: -0.02em;
-  opacity: var(--ask);
-}
-
-/* the drops and the body they make: the real liquid on a canvas, or cut-out drops without WebGL2 */
-.r2o-liquid {
+/* the liquid's canvas is the scene's ground; every text sits above it */
+.r2o-liquid-holder,
+.r2o-liquid,
+.r2o-plain {
   position: absolute;
   z-index: 0;
   inset: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
+}
+.r2o-liquid {
   display: none;
 }
 .r2o-stage[data-liquid] .r2o-liquid {
   display: block;
 }
-.r2o-stage[data-liquid] .r2o-drops {
+.r2o-stage[data-liquid] .r2o-plain {
   display: none;
 }
-.r2o-defs {
-  position: absolute;
-  width: 0;
-  height: 0;
-}
-.r2o-drops {
-  position: absolute;
-  inset: 0;
-  filter: url(#r2o-goo) drop-shadow(0.5vw 0.9vw 0.8vw rgba(43, 38, 32, 0.16));
-  pointer-events: none;
-}
-.r2o-drops img {
+.r2o-plain > * {
   position: absolute;
   left: 0;
   top: 0;
-  height: auto;
-  user-select: none;
   will-change: transform, opacity;
 }
-.r2o-tags {
-  position: absolute;
-  inset: 0;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  pointer-events: none;
+.r2o-plain [data-rect] {
+  border: var(--sys-line) solid var(--r2o-faint);
 }
-.r2o-tags li {
-  position: absolute;
-  left: 0;
-  top: 0;
-  font: var(--sys-micro) / 1.4 var(--sys-mono);
-  letter-spacing: 0.12em;
-  white-space: nowrap;
-}
-.r2o-tags b {
-  display: block;
-  font-weight: 400;
-  color: var(--r2o-soft);
+.r2o-plain img {
+  height: auto;
+  user-select: none;
 }
 
-/* the finished frame: what changed, and what it came to */
-.r2o-done {
+/* left: who ready2order is, the question, and the four steps; the current one opens */
+.r2o-left {
   position: absolute;
-  inset: 0;
-  opacity: var(--done);
-  pointer-events: none;
-}
-.r2o-done > * {
-  pointer-events: auto;
-}
-.r2o-list {
-  position: absolute;
+  z-index: 1;
   left: var(--sys-margin);
-  top: calc(var(--sys-s8) + 2vh);
-  width: 30vw;
+  top: var(--sys-s8);
+  width: 28vw;
 }
-.r2o-list .r2o-label {
-  margin: 0 0 var(--sys-s3);
+.r2o-ask {
+  margin: var(--sys-s3) 0 0;
+  font:
+    700 var(--sys-lead) / 1.3 'Mattone',
+    system-ui,
+    sans-serif;
 }
-.r2o-list ol {
-  margin: 0;
+.r2o-who {
+  max-width: 40ch;
+  margin: var(--sys-s3) 0 0;
+  font: 13px / 1.55 var(--sys-mono);
+  color: var(--r2o-soft);
+  transition: opacity 0.4s var(--sys-out);
+}
+.r2o-who a {
+  white-space: nowrap;
+  color: var(--sys-paper);
+  text-decoration: none;
+  border-bottom: var(--sys-line) solid var(--r2o-faint);
+}
+.r2o-stage:not([data-step='1']) .r2o-who {
+  opacity: 0;
+  visibility: hidden;
+}
+.r2o-steps {
+  margin: var(--sys-s6) 0 0;
   padding: 0;
   list-style: none;
 }
-.r2o-list li {
-  border-top: var(--sys-line) solid var(--sys-paper);
-}
-/* each change is a button: it pulls its own drop out of the body for a moment */
-.r2o-fix {
+.r2o-steps li {
   display: grid;
   grid-template-columns: var(--sys-s5) 1fr;
-  width: 100%;
   padding: var(--sys-s2) 0;
-  border: 0;
-  background: none;
+  border-top: var(--sys-line) solid var(--r2o-faint);
+  color: var(--r2o-faint);
+  transition: color 0.4s var(--sys-out);
+}
+.r2o-steps li:last-child {
+  border-bottom: var(--sys-line) solid var(--r2o-faint);
+}
+.r2o-steps li > .r2o-micro {
+  padding-top: 0.45em;
   color: inherit;
-  text-align: left;
+}
+.r2o-steps b {
+  display: block;
   font:
-    700 var(--sys-lead) / 1.3 'Mattone',
+    700 var(--sys-lead) / 1.25 'Mattone',
     system-ui,
     sans-serif;
-  cursor: pointer;
 }
-.r2o-list li:last-child {
-  border-bottom: var(--sys-line) solid var(--sys-paper);
+.r2o-steps li[data-state='now'] {
+  color: var(--sys-paper);
 }
-.r2o-fix .r2o-micro {
-  padding-top: 0.35em;
+.r2o-steps li[data-state='past'] {
+  color: var(--r2o-soft);
 }
-.r2o-say {
-  position: absolute;
-  left: var(--sys-margin);
-  bottom: var(--sys-s6);
-  width: 30vw;
-  margin: 0;
-  font:
-    700 var(--sys-lead) / 1.3 'Mattone',
-    system-ui,
-    sans-serif;
+/* the open step's text unfolds; the others keep only their titles */
+.r2o-text {
+  overflow: hidden;
+  max-width: 42ch;
+  font: 13px / 1.55 var(--sys-mono);
+  color: var(--r2o-soft);
+  opacity: 0;
+}
+.r2o-steps li[data-state='now'] .r2o-text {
+  margin-top: var(--sys-s1);
+  opacity: 1;
+}
+.r2o-text {
+  display: block;
+  max-height: 0;
+  transition:
+    max-height 0.5s var(--sys-out),
+    margin 0.5s var(--sys-out),
+    opacity 0.4s var(--sys-out);
+}
+.r2o-steps li[data-state='now'] .r2o-text {
+  max-height: 12em;
 }
 .r2o-door {
   display: inline-flex;
   align-items: center;
   gap: 0.6em;
   min-height: var(--sys-touch);
-  margin-top: var(--sys-s3);
   color: var(--sys-paper);
   text-decoration: none;
   border-bottom: var(--sys-line) solid var(--sys-paper);
 }
-.r2o-result {
+
+/* right: the map's captions and the parts' names, placed against the blocks by the script */
+.r2o-map {
   position: absolute;
-  right: var(--sys-margin);
-  bottom: var(--sys-s6);
-  text-align: right;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
 }
-.r2o-result .r2o-micro {
-  margin: 0 0 var(--sys-s2);
+.r2o-map > * {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 0;
+  opacity: 0;
+  visibility: hidden;
+}
+.r2o-cap {
+  font: var(--sys-micro) / 1.4 var(--sys-mono);
+  letter-spacing: 0.12em;
+  color: var(--r2o-soft);
+}
+.r2o-cap b {
+  font-weight: 400;
   color: var(--sys-paper);
+}
+.r2o-tag {
+  font: 13px / 1.45 var(--sys-mono);
+  letter-spacing: 0.02em;
+}
+.r2o-tag em {
+  display: block;
+  font-style: normal;
+  color: var(--r2o-soft);
+}
+.r2o-map .r2o-big {
+  translate: 12px -50%;
 }
 .r2o-big {
   margin: 0;
   font:
-    900 var(--sys-xl) / 0.86 'Mattone',
+    900 var(--sys-l) / 0.86 'Mattone',
     system-ui,
     sans-serif;
   letter-spacing: -0.03em;
@@ -211,62 +209,55 @@
 }
 
 @media (max-width: 700px) {
-  .r2o-ask,
-  .r2o-list {
-    top: var(--sys-s7);
+  /* on a phone the map is the top of the screen and the open step sits under it */
+  .r2o-left {
+    top: auto;
     right: var(--sys-margin);
-    width: auto;
-    max-width: none;
-  }
-  .r2o-ask .r2o-label {
-    white-space: normal;
-    line-height: 1.5;
-  }
-  .r2o-name {
-    bottom: var(--sys-s5);
-  }
-  .r2o-tags li {
-    white-space: normal;
-    max-width: 180px;
-  }
-  .r2o-fix {
-    padding: 12px 0;
-  }
-  .r2o-say {
-    right: var(--sys-margin);
-    width: auto;
     bottom: var(--sys-s4);
+    width: auto;
   }
-  .r2o-result {
-    right: var(--sys-margin);
-    bottom: calc(var(--sys-s4) + 120px);
+  .r2o-stage:not([data-step='1']) .r2o-intro {
+    display: none;
   }
-  .r2o-big {
-    font-size: 22vw;
+  .r2o-who {
+    font-size: 12px;
+  }
+  .r2o-steps {
+    margin-top: var(--sys-s3);
+  }
+  .r2o-steps li {
+    grid-template-columns: var(--sys-s4) 1fr;
+  }
+  .r2o-steps li:not([data-state='now']) {
+    display: none;
+  }
+  .r2o-steps li[data-state='now'] {
+    border-bottom: var(--sys-line) solid var(--r2o-faint);
+  }
+  .r2o-text {
+    font-size: 12px;
+  }
+  .r2o-tag {
+    font-size: 11px;
   }
 }
 
-/* reduced motion: the finished frame as a plain section */
+/* reduced motion: the story as a plain section */
 .r2o--still {
   height: auto;
   display: grid;
-  gap: var(--sys-s6);
+  gap: var(--sys-s5);
   padding: var(--sys-s8) var(--sys-margin) var(--sys-s7);
 }
-.r2o--still > * {
-  position: static;
-  width: auto;
+.r2o--still .r2o-steps {
+  margin: 0;
   max-width: 40rem;
+}
+.r2o--still .r2o-steps li {
+  color: var(--sys-paper);
+}
+.r2o--still .r2o-text {
+  max-height: none;
+  margin-top: var(--sys-s1);
   opacity: 1;
-}
-.r2o--still .r2o-result {
-  text-align: left;
-}
-
-/* the liquid's canvas is the scene's ground; every text sits above it */
-.r2o-ask,
-.r2o-name,
-.r2o-tags,
-.r2o-done {
-  z-index: 1;
 }

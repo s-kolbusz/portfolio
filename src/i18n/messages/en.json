@@ -363,34 +363,62 @@
   "ready2order": {
     "label": "ready2order · 2019–2025",
     "question": "Why did a till app take so long to start on a shop’s tablet?",
-    "causes": {
-      "webpack": {
-        "name": "Webpack config",
-        "why": "legacy, hand-grown"
+    "who": "ready2order is the till system of 10,000+ cafés, shops and salons in Austria and Germany. I built its web front end for six years.",
+    "site": "ready2order.com",
+    "steps": {
+      "one": {
+        "title": "One heavy download",
+        "text": "Every tablet loaded the whole app before it showed the first screen."
       },
-      "bundle": {
-        "name": "One bundle",
-        "why": "everything, on every screen"
+      "apart": {
+        "title": "Taken apart",
+        "text": "What was actually in there."
       },
-      "redux": {
-        "name": "Redux",
-        "why": "a second copy of the cache"
+      "fates": {
+        "title": "Slimmed, split off, thrown out",
+        "text": "Webpack config rewritten · code split, dead code out · Redux out, Apollo already cached the data · dependencies updated."
       },
-      "deps": {
-        "name": "Old dependencies",
-        "why": ""
+      "half": {
+        "title": "Half the size",
+        "text": "Four changes that added up."
       }
     },
-    "listLabel": "ready2order · not one fix",
-    "changes": {
-      "webpack": "Webpack config rewritten",
-      "split": "Code split, dead code out",
-      "redux": "Redux out: Apollo already cached the data",
-      "deps": "Dependencies updated"
+    "map": {
+      "whole": "the production bundle · everything a tablet loads before the first screen",
+      "apart": "the production bundle · taken apart",
+      "fates": "the production bundle · what happened to each part",
+      "before": "before",
+      "after": "after",
+      "illustrative": "illustrative · not to scale",
+      "metric": "JavaScript loaded at start · production build"
     },
-    "say": "Four small changes that added up.",
-    "door": "The whole story",
+    "parts": {
+      "app": {
+        "name": "The app’s own code",
+        "fate": "stays · dead code out"
+      },
+      "deps": {
+        "name": "Dependencies",
+        "fate": "updated · smaller"
+      },
+      "screens": {
+        "name": "Screens not needed at start",
+        "fate": ""
+      },
+      "redux": {
+        "name": "Redux: store, reducers, actions",
+        "fate": "thrown out · Apollo already cached the data"
+      },
+      "dead": {
+        "name": "dead code, scattered through both",
+        "fate": ""
+      },
+      "shelf": {
+        "name": "Screens",
+        "fate": "split off · each loads when it is opened"
+      }
+    },
     "result": "−50%",
-    "resultLabel": "production bundle size"
+    "door": "The whole story"
   }
 }

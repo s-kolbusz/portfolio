@@ -5,7 +5,9 @@ import { useEffect, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 
 import {
+  type DropsFrame,
   type DropsStage,
+  type GroundRect,
   startDropsStage,
   supportsDrops,
 } from '@/components/canvas/liquid-hero/drops-stage'
@@ -14,116 +16,231 @@ import { Link } from '@/i18n/navigation'
 
 import './ready2order-scene.css'
 
-/**
- * The four causes, as drops: where each sits (fractions of the stage), its width (px at a
- * 1440-wide stage, scaled with it), rotation and image. Bodies cut from the hero liquid's
- * real frames (cook/akt3/drops); the big ones share the clean body, turned and flipped.
- */
-const DROPS = {
-  wide: [
-    { key: 'webpack', x: 0.52, y: 0.3, w: 250, r: -112, flip: false, src: 'body' },
-    { key: 'bundle', x: 0.76, y: 0.4, w: 150, r: 18, flip: true, src: 'body' },
-    { key: 'redux', x: 0.6, y: 0.66, w: 190, r: 160, flip: true, src: 'body' },
-    { key: 'deps', x: 0.86, y: 0.74, w: 66, r: 0, flip: false, src: 'drop-s' },
-  ],
-  phone: [
-    { key: 'webpack', x: 0.24, y: 0.32, w: 120, r: -112, flip: false, src: 'body' },
-    { key: 'bundle', x: 0.3, y: 0.48, w: 80, r: 18, flip: true, src: 'body' },
-    { key: 'redux', x: 0.22, y: 0.63, w: 100, r: 160, flip: true, src: 'body' },
-    { key: 'deps', x: 0.3, y: 0.76, w: 40, r: 0, flip: false, src: 'drop-s' },
-  ],
-} as const
-
-const CHANGES = ['webpack', 'split', 'redux', 'deps'] as const
-
 const clamp01 = (n: number) => Math.min(1, Math.max(0, n))
-const ease = (t: number) => 1 - Math.pow(1 - t, 3)
+const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
 const span = (p: number, a: number, b: number) => clamp01((p - a) / (b - a))
+const mix = (a: number, b: number, t: number) => a + (b - a) * t
 
 /**
- * Act 3, second scene: ready2order. Four separate drops (the causes of a slow start) run
- * together into one body as the page scrolls, and the result stands next to it: the
- * production bundle halved. Liquid in motion, solid when done. With reduced motion it is
- * the finished frame, as a plain section.
+ * The bundle's parts as liquid. Shares of the whole (illustrative, not to scale: no real module sizes
+ * are known). Dependencies are two groups, so part of them can drain away while the rest stays;
+ * the split-off screens are three, so they land on the shelf as separate drops. Dead code is named,
+ * not drawn: as drops of its own it was too small to come apart without threads.
+ */
+const GROUPS = [
+  { key: 'app', share: 0.33 },
+  { key: 'depsKeep', share: 0.13 },
+  { key: 'depsShed', share: 0.1 },
+  { key: 's1', share: 0.11 },
+  { key: 's2', share: 0.09 },
+  { key: 's3', share: 0.07 },
+  { key: 'redux', share: 0.17 },
+] as const
+type GroupKey = (typeof GROUPS)[number]['key']
+
+/** the bundle's blocks as fractions of the map: [x, y, w, h] */
+const BLOCKS = {
+  app: [0, 0, 0.52, 0.6],
+  deps: [0, 0.6, 0.52, 0.4],
+  screens: [0.52, 0, 0.48, 0.66],
+  redux: [0.52, 0.66, 0.48, 0.34],
+} as const
+type BlockKey = keyof typeof BLOCKS
+type Box = { x: number; y: number; w: number; h: number }
+
+/**
+ * The scroll, as fractions of the section's travel: when each step's text takes over, and when the
+ * liquid moves. One body → taken apart → slimmed, split off, thrown out → half the size.
+ */
+const T = {
+  apart: [0.12, 0.3],
+  fates: [0.4, 0.6],
+  half: [0.66, 0.8],
+  step: [0, 0.2, 0.42, 0.68],
+}
+
+/** where everything stands at a stage size (CSS px) */
+function geometry(W: number, H: number) {
+  const phone = W <= 700
+  const M = W * 0.0667
+  let box: Box, shelf: Box
+  if (phone) {
+    box = { x: M, y: 96, w: W - 2 * M, h: H * 0.38 }
+    shelf = { x: M, y: box.y + box.h + 40, w: box.w, h: H * 0.15 }
+  } else {
+    const x0 = W * 0.42
+    const full = W - M - x0
+    const shelfW = full * 0.26
+    box = { x: x0, y: 150, w: full - shelfW - 32, h: H - 150 - 96 }
+    shelf = { x: box.x + box.w + 32, y: box.y, w: shelfW, h: box.h }
+  }
+  const k = Math.SQRT1_2
+  const half: Box = { x: box.x, y: box.y, w: box.w * k, h: box.h * k }
+  const block = (b: BlockKey): Box => {
+    const [u, v, w, h] = BLOCKS[b]
+    return { x: box.x + u * box.w, y: box.y + v * box.h, w: w * box.w, h: h * box.h }
+  }
+  const mid = (b: Box, u = 0.5, v = 0.5) => ({ x: b.x + b.w * u, y: b.y + b.h * v })
+  // the one body fills the map; each part's drop has its share of that body's area
+  const R = Math.min(box.w, box.h) * (phone ? 0.28 : 0.34)
+  const radius = GROUPS.map((g) => R * Math.sqrt(g.share))
+  // the labels sit in each block's top-left corner, so the drops sit a little below the middle
+  const inBlock = (b: BlockKey) => mid(block(b), 0.5, 0.56)
+  const drain = H * 1.3
+  const shelfAt = (i: number) =>
+    phone ? mid(shelf, 0.18 + i * 0.32, 0.66) : mid(shelf, 0.5, 0.22 + i * 0.3)
+  // [taken apart, after the fates, half the size] for each group
+  const at: Record<GroupKey, Array<{ x: number; y: number }>> = {
+    app: [inBlock('app'), inBlock('app'), mid(half, 0.5, 0.54)],
+    depsKeep: [inBlock('deps'), inBlock('deps'), mid(half, 0.5, 0.54)],
+    depsShed: [inBlock('deps'), { x: mid(block('deps')).x, y: drain }],
+    s1: [inBlock('screens'), shelfAt(0)],
+    s2: [inBlock('screens'), shelfAt(1)],
+    s3: [inBlock('screens'), shelfAt(2)],
+    redux: [inBlock('redux'), { x: mid(block('redux')).x, y: drain }],
+  }
+  return { phone, box, shelf, half, block, radius, at, start: mid(box) }
+}
+type Geo = ReturnType<typeof geometry>
+
+/** when each group meets its fate: the shed dependencies first, then Redux and the screens */
+const FATE_AT: Partial<Record<GroupKey, [number, number]>> = {
+  depsShed: [0.44, 0.56],
+  redux: [0.46, 0.6],
+  s1: [0.44, 0.58],
+  s2: [0.46, 0.6],
+  s3: [0.48, 0.6],
+}
+
+/** the liquid's targets and the ground's blocks at scroll progress p */
+function frameAt(g: Geo, p: number): DropsFrame {
+  const apart = ease(span(p, T.apart[0], T.apart[1]))
+  const half = ease(span(p, T.half[0], T.half[1]))
+  const targets = GROUPS.map(({ key }) => {
+    const [a, b, c] = g.at[key]
+    let x = mix(g.start.x, a.x, apart),
+      y = mix(g.start.y, a.y, apart)
+    const f = FATE_AT[key]
+    if (f) {
+      const t = ease(span(p, f[0], f[1]))
+      x = mix(x, b.x, t)
+      y = mix(y, b.y, t)
+    } else if (c) {
+      x = mix(x, c.x, half)
+      y = mix(y, c.y, half)
+    }
+    return { x, y }
+  })
+  const gone = span(p, 0.44, 0.6)
+  const r = (b: Box, a: number, dashed = false): GroundRect => ({ ...b, a, dashed })
+  const rects = [
+    r(g.box, 1 - half),
+    r(g.block('app'), apart * (1 - half)),
+    r(g.block('deps'), apart * (1 - half)),
+    r(g.block('screens'), apart * (1 - gone)),
+    r(g.block('redux'), apart * (1 - gone)),
+    r(g.shelf, span(p, 0.42, 0.56), true),
+    r(g.box, half * 0.8, true),
+    r(g.half, half * 1.2),
+  ]
+  return { targets, rects }
+}
+
+/**
+ * Act 3, second scene: ready2order. The production bundle is one body of liquid on a map of its
+ * blocks. Scrolling takes it apart into its parts, then each part meets its fate: dependencies
+ * slimmed in place, screens split off onto a shelf (they still load, when opened), Redux and the dead code
+ * drained away. What is left runs together into a body half the size, in the old outline.
+ * With reduced motion it is the story as a plain section.
  */
 export function Ready2orderScene() {
   const t = useTranslations('ready2order')
   const reduced = usePrefersReducedMotion()
   const trackRef = useRef<HTMLElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
-  const liquidRef = useRef<HTMLCanvasElement>(null)
+  const liquidRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (reduced) return
     const track = trackRef.current
     const stage = stageRef.current
-    if (!track || !stage) return
-    const drops = Array.from(stage.querySelectorAll<HTMLElement>('[data-drop]'))
-    const tags = Array.from(stage.querySelectorAll<HTMLElement>('[data-tag]'))
-    const rows = Array.from(stage.querySelectorAll<HTMLElement>('[data-row]'))
-    const body = stage.querySelector<HTMLElement>('[data-body]')
-    const done = stage.querySelector<HTMLElement>('.r2o-done')
-    if (done) done.inert = true
+    const holder = liquidRef.current
+    if (!track || !stage || !holder) return
+    const q = <E extends HTMLElement>(s: string) => Array.from(stage.querySelectorAll<E>(s))
+    const steps = q('[data-step]')
+    const fades = q('[data-show]')
+    const placed = q('[data-at]')
+    const drops = q<HTMLImageElement>('[data-drop]')
+    const whole = stage.querySelector<HTMLElement>('[data-whole]')
+    const boxes = q('[data-rect]')
+    const door = stage.querySelector<HTMLElement>('.r2o-door')
     let frame = 0
-    let last = -1
-    let mergeNow = 0
+    let p = 0
+    let geo = geometry(stage.clientWidth, stage.clientHeight)
 
-    // where everything stands at the current stage size (CSS px)
-    const geometry = () => {
-      const W = stage.clientWidth
-      const H = stage.clientHeight
-      const phone = W <= 700
-      const set = phone ? DROPS.phone : DROPS.wide
-      const u = phone ? W / 390 : W / 1440
-      return {
-        W,
-        H,
-        phone,
-        set,
-        u,
-        // where the body stands when the drops have run together
-        bx: (phone ? 0.26 : 0.66) * W,
-        by: (phone ? 0.52 : 0.4) * H,
-      }
-    }
-
-    // the real liquid: the hero's simulation, the drops as groups of particles the scroll pulls together.
-    // Without WebGL2 the cut-out drops below stay and do the same with images.
+    // the real liquid; without WebGL2 cut-out drops and drawn boxes do the same, plainer
     let liquid: DropsStage | null = null
-    const canvas = liquidRef.current
-    if (canvas && supportsDrops()) {
+    const start = () => {
+      liquid?.stop()
+      liquid = null
+      if (!supportsDrops()) return
+      // a fresh canvas each time: a stopped stage has given up its WebGL context for good
+      const canvas = document.createElement('canvas')
+      canvas.className = 'r2o-liquid'
+      canvas.setAttribute('aria-hidden', 'true')
+      holder.replaceChildren(canvas)
       stage.dataset.liquid = '1'
       liquid = startDropsStage({
         canvas,
-        layout: () => {
-          const g = geometry()
-          return {
-            drops: g.set.map((d) => ({
-              x: d.x * g.W,
-              y: d.y * g.H,
-              r: Math.max(d.w * g.u * 0.34, 0.024 * g.H),
-            })),
-            body: { x: g.bx, y: g.by },
-          }
-        },
-        merge: () => mergeNow,
+        groups: geo.radius,
+        start: geo.start,
+        frame: () => frameAt(geo, p),
         onFail: () => delete stage.dataset.liquid,
       })
     }
+    start()
 
-    // a change on the list, once the body has formed, pulls its own drop out for a moment:
-    // the four things are still in there, each one its own part of the result
-    const onClick = (e: MouseEvent) => {
-      const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-pluck]')
-      if (!btn || !liquid || mergeNow < 0.9) return
-      const sr = stage.getBoundingClientRect(),
-        br = btn.getBoundingClientRect()
-      liquid.pluck(Number(btn.dataset.pluck), {
-        x: br.right - sr.left,
-        y: br.top + br.height / 2 - sr.top,
-      })
+    // labels and captions: placed against the map's blocks, shown in their steps
+    const place = () => {
+      const g = geo
+      const boxOf: Record<string, Box> = {
+        box: g.box,
+        half: g.half,
+        shelf: g.shelf,
+        app: g.block('app'),
+        deps: g.block('deps'),
+        screens: g.block('screens'),
+        redux: g.block('redux'),
+      }
+      for (const el of placed) {
+        const [name, where] = (el.dataset.at ?? '').split(':')
+        const b = boxOf[name]
+        if (!b) continue
+        let x = b.x,
+          y = b.y
+        if (where === 'above') y -= 8
+        else if (where === 'below') y += b.h + 12
+        else if (where === 'band') {
+          // the strip the old outline leaves under the new, half-size bundle
+          y = g.half.y + g.half.h + (g.box.h - g.half.h) / 2
+        } else {
+          x += 12
+          y += 10
+        }
+        el.style.transform = `translate(${x}px, ${y}px)${where === 'above' ? ' translateY(-100%)' : ''}`
+        el.style.maxWidth =
+          where === 'above' || where === 'below'
+            ? `${g.shelf.x + g.shelf.w - g.box.x}px`
+            : `${b.w - 24}px`
+      }
+      // the result fills the freed strip without spilling out of it
+      const big = stage.querySelector<HTMLElement>('.r2o-big')
+      if (big) {
+        const room = g.box.h - g.half.h
+        big.style.fontSize = `${Math.min(room * 0.72, g.phone ? g.box.w * 0.24 : g.box.w * 0.2)}px`
+      }
     }
-    stage.addEventListener('click', onClick)
+    place()
 
     // the site bar turns light over this dark scene, as it does over the hero's dark sheet
     const adapt = (on: boolean) => {
@@ -137,6 +254,7 @@ export function Ready2orderScene() {
       }
     }
     let wasIn = false
+    let last = -1
 
     const draw = () => {
       frame = 0
@@ -145,155 +263,205 @@ export function Ready2orderScene() {
       if (inView || wasIn) adapt(inView)
       wasIn = inView
       const travel = rect.height - window.innerHeight
-      const p = travel > 0 ? clamp01(-rect.top / travel) : 1
+      p = travel > 0 ? clamp01(-rect.top / travel) : 1
       if (Math.abs(p - last) < 0.0005) return
       last = p
-      const { W, H, phone, set, u, bx, by } = geometry()
-      const merge = ease(span(p, 0.22, 0.5))
-      // the liquid follows a target that arrives a little earlier, so it has time to settle into one body
-      mergeNow = ease(span(p, 0.16, 0.42))
-      drops.forEach((el, i) => {
-        const d = set[i]
-        const x = d.x * W + (bx - d.x * W) * merge
-        const y = d.y * H + (by - d.y * H) * merge
-        // they shrink as they meet: the body is what they make together
-        const s = 1 - 0.3 * merge
-        el.style.width = `${d.w * u}px`
-        el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%) rotate(${d.r}deg) scale(${(d.flip ? -1 : 1) * s}, ${s})`
-        // the small one is taken in first, so it never sits on top as a separate dot
-        el.style.opacity = String(
-          1 - span(p, d.src === 'drop-s' ? 0.36 : 0.46, d.src === 'drop-s' ? 0.44 : 0.54)
-        )
-        const tag = tags[i]
-        const tx = d.x * W + d.w * u * 0.62
-        const right = !phone && tx + 260 > W * (1 - 0.0667)
-        tag.style.transform = `translate(${right ? d.x * W - d.w * u * 0.62 : tx}px, ${d.y * H - 6}px) translateX(${right ? '-100%' : '0'})`
-        tag.style.textAlign = right ? 'right' : 'left'
-        tag.style.opacity = String(1 - span(p, 0.18, 0.28))
+      // the step the text is on; the rail's line opens it, the others fold
+      let now = 0
+      T.step.forEach((s, i) => {
+        if (p >= s) now = i
       })
-      if (body) {
-        const bw = phone ? W * 0.32 : Math.min(W * 0.19, H * 0.4)
-        const grow = ease(span(p, 0.42, 0.58))
-        body.style.width = `${bw}px`
-        body.style.transform = `translate(${bx}px, ${by}px) translate(-50%, -50%) rotate(-8deg) scale(${0.8 + 0.2 * grow})`
-        body.style.opacity = String(span(p, 0.42, 0.52))
+      stage.dataset.step = String(now + 1)
+      steps.forEach((el, i) => {
+        el.dataset.state = i === now ? 'now' : i < now ? 'past' : 'next'
+      })
+      if (door) door.tabIndex = now === 3 ? 0 : -1
+      // labels fade in and out over their own stretch of the scroll
+      for (const el of fades) {
+        const [a, b, c, d] = (el.dataset.show ?? '0 0 1 1').split(' ').map(Number)
+        const o = Math.min(span(p, a, b), 1 - span(p, c, d))
+        el.style.opacity = String(o)
+        el.style.visibility = o > 0.01 ? 'visible' : 'hidden'
       }
-      stage.style.setProperty('--ask', String(1 - span(p, 0.36, 0.46)))
-      stage.style.setProperty('--done', String(ease(span(p, 0.46, 0.62))))
-      // until the finished frame is really there, its buttons and link take no pointer, focus or ring
-      const shown = span(p, 0.46, 0.62) > 0.6
-      if (done && done.inert === shown) done.inert = !shown
-      rows.forEach((row, i) => {
-        const a = ease(span(p, 0.48 + i * 0.04, 0.6 + i * 0.04))
-        row.style.opacity = String(a)
-        row.style.transform = `translateY(${(1 - a) * 16}px)`
-      })
+      // without WebGL2: the same story with cut-out drops and drawn boxes
+      if (!stage.dataset.liquid) {
+        const f = frameAt(geo, p)
+        const apart = span(p, T.apart[0], T.apart[0] + 0.06)
+        if (whole) {
+          const d = Math.min(geo.box.w, geo.box.h) * 0.86
+          whole.style.width = `${d}px`
+          whole.style.transform = `translate(${geo.start.x - d / 2}px, ${geo.start.y - d / 2}px)`
+          whole.style.opacity = String(1 - apart)
+        }
+        drops.forEach((el, i) => {
+          const d = geo.radius[i] * 2.15
+          const tg = f.targets[i]
+          el.style.width = `${d}px`
+          el.style.transform = `translate(${tg.x - d / 2}px, ${tg.y - d / 2}px) rotate(${i * 67}deg)`
+          el.style.opacity = String(apart)
+        })
+        boxes.forEach((el, i) => {
+          const r = f.rects[i]
+          el.style.transform = `translate(${r.x}px, ${r.y}px)`
+          el.style.width = `${r.w}px`
+          el.style.height = `${r.h}px`
+          el.style.opacity = String(Math.min(1, r.a))
+          el.style.borderStyle = r.dashed ? 'dashed' : 'solid'
+        })
+      }
     }
     const request = () => {
       if (!frame) frame = requestAnimationFrame(draw)
     }
+    let lastW = stage.clientWidth,
+      lastH = stage.clientHeight,
+      restart = 0
+    const onResize = () => {
+      const w = stage.clientWidth,
+        h = stage.clientHeight
+      if (w === lastW && Math.abs(h - lastH) < 120) return request()
+      lastW = w
+      lastH = h
+      geo = geometry(w, h)
+      place()
+      last = -1
+      request()
+      // the liquid's canvas has a fixed size: start it again for the new one, once resizing stops
+      clearTimeout(restart)
+      restart = window.setTimeout(start, 250)
+    }
     draw()
     window.addEventListener('scroll', request, { passive: true })
-    window.addEventListener('resize', request)
+    window.addEventListener('resize', onResize)
     return () => {
       liquid?.stop()
-      stage.removeEventListener('click', onClick)
+      holder.replaceChildren()
+      clearTimeout(restart)
       adapt(false)
       delete stage.dataset.liquid
       cancelAnimationFrame(frame)
       window.removeEventListener('scroll', request)
-      window.removeEventListener('resize', request)
+      window.removeEventListener('resize', onResize)
     }
   }, [reduced])
 
-  const list = (
-    <div className="r2o-list">
-      <p className="r2o-label">{t('listLabel')}</p>
-      <ol>
-        {CHANGES.map((key, i) => (
-          <li key={key} data-row>
-            <button type="button" data-pluck={i} className="r2o-fix">
-              <span className="r2o-micro">{String(i + 1).padStart(2, '0')}</span>
-              {t(`changes.${key}`)}
-            </button>
-          </li>
-        ))}
-      </ol>
-    </div>
+  const STEP_KEYS = ['one', 'apart', 'fates', 'half'] as const
+  const door = (
+    <Link href="/projects/ready2order" className="r2o-door">
+      {t('door')} <span aria-hidden="true">→</span>
+    </Link>
   )
-  const result = (
-    <div className="r2o-result">
-      <p className="r2o-micro">{t('resultLabel')}</p>
-      <p className="r2o-big">{t('result')}</p>
-    </div>
-  )
-  const say = (
-    <p className="r2o-say">
-      {t('say')}
-      <br />
-      <Link href="/projects/ready2order" className="r2o-door">
-        {t('door')} <span aria-hidden="true">→</span>
-      </Link>
-    </p>
+  const intro = (
+    <>
+      <p className="r2o-label">{t('label')}</p>
+      <h2 id="r2o-title" className="r2o-ask">
+        {t('question')}
+      </h2>
+      <p className="r2o-who">
+        {t('who')}{' '}
+        <a href="https://ready2order.com" target="_blank" rel="noopener noreferrer">
+          {t('site')} <span aria-hidden="true">↗</span>
+        </a>
+      </p>
+    </>
   )
 
   if (reduced) {
     return (
       <section id="ready2order" className="r2o r2o--still" aria-labelledby="r2o-title">
-        <p className="r2o-ask">
-          <span className="r2o-label">{t('label')}</span>
-          <span id="r2o-title">{t('question')}</span>
-        </p>
-        {list}
-        {result}
-        {say}
+        <div className="r2o-intro">{intro}</div>
+        <ol className="r2o-steps">
+          {STEP_KEYS.map((key, i) => (
+            <li key={key} data-state="now">
+              <span className="r2o-micro">{String(i + 1).padStart(2, '0')}</span>
+              <div>
+                <b>{t(`steps.${key}.title`)}</b>
+                <span className="r2o-text">{t(`steps.${key}.text`)}</span>
+              </div>
+            </li>
+          ))}
+        </ol>
+        <p className="r2o-big">{t('result')}</p>
+        <p className="r2o-micro">{t('map.metric')}</p>
+        {door}
       </section>
     )
   }
 
+  // a label's place (block:where) and when it shows (in, full, out, gone: scroll fractions)
+  const label = (at: string, show: string, name: string, fate?: string) => (
+    <p className="r2o-tag" data-at={at} data-show={show}>
+      {name}
+      {fate ? <em>{fate}</em> : null}
+    </p>
+  )
+
   return (
     <section ref={trackRef} id="ready2order" className="r2o" aria-labelledby="r2o-title">
-      <div ref={stageRef} className="r2o-stage">
-        <p className="r2o-ask">
-          <span className="r2o-label">{t('label')}</span>
-          <span id="r2o-title">{t('question')}</span>
-        </p>
-        <p className="r2o-name" aria-hidden="true">
-          ready2order
-        </p>
-        {/* goo: the drops' edges run together where they meet; the originals stay sharp on top */}
-        <svg className="r2o-defs" aria-hidden="true">
-          <filter id="r2o-goo">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur" />
-            <feColorMatrix
-              in="blur"
-              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9"
-              result="goo"
-            />
-            <feComposite in="SourceGraphic" in2="goo" operator="atop" />
-          </filter>
-        </svg>
-        <canvas ref={liquidRef} className="r2o-liquid" aria-hidden="true" />
-        <div className="r2o-drops" aria-hidden="true">
-          {DROPS.wide.map((d) => (
-            // eslint-disable-next-line @next/next/no-img-element -- transformed every frame; next/image adds nothing here
-            <img key={d.key} data-drop src={`/images/r2o/${d.src}.png`} alt="" draggable={false} />
+      <div ref={stageRef} className="r2o-stage" data-step="1">
+        <div ref={liquidRef} className="r2o-liquid-holder" />
+        {/* without WebGL2: the map's boxes and cut-out drops */}
+        <div className="r2o-plain" aria-hidden="true">
+          {Array.from({ length: 8 }, (_, i) => (
+            <span key={i} data-rect />
           ))}
-          {/* eslint-disable-next-line @next/next/no-img-element -- as above */}
-          <img data-body src="/images/r2o/body.png" alt="" draggable={false} />
+          {/* eslint-disable-next-line @next/next/no-img-element -- transformed every frame; next/image adds nothing here */}
+          <img data-whole src="/images/r2o/body.png" alt="" draggable={false} />
+          {GROUPS.map((g) => (
+            // eslint-disable-next-line @next/next/no-img-element -- as above
+            <img key={g.key} data-drop src="/images/r2o/body.png" alt="" draggable={false} />
+          ))}
         </div>
-        <ul className="r2o-tags">
-          {DROPS.wide.map((d) => (
-            <li key={d.key} data-tag>
-              {t(`causes.${d.key}.name`)}
-              <b>{t(`causes.${d.key}.why`)}</b>
-            </li>
-          ))}
-        </ul>
-        <div className="r2o-done">
-          {list}
-          {say}
-          {result}
+
+        <div className="r2o-left">
+          <div className="r2o-intro">{intro}</div>
+          <ol className="r2o-steps">
+            {STEP_KEYS.map((key, i) => (
+              <li key={key} data-step data-state={i === 0 ? 'now' : 'next'}>
+                <span className="r2o-micro">{String(i + 1).padStart(2, '0')}</span>
+                <div>
+                  <b>{t(`steps.${key}.title`)}</b>
+                  <span className="r2o-text">
+                    {t(`steps.${key}.text`)}
+                    {key === 'half' ? <> {door}</> : null}
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <div className="r2o-map" aria-hidden="true">
+          <p className="r2o-cap" data-at="box:above" data-show="-1 0 0.14 0.17">
+            {t('map.whole')} · <b>100%</b>
+          </p>
+          <p className="r2o-cap" data-at="box:above" data-show="0.17 0.2 0.38 0.41">
+            {t('map.apart')}
+          </p>
+          <p className="r2o-cap" data-at="box:above" data-show="0.41 0.44 0.64 0.67">
+            {t('map.fates')}
+          </p>
+          <p className="r2o-cap" data-at="box:above" data-show="0.67 0.7 2 2">
+            {t('map.before')} · 100%
+          </p>
+          <p className="r2o-cap" data-at="box:below" data-show="0.2 0.28 0.64 0.68">
+            {t('map.illustrative')}
+          </p>
+          <p className="r2o-cap" data-at="box:below" data-show="0.7 0.78 2 2">
+            {t('map.metric')}
+          </p>
+          {label('app', '0.2 0.28 0.46 0.52', t('parts.app.name'))}
+          {label('deps', '0.2 0.28 0.46 0.52', t('parts.deps.name'))}
+          {label('screens', '0.2 0.28 0.42 0.48', t('parts.screens.name'))}
+          {label('redux', '0.2 0.28 0.42 0.46', t('parts.redux.name'))}
+          {label('app', '0.46 0.52 0.66 0.7', t('parts.app.name'), t('parts.app.fate'))}
+          {label('deps', '0.46 0.52 0.66 0.7', t('parts.deps.name'), t('parts.deps.fate'))}
+          {label('redux', '0.48 0.54 0.64 0.68', 'Redux', t('parts.redux.fate'))}
+          {label('shelf', '0.5 0.56 2 2', t('parts.shelf.name'), t('parts.shelf.fate'))}
+          {label('half', '0.72 0.8 2 2', `${t('map.after')} · 50%`)}
+          <p className="r2o-big" data-at="half:band" data-show="0.74 0.82 2 2">
+            {t('result')}
+          </p>
         </div>
       </div>
     </section>
