@@ -53,6 +53,8 @@ export interface DropsStageOptions {
   onFail: () => void
   /** the liquid on the page's paper, as the hero draws its drop there, instead of on ink (act 4) */
   paper?: boolean
+  /** each drawn frame: the particles in CSS px of the canvas (x, y pairs; y down) and how many */
+  shape?: (xy: Float32Array, n: number) => void
 }
 
 export interface DropsStage {
@@ -207,7 +209,7 @@ export function startDropsStage(opts: DropsStageOptions): DropsStage {
   }
 }
 
-function run({ canvas, groups, start, frame: read, paper }: DropsStageOptions): DropsStage {
+function run({ canvas, groups, start, frame: read, paper, shape }: DropsStageOptions): DropsStage {
   // on touch screens the scene is drawn at 1.25x at most: an iPad drew 4 million pixels a frame and
   // lagged, worst in low power mode (owner, 2026-11-18). There is no text in this canvas to blur.
   const dprCap = matchMedia('(pointer: coarse)').matches ? 1.25 : 2
@@ -411,6 +413,7 @@ function run({ canvas, groups, start, frame: read, paper }: DropsStageOptions): 
 
   // particle positions for the splat; sized once the physics thread says how many there are
   let pos = new Float32Array(0)
+  let xy = new Float32Array(0)
   const pBuf = gl.createBuffer()
   gl.bindBuffer(gl.ARRAY_BUFFER, pBuf)
   const pVao = gl.createVertexArray()
@@ -537,6 +540,14 @@ function run({ canvas, groups, start, frame: read, paper }: DropsStageOptions): 
     for (let i = 0; i < used * 2; i += 2) {
       pos[i] = (snapA[i] + (snapB[i] - snapA[i]) * k) * Hq
       pos[i + 1] = (snapA[i + 1] + (snapB[i + 1] - snapA[i + 1]) * k) * Hq - BELOW
+    }
+    if (shape) {
+      if (xy.length !== pos.length) xy = new Float32Array(pos.length)
+      for (let i = 0; i < pos.length; i += 2) {
+        xy[i] = pos[i] * CH
+        xy[i + 1] = (1 - pos[i + 1]) * CH
+      }
+      shape(xy, used)
     }
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo)
     gl.viewport(0, 0, DW, DH)

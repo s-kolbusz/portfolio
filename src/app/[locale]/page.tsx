@@ -11,8 +11,8 @@ const AspectDemo = dynamic(() =>
 const Ready2orderScene = dynamic(() =>
   import('@/components/sections/ready2order-scene').then((m) => ({ default: m.Ready2orderScene }))
 )
-const HowIWork = dynamic(() =>
-  import('@/components/sections/how-i-work').then((m) => ({ default: m.HowIWork }))
+const HowIWorkFinale = dynamic(() =>
+  import('@/components/sections/how-i-work-finale').then((m) => ({ default: m.HowIWorkFinale }))
 )
 const About = dynamic(() =>
   import('@/components/sections/about').then((m) => ({ default: m.About }))
@@ -50,7 +50,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
       <Hero />
       <AspectDemo />
       <Ready2orderScene />
-      <HowIWork />
+      <HowIWorkFinale />
       <About />
       <Projects locale={locale} />
       <Services />

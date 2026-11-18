@@ -447,6 +447,12 @@
     "alone": "Pracuję sam. Projekt, kod, serwer i utrzymanie są w jednych rękach.",
     "shelf": "Nie używam szablonów ani cudzych widgetów tam, gdzie decydują o wrażeniu.",
     "vision": "Do Twojego pomysłu dokładam własną wizję i wyczucie, żeby wyszedł jak najlepiej.",
-    "fixed": "Potrzebujesz sprawdzonej strony w stałej cenie? Od tego jest <mark>stronypodhale.pl</mark>."
+    "fixed": "Potrzebujesz sprawdzonej strony w stałej cenie? Od tego jest <mark>stronypodhale.pl</mark>.",
+    "more": {
+      "alone": "Rozmawiasz z jedną osobą, która stronę rysuje, buduje i utrzymuje. Nic nie ginie między grafikiem, programistą a firmą hostingową, a jeśli coś się zepsuje po starcie, naprawia to ten, kto to zrobił.",
+      "shelf": "Tam, gdzie strona ma zrobić wrażenie, kod powstaje dla niej: układ, ruch, szczegóły. Dlatego nie wygląda jak tysiąc innych stron i ładuje tylko to, czego naprawdę używa.",
+      "vision": "Ty przynosisz pomysł i znasz swoją branżę. Ja dokładam oko: co wyciąć, co powiększyć, gdzie gość ma spojrzeć najpierw. Strona zostaje Twoja, tylko wyraźniejsza niż brief.",
+      "fixed": "To moje studio dla lokalnych firm z Podhala: układ sprawdzony na prawdziwych klientach, cena ustalona z góry i te same ręce za wszystkim."
+    }
   }
 }
