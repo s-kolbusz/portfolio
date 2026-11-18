@@ -886,6 +886,13 @@ async function run(els: LiquidStageElements, opts: LiquidStageOptions, life: Lif
   if (PORTRAIT) {
     tiltBtn.style.top = `${VH - INSET - 0.05 * VH - 21}px`
     tiltBtn.style.right = `${0.0667 * VW}px`
+  } else {
+    // across, it sits under the site bar, in line with MENU on the page margin and a clear 32 px below
+    // it: in the corner beside MENU a finger hit the wrong one (owner, tablet, 2026-11-18)
+    const bar = document.querySelector('.site-bar')?.getBoundingClientRect()
+    const menu = document.querySelector('.site-bar__toggle')?.getBoundingClientRect()
+    tiltBtn.style.top = `${Math.max(72, bar ? bar.bottom : 0) + 32}px`
+    tiltBtn.style.right = `${menu && menu.width ? VW - menu.right : 0.0667 * VW}px`
   }
   let tiltOn = false,
     tgx = 0,
