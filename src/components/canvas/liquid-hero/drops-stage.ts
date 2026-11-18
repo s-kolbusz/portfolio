@@ -256,7 +256,7 @@ function run({ canvas, groups, start, frame: read }: DropsStageOptions): DropsSt
     if (!probe || now - count.since < 1000) return
     const s = (now - count.since) / 1000
     const pace = still
-      ? 'drops without physics'
+      ? `drops without physics (physics was ${watch.rate} steps/s, ${watch.msEach} ms each)`
       : `physics ${Math.round(count.steps / s)}/120 steps/s, ${(count.ms / Math.max(1, count.steps)).toFixed(1)} ms each`
     probe.textContent = `r2o · ${pace} · ${Math.round(count.frames / s)} fps · ${used} particles · ${W}x${H}`
     count.steps = 0
@@ -270,7 +270,7 @@ function run({ canvas, groups, start, frame: read }: DropsStageOptions): DropsSt
   // each part a disc of particles around its target, parts that touch laid out as one disc of their
   // summed area (so a merge keeps the volume), every particle easing to its place and swaying a little.
   // ?bezfizyki forces it, to check it on a fast machine.
-  const watch = { since: 0, steps: 0, done: false }
+  const watch = { since: 0, steps: 0, ms: 0, done: false, rate: 0, msEach: '' }
   const forceStill = new URLSearchParams(location.search).has('bezfizyki')
   let still: ReturnType<typeof makeStill> | null = null
   physics.onmessage = ({ data }: MessageEvent<DropsOutMessage>) => {
@@ -279,6 +279,7 @@ function run({ canvas, groups, start, frame: read }: DropsStageOptions): DropsSt
     count.steps += data.steps ?? 0
     count.ms += data.ms ?? 0
     watch.steps += data.steps ?? 0
+    watch.ms += data.ms ?? 0
     if (!data.pos) return
     const now = performance.now()
     if (snapB) gap = gap * 0.9 + Math.min(now - snapAt, 100) * 0.1
@@ -621,8 +622,12 @@ function run({ canvas, groups, start, frame: read }: DropsStageOptions): DropsSt
       if (!watch.since || now - watch.since > 3000) {
         watch.since = now
         watch.steps = 0
+        watch.ms = 0
       } else if (now - watch.since > 1500) {
         const rate = watch.steps / ((now - watch.since) / 1000)
+        // kept for the ?pomiar readout: how the physics did before the switch
+        watch.rate = Math.round(rate)
+        watch.msEach = (watch.ms / Math.max(1, watch.steps)).toFixed(1)
         if (rate < 60 || forceStill) goStill()
         else watch.done = true
       }
