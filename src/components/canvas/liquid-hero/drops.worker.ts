@@ -81,7 +81,8 @@ let acc = 0,
   paused = false,
   timer: ReturnType<typeof setTimeout> | null = null,
   buf: Float32Array | null = null
-// Light physics on slow devices: one bigger step covering up to 4 base steps. Same particles, same
+// Light physics on slow devices: one bigger step covering all the time that passed
+// (up to MAX_D base steps). Same particles, same
 // forces, same drawing, still real liquid. Unlike the hero's light mode it keeps the viscosity and
 // smoothing passes: without them this big body (2818 particles in a 2000 px window) tore into a foam
 // of holes and never settled, and the owner's desktop under load tripped into it (2026-11-18). It switches
@@ -90,6 +91,9 @@ let acc = 0,
 let light = false
 const timing = { skip: 0, n: 0, ms: 0 }
 const LIGHT_MS = 6.5 // ms a full step may cost: 120 of them take 780 ms of every second
+// a light step covers at most this many base steps (100 ms). With 4, the iPad's ~85 ms steps covered
+// only 33 ms of liquid time each: the liquid ran at 40% speed, in slow motion (owner, 2026-11-18)
+const MAX_D = 12
 
 function init(d: DropsInit) {
   const dy = (d.spacing * Math.sqrt(3)) / 2
@@ -309,16 +313,16 @@ function tick() {
     steps = 0
   const t0 = performance.now()
   if (light) {
-    // one step covering all the time that passed (up to 4 base steps), so the liquid does not slow down
+    // one step covering all the time that passed, so the liquid does not slow down
     if (acc >= 0.5) {
-      const d = Math.min(acc, 4)
+      const d = Math.min(acc, MAX_D)
       steer(d)
       sim.step(d)
       acc -= d
       n = 1
       steps = d
     }
-    if (acc > 4) acc = 0
+    if (acc > MAX_D) acc = 0
   } else {
     // up to 8 steps at a time: at 30 frames a second each frame owes 4
     while (acc >= 1 && n < 8) {
