@@ -84,7 +84,7 @@ export function HowIWorkFinale() {
     const box = textRef.current
     if (!stage || !holder || !box || !supportsDrops()) return
     const paras = Array.from(box.querySelectorAll<HTMLElement>('[data-p]'))
-    const source = paras.map((p) => words(p.dataset.head ?? '', p.dataset.body ?? ''))
+    const source = paras.map((p) => words(p.dataset.head ?? '', ''))
     const ctx = document.createElement('canvas').getContext('2d')
     if (!ctx) return
 
@@ -103,10 +103,12 @@ export function HowIWorkFinale() {
     let bins = 0
     let occ = new Float32Array(0)
     let hit = new Uint8Array(0)
+    let extLo = new Float32Array(0)
+    let extHi = new Float32Array(0)
     let flow: Word[][] = []
     const font = (k: Kind, size: number) =>
       k === 'head'
-        ? `700 ${size * 0.86}px Mattone, system-ui, sans-serif`
+        ? `700 ${size}px Mattone, system-ui, sans-serif`
         : k === 'mark'
           ? `500 ${size * 1.12}px "Cabinet Grotesk", system-ui, sans-serif`
           : `500 ${size}px "Cabinet Grotesk", system-ui, sans-serif`
@@ -119,7 +121,7 @@ export function HowIWorkFinale() {
       left = pad
       right = W - pad
       top = parseFloat(getComputedStyle(stage).paddingTop) || 64
-      R = phone ? Math.min(W * 0.2, 80) : Math.max(70, Math.min(H * 0.2, W * 0.13, 190))
+      R = phone ? Math.min(W * 0.15, 64) : Math.max(70, Math.min(H * 0.2, W * 0.13, 190))
       // every word measured once at 100px; sizes below scale from it
       ctx.font = font('body', 100)
       const space100 = ctx.measureText(' ').width
@@ -132,22 +134,22 @@ export function HowIWorkFinale() {
         })
       )
       const ink100 = at100.reduce((s, ws) => s + ws.reduce((t, w) => t + w.w + space100, 0), 0)
-      // the largest size at which all the text fills the stage around the drop: the text is the
-      // picture here, so it takes the whole screen rather than sitting small at the top
+      // the largest size at which the four lines fill the stage around the drop, with an empty row
+      // between them: few words, big and heavy, so each one carries weight
       const width = right - left
       const availH = H - top * 2
-      fs = phone ? 15 : 16
-      for (let size = phone ? 22 : 46; size >= (phone ? 15 : 16); size -= 0.5) {
-        const lineH = size * 1.42
+      fs = phone ? 18 : 22
+      for (let size = phone ? 34 : 84; size >= (phone ? 18 : 22); size -= 0.5) {
+        const lineH = size * 1.16
         const area = Math.floor(availH / lineH) * lineH * width
         const drop = (2 * R + 2 * size * 0.9) * (2 * R + lineH)
-        const need = (ink100 * (size / 100) * 1.1 + at100.length * width * 0.5) * lineH
+        const need = (ink100 * (size / 100) * 1.25 + at100.length * width * 1.5) * lineH
         if (need <= area - drop) {
           fs = size
           break
         }
       }
-      lh = fs * 1.42
+      lh = fs * 1.16
       box.style.fontSize = `${fs}px`
       box.style.lineHeight = `${lh}px`
       rows = Math.max(1, Math.floor(availH / lh))
@@ -156,6 +158,8 @@ export function HowIWorkFinale() {
       bins = Math.ceil(W / BIN)
       occ = new Float32Array(rows * bins)
       hit = new Uint8Array(rows * bins)
+      extLo = new Float32Array(rows).fill(-1)
+      extHi = new Float32Array(rows).fill(-1)
       space = space100 * (fs / 100)
       flow = at100.map((ws) => ws.map((w) => ({ ...w, w: w.w * (fs / 100) })))
     }
@@ -165,7 +169,7 @@ export function HowIWorkFinale() {
     let n = 0
     const sense = () => {
       hit.fill(0)
-      if (!xy) return
+      if (!xy) return false
       const padX = fs * 0.9
       const padY = fs * 0.35
       for (let i = 0; i < n; i++) {
@@ -179,6 +183,25 @@ export function HowIWorkFinale() {
         for (let r = r0; r <= r1; r++) hit.fill(1, r * bins + b0, r * bins + b1 + 1)
       }
       for (let i = 0; i < occ.length; i++) occ[i] += (hit[i] - occ[i]) * 0.3
+      // what the text wraps around: the liquid's extent on each row, changed only when it moved
+      // far enough to matter, so the liquid's own quiver never shifts a word
+      let moved = false
+      for (let r = 0; r < rows; r++) {
+        let lo = -1,
+          hi = -1
+        for (let b = 0; b < bins; b++)
+          if (occ[r * bins + b] >= 0.5) {
+            if (lo < 0) lo = b * BIN
+            hi = (b + 1) * BIN
+          }
+        const was = lo < 0 !== extLo[r] < 0
+        if (was || Math.abs(lo - extLo[r]) > fs * 0.6 || Math.abs(hi - extHi[r]) > fs * 0.6) {
+          extLo[r] = lo
+          extHi[r] = hi
+          moved = true
+        }
+      }
+      return moved
     }
 
     // --- the layout: free slots on each row, filled with words left to right, top to bottom
@@ -186,25 +209,20 @@ export function HowIWorkFinale() {
     const layout = () => {
       lines.length = 0
       paras.forEach(() => lines.push([]))
-      const minSlot = fs * 3.2
+      const minSlot = fs * (W <= 700 ? 6 : 2.6)
       let row = 0
       let slots: [number, number][] = []
       let si = 0
-      // a row has at most two slots, left and right of everything the liquid covers on it: text
-      // never runs into a hole or a gap inside the liquid, so the reading order stays plain
+      // one slot a row, on the wider side of the liquid: a big line never jumps across the drop
+      // (read as a zigzag, it fell apart), it steps aside and goes on
       const slotsOf = (r: number) => {
-        let lo = -1,
-          hi = -1
-        for (let b = 0; b < bins; b++)
-          if (occ[r * bins + b] >= 0.5) {
-            if (lo < 0) lo = b
-            hi = b
-          }
+        const lo = extLo[r],
+          hi = extHi[r]
         if (lo < 0) return [[left, right]] as [number, number][]
-        const out: [number, number][] = []
-        if (lo * BIN - left >= minSlot) out.push([left, lo * BIN])
-        if (right - (hi + 1) * BIN >= minSlot) out.push([(hi + 1) * BIN, right])
-        return out
+        const l = lo - left,
+          rr = right - hi
+        const best: [number, number] = l >= rr ? [left, lo] : [hi, right]
+        return Math.max(l, rr) >= minSlot ? [best] : []
       }
       const nextSlot = () => {
         si++
@@ -240,16 +258,17 @@ export function HowIWorkFinale() {
             if (!nextSlot()) return
             continue
           }
-          const last = i >= ws.length
-          const gap = !last && line.length > 1 ? (width - used) / (line.length - 1) : 0
-          lines[p].push({ words: line, x: a, y: top + row * lh, gap: gap > fs * 0.45 ? 0 : gap })
+          // ragged, not justified: big words with stretched gaps read worse
+          lines[p].push({ words: line, x: a, y: top + row * lh, gap: 0 })
           if (!nextSlot()) return
         }
-        // a new thought starts on a new row
+        // a new thought starts after an empty row
         if (si !== 0) {
           si = slots.length - 1
           if (!nextSlot()) return
         }
+        si = slots.length - 1
+        if (!nextSlot()) return
       }
     }
 
@@ -310,7 +329,6 @@ export function HowIWorkFinale() {
     }
 
     let liquid: DropsStage | null = null
-    let t0 = performance.now()
     const free = () => {
       liquid?.stop()
       liquid = null
@@ -323,15 +341,7 @@ export function HowIWorkFinale() {
       canvas.className = 'hwf-liquid'
       canvas.setAttribute('aria-hidden', 'true')
       holder.replaceChildren(canvas)
-      // the drop rests a little right of the middle and wanders slowly around it, so the text keeps
-      // breathing even when nobody touches it
-      const home = () => {
-        const s = (performance.now() - t0) / 1000
-        return {
-          x: W * 0.55 + Math.sin(s * 0.21) * W * 0.07,
-          y: top + (rows * lh) / 2 + Math.sin(s * 0.29 + 1) * lh * 1.6,
-        }
-      }
+      const home = () => ({ x: W * (W <= 700 ? 0.76 : 0.55), y: top + (rows * lh) / 2 })
       liquid = startDropsStage({
         canvas,
         groups: [R],
@@ -341,7 +351,8 @@ export function HowIWorkFinale() {
         shape: (p, count) => {
           xy = p
           n = count
-          sense()
+          const moved = sense()
+          if (laid && !moved) return
           if (selecting()) return
           layout()
           render()
@@ -368,7 +379,6 @@ export function HowIWorkFinale() {
       again = window.setTimeout(() => {
         if (!near) return
         xy = null
-        t0 = performance.now()
         start()
       }, 200)
     }
@@ -390,10 +400,9 @@ export function HowIWorkFinale() {
       <div ref={textRef} className="hwf-text">
         {KEYS.map((key) => {
           const head = t.raw(key) as string
-          const body = t(`more.${key}`)
           const m = /^(.*?)<mark>(.*?)<\/mark>(.*)$/.exec(head)
           return (
-            <p key={key} className="hwf-p" data-p={key} data-head={head} data-body={body}>
+            <p key={key} className="hwf-p" data-p={key} data-head={head}>
               <b>
                 {m ? (
                   <>
@@ -408,8 +417,7 @@ export function HowIWorkFinale() {
                 ) : (
                   head
                 )}
-              </b>{' '}
-              {body}
+              </b>
             </p>
           )
         })}

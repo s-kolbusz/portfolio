@@ -24,27 +24,27 @@
 .hwf-text {
   position: relative;
   z-index: 1;
-  columns: 2 28ch;
-  column-gap: var(--sys-s5);
+  max-width: 24ch;
   font:
-    500 clamp(17px, 1.45vw, 25px) / 1.42 'Cabinet Grotesk',
+    700 clamp(26px, 3.4vw, 6vh) / 1.16 'Mattone',
     system-ui,
     sans-serif;
-  color: var(--sys-ink-2);
+  letter-spacing: -0.01em;
+  color: var(--sys-ink);
 }
 .hwf-p {
   margin: 0 0 1em;
 }
 .hwf-text b {
-  font: 700 0.86em 'Mattone', system-ui, sans-serif;
-  color: var(--sys-ink);
+  font: inherit;
 }
 
 /* live: every line stands where the liquid leaves room for it, in the stage's px */
 .hwf-text[data-live] {
   position: absolute;
   inset: 0;
-  columns: auto;
+  max-width: none;
+  letter-spacing: 0;
 }
 .hwf-text[data-live] .hwf-p {
   margin: 0;
@@ -66,9 +66,6 @@
   color: var(--sys-ink);
   text-decoration: none;
 }
-.hwf-text b .hwf-mark {
-  font-size: calc(1.12em / 0.86);
-}
 .hwf-mark .acc {
   color: oklch(0.8 0.125 47);
 }
@@ -87,6 +84,6 @@
     padding: var(--sys-s6) var(--sys-margin);
   }
   .hwf-text {
-    font-size: 16px;
+    font-size: 24px;
   }
 }
