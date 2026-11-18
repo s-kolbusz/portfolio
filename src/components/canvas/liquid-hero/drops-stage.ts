@@ -241,8 +241,28 @@ function run({ canvas, groups, start, frame: read }: DropsStageOptions): DropsSt
     snapB: Float32Array | null = null,
     snapAt = 0,
     gap = 1000 / 60
+  // ?pomiar: a readout of how fast the physics and the drawing really run on this device
+  // (to measure an iPad that lagged, 2026-11-18): physics steps a second against the 120 it aims at
+  const probe = new URLSearchParams(location.search).has('pomiar')
+    ? document.createElement('p')
+    : null
+  const count = { steps: 0, frames: 0, since: performance.now() }
+  if (probe) {
+    probe.style.cssText =
+      'position:fixed;left:8px;bottom:8px;z-index:99;margin:0;padding:6px 8px;background:#000;color:#0f0;font:12px ui-monospace,monospace'
+    document.body.append(probe)
+  }
+  const report = (now: number) => {
+    if (!probe || now - count.since < 1000) return
+    const s = (now - count.since) / 1000
+    probe.textContent = `r2o · physics ${Math.round(count.steps / s)}/120 steps/s · ${Math.round(count.frames / s)} fps · ${used} particles · ${W}x${H}`
+    count.steps = 0
+    count.frames = 0
+    count.since = now
+  }
   physics.onmessage = ({ data }: MessageEvent<DropsOutMessage>) => {
     if (data.ready) used = data.used ?? 0
+    count.steps += data.steps ?? 0
     if (!data.pos) return
     const now = performance.now()
     if (snapB) gap = gap * 0.9 + Math.min(now - snapAt, 100) * 0.1
@@ -474,6 +494,8 @@ function run({ canvas, groups, start, frame: read }: DropsStageOptions): DropsSt
   function frame(now: number) {
     raf = 0
     if (!visible) return
+    count.frames++
+    report(now)
     const f = read()
     sendTargets(f)
     if (!snapA || !snapB || !used) {
@@ -530,6 +552,7 @@ function run({ canvas, groups, start, frame: read }: DropsStageOptions): DropsSt
   return {
     stop: () => {
       cancelAnimationFrame(raf)
+      probe?.remove()
       io.disconnect()
       physics.terminate()
       window.removeEventListener('pointermove', onPointer)

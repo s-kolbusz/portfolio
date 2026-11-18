@@ -143,7 +143,10 @@ export function AspectDemo() {
       if (wrap) wrap.style.transform = grown
     }
     const fitNow = () => {
-      if (window.innerWidth <= 900) {
+      // touch screens (tablets too) show it at its natural size, as phones do: zoomed to the height of
+      // a landscape tablet it was too small to use, and Safari's toolbar, showing and hiding while
+      // scrolling, changed that height and re-zoomed it all the time (owner's iPad video, 2026-11-18)
+      if (window.innerWidth <= 900 || matchMedia('(pointer: coarse)').matches) {
         el.style.zoom = ''
         el.style.width = ''
         return
