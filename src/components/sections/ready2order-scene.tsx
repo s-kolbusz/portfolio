@@ -62,6 +62,8 @@ export function Ready2orderScene() {
     const tags = Array.from(stage.querySelectorAll<HTMLElement>('[data-tag]'))
     const rows = Array.from(stage.querySelectorAll<HTMLElement>('[data-row]'))
     const body = stage.querySelector<HTMLElement>('[data-body]')
+    const done = stage.querySelector<HTMLElement>('.r2o-done')
+    if (done) done.inert = true
     let frame = 0
     let last = -1
     let mergeNow = 0
@@ -178,6 +180,9 @@ export function Ready2orderScene() {
       }
       stage.style.setProperty('--ask', String(1 - span(p, 0.36, 0.46)))
       stage.style.setProperty('--done', String(ease(span(p, 0.46, 0.62))))
+      // until the finished frame is really there, its buttons and link take no pointer, focus or ring
+      const shown = span(p, 0.46, 0.62) > 0.6
+      if (done && done.inert === shown) done.inert = !shown
       rows.forEach((row, i) => {
         const a = ease(span(p, 0.48 + i * 0.04, 0.6 + i * 0.04))
         row.style.opacity = String(a)
