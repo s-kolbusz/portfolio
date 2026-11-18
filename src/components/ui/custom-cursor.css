@@ -1,0 +1,49 @@
+/* Always visible: the dot and the free ring are white with a difference blend, so they turn dark
+   on paper and light on ink, the dark sheet or a photo. On a link the ring is the keyboard focus
+   ring instead (custom-cursor.tsx switches the blend off there). */
+.cc-dot,
+.cc-ring {
+  mix-blend-mode: difference;
+}
+.cc-dot {
+  color: #fff;
+}
+.cc-ring {
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+/* The cursor dot: two bars centred on the pointer, so one element can morph between shapes. */
+.cc-dot {
+  width: 0;
+  height: 0;
+}
+.cc-dot i {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background: currentColor;
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.24s cubic-bezier(0.2, 0.8, 0.2, 1),
+    height 0.24s cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-radius 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.cc-dot[data-shape='text'] i {
+  width: 2px;
+  height: 22px;
+  border-radius: 1px;
+}
+.cc-dot[data-shape='cross'] i {
+  border-radius: 1px;
+}
+.cc-dot[data-shape='cross'] [data-bar='h'] {
+  width: 22px;
+  height: 2px;
+}
+.cc-dot[data-shape='cross'] [data-bar='v'] {
+  width: 2px;
+  height: 22px;
+}

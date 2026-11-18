@@ -7,6 +7,23 @@ import { useMedia, usePrefersReducedMotion } from '@/hooks/use-media'
 import { gsap, useGSAP } from '@/lib/gsap-core'
 import { useCursorStore } from '@/lib/stores'
 
+import './custom-cursor.css'
+
+type Shape = 'dot' | 'text' | 'cross'
+
+/** the dot's shape for what is under the pointer: a crosshair where you place a point, a text bar over selectable text */
+function shapeFor(el: Element | null): Shape {
+  if (!(el instanceof HTMLElement)) return 'dot'
+  if (el.closest('[data-cursor-shape="cross"], .focal-editor__image-wrapper')) return 'cross'
+  if (el.closest('a[href], button, [role="button"], label, input, select, textarea, [inert]'))
+    return 'dot'
+  const hasText = Array.from(el.childNodes).some(
+    (n) => n.nodeType === Node.TEXT_NODE && (n.textContent ?? '').trim().length > 0
+  )
+  if (!hasText) return 'dot'
+  return getComputedStyle(el).userSelect === 'none' ? 'dot' : 'text'
+}
+
 export function CustomCursor() {
   const prefersReducedMotion = usePrefersReducedMotion()
   const isEnabled = useMedia('(pointer: fine)') && !prefersReducedMotion
@@ -79,10 +96,12 @@ export function CustomCursor() {
           // on a target the ring is the focus ring: same colour, same weight
           ringRef.current.style.borderColor = 'var(--color-ring)'
           ringRef.current.style.borderWidth = '2px'
+          ringRef.current.style.mixBlendMode = 'normal'
         } else if (ringRef.current) {
           gsap.to(ringRef.current, { borderRadius: '50%', duration: 0.2 })
           ringRef.current.style.borderColor = ''
           ringRef.current.style.borderWidth = ''
+          ringRef.current.style.mixBlendMode = ''
         }
       }
 
@@ -117,9 +136,43 @@ export function CustomCursor() {
   useGSAP(() => {
     if (!isEnabled) return
 
+    let shape: Shape = 'dot'
+    let pending: EventTarget | null = null
+    let shapeFrame = 0
+    const applyShape = () => {
+      shapeFrame = 0
+      const next = magneticTargetRef.current ? 'dot' : shapeFor(pending as Element | null)
+      if (next === shape || !cursorRef.current || !ringRef.current) return
+      shape = next
+      cursorRef.current.dataset.shape = next
+      // one cursor at a time: when the dot becomes a crosshair or a text bar, the ring steps back
+      gsap.to(ringRef.current, {
+        opacity: next === 'dot' ? 1 : 0,
+        scale: next === 'dot' ? 1 : 0.5,
+        duration: 0.22,
+        ease: 'power3.out',
+      })
+    }
+    const onMouseDown = () => {
+      if (!cursorRef.current || !ringRef.current) return
+      gsap.to(cursorRef.current, { scale: 0.7, duration: 0.12, ease: 'power2.out' })
+      if (shape === 'dot')
+        gsap.to(ringRef.current, { scale: 0.86, duration: 0.12, ease: 'power2.out' })
+    }
+    const onMouseUp = () => {
+      if (!cursorRef.current || !ringRef.current) return
+      gsap.to(cursorRef.current, { scale: 1, duration: 0.3, ease: 'back.out(3)' })
+      if (shape === 'dot')
+        gsap.to(ringRef.current, { scale: 1, duration: 0.3, ease: 'back.out(3)' })
+    }
+    window.addEventListener('mousedown', onMouseDown)
+    window.addEventListener('mouseup', onMouseUp)
+
     const onMouseMove = (e: MouseEvent) => {
       mouse.current.x = e.clientX
       mouse.current.y = e.clientY
+      pending = e.target
+      if (!shapeFrame) shapeFrame = requestAnimationFrame(applyShape)
       if (!hasMoved.current) {
         if (cursorRef.current && ringRef.current) {
           hasMoved.current = true
@@ -129,7 +182,12 @@ export function CustomCursor() {
     }
 
     window.addEventListener('mousemove', onMouseMove)
-    return () => window.removeEventListener('mousemove', onMouseMove)
+    return () => {
+      cancelAnimationFrame(shapeFrame)
+      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('mousedown', onMouseDown)
+      window.removeEventListener('mouseup', onMouseUp)
+    }
   }, [isEnabled])
 
   useGSAP(() => {
@@ -275,14 +333,19 @@ export function CustomCursor() {
       data-adapt-theme="pointer"
       className="pointer-events-none fixed inset-0 z-9998 overflow-hidden print:hidden"
     >
+      {/* the dot is two bars that morph: both round = a dot, both tall = a text bar, crossed = a crosshair */}
       <div
         ref={cursorRef}
-        className="bg-foreground pointer-events-none fixed top-0 left-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0 will-change-transform"
-      />
+        data-shape="dot"
+        className="cc-dot pointer-events-none fixed top-0 left-0 opacity-0 will-change-transform"
+      >
+        <i data-bar="h" />
+        <i data-bar="v" />
+      </div>
 
       <div
         ref={ringRef}
-        className="border-foreground/70 pointer-events-none fixed top-0 left-0 h-11 w-11 -translate-x-1/2 -translate-y-1/2 rounded-full border opacity-0 transition-colors will-change-transform"
+        className="cc-ring pointer-events-none fixed top-0 left-0 h-11 w-11 -translate-x-1/2 -translate-y-1/2 rounded-full border opacity-0 transition-colors will-change-transform"
       />
     </div>
   )
