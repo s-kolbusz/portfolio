@@ -81,8 +81,10 @@ let acc = 0,
   paused = false,
   timer: ReturnType<typeof setTimeout> | null = null,
   buf: Float32Array | null = null
-// Light physics, as the hero's on slow devices: one bigger step covering up to 4 base steps, without the
-// separate viscosity and smoothing passes. Same particles, same drawing, still real liquid. It switches
+// Light physics on slow devices: one bigger step covering up to 4 base steps. Same particles, same
+// forces, same drawing, still real liquid. Unlike the hero's light mode it keeps the viscosity and
+// smoothing passes: without them this big body (2818 particles in a 2000 px window) tore into a foam
+// of holes and never settled, and the owner's desktop under load tripped into it (2026-11-18). It switches
 // on when full steps cost too much compute to keep 120 a second: the owner's iPad took 84.5 ms a step
 // (Mac WebKit 2 ms), and the round discs that stood in for the liquid there were rejected (2026-11-18).
 let light = false
@@ -176,10 +178,6 @@ function regroup() {
 
 function goLight() {
   light = true
-  if (!sim) return
-  // no separate viscosity and XSPH, stronger damping instead (as the hero's light mode)
-  sim.P.light = true
-  sim.P.drag = 0.988
 }
 
 // d = how many base steps this step covers: the steering forces scale with it
