@@ -29,8 +29,9 @@ export interface DropsOutMessage {
   ready?: boolean
   used?: number
   pos?: Float32Array
-  /** physics steps since the last positions (for the ?pomiar readout) */
+  /** physics steps since the last positions, and the ms they took (for the ?pomiar readout) */
   steps?: number
+  ms?: number
 }
 
 interface WorkerScope {
@@ -270,7 +271,8 @@ scope.onmessage = ({ data }) => {
   }
 }
 
-let stepped = 0
+let stepped = 0,
+  spent = 0
 
 function tick() {
   timer = null
@@ -279,6 +281,7 @@ function tick() {
   acc += Math.min((now - tPrev) / 1000, 0.1) * STEPS_PER_SECOND
   tPrev = now
   let n = 0
+  const t0 = performance.now()
   // up to 8 steps at a time: at 30 frames a second each frame owes 4
   while (acc >= 1 && n < 8) {
     steer()
@@ -288,6 +291,7 @@ function tick() {
   }
   if (n === 8) acc = Math.min(acc, 1)
   stepped += n
+  spent += performance.now() - t0
   if (n) send()
   timer = setTimeout(tick, acc >= 1 ? 0 : Math.max(0, ((1 - acc) / STEPS_PER_SECOND) * 1000))
 }
@@ -300,6 +304,7 @@ function send() {
     pos[i * 2] = sim.x[i]
     pos[i * 2 + 1] = sim.y[i]
   }
-  scope.postMessage({ pos, steps: stepped }, [pos.buffer])
+  scope.postMessage({ pos, steps: stepped, ms: spent }, [pos.buffer])
   stepped = 0
+  spent = 0
 }

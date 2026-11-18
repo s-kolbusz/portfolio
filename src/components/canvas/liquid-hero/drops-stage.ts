@@ -246,7 +246,7 @@ function run({ canvas, groups, start, frame: read }: DropsStageOptions): DropsSt
   const probe = new URLSearchParams(location.search).has('pomiar')
     ? document.createElement('p')
     : null
-  const count = { steps: 0, frames: 0, since: performance.now() }
+  const count = { steps: 0, frames: 0, ms: 0, since: performance.now() }
   if (probe) {
     probe.style.cssText =
       'position:fixed;left:8px;bottom:8px;z-index:99;margin:0;padding:6px 8px;background:#000;color:#0f0;font:12px ui-monospace,monospace'
@@ -257,9 +257,10 @@ function run({ canvas, groups, start, frame: read }: DropsStageOptions): DropsSt
     const s = (now - count.since) / 1000
     const pace = still
       ? 'drops without physics'
-      : `physics ${Math.round(count.steps / s)}/120 steps/s`
+      : `physics ${Math.round(count.steps / s)}/120 steps/s, ${(count.ms / Math.max(1, count.steps)).toFixed(1)} ms each`
     probe.textContent = `r2o · ${pace} · ${Math.round(count.frames / s)} fps · ${used} particles · ${W}x${H}`
     count.steps = 0
+    count.ms = 0
     count.frames = 0
     count.since = now
   }
@@ -276,6 +277,7 @@ function run({ canvas, groups, start, frame: read }: DropsStageOptions): DropsSt
     if (still) return
     if (data.ready) used = data.used ?? 0
     count.steps += data.steps ?? 0
+    count.ms += data.ms ?? 0
     watch.steps += data.steps ?? 0
     if (!data.pos) return
     const now = performance.now()
