@@ -352,7 +352,7 @@
   "aspectDemo": {
     "label": "aspect-preview · open source · Payload CMS",
     "question": "Where will each layout cut this photo?",
-    "how": "Drag the point, draw a crop, and every ratio follows. This is the plugin itself, running here without Payload.",
+    "how": "Drag the point, draw a crop, and every ratio follows. Shaded bands mark where a site puts text over the photo. This is the plugin itself, running here without Payload.",
     "alt": "The photo being edited",
     "another": "Another photo",
     "own": "Your own photo",

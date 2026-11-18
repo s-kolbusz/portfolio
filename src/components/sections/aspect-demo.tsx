@@ -7,6 +7,8 @@ import { useTranslations } from 'next-intl'
 import {
   AspectPreviewEditor,
   type AspectPreviewValue,
+  type AspectRatioConfig,
+  DEFAULT_ASPECT_RATIOS,
 } from 'payload-plugin-aspect-preview/playground'
 
 import './aspect-demo.css'
@@ -25,6 +27,27 @@ const PHOTOS = [
 
 const REPO_URL = 'https://github.com/s-kolbusz/payload-plugin-aspect-preview'
 const NPM_COMMAND = 'npm i payload-plugin-aspect-preview'
+
+/**
+ * The plugin's default ratios with its `overlays` turned on, so the demo also shows where a
+ * site lays text over the photo: bands fixed to the frame while the image moves under them.
+ * Values as in the plugin's own dev app and README.
+ */
+const RATIOS: AspectRatioConfig[] = DEFAULT_ASPECT_RATIOS.map((ratio) => {
+  if (ratio.ratio === '4:3')
+    return {
+      ...ratio,
+      overlays: [
+        { label: 'Chips', edge: 'top', min: 0.12 },
+        { label: 'Title + price', edge: 'bottom', min: 0.22, max: 0.4 },
+      ],
+    }
+  if (ratio.ratio === '16:9')
+    return { ...ratio, overlays: [{ label: 'Headline', edge: 'left', min: 0.35, max: 0.5 }] }
+  if (ratio.ratio === '9:16')
+    return { ...ratio, overlays: [{ label: 'Caption', edge: 'bottom', min: 0.15, max: 0.3 }] }
+  return ratio
+})
 
 const startValue = (index: number): AspectPreviewValue => ({
   focal: { x: PHOTOS[index].x, y: PHOTOS[index].y },
@@ -137,6 +160,7 @@ export function AspectDemo() {
                 <AspectPreviewEditor
                   src={src}
                   alt={t('alt')}
+                  aspectRatios={RATIOS}
                   value={value}
                   onChange={setValue}
                   className="apd-theme"
