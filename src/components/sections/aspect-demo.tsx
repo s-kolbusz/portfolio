@@ -1,6 +1,6 @@
 'use client'
 
-import { type CSSProperties, useEffect, useRef, useState } from 'react'
+import { type CSSProperties, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 import { useTranslations } from 'next-intl'
 
@@ -14,15 +14,16 @@ import {
 import './aspect-demo.css'
 
 /**
- * Placeholder photos with the main subject as the starting focal point (percent of the photo).
- * They come from Zakofy, the client the plugin was first built for: before this reaches main,
- * either the client agrees or they are swapped for the owner's own photos.
+ * Photos from Unsplash (via Lorem Picsum, Unsplash licence), each with its subject off the middle,
+ * and the subject as the starting focal point (percent of the photo). One is picked at random.
  */
 const PHOTOS = [
-  { src: '/images/demo/pleso.jpg', name: 'strbske-pleso.jpg', x: 58.5, y: 66 },
-  { src: '/images/demo/giewont.jpg', name: 'giewont.jpg', x: 62, y: 28 },
-  { src: '/images/demo/bacowka.jpg', name: 'bacowka.jpg', x: 50, y: 55 },
-  { src: '/images/demo/pleso-2.jpg', name: 'pleso-evening.jpg', x: 50, y: 50 },
+  { src: '/images/demo/street.jpg', name: 'street-crossing.jpg', x: 58, y: 52 },
+  { src: '/images/demo/pug.jpg', name: 'pug-in-a-blanket.jpg', x: 49, y: 20 },
+  { src: '/images/demo/walruses.jpg', name: 'walruses.jpg', x: 82, y: 40 },
+  { src: '/images/demo/waterfall.jpg', name: 'waterfall.jpg', x: 50, y: 85 },
+  { src: '/images/demo/sunglasses.jpg', name: 'meadow-portrait.jpg', x: 55, y: 40 },
+  { src: '/images/demo/lioness.jpg', name: 'lioness.jpg', x: 49, y: 42 },
 ] as const
 
 const REPO_URL = 'https://github.com/s-kolbusz/payload-plugin-aspect-preview'
@@ -73,7 +74,11 @@ export function AspectDemo() {
     if (!el || near) return
     const io = new IntersectionObserver(
       (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) setNear(true)
+        if (!entries.some((entry) => entry.isIntersecting)) return
+        const first = Math.floor(Math.random() * PHOTOS.length)
+        setPhoto(first)
+        setValue(startValue(first))
+        setNear(true)
       },
       { rootMargin: '100% 0px' }
     )
@@ -112,6 +117,44 @@ export function AspectDemo() {
     }
   }, [near, src])
 
+  // On a desktop the whole admin window is shown at most 90% of the screen's height: it is drawn at
+  // its natural size and zoomed down to fit, like a preview of the real thing. CSS zoom (not a
+  // transform) so the plugin's pointer maths stays right.
+  const adminRef = useRef<HTMLDivElement>(null)
+  useLayoutEffect(() => {
+    const el = adminRef.current
+    if (!el) return
+    const fit = () => {
+      if (window.innerWidth <= 900) {
+        el.style.zoom = ''
+        el.style.width = ''
+        return
+      }
+      // a fixed layout width: under zoom an auto width would grow to fill the column and the
+      // window's height would no longer shrink with it
+      el.style.width = ''
+      el.style.zoom = ''
+      el.style.width = `${el.parentElement?.clientWidth ?? el.clientWidth}px`
+      // the photo's cap in px (not screen units), so the whole window scales evenly with the zoom
+      el.style.setProperty('--apd-cap', `${Math.round(window.innerHeight * 0.62)}px`)
+      let z = 1
+      for (let k = 0; k < 3; k++) {
+        el.style.zoom = String(z)
+        const h = el.getBoundingClientRect().height
+        z = Math.min(1, z * ((window.innerHeight * 0.9) / h))
+      }
+      el.style.zoom = String(z)
+    }
+    fit()
+    const img = el.querySelector('.focal-editor img')
+    img?.addEventListener('load', fit)
+    window.addEventListener('resize', fit)
+    return () => {
+      img?.removeEventListener('load', fit)
+      window.removeEventListener('resize', fit)
+    }
+  }, [near, size])
+
   return (
     <section ref={sectionRef} id="aspect-preview" className="apd" aria-labelledby="apd-title">
       <header className="apd-head">
@@ -126,48 +169,73 @@ export function AspectDemo() {
         className="apd-editor"
         style={ratio ? ({ '--apd-ratio': ratio } as CSSProperties) : undefined}
       >
-        {/* A wireframe of the Payload admin's media view around the plugin: everything but the
-            plugin's field is a drawing, out of the tab order and the accessibility tree. */}
-        <div className="apd-admin">
+        {/* A wireframe of the Payload admin's media edit view around the plugin, laid out as
+            Payload 3 lays it out: everything but the plugin's field is a drawing, out of the tab
+            order and the accessibility tree. */}
+        <div ref={adminRef} className="apd-admin">
           <aside className="apd-admin__nav" inert aria-hidden="true">
-            <span className="apd-admin__logo" />
             <span className="apd-admin__group">Collections</span>
             <span>Users</span>
             <span className="is-on">Media</span>
+            <span>Pages</span>
+            <span>Posts</span>
+            <span className="apd-admin__group">Globals</span>
+            <span>Header</span>
+            <span>Footer</span>
+            <span className="apd-admin__logout">Log out</span>
           </aside>
           <div className="apd-admin__main">
             <div className="apd-admin__bar" inert aria-hidden="true">
-              <span>
-                Media <i>/</i> {fileName}
+              <span className="apd-admin__crumbs">
+                <span className="apd-admin__mark" />
+                <i>/</i> Media <i>/</i> {fileName}
               </span>
-              <span className="apd-admin__save">Save</span>
+              <span className="apd-admin__avatar" />
             </div>
             <div className="apd-admin__doc">
-              <div inert aria-hidden="true">
+              <div className="apd-admin__head" inert aria-hidden="true">
                 <p className="apd-admin__title">{fileName}</p>
-                <div className="apd-admin__upload">
-                  <span className="apd-admin__thumb" style={{ backgroundImage: `url("${src}")` }} />
-                  <span>
-                    {fileName}
-                    <br />
-                    <i>{size ? `${size.w}×${size.h}` : ''} · image/jpeg</i>
-                  </span>
+                <div className="apd-admin__tabs">
+                  <span className="is-on">Edit</span>
+                  <span>API</span>
                 </div>
-                <span className="apd-admin__label">Alt</span>
-                <span className="apd-admin__input">{t('alt')}</span>
+                <div className="apd-admin__controls">
+                  <span>
+                    Last modified <b>just now</b> · Created <b>just now</b>
+                  </span>
+                  <span className="apd-admin__save">Save</span>
+                </div>
               </div>
-              {near ? (
-                <AspectPreviewEditor
-                  src={src}
-                  alt={t('alt')}
-                  aspectRatios={RATIOS}
-                  value={value}
-                  onChange={setValue}
-                  className="apd-theme"
-                />
-              ) : (
-                <div className="apd-wait" aria-hidden="true" />
-              )}
+              <div className="apd-admin__fields">
+                <div inert aria-hidden="true">
+                  <div className="apd-admin__upload">
+                    <span
+                      className="apd-admin__thumb"
+                      style={{ backgroundImage: `url("${src}")` }}
+                    />
+                    <span>
+                      {fileName}
+                      <br />
+                      <i>{size ? `${size.w}x${size.h}` : ''} · image/jpeg</i>
+                    </span>
+                    <span className="apd-admin__chip">Preview Sizes</span>
+                  </div>
+                  <span className="apd-admin__label">Alt</span>
+                  <span className="apd-admin__input">{t('alt')}</span>
+                </div>
+                {near ? (
+                  <AspectPreviewEditor
+                    src={src}
+                    alt={t('alt')}
+                    aspectRatios={RATIOS}
+                    value={value}
+                    onChange={setValue}
+                    className="apd-theme"
+                  />
+                ) : (
+                  <div className="apd-wait" aria-hidden="true" />
+                )}
+              </div>
             </div>
           </div>
         </div>

@@ -111,9 +111,14 @@
   --apv-radius-m: 0;
   font-family: var(--sys-mono);
 }
-/* ——— the Payload admin, drawn as a wireframe: only the plugin's field is live ——— */
+/* ——— the Payload admin, drawn as a wireframe: only the plugin's field is live ———
+   Proportions follow Payload 3's media edit view: a 240 px nav, a slim app header with
+   breadcrumbs, the document header (title, Edit/API tabs, dates and Save), then the fields.
+   The whole window is at most 90% of the screen's height on a desktop. */
 .apd-admin {
+  --apd-line: rgba(43, 38, 32, 0.18);
   display: flex;
+  margin-inline: auto;
   border: var(--sys-line) solid var(--sys-ink);
   background: var(--sys-paper);
   font: 12px / 1.4 var(--sys-mono);
@@ -125,27 +130,29 @@
 .apd-admin__nav {
   display: flex;
   flex-direction: column;
-  gap: var(--sys-s2);
-  flex: 0 0 168px;
-  padding: var(--sys-s3);
-  border-right: var(--sys-line) solid rgba(43, 38, 32, 0.22);
-}
-.apd-admin__logo {
-  width: var(--sys-s4);
-  height: var(--sys-s4);
-  margin-bottom: var(--sys-s3);
-  border: var(--sys-line) solid rgba(43, 38, 32, 0.4);
-  border-radius: 50%;
+  gap: 10px;
+  flex: 0 0 240px;
+  padding: 72px var(--sys-s4) var(--sys-s4);
+  border-right: var(--sys-line) solid var(--apd-line);
+  font-size: 13px;
 }
 .apd-admin__group {
+  margin-top: var(--sys-s2);
   font-size: var(--sys-micro);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   opacity: 0.7;
 }
+.apd-admin__group:first-child {
+  margin-top: 0;
+}
 .apd-admin__nav .is-on {
   color: var(--sys-ink);
   font-weight: 700;
+}
+.apd-admin__logout {
+  margin-top: auto;
+  opacity: 0.6;
 }
 .apd-admin__main {
   flex: 1;
@@ -156,37 +163,93 @@
   justify-content: space-between;
   align-items: center;
   gap: var(--sys-s2);
-  padding: var(--sys-s2) var(--sys-s4);
-  border-bottom: var(--sys-line) solid rgba(43, 38, 32, 0.22);
+  height: 56px;
+  padding: 0 var(--sys-s5);
+  border-bottom: var(--sys-line) solid var(--apd-line);
 }
-.apd-admin__bar i {
+.apd-admin__crumbs {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.apd-admin__crumbs i {
   font-style: normal;
-  opacity: 0.5;
-  margin: 0 0.4em;
+  opacity: 0.45;
 }
-.apd-admin__save {
-  padding: 6px var(--sys-s2);
+.apd-admin__mark {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(43, 38, 32, 0.45);
+  transform: rotate(45deg) scale(0.8);
+}
+.apd-admin__avatar {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
   border: var(--sys-line) solid rgba(43, 38, 32, 0.4);
 }
 .apd-admin__doc {
-  padding: var(--sys-s4);
+  padding: 0 var(--sys-s5) var(--sys-s4);
+}
+.apd-admin__head {
+  border-bottom: var(--sys-line) solid var(--apd-line);
+  margin: 0 calc(-1 * var(--sys-s5));
+  padding: var(--sys-s4) var(--sys-s5) 0;
 }
 .apd-admin__title {
-  margin: 0 0 var(--sys-s3);
+  margin: 0 0 var(--sys-s2);
   font:
-    700 22px / 1.1 'Mattone',
+    700 26px / 1.1 'Mattone',
     system-ui,
     sans-serif;
   color: var(--sys-ink-2);
   overflow-wrap: anywhere;
 }
+.apd-admin__tabs {
+  display: flex;
+  gap: var(--sys-s3);
+}
+.apd-admin__tabs span {
+  padding: 6px 0;
+}
+.apd-admin__tabs .is-on {
+  color: var(--sys-ink);
+  border-bottom: 2px solid rgba(43, 38, 32, 0.6);
+}
+.apd-admin__controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sys-s2);
+  margin: 0 calc(-1 * var(--sys-s5));
+  padding: 10px var(--sys-s5);
+  border-top: var(--sys-line) solid var(--apd-line);
+}
+.apd-admin__controls b {
+  font-weight: 700;
+  color: var(--sys-ink-2);
+}
+.apd-admin__save {
+  padding: 6px var(--sys-s2);
+  background: rgba(43, 38, 32, 0.55);
+  color: var(--sys-paper);
+}
+.apd-admin__fields {
+  padding-top: var(--sys-s3);
+}
 .apd-admin__upload {
   display: flex;
   align-items: center;
   gap: var(--sys-s2);
-  padding: var(--sys-s2);
-  margin-bottom: var(--sys-s3);
-  border: var(--sys-line) solid rgba(43, 38, 32, 0.22);
+  padding: 10px;
+  margin-bottom: var(--sys-s2);
+  border: var(--sys-line) solid var(--apd-line);
 }
 .apd-admin__upload i {
   font-style: normal;
@@ -194,30 +257,38 @@
 }
 .apd-admin__thumb {
   flex: 0 0 auto;
-  width: 72px;
-  height: 48px;
+  width: 64px;
+  height: 44px;
   background: var(--sys-light) center / cover no-repeat;
   filter: grayscale(1);
   opacity: 0.6;
 }
+.apd-admin__chip {
+  margin-left: auto;
+  padding: 4px 10px;
+  border: var(--sys-line) solid rgba(43, 38, 32, 0.3);
+}
 .apd-admin__label {
   display: block;
-  margin-bottom: var(--sys-s1);
+  margin-bottom: 6px;
 }
 .apd-admin__input {
   display: block;
-  padding: 10px var(--sys-s2);
-  border: var(--sys-line) solid rgba(43, 38, 32, 0.22);
+  padding: 8px var(--sys-s2);
+  border: var(--sys-line) solid var(--apd-line);
   color: rgba(43, 38, 32, 0.45);
+}
+/* the photo is drawn no taller than most of the screen; the whole window is then zoomed to fit
+   90% of it (see AspectDemo) */
+@media (min-width: 901px) {
+  .apd .focal-editor__image-wrapper {
+    max-width: min(100%, calc(var(--apd-cap, 62svh) * var(--apd-ratio, 1.5)));
+  }
 }
 /* the plugin's own panel, in ink: the one live part of the drawing */
 .apd .focal-editor {
   margin-top: var(--sys-s3);
   border-color: var(--sys-ink);
-}
-/* a photo is never taller than most of the screen: its width follows from its shape */
-.apd .focal-editor__image-wrapper {
-  max-width: calc(68svh * var(--apd-ratio, 1.5));
 }
 /* the plugin hard-codes teal and orange for these; here they are ink: CSS on light, Crop inverted */
 .apd .focal-preview__card-source {
@@ -254,6 +325,9 @@
   .apd-admin__nav {
     display: none;
   }
+  .apd-admin__controls > span:first-child {
+    display: none;
+  }
   .apd .focal-editor__right {
     width: 100%;
   }
@@ -274,6 +348,11 @@
   }
   .apd-admin__bar,
   .apd-admin__doc {
+    padding-inline: var(--sys-s2);
+  }
+  .apd-admin__head,
+  .apd-admin__controls {
+    margin-inline: calc(-1 * var(--sys-s2));
     padding-inline: var(--sys-s2);
   }
   /* on a phone the admin is only suggested (path, title), so the plugin starts on the first screen */
