@@ -225,16 +225,56 @@
 
 /* the receipt: paper from the till, fed up from the bottom of the column. Lines print one by one;
    the oldest ones go up and out of sight under the column's edge when there is no room */
-.r2o-receipt {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+.r2o-slot {
+  position: relative;
   flex: 1 1 0;
   min-height: 0;
   max-width: 300px;
   margin-top: var(--sys-s3);
+}
+.r2o-receipt {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
   overflow: hidden;
-  mask: linear-gradient(transparent, #000 var(--sys-s4));
+  cursor: pointer;
+  transition:
+    height 0.7s var(--sys-out),
+    filter 0.7s var(--sys-out);
+}
+/* the column's edge the receipt is tucked under: ink fading over the paper's top */
+.r2o-receipt::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset: 0 0 auto;
+  height: var(--sys-s4);
+  background: linear-gradient(var(--sys-ink), transparent);
+  pointer-events: none;
+  transition: opacity 0.4s var(--sys-out);
+}
+.r2o-receipt[aria-expanded='true'] {
+  overflow: visible;
+  filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.45));
+}
+.r2o-receipt[aria-expanded='true']::before {
+  opacity: 0;
+}
+.r2o-receipt .r2o-paper {
+  transition: transform 0.7s var(--sys-out);
+}
+.r2o-receipt[aria-expanded='true'] .r2o-paper {
+  transform: translateY(-6px) rotate(-1.5deg);
+}
+.r2o-receipt:focus-visible {
+  outline: 2px solid var(--sys-paper);
+  outline-offset: 4px;
 }
 .r2o-paper {
   padding: var(--sys-s2) 18px 14px;
@@ -399,7 +439,7 @@
   .r2o-path ol {
     margin-top: var(--sys-s2);
   }
-  .r2o-stage[data-step='1'] .r2o-receipt {
+  .r2o-stage[data-step='1'] .r2o-slot {
     display: none;
   }
   .r2o-now {
@@ -411,7 +451,7 @@
   .r2o-step p {
     font-size: 12px;
   }
-  .r2o-receipt {
+  .r2o-slot {
     max-width: none;
     margin-top: var(--sys-s2);
   }

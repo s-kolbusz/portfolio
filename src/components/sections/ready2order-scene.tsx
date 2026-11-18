@@ -267,6 +267,7 @@ export function Ready2orderScene() {
     }
     let wasIn = false
     let last = -1
+    let closeReceipt = () => {}
 
     const draw = () => {
       frame = 0
@@ -283,6 +284,8 @@ export function Ready2orderScene() {
       T.step.forEach((s, i) => {
         if (p >= s) now = i
       })
+      // a new step prints new lines: a pulled-up receipt goes back in first
+      if (stage.dataset.step !== String(now + 1)) closeReceipt()
       stage.dataset.step = String(now + 1)
       steps.forEach((el, i) => {
         el.dataset.state = i === now ? 'now' : i < now ? 'past' : 'next'
@@ -365,12 +368,53 @@ export function Ready2orderScene() {
       else window.scrollTo({ top: y, behavior: 'smooth' })
     }
     stage.addEventListener('click', go)
+
+    // the receipt: pulled up to its whole length, and tucked back in
+    const slot = stage.querySelector<HTMLElement>('.r2o-slot')
+    const receipt = stage.querySelector<HTMLElement>('.r2o-receipt')
+    const paper = stage.querySelector<HTMLElement>('.r2o-paper')
+    const isOpen = () => receipt?.getAttribute('aria-expanded') === 'true'
+    const setReceipt = (open: boolean) => {
+      if (!slot || !receipt || !paper || open === isOpen()) return
+      const from = receipt.offsetHeight
+      // no higher than the column: from the slot's bottom up to the top of the column
+      const to = open
+        ? Math.min(paper.offsetHeight, slot.offsetTop + slot.offsetHeight)
+        : slot.offsetHeight
+      receipt.style.height = `${from}px`
+      void receipt.offsetHeight
+      receipt.setAttribute('aria-expanded', String(open))
+      receipt.style.height = `${to}px`
+      const done = (e: TransitionEvent) => {
+        if (e.propertyName !== 'height') return
+        receipt.removeEventListener('transitionend', done)
+        if (!isOpen()) receipt.style.height = ''
+      }
+      receipt.addEventListener('transitionend', done)
+    }
+    const onReceipt = (e: MouseEvent) => {
+      if (!receipt) return
+      if (receipt.contains(e.target as Node)) setReceipt(!isOpen())
+      else if (isOpen()) setReceipt(false)
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen()) setReceipt(false)
+      if (e.target === receipt && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault()
+        setReceipt(!isOpen())
+      }
+    }
+    document.addEventListener('click', onReceipt)
+    document.addEventListener('keydown', onKey)
+    closeReceipt = () => setReceipt(false)
     draw()
     window.addEventListener('scroll', request, { passive: true })
     window.addEventListener('resize', onResize)
     return () => {
       liquid?.stop()
       stage.removeEventListener('click', go)
+      document.removeEventListener('click', onReceipt)
+      document.removeEventListener('keydown', onKey)
       holder.replaceChildren()
       clearTimeout(restart)
       adapt(false)
@@ -428,23 +472,32 @@ export function Ready2orderScene() {
     </div>
   )
   const receipt = (
-    <div className="r2o-receipt" aria-hidden="true">
-      <div className="r2o-paper">
-        <p className="r2o-hd">{t('receipt.head')}</p>
-        <p className="r2o-sub">{t('receipt.sub')}</p>
-        {line(1, t('receipt.all'), '100%')}
-        {line(2, t('receipt.app'), t('receipt.kept'), false, 3)}
-        {line(2, t('receipt.deps'), t('receipt.updated'), false, 3)}
-        {line(2, t('receipt.screens'), t('receipt.later'), false, 3)}
-        {line(2, t('receipt.redux'), t('receipt.removed'), true, 3)}
-        {line(3, t('receipt.webpack'), t('receipt.rewritten'))}
-        <div className="r2o-tot" data-print={4} data-on="0">
-          <span>{t('receipt.total')}</span>
-          <strong>{t('result')}</strong>
+    <div className="r2o-slot">
+      {/* tucked under the column's edge; a click or tap pulls the whole receipt up over the steps */}
+      <div
+        className="r2o-receipt"
+        role="button"
+        tabIndex={0}
+        aria-expanded="false"
+        aria-label={t('receipt.show')}
+      >
+        <div className="r2o-paper" aria-hidden="true">
+          <p className="r2o-hd">{t('receipt.head')}</p>
+          <p className="r2o-sub">{t('receipt.sub')}</p>
+          {line(1, t('receipt.all'), '100%')}
+          {line(2, t('receipt.app'), t('receipt.kept'), false, 3)}
+          {line(2, t('receipt.deps'), t('receipt.updated'), false, 3)}
+          {line(2, t('receipt.screens'), t('receipt.later'), false, 3)}
+          {line(2, t('receipt.redux'), t('receipt.removed'), true, 3)}
+          {line(3, t('receipt.webpack'), t('receipt.rewritten'))}
+          <div className="r2o-tot" data-print={4} data-on="0">
+            <span>{t('receipt.total')}</span>
+            <strong>{t('result')}</strong>
+          </div>
+          <p className="r2o-thx" data-print={4} data-on="0">
+            {t('receipt.thanks')}
+          </p>
         </div>
-        <p className="r2o-thx" data-print={4} data-on="0">
-          {t('receipt.thanks')}
-        </p>
       </div>
     </div>
   )

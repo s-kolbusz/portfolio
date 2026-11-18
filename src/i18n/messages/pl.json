@@ -437,7 +437,8 @@
       "removed": "removed",
       "rewritten": "rewritten",
       "total": "JS at start",
-      "thanks": "Danke!"
+      "thanks": "Danke!",
+      "show": "The whole receipt"
     }
   }
 }
