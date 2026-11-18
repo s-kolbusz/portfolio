@@ -132,16 +132,22 @@ function frameAt(g: Geo, p: number): DropsFrame {
     return { x, y }
   })
   const gone = span(p, 0.44, 0.6)
-  const r = (b: Box, a: number, dashed = false): GroundRect => ({ ...b, a, dashed })
+  const r = (b: Box, a: number, more: Partial<GroundRect> = {}): GroundRect => ({
+    ...b,
+    a,
+    ...more,
+  })
+  // from the start the map shows its modules; the parts' outlines firm up as the body comes apart
+  const edge = 0.35 + 0.65 * apart
   const rects = [
     r(g.box, 1 - half),
-    r(g.block('app'), apart * (1 - half)),
-    r(g.block('deps'), apart * (1 - half)),
-    r(g.block('screens'), apart * (1 - gone)),
-    r(g.block('redux'), apart * (1 - gone)),
-    r(g.shelf, span(p, 0.42, 0.56), true),
-    r(g.box, half * 0.8, true),
-    r(g.half, half * 1.2),
+    r(g.block('app'), 1 - half, { modules: 1, edge }),
+    r(g.block('deps'), 1 - half, { modules: 1, edge }),
+    r(g.block('screens'), 1 - gone, { modules: 1 - gone, edge }),
+    r(g.block('redux'), 1 - gone, { modules: 1 - gone, edge }),
+    r(g.shelf, span(p, 0.42, 0.56), { dashed: true }),
+    r(g.box, half * 0.8, { dashed: true }),
+    r(g.half, half * 1.2, { modules: 1 }),
   ]
   return { targets, rects }
 }

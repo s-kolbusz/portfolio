@@ -7,6 +7,7 @@
 // Rendering is a lean pass of its own: particles splatted into a density field (the hero's splat
 // shaders), then the ground with the bundle's blocks and the liquid as green glass (SURFACE below).
 
+import type { DropsInMessage, DropsOutMessage } from './drops.worker'
 import {
   BLUR_FRAGMENT,
   HEIGHT_FRAGMENT,
@@ -17,7 +18,6 @@ import {
   SPLAT_VERTEX,
   VERTEX,
 } from './shaders'
-import { createSim, STEPS_PER_SECOND } from './sim'
 
 /** a block drawn on the ground, in CSS px of the canvas; `a` is its opacity (0 = not drawn) */
 export interface GroundRect {
@@ -27,6 +27,10 @@ export interface GroundRect {
   h: number
   a: number
   dashed?: boolean
+  /** how strongly its modules show inside it (0 = an empty block) */
+  modules?: number
+  /** how strongly its own outline shows (default 1) */
+  edge?: number
 }
 
 export interface DropsFrame {
@@ -68,7 +72,7 @@ const SURFACE = `#version 300 es
 precision highp float;
 uniform sampler2D uDens, uDist, uHgt;
 uniform vec2 uRes, uHgtSize; uniform float uTime, uDH;
-uniform vec4 uR[8]; uniform vec2 uRS[8]; uniform float uLW;
+uniform vec4 uR[8]; uniform vec4 uRS[8]; uniform float uLW;
 out vec4 o;
 const float ISO = 0.38;
 const vec3 GROUND = vec3(0.169, 0.149, 0.125);
@@ -79,8 +83,30 @@ float vnoise(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f*f*(3. - 2.*f);
   return mix(mix(hsh(i), hsh(i + vec2(1, 0)), u.x), mix(hsh(i + vec2(0, 1)), hsh(i + vec2(1, 1)), u.x), u.y); }
 vec2 suv(vec2 q){ return vec2(q.x * uRes.y / uRes.x, q.y); }
 float dens(vec2 q){ return texture(uDens, suv(q)).r; }
-// the bundle's blocks: a one-pixel outline (dashed for what is gone or moved), a faint fill inside.
-// Line width comes from the pixel size, not fwidth: ground() is also read under the refraction.
+// the bundle's blocks, as a bundle analyser draws them: each block's outline, and inside it its modules,
+// split again and again along the longer side, thinner and fainter deeper down (illustrative, not real
+// module sizes). Dashed blocks are what is gone or moved: outline only. Line width comes from the pixel
+// size, not fwidth: ground() is also read under the refraction.
+float modules(vec2 q, vec2 lo, vec2 hi, float seed){
+  vec2 a = lo, b = hi;
+  float line = 0.;
+  for (int k = 0; k < 6; k++) {
+    vec2 size = b - a;
+    if (max(size.x, size.y) < 0.03) break;
+    float t = 0.3 + 0.4 * hsh(a * 17.3 + b * 31.1 + vec2(seed, float(k) * 1.7));
+    float w = mix(0.75, 0.3, float(k) / 5.);
+    if (size.x > size.y) {
+      float sx = mix(a.x, b.x, t);
+      line = max(line, (1. - clamp(abs(q.x - sx) / uLW - 0.5, 0., 1.)) * w);
+      if (q.x < sx) b.x = sx; else a.x = sx;
+    } else {
+      float sy = mix(a.y, b.y, t);
+      line = max(line, (1. - clamp(abs(q.y - sy) / uLW - 0.5, 0., 1.)) * w);
+      if (q.y < sy) b.y = sy; else a.y = sy;
+    }
+  }
+  return line;
+}
 vec3 ground(vec2 q){
   vec3 c = GROUND;
   float line = 0.;
@@ -94,8 +120,12 @@ vec3 ground(vec2 q){
     float l = 1. - clamp(abs(sd) / uLW - 0.5, 0., 1.);
     // dashes: three pixels on, five off, along whichever edge this is
     if (uRS[i].y > 0.5) l *= step(fract((q.x + q.y) / (8. * uLW)), 0.4);
-    line = max(line, l * a);
-    if (sd < 0.) c += vec3(0.012, 0.011, 0.01) * a;
+    line = max(line, l * a * uRS[i].w);
+    if (sd < 0.) {
+      // each module a touch lighter or darker, so they read as blocks
+      c += vec3(0.012, 0.011, 0.01) * a;
+      if (uRS[i].z > 0.) line = max(line, modules(q, lo, hi, float(i) * 3.1) * a * uRS[i].z * 0.55);
+    }
   }
   return mix(c, PAPER, line * 0.36);
 }
@@ -137,7 +167,8 @@ void main(){
   curl *= curl;
   n = normalize(vec3(n.xy*(1. + curl*7.), n.z*(1. - curl*0.92)));
   // green glass over ink: what is under it, bent and tinted (the hero's drop on its dark sheet)
-  vec3 seen = ground(q - n.xy*0.028);
+  // the map's lines only faintly through the glass: bent hard lines read as cracks
+  vec3 seen = mix(GROUND, ground(q - n.xy*0.028), 0.3);
   vec3 body = (seen*vec3(0.55, 1.0, 0.76) + TINT*0.5)*(1. - 0.25*curl);
   float F = 0.02 + 0.98*pow(1. - max(n.z, 0.), 5.);
   vec3 r = reflect(vec3(0., 0., -1.), n);
@@ -180,191 +211,72 @@ function run({ canvas, groups, start, frame: read }: DropsStageOptions): DropsSt
   const A = CW / CH
 
   // --- the particles, in sim units (h), y up; the field starts BELOW canvas heights under the canvas
-  // particle interaction radius in canvas heights: finer where the parts are small, so even a small part
-  // has enough particles to come apart as a drop of its own
+  // particle interaction radius in canvas heights: the hero's size, finer where the parts are small,
+  // so even a small part has enough particles to come apart as a drop of its own
   const rMax = Math.max(...groups) / CH
   const Hq = Math.min(0.021, Math.max(0.012, rMax / 3.2))
   const toSim = (px: number, py: number) => ({ x: px / CH / Hq, y: (1 - py / CH + BELOW) / Hq })
   const G = groups.length
-  const share = groups.map((r) => r * r)
-  const totalR = Math.sqrt(share.reduce((s, v) => s + v, 0)) / CH / Hq
+  const totalR = Math.sqrt(groups.reduce((s, r) => s + r * r, 0)) / CH / Hq
   const c0 = toSim(start.x, start.y)
-  const pts: Array<[number, number]> = []
-  const dy = (SPACING * Math.sqrt(3)) / 2
-  for (let y = -totalR, row = 0; y <= totalR; y += dy, row++)
-    for (let x = -totalR + ((row % 2) * SPACING) / 2; x <= totalR; x += SPACING)
-      if (x * x + y * y <= totalR * totalR) pts.push([c0.x + x, c0.y + y])
-  const sim = createSim({
-    width: A / Hq,
-    height: (1 + BELOW) / Hq,
-    center: c0,
-    radius: totalR * 1.08,
-    spacing: SPACING,
-  })
-  const N = sim.N
-  const used = pts.length
-  // each group's share of the particles, by area
-  const cap = new Int32Array(G)
-  const sum = share.reduce((s, v) => s + v, 0)
-  let given = 0
-  for (let g = 0; g < G; g++) {
-    cap[g] = g === G - 1 ? used - given : Math.round((used * share[g]) / sum)
-    given += cap[g]
-  }
-  const group = new Int8Array(N).fill(-1)
-  for (let i = 0; i < N; i++) {
-    if (i < used) {
-      sim.x[i] = pts[i][0]
-      sim.y[i] = pts[i][1]
-    } else {
-      // the spare ones are parked in the far corner of the field, under the canvas
-      sim.x[i] = 0.5
-      sim.y[i] = 0.5
-    }
-    sim.vx[i] = 0
-    sim.vy[i] = 0
-  }
-  // only the liquid's own forces: no pull to a main body, no return to the middle, no own weight;
-  // the slow swirling stays, so the liquid never stands dead still
-  Object.assign(sim.P, { pull: 0, anchor: 0, self: 0, cursorPull: 0, life: 0.0003 })
 
-  const cx = new Float32Array(G),
-    cy = new Float32Array(G),
-    cvx = new Float32Array(G),
-    cvy = new Float32Array(G),
-    cn = new Float32Array(G),
-    tx = new Float32Array(G),
-    ty = new Float32Array(G),
-    ax = new Float32Array(G),
-    ay = new Float32Array(G)
-  // the group as a whole is steered to its target; every particle is also drawn to it a little,
-  // which keeps each part round instead of letting it trail behind as a thread
-  const SPRING = 0.002,
-    DAMP = 0.04,
-    GATHER = 0.0005,
-    GATHER_MAX = 0.02
-  // which part a particle belongs to is decided again and again: each target takes the particles
-  // nearest to it, up to its own share, so the body divides into clean pieces and never into threads
-  const pairD = new Float32Array(used * G)
-  const pairIdx = new Int32Array(used * G)
-  const left = new Int32Array(G)
-  const taken = new Uint8Array(used)
-  function regroup() {
-    for (let i = 0; i < used; i++) {
-      for (let g = 0; g < G; g++) {
-        const ddx = sim.x[i] - tx[g],
-          ddy = sim.y[i] - ty[g]
-        pairD[i * G + g] = ddx * ddx + ddy * ddy
-        pairIdx[i * G + g] = i * G + g
-      }
-    }
-    const idx = Array.from(pairIdx).sort((a, b) => pairD[a] - pairD[b])
-    left.set(cap)
-    taken.fill(0)
-    for (const e of idx) {
-      const i = (e / G) | 0,
-        g = e % G
-      if (taken[i] || left[g] <= 0) continue
-      taken[i] = 1
-      left[g]--
-      group[i] = g
-    }
+  // the physics runs in its own thread (drops.worker.ts); here we send targets and the pointer, and
+  // draw its result, smoothed between the last two states it sent
+  const physics = new Worker(new URL('./drops.worker.ts', import.meta.url), { type: 'module' })
+  physics.postMessage({
+    init: {
+      width: A / Hq,
+      height: (1 + BELOW) / Hq,
+      start: c0,
+      radius: totalR,
+      spacing: SPACING,
+      share: groups.map((r) => r * r),
+    },
+  } satisfies DropsInMessage)
+  let used = 0
+  let snapA: Float32Array | null = null,
+    snapB: Float32Array | null = null,
+    snapAt = 0,
+    gap = 1000 / 60
+  physics.onmessage = ({ data }: MessageEvent<DropsOutMessage>) => {
+    if (data.ready) used = data.used ?? 0
+    if (!data.pos) return
+    const now = performance.now()
+    if (snapB) gap = gap * 0.9 + Math.min(now - snapAt, 100) * 0.1
+    snapAt = now
+    // the old buffer goes back to the thread for reuse
+    if (snapA && snapA !== snapB) physics.postMessage({ buf: snapA }, [snapA.buffer])
+    snapA = snapB ?? data.pos
+    snapB = data.pos
   }
-  let stepN = 0
-  // re-dividing only while the targets move: at rest each drop keeps its own particles, so a drop whose
-  // share differs a little from its size never draws a tail out of its neighbour
-  const lastTx = new Float32Array(G).fill(NaN),
-    lastTy = new Float32Array(G).fill(NaN)
-  let still = 0
-  // small parts gather hard, so they pinch off as whole drops instead of trailing out as threads
-  const grip = share.map((v) => (v / sum < 0.03 ? 5 : 1))
-  // the pointer, in sim units: it pushes the liquid it moves through, and a click splashes it
-  const ptr = { x: -99, y: -99, vx: 0, vy: 0, on: false, hit: 0 }
-  function steer(f: DropsFrame) {
+  const targets = new Float32Array(G * 2)
+  const sendTargets = (f: DropsFrame) => {
     for (let g = 0; g < G; g++) {
       const t = f.targets[g] ? toSim(f.targets[g].x, f.targets[g].y) : c0
-      tx[g] = t.x
-      ty[g] = t.y
+      targets[g * 2] = t.x
+      targets[g * 2 + 1] = t.y
     }
-    let moved = 0
-    for (let g = 0; g < G; g++) {
-      if (Number.isFinite(lastTx[g]))
-        moved = Math.max(moved, Math.hypot(tx[g] - lastTx[g], ty[g] - lastTy[g]))
-      lastTx[g] = tx[g]
-      lastTy[g] = ty[g]
-    }
-    still = moved > 1e-3 ? 0 : still + 1
-    if (stepN % 20 === 0 && (stepN === 0 || still < 60)) regroup()
-    stepN++
-    cx.fill(0)
-    cy.fill(0)
-    cvx.fill(0)
-    cvy.fill(0)
-    cn.fill(0)
-    for (let i = 0; i < used; i++) {
-      const g = group[i]
-      cx[g] += sim.x[i]
-      cy[g] += sim.y[i]
-      cvx[g] += sim.vx[i]
-      cvy[g] += sim.vy[i]
-      cn[g]++
-    }
-    for (let g = 0; g < G; g++) {
-      if (!cn[g]) continue
-      ax[g] = (tx[g] - cx[g] / cn[g]) * SPRING - (cvx[g] / cn[g]) * DAMP
-      ay[g] = (ty[g] - cy[g] / cn[g]) * SPRING - (cvy[g] / cn[g]) * DAMP
-    }
-    for (let i = 0; i < N; i++) {
-      const g = group[i]
-      if (g < 0) {
-        sim.vx[i] = 0
-        sim.vy[i] = 0
-        continue
-      }
-      const gk = GATHER * grip[g],
-        gm = GATHER_MAX * (grip[g] > 1 ? 2 : 1)
-      const gx = Math.max(-gm, Math.min(gm, (tx[g] - sim.x[i]) * gk)),
-        gy = Math.max(-gm, Math.min(gm, (ty[g] - sim.y[i]) * gk))
-      sim.vx[i] += ax[g] + gx
-      sim.vy[i] += ay[g] + gy
-      if (ptr.on) {
-        const ddx = sim.x[i] - ptr.x,
-          ddy = sim.y[i] - ptr.y
-        const d2 = ddx * ddx + ddy * ddy
-        if (d2 < 16) {
-          const d = Math.sqrt(d2) + 1e-3,
-            fall = 1 - d / 4
-          // the pointer drags the liquid along and parts it a little
-          sim.vx[i] += ptr.vx * 0.06 * fall + (ddx / d) * 0.0025 * fall
-          sim.vy[i] += ptr.vy * 0.06 * fall + (ddy / d) * 0.0025 * fall
-          if (ptr.hit) {
-            sim.vx[i] += (ddx / d) * ptr.hit * fall
-            sim.vy[i] += (ddy / d) * ptr.hit * fall
-          }
-        }
-      }
-    }
-    ptr.hit = 0
-    ptr.vx *= 0.9
-    ptr.vy *= 0.9
+    physics.postMessage({ targets } satisfies DropsInMessage)
   }
 
+  // the pointer, in sim units: it pushes the liquid it moves through, and a click splashes it
+  const ptr = { x: -99, y: -99, vx: 0, vy: 0, on: false, hit: 0 }
   const onPointer = (e: PointerEvent) => {
     const r = canvas.getBoundingClientRect()
     const p = toSim(e.clientX - r.left, e.clientY - r.top)
     const inside =
       e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom
-    if (ptr.on && inside) {
-      ptr.vx = (p.x - ptr.x) * 0.5
-      ptr.vy = (p.y - ptr.y) * 0.5
-    }
+    ptr.vx = ptr.on && inside ? (p.x - ptr.x) * 0.5 : 0
+    ptr.vy = ptr.on && inside ? (p.y - ptr.y) * 0.5 : 0
     ptr.x = p.x
     ptr.y = p.y
     ptr.on = inside
+    physics.postMessage({ pointer: { ...ptr } } satisfies DropsInMessage)
+    ptr.hit = 0
   }
   const onDown = (e: PointerEvent) => {
+    ptr.hit = 0.06
     onPointer(e)
-    if (ptr.on) ptr.hit = 0.06
   }
   window.addEventListener('pointermove', onPointer, { passive: true })
   window.addEventListener('pointerdown', onDown, { passive: true })
@@ -456,10 +368,10 @@ function run({ canvas, groups, start, frame: read }: DropsStageOptions): DropsSt
   gl.enableVertexAttribArray(gl.getAttribLocation(surface, 'aPos'))
   gl.vertexAttribPointer(gl.getAttribLocation(surface, 'aPos'), 2, gl.FLOAT, false, 0, 0)
 
-  const pos = new Float32Array(used * 2)
+  // particle positions for the splat; sized once the physics thread says how many there are
+  let pos = new Float32Array(0)
   const pBuf = gl.createBuffer()
   gl.bindBuffer(gl.ARRAY_BUFFER, pBuf)
-  gl.bufferData(gl.ARRAY_BUFFER, pos.byteLength, gl.DYNAMIC_DRAW)
   const pVao = gl.createVertexArray()
   gl.bindVertexArray(pVao)
   gl.enableVertexAttribArray(gl.getAttribLocation(splat, 'aP'))
@@ -486,19 +398,15 @@ function run({ canvas, groups, start, frame: read }: DropsStageOptions): DropsSt
   const uRL = gl.getUniformLocation(surface, 'uR'),
     uRSL = gl.getUniformLocation(surface, 'uRS')
   const rBox = new Float32Array(32),
-    rStyle = new Float32Array(16)
+    rStyle = new Float32Array(32)
 
   let raf = 0,
-    tPrev = performance.now(),
-    acc = 0,
     visible = true
   const io = new IntersectionObserver(
     (entries) => {
       visible = entries.some((e) => e.isIntersecting)
-      if (visible && !raf) {
-        tPrev = performance.now()
-        raf = requestAnimationFrame(frame)
-      }
+      physics.postMessage({ pause: !visible } satisfies DropsInMessage)
+      if (visible && !raf) raf = requestAnimationFrame(frame)
     },
     { rootMargin: '50% 0px' }
   )
@@ -565,20 +473,22 @@ function run({ canvas, groups, start, frame: read }: DropsStageOptions): DropsSt
   function frame(now: number) {
     raf = 0
     if (!visible) return
-    acc += Math.min((now - tPrev) / 1000, 0.05) * STEPS_PER_SECOND
-    tPrev = now
     const f = read()
-    let n = 0
-    while (acc >= 1 && n < 4) {
-      steer(f)
-      sim.step()
-      acc -= 1
-      n++
+    sendTargets(f)
+    if (!snapA || !snapB || !used) {
+      raf = requestAnimationFrame(frame)
+      return
     }
-    if (acc > 4) acc = 0
-    for (let i = 0; i < used; i++) {
-      pos[i * 2] = sim.x[i] * Hq
-      pos[i * 2 + 1] = sim.y[i] * Hq - BELOW
+    if (pos.length !== used * 2) {
+      pos = new Float32Array(used * 2)
+      gl.bindBuffer(gl.ARRAY_BUFFER, pBuf)
+      gl.bufferData(gl.ARRAY_BUFFER, pos.byteLength, gl.DYNAMIC_DRAW)
+    }
+    // the image between the last two physics states (one state behind), so motion is smooth at any rate
+    const k = Math.min(1, (now - snapAt) / gap)
+    for (let i = 0; i < used * 2; i += 2) {
+      pos[i] = (snapA[i] + (snapB[i] - snapA[i]) * k) * Hq
+      pos[i + 1] = (snapA[i + 1] + (snapB[i + 1] - snapA[i + 1]) * k) * Hq - BELOW
     }
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo)
     gl.viewport(0, 0, DW, DH)
@@ -604,10 +514,10 @@ function run({ canvas, groups, start, frame: read }: DropsStageOptions): DropsSt
     rStyle.fill(0)
     f.rects.slice(0, 8).forEach((r, i) => {
       rBox.set([r.x / CH, 1 - (r.y + r.h) / CH, (r.x + r.w) / CH, 1 - r.y / CH], i * 4)
-      rStyle.set([r.a, r.dashed ? 1 : 0], i * 2)
+      rStyle.set([r.a, r.dashed ? 1 : 0, r.modules ?? 0, r.edge ?? 1], i * 4)
     })
     gl.uniform4fv(uRL, rBox)
-    gl.uniform2fv(uRSL, rStyle)
+    gl.uniform4fv(uRSL, rStyle)
     gl.bindVertexArray(qVao)
     gl.activeTexture(gl.TEXTURE0)
     gl.bindTexture(gl.TEXTURE_2D, dTex)
@@ -620,6 +530,7 @@ function run({ canvas, groups, start, frame: read }: DropsStageOptions): DropsSt
     stop: () => {
       cancelAnimationFrame(raf)
       io.disconnect()
+      physics.terminate()
       window.removeEventListener('pointermove', onPointer)
       window.removeEventListener('pointerdown', onDown)
       gl.getExtension('WEBGL_lose_context')?.loseContext()
