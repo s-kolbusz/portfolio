@@ -532,13 +532,23 @@ async function run(els: LiquidStageElements, opts: LiquidStageOptions, life: Lif
   const gapY = PORTRAIT ? 18 : 26,
     vpad = 2 * Math.min(pad, 36)
   // the portrait phone screenshot is capped at 60% of the visible height: the scene must not run under the site's bar
-  const fw = Math.min(
+  let fw = Math.min(
       cw,
       (VIS - (wmH - overlap) - gapY - rowH - vpad) * IA,
       PHONE_SHOT ? 0.6 * VIS * IA : Infinity
     ),
     fh = fw / IA
-  const stackTop = (VIS - (wmH - overlap + fh + gapY + rowH)) / 2
+  let stackTop = (VIS - (wmH - overlap + fh + gapY + rowH)) / 2
+  // never under the site's bar: on a short screen (a tablet held across) the centred stack started at
+  // 36 px, under a bar ending at 69 (owner's iPad video, 2026-11-18). Then it starts below the bar and
+  // the screenshot gives up the height it needs; where it already fits, nothing changes.
+  const barBottom = document.querySelector('.site-bar')?.getBoundingClientRect().bottom || 72
+  const clear = barBottom + 12
+  if (stackTop < clear) {
+    fw = Math.min(fw, (VIS - clear - (wmH - overlap) - gapY - rowH - vpad / 2) * IA)
+    fh = fw / IA
+    stackTop = clear + Math.max(0, VIS - clear - vpad / 2 - (wmH - overlap + fh + gapY + rowH)) / 2
+  }
   const placed = { x: (VW - fw) / 2, y: stackTop + wmH - overlap }
   scene.style.top = stackTop + 'px'
   row.style.top = wmH - overlap + fh + gapY + 'px'
