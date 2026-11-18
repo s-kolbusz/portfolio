@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 
 import { useTranslations } from 'next-intl'
 
+import { startDropsStage, supportsDrops } from '@/components/canvas/liquid-hero/drops-stage'
 import { usePrefersReducedMotion } from '@/hooks/use-media'
 import { Link } from '@/i18n/navigation'
 
@@ -22,9 +23,9 @@ const DROPS = {
     { key: 'deps', x: 0.86, y: 0.74, w: 66, r: 0, flip: false, src: 'drop-s' },
   ],
   phone: [
-    { key: 'webpack', x: 0.24, y: 0.36, w: 120, r: -112, flip: false, src: 'body' },
-    { key: 'bundle', x: 0.3, y: 0.5, w: 80, r: 18, flip: true, src: 'body' },
-    { key: 'redux', x: 0.22, y: 0.64, w: 100, r: 160, flip: true, src: 'body' },
+    { key: 'webpack', x: 0.24, y: 0.32, w: 120, r: -112, flip: false, src: 'body' },
+    { key: 'bundle', x: 0.3, y: 0.48, w: 80, r: 18, flip: true, src: 'body' },
+    { key: 'redux', x: 0.22, y: 0.63, w: 100, r: 160, flip: true, src: 'body' },
     { key: 'deps', x: 0.3, y: 0.76, w: 40, r: 0, flip: false, src: 'drop-s' },
   ],
 } as const
@@ -46,6 +47,7 @@ export function Ready2orderScene() {
   const reduced = usePrefersReducedMotion()
   const trackRef = useRef<HTMLElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
+  const liquidRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
     if (reduced) return
@@ -58,6 +60,50 @@ export function Ready2orderScene() {
     const body = stage.querySelector<HTMLElement>('[data-body]')
     let frame = 0
     let last = -1
+    let mergeNow = 0
+
+    // where everything stands at the current stage size (CSS px)
+    const geometry = () => {
+      const W = stage.clientWidth
+      const H = stage.clientHeight
+      const phone = W <= 700
+      const set = phone ? DROPS.phone : DROPS.wide
+      const u = phone ? W / 390 : W / 1440
+      return {
+        W,
+        H,
+        phone,
+        set,
+        u,
+        // where the body stands when the drops have run together
+        bx: (phone ? 0.26 : 0.66) * W,
+        by: (phone ? 0.52 : 0.4) * H,
+      }
+    }
+
+    // the real liquid: the hero's simulation, the drops as groups of particles the scroll pulls together.
+    // Without WebGL2 the cut-out drops below stay and do the same with images.
+    let stopLiquid = () => {}
+    const canvas = liquidRef.current
+    if (canvas && supportsDrops()) {
+      stage.dataset.liquid = '1'
+      stopLiquid = startDropsStage({
+        canvas,
+        layout: () => {
+          const g = geometry()
+          return {
+            drops: g.set.map((d) => ({
+              x: d.x * g.W,
+              y: d.y * g.H,
+              r: Math.max(d.w * g.u * 0.34, 0.024 * g.H),
+            })),
+            body: { x: g.bx, y: g.by },
+          }
+        },
+        merge: () => mergeNow,
+        onFail: () => delete stage.dataset.liquid,
+      })
+    }
 
     const draw = () => {
       frame = 0
@@ -66,15 +112,10 @@ export function Ready2orderScene() {
       const p = travel > 0 ? clamp01(-rect.top / travel) : 1
       if (Math.abs(p - last) < 0.0005) return
       last = p
-      const W = stage.clientWidth
-      const H = stage.clientHeight
-      const phone = W <= 700
-      const set = phone ? DROPS.phone : DROPS.wide
-      const u = phone ? W / 390 : W / 1440
-      // where the body stands when the drops have run together
-      const bx = (phone ? 0.26 : 0.66) * W
-      const by = (phone ? 0.52 : 0.4) * H
+      const { W, H, phone, set, u, bx, by } = geometry()
       const merge = ease(span(p, 0.22, 0.5))
+      // the liquid follows a target that arrives a little earlier, so it has time to settle into one body
+      mergeNow = ease(span(p, 0.16, 0.42))
       drops.forEach((el, i) => {
         const d = set[i]
         const x = d.x * W + (bx - d.x * W) * merge
@@ -116,6 +157,8 @@ export function Ready2orderScene() {
     window.addEventListener('scroll', request, { passive: true })
     window.addEventListener('resize', request)
     return () => {
+      stopLiquid()
+      delete stage.dataset.liquid
       cancelAnimationFrame(frame)
       window.removeEventListener('scroll', request)
       window.removeEventListener('resize', request)
@@ -187,6 +230,7 @@ export function Ready2orderScene() {
             <feComposite in="SourceGraphic" in2="goo" operator="atop" />
           </filter>
         </svg>
+        <canvas ref={liquidRef} className="r2o-liquid" aria-hidden="true" />
         <div className="r2o-drops" aria-hidden="true">
           {DROPS.wide.map((d) => (
             // eslint-disable-next-line @next/next/no-img-element -- transformed every frame; next/image adds nothing here

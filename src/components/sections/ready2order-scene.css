@@ -60,7 +60,21 @@
   opacity: var(--ask);
 }
 
-/* the drops and the body they make */
+/* the drops and the body they make: the real liquid on a canvas, or cut-out drops without WebGL2 */
+.r2o-liquid {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  display: none;
+}
+.r2o-stage[data-liquid] .r2o-liquid {
+  display: block;
+}
+.r2o-stage[data-liquid] .r2o-drops {
+  display: none;
+}
 .r2o-defs {
   position: absolute;
   width: 0;
