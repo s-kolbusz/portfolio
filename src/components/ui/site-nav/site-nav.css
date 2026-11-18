@@ -76,6 +76,10 @@ html.site-menu-open [data-adapt-theme='pointer'] {
 .site-bar[data-solid]:not([data-menu])::before {
   opacity: 1;
 }
+/* over a dark scene (ready2order) the margin is ink, so the light bar stays readable */
+.site-bar.dark::before {
+  background: linear-gradient(var(--sys-ink) 52%, rgba(43, 38, 32, 0));
+}
 .site-bar a,
 .site-bar button {
   pointer-events: auto;

@@ -1,11 +1,14 @@
-/* Act 3, ready2order: drops on paper that run into one body. Size system v1 only (system.css). */
+/* Act 3, ready2order: drops that run into one body. Size system v1 only (system.css).
+   The scene is on ink, like the hero's dark water sheet: after the paper of the plugin demo it is
+   plainly a new part, and the green liquid reads as glass over a dark ground. */
 
 .r2o {
   position: relative;
   width: 100%;
   height: 260svh;
-  background: var(--sys-paper);
-  color: var(--sys-ink);
+  background: var(--sys-ink);
+  color: var(--sys-paper);
+  --r2o-soft: rgba(251, 249, 244, 0.62);
 }
 .r2o-stage {
   position: sticky;
@@ -25,7 +28,7 @@
 .r2o-micro {
   font: var(--sys-micro) / 1.4 var(--sys-mono);
   letter-spacing: 0.12em;
-  color: var(--sys-ink-2);
+  color: var(--r2o-soft);
 }
 
 /* the question, while the causes are still apart */
@@ -63,6 +66,7 @@
 /* the drops and the body they make: the real liquid on a canvas, or cut-out drops without WebGL2 */
 .r2o-liquid {
   position: absolute;
+  z-index: 0;
   inset: 0;
   width: 100%;
   height: 100%;
@@ -113,7 +117,7 @@
 .r2o-tags b {
   display: block;
   font-weight: 400;
-  color: var(--sys-ink-2);
+  color: var(--r2o-soft);
 }
 
 /* the finished frame: what changed, and what it came to */
@@ -141,19 +145,28 @@
   list-style: none;
 }
 .r2o-list li {
+  border-top: var(--sys-line) solid var(--sys-paper);
+}
+/* each change is a button: it pulls its own drop out of the body for a moment */
+.r2o-fix {
   display: grid;
   grid-template-columns: var(--sys-s5) 1fr;
+  width: 100%;
   padding: var(--sys-s2) 0;
-  border-top: var(--sys-line) solid var(--sys-ink);
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
   font:
     700 var(--sys-lead) / 1.3 'Mattone',
     system-ui,
     sans-serif;
+  cursor: pointer;
 }
 .r2o-list li:last-child {
-  border-bottom: var(--sys-line) solid var(--sys-ink);
+  border-bottom: var(--sys-line) solid var(--sys-paper);
 }
-.r2o-list li .r2o-micro {
+.r2o-fix .r2o-micro {
   padding-top: 0.35em;
 }
 .r2o-say {
@@ -173,9 +186,9 @@
   gap: 0.6em;
   min-height: var(--sys-touch);
   margin-top: var(--sys-s3);
-  color: var(--sys-ink);
+  color: var(--sys-paper);
   text-decoration: none;
-  border-bottom: var(--sys-line) solid var(--sys-ink);
+  border-bottom: var(--sys-line) solid var(--sys-paper);
 }
 .r2o-result {
   position: absolute;
@@ -185,7 +198,7 @@
 }
 .r2o-result .r2o-micro {
   margin: 0 0 var(--sys-s2);
-  color: var(--sys-ink);
+  color: var(--sys-paper);
 }
 .r2o-big {
   margin: 0;
@@ -216,7 +229,7 @@
     white-space: normal;
     max-width: 180px;
   }
-  .r2o-list li {
+  .r2o-fix {
     padding: 12px 0;
   }
   .r2o-say {
@@ -248,4 +261,12 @@
 }
 .r2o--still .r2o-result {
   text-align: left;
+}
+
+/* the liquid's canvas is the scene's ground; every text sits above it */
+.r2o-ask,
+.r2o-name,
+.r2o-tags,
+.r2o-done {
+  z-index: 1;
 }

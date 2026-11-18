@@ -4,7 +4,11 @@ import { useEffect, useRef } from 'react'
 
 import { useTranslations } from 'next-intl'
 
-import { startDropsStage, supportsDrops } from '@/components/canvas/liquid-hero/drops-stage'
+import {
+  type DropsStage,
+  startDropsStage,
+  supportsDrops,
+} from '@/components/canvas/liquid-hero/drops-stage'
 import { usePrefersReducedMotion } from '@/hooks/use-media'
 import { Link } from '@/i18n/navigation'
 
@@ -83,11 +87,11 @@ export function Ready2orderScene() {
 
     // the real liquid: the hero's simulation, the drops as groups of particles the scroll pulls together.
     // Without WebGL2 the cut-out drops below stay and do the same with images.
-    let stopLiquid = () => {}
+    let liquid: DropsStage | null = null
     const canvas = liquidRef.current
     if (canvas && supportsDrops()) {
       stage.dataset.liquid = '1'
-      stopLiquid = startDropsStage({
+      liquid = startDropsStage({
         canvas,
         layout: () => {
           const g = geometry()
@@ -105,9 +109,39 @@ export function Ready2orderScene() {
       })
     }
 
+    // a change on the list, once the body has formed, pulls its own drop out for a moment:
+    // the four things are still in there, each one its own part of the result
+    const onClick = (e: MouseEvent) => {
+      const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-pluck]')
+      if (!btn || !liquid || mergeNow < 0.9) return
+      const sr = stage.getBoundingClientRect(),
+        br = btn.getBoundingClientRect()
+      liquid.pluck(Number(btn.dataset.pluck), {
+        x: br.right - sr.left,
+        y: br.top + br.height / 2 - sr.top,
+      })
+    }
+    stage.addEventListener('click', onClick)
+
+    // the site bar turns light over this dark scene, as it does over the hero's dark sheet
+    const adapt = (on: boolean) => {
+      for (const el of Array.from(document.querySelectorAll<HTMLElement>('[data-adapt-theme]'))) {
+        if (el.dataset.adaptTheme === 'pointer') continue
+        const r = el.getBoundingClientRect()
+        const sr = stage.getBoundingClientRect()
+        const y = r.top + r.height / 2
+        const dark = on && y >= sr.top && y < sr.bottom
+        if (el.classList.contains('dark') !== dark) el.classList.toggle('dark', dark)
+      }
+    }
+    let wasIn = false
+
     const draw = () => {
       frame = 0
       const rect = track.getBoundingClientRect()
+      const inView = rect.top < window.innerHeight && rect.bottom > 0
+      if (inView || wasIn) adapt(inView)
+      wasIn = inView
       const travel = rect.height - window.innerHeight
       const p = travel > 0 ? clamp01(-rect.top / travel) : 1
       if (Math.abs(p - last) < 0.0005) return
@@ -157,7 +191,9 @@ export function Ready2orderScene() {
     window.addEventListener('scroll', request, { passive: true })
     window.addEventListener('resize', request)
     return () => {
-      stopLiquid()
+      liquid?.stop()
+      stage.removeEventListener('click', onClick)
+      adapt(false)
       delete stage.dataset.liquid
       cancelAnimationFrame(frame)
       window.removeEventListener('scroll', request)
@@ -171,8 +207,10 @@ export function Ready2orderScene() {
       <ol>
         {CHANGES.map((key, i) => (
           <li key={key} data-row>
-            <span className="r2o-micro">{String(i + 1).padStart(2, '0')}</span>
-            {t(`changes.${key}`)}
+            <button type="button" data-pluck={i} className="r2o-fix">
+              <span className="r2o-micro">{String(i + 1).padStart(2, '0')}</span>
+              {t(`changes.${key}`)}
+            </button>
           </li>
         ))}
       </ol>
