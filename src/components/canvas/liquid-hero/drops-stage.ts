@@ -33,31 +33,56 @@ export interface DropsStage {
 
 const SPACING = 0.42
 
-// The ground and the liquid, after the hero's dark water sheet: ink with faint contour lines that
-// drift, and the liquid as green glass over it. It bends the lines under it (refraction from the
-// surface slope), reflects a moving window at its rim (fresnel), rolls its edge under and carries
-// slow, uneven waves, so it never stands still. Simplified from MAIN_FRAGMENT in shaders.ts.
+// The ground and the liquid. The ground is ready2order's production bundle drawn as a treemap
+// (blocks of modules, as a bundle analyser shows them), faint on ink. As the drops run into one
+// body the map shrinks to half its area around the body: the same bundle, half the size. The
+// liquid is green glass over it, after the hero's dark sheet: it bends the map's lines under it
+// (refraction from the surface slope), reflects a moving window at its rim, rolls its edge under
+// and carries slow, uneven waves. Simplified from MAIN_FRAGMENT in shaders.ts.
 const SURFACE = `#version 300 es
 precision highp float;
 uniform sampler2D uD; uniform vec2 uRes; uniform float uTime;
+uniform float uMerge; uniform vec2 uBody; uniform float uA;
 out vec4 o;
 const float ISO = 0.38;
 const vec3 GROUND = vec3(0.169, 0.149, 0.125);
+const vec3 PAPER = vec3(0.984, 0.976, 0.957);
 const vec3 TINT = vec3(0.03, 0.575, 0.363);
 float hsh(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float vnoise(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f*f*(3. - 2.*f);
   return mix(mix(hsh(i), hsh(i + vec2(1, 0)), u.x), mix(hsh(i + vec2(0, 1)), hsh(i + vec2(1, 1)), u.x), u.y); }
 vec2 suv(vec2 q){ return vec2(q.x * uRes.y / uRes.x, q.y); }
 float dens(vec2 q){ return texture(uD, suv(q)).r; }
-// the ground: ink, and contour lines of a slow, made-up terrain
+// the bundle: a treemap of nested blocks, split along their longer side, thinner lines deeper down
 vec3 ground(vec2 q){
-  vec2 p = q * 1.7 + vec2(uTime * 0.012, -uTime * 0.008);
-  float h = vnoise(p) * 0.6 + vnoise(p * 2.1 + 3.7) * 0.3 + vnoise(p * 4.3 - 1.3) * 0.1;
-  float v = h * 14.;
-  float d = abs(fract(v + 0.5) - 0.5) / max(fwidth(v), 1e-5);
-  float major = step(mod(floor(v + 0.5), 4.), 0.5);
-  float line = clamp(1. - d / 1.4, 0., 1.) * mix(0.07, 0.15, major);
-  return mix(GROUND, vec3(0.95, 0.93, 0.88), line);
+  float s = mix(1., 0.7071, uMerge);
+  vec2 lo = uBody + (vec2(0.04, 0.05) - uBody) * s, hi = uBody + (vec2(uA - 0.04, 0.95) - uBody) * s;
+  vec2 u = (q - lo) / (hi - lo);
+  // one pixel in map units, worked out (not fwidth: ground() is also read under the liquid's refraction)
+  vec2 fw = vec2(1. / uRes.y) / (hi - lo);
+  if (any(lessThan(u, vec2(0.))) || any(greaterThan(u, vec2(1.)))) return GROUND;
+  vec2 a = vec2(0.), b = vec2(1.);
+  float line = 0.;
+  for (int i = 0; i < 7; i++) {
+    float t = 0.28 + 0.44 * hsh(a * 17.3 + b * 31.1 + float(i) * 1.7);
+    vec2 size = (b - a) * (hi - lo);
+    float w = mix(1., 0.3, float(i) / 6.);
+    if (size.x > size.y) {
+      float sx = mix(a.x, b.x, t);
+      line = max(line, (1. - clamp(abs(u.x - sx) / fw.x - 0.5, 0., 1.)) * w);
+      if (u.x < sx) b.x = sx; else a.x = sx;
+    } else {
+      float sy = mix(a.y, b.y, t);
+      line = max(line, (1. - clamp(abs(u.y - sy) / fw.y - 0.5, 0., 1.)) * w);
+      if (u.y < sy) b.y = sy; else a.y = sy;
+    }
+  }
+  // the outer frame of the map
+  vec2 e = min(u, 1. - u) / fw;
+  line = max(line, 1. - clamp(min(e.x, e.y) - 0.5, 0., 1.));
+  // each block a touch lighter or darker, so they read as blocks
+  vec3 c = GROUND + vec3(0.035, 0.032, 0.028) * hsh(a * 91.7 + b * 13.3);
+  return mix(c, PAPER, line * 0.16);
 }
 float waves(vec2 q, float t){
   vec2 w = vec2(vnoise(q * 3.1 + vec2(t * 0.11, -t * 0.07)), vnoise(q * 3.1 + vec2(5.2 - t * 0.09, 1.3 + t * 0.1))) - 0.5;
@@ -89,8 +114,10 @@ void main(){
   float curl = (1. - edge) * (1. - edge);
   n = normalize(vec3(n.xy * (1. + curl * 7.), n.z * (1. - curl * 0.9)));
   // green glass: the lines under it, bent and tinted
-  float k = min(0.035 + 0.1 * pow(1. - max(n.z, 0.), 1.6), 0.08);
+  float k = min(0.012 + 0.05 * pow(1. - max(n.z, 0.), 1.6), 0.04);
   vec3 seen = vec3(ground(q - n.xy * k * 0.97).r, ground(q - n.xy * k).g, ground(q - n.xy * k * 1.03).b);
+  // the map's lines only faintly through the glass: bent hard lines read as cracks
+  seen = mix(GROUND, seen, 0.45);
   vec3 body = seen * vec3(0.55, 1.0, 0.76) + TINT * 0.5;
   body *= 1. - 0.35 * curl;
   float F = 0.02 + 0.98 * pow(1. - max(n.z, 0.), 5.);
@@ -410,6 +437,9 @@ function run(
   gl.uniform1i(gl.getUniformLocation(surface, 'uD'), 0)
   gl.uniform2f(gl.getUniformLocation(surface, 'uRes'), W, H)
   const uTime = gl.getUniformLocation(surface, 'uTime')
+  const uMergeL = gl.getUniformLocation(surface, 'uMerge'),
+    uBodyL = gl.getUniformLocation(surface, 'uBody')
+  gl.uniform1f(gl.getUniformLocation(surface, 'uA'), A)
 
   let raf = 0,
     tPrev = performance.now(),
@@ -464,6 +494,9 @@ function run(
     gl.clear(gl.COLOR_BUFFER_BIT)
     gl.useProgram(surface)
     gl.uniform1f(uTime, now / 1000)
+    gl.uniform1f(uMergeL, m)
+    const bq = toQ(L.body.x, L.body.y)
+    gl.uniform2f(uBodyL, bq.x, bq.y)
     gl.bindVertexArray(qVao)
     gl.activeTexture(gl.TEXTURE0)
     gl.bindTexture(gl.TEXTURE_2D, dTex)

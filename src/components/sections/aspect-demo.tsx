@@ -137,11 +137,17 @@ export function AspectDemo() {
       el.style.width = `${el.parentElement?.clientWidth ?? el.clientWidth}px`
       // the photo's cap in px (not screen units), so the whole window scales evenly with the zoom
       el.style.setProperty('--apd-cap', `${Math.round(window.innerHeight * 0.62)}px`)
+      // one screen holds the window and the photo buttons under it
+      const tools = el.closest('.apd')?.querySelector<HTMLElement>('.apd-tools')
+      const target = Math.min(
+        window.innerHeight * 0.9,
+        window.innerHeight * 0.96 - (tools?.offsetHeight ?? 44) - 32
+      )
       let z = 1
       for (let k = 0; k < 3; k++) {
         el.style.zoom = String(z)
         const h = el.getBoundingClientRect().height
-        z = Math.min(1, z * ((window.innerHeight * 0.9) / h))
+        z = Math.min(1, z * (target / h))
       }
       el.style.zoom = String(z)
     }
