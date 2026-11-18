@@ -12,6 +12,7 @@
   "nav": {
     "main_navigation": "Main Navigation",
     "hero": "Home",
+    "aspect": "aspect-preview",
     "about": "About",
     "projects": "Work",
     "services": "Services",
@@ -341,10 +342,20 @@
   "navFacts": {
     "hero": "Liquid on paper, simulated live in your browser.",
     "work": "My web studio: websites for businesses in Podhale, with the design and the price agreed up front.",
+    "aspect-preview": "My open-source Payload plugin: crop once, see every layout. Try it here.",
     "about": "Frontend engineer and designer in Zakopane. Building websites since 2016.",
     "projects": "Cut a POS platform’s production bundle in half at ready2order.",
     "services": "Design, code, server and upkeep, in one pair of hands.",
     "calculator": "A rebuilt Creality K1. I print on request.",
     "contact": "Zakopane, Poland. Working remotely."
+  },
+  "aspectDemo": {
+    "label": "aspect-preview · open source · Payload CMS",
+    "question": "Where will each layout cut this photo?",
+    "how": "Drag the point, draw a crop, and every ratio follows. This is the plugin itself, running here without Payload.",
+    "alt": "The photo being edited",
+    "another": "Another photo",
+    "own": "Your own photo",
+    "stays": "It stays in your browser."
   }
 }

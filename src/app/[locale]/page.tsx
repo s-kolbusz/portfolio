@@ -5,6 +5,9 @@ import { Hero } from '@/components/sections/hero'
 import { getLocaleFromParams } from '@/i18n/locale'
 import { buildHomePageMetadata } from '@/lib/page-metadata'
 
+const AspectDemo = dynamic(() =>
+  import('@/components/sections/aspect-demo').then((m) => ({ default: m.AspectDemo }))
+)
 const About = dynamic(() =>
   import('@/components/sections/about').then((m) => ({ default: m.About }))
 )
@@ -39,6 +42,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
   return (
     <main id="main-content" className="flex min-h-screen flex-col items-center justify-between">
       <Hero />
+      <AspectDemo />
       <About />
       <Projects locale={locale} />
       <Services />

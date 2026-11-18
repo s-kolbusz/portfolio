@@ -12,6 +12,7 @@ export interface Stop {
 export const STOPS: Stop[] = [
   { id: 'hero', href: '/#hero', label: 'hero' },
   { id: 'work', href: '/#work', label: 'stronypodhale.pl', brand: true },
+  { id: 'aspect-preview', href: '/#aspect-preview', label: 'aspect' },
   { id: 'about', href: '/#about', label: 'about' },
   { id: 'projects', href: '/#projects', label: 'projects' },
   { id: 'services', href: '/#services', label: 'services' },
@@ -35,7 +36,7 @@ export interface Position {
 
 /**
  * Scroll positions (in px) where each stop starts, plus the end of the page.
- * `tops` are the document tops of the sections after the hero (about…contact).
+ * `tops` are the document tops of the sections after the hero (aspect-preview…contact).
  */
 export function stopBounds(tops: number[], viewport: number, maxScroll: number): number[] {
   const starts = [0, SHEET_DARK_AT * viewport, ...tops.map((top) => top - READING_LINE * viewport)]

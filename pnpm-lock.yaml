@@ -48,6 +48,9 @@ importers:
       next-themes:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      payload-plugin-aspect-preview:
+        specifier: 0.4.0
+        version: 0.4.0(react@19.2.8)
       react:
         specifier: 19.2.8
         version: 19.2.8
@@ -2875,6 +2878,19 @@ packages:
   pathe@2.0.3:
     resolution: {integrity: sha512-WUjGcAqP1gQacoQe+OBJsFA7Ld4DyXuUIjZ5cc75cLHvJ7dtNsTugphxIADwspS+AraAUePCKrSVtPLFj/F88w==}
 
+  payload-plugin-aspect-preview@0.4.0:
+    resolution: {integrity: sha512-NIyOntSQuZ5fvmoXcI9xxxSQv98m6I5dIdnXv3BAHMIhWpL7d8YAIrSxRluxdxTlLqxabhH30BKHllvCSLykog==}
+    engines: {node: '>=20.9.0'}
+    peerDependencies:
+      '@payloadcms/ui': ^3.85.0
+      payload: ^3.85.0
+      react: ^19.0.0
+    peerDependenciesMeta:
+      '@payloadcms/ui':
+        optional: true
+      payload:
+        optional: true
+
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
 
@@ -2989,6 +3005,11 @@ packages:
     resolution: {integrity: sha512-rVprimfGBG3DR+Tq0IQG2DT5PxKth1WIGDmj5yPmlzr4YBe7uyE+Du4oVqTDXZSHGGGXRtTJEGSSePyQCMBglQ==}
     peerDependencies:
       react: ^19.2.8
+
+  react-image-crop@11.1.2:
+    resolution: {integrity: sha512-+0Pc2fxpwKL4u4oLmdKBw8XSwUceFbXbKEHvFOlsl/MGB1OVNic4uBlAPmEHGXYgoJIq+b63xHbc/aJMG0AVkA==}
+    peerDependencies:
+      react: '>=16.13.1'
 
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
@@ -6169,6 +6190,11 @@ snapshots:
 
   pathe@2.0.3: {}
 
+  payload-plugin-aspect-preview@0.4.0(react@19.2.8):
+    dependencies:
+      react: 19.2.8
+      react-image-crop: 11.1.2(react@19.2.8)
+
   picocolors@1.1.1: {}
 
   picomatch@4.0.5: {}
@@ -6223,6 +6249,10 @@ snapshots:
     dependencies:
       react: 19.2.8
       scheduler: 0.27.0
+
+  react-image-crop@11.1.2(react@19.2.8):
+    dependencies:
+      react: 19.2.8
 
   react-is@16.13.1: {}
 

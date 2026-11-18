@@ -1,0 +1,182 @@
+/* Act 3, aspect-preview: the plugin's own editor, themed with the size system (system.css).
+   Only the plugin's public --apv-* variables and a few surface rules change: its layout and
+   behaviour stay as they ship, because the point of the scene is that this is the real thing. */
+
+.apd {
+  width: 100%;
+  background: var(--sys-paper);
+  color: var(--sys-ink);
+  padding: var(--sys-s8) var(--sys-margin) var(--sys-s7);
+}
+
+.apd-head {
+  display: grid;
+  gap: var(--sys-s3);
+  max-width: 34rem;
+  margin-bottom: var(--sys-s6);
+}
+.apd-label,
+.apd-door,
+.apd-note {
+  font: var(--sys-label) / 1 var(--sys-mono);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin: 0;
+}
+.apd-lead {
+  margin: 0;
+  max-width: 24ch;
+  font:
+    700 var(--sys-lead) / 1.3 'Mattone',
+    system-ui,
+    sans-serif;
+}
+.apd-how {
+  margin: 0;
+  max-width: 44ch;
+  font:
+    400 15px / 1.45 'Mattone',
+    system-ui,
+    sans-serif;
+  color: var(--sys-ink-2);
+}
+
+.apd-editor {
+  min-height: 40vh;
+}
+.apd-wait {
+  height: 60vh;
+  background: var(--sys-light);
+}
+
+.apd-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sys-s2) var(--sys-s4);
+  margin-top: var(--sys-s4);
+}
+.apd-door {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  min-height: var(--sys-touch);
+  padding: 0;
+  border: 0;
+  border-bottom: var(--sys-line) solid var(--sys-ink);
+  background: none;
+  color: var(--sys-ink);
+  cursor: pointer;
+  text-decoration: none;
+}
+.apd-door:focus-within {
+  outline: var(--sys-line) solid var(--sys-ink);
+  outline-offset: 4px;
+}
+.apd-note {
+  font-size: var(--sys-micro);
+  letter-spacing: 0.12em;
+  color: var(--sys-ink-2);
+}
+.apd-get {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sys-s3);
+  margin-left: auto;
+}
+.apd-get code {
+  font: 13px / 1 var(--sys-mono);
+  padding: var(--sys-s2) var(--sys-s3);
+  background: var(--sys-light);
+}
+
+/* the plugin's theme: the editor and the preview grid each declare the variables, so both */
+.apd :is(.focal-editor, .focal-preview) {
+  --apv-bg: var(--sys-paper);
+  --apv-bg-subtle: var(--sys-paper);
+  --apv-bg-muted: var(--sys-light);
+  --apv-bg-inverse: var(--sys-ink);
+  --apv-on-inverse: var(--sys-paper);
+  --apv-border: rgba(43, 38, 32, 0.22);
+  --apv-border-strong: var(--sys-ink);
+  --apv-border-hover: var(--sys-ink);
+  --apv-border-focus: var(--sys-ink);
+  --apv-text: var(--sys-ink);
+  --apv-text-strong: var(--sys-ink);
+  --apv-text-soft: var(--sys-ink-2);
+  --apv-text-muted: var(--sys-ink-2);
+  --apv-text-disabled: rgba(43, 38, 32, 0.4);
+  --apv-radius-s: 0;
+  --apv-radius-m: 0;
+  font-family: var(--sys-mono);
+}
+/* the editor sits on the page's own margins, not in a panel */
+.apd .focal-editor {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+/* a photo is never taller than most of the screen: its width follows from its shape */
+.apd .focal-editor__image-wrapper {
+  max-width: calc(68svh * var(--apd-ratio, 1.5));
+}
+/* the plugin hard-codes teal and orange for these; here they are ink: CSS on light, Crop inverted */
+.apd .focal-preview__card-source {
+  font: 400 var(--sys-micro) / 1.4 var(--sys-mono);
+  letter-spacing: 0.12em;
+}
+.apd .focal-preview__card-source--css {
+  color: var(--sys-ink);
+  background: var(--sys-light);
+}
+.apd .focal-preview__card-source--crop {
+  color: var(--sys-paper);
+  background: var(--sys-ink);
+}
+/* paper does not lift: the cards stay put under the pointer */
+.apd .focal-preview__card:hover {
+  transform: none;
+  box-shadow: none;
+}
+.apd .focal-preview__card-name {
+  font: 400 var(--sys-micro) / 1.4 var(--sys-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+/* below 900 px the plugin stacks the columns and drops the sticky left column */
+@media (min-width: 901px) {
+  .apd .focal-editor__left {
+    top: var(--sys-s7);
+  }
+}
+
+/* stacked, the plugin's flex-start alignment shrinks the preview column to half the width */
+@media (max-width: 900px) {
+  .apd .focal-editor__right {
+    width: 100%;
+  }
+}
+
+@media (max-width: 700px) {
+  /* on a phone the finger is the input: the number fields would push the photo a screen down */
+  .apd .focal-editor__toolbar-inputs {
+    display: none;
+  }
+  /* two narrow columns read as a contact sheet; one column of six is a long scroll */
+  .apd .focal-preview__grid {
+    columns: 2;
+    column-gap: var(--sys-s1);
+  }
+  .apd {
+    padding: var(--sys-s7) var(--sys-margin) var(--sys-s6);
+  }
+  .apd-get {
+    margin-left: 0;
+  }
+  .apd-get code {
+    font-size: 11px;
+    padding: var(--sys-s2);
+    white-space: nowrap;
+  }
+}
