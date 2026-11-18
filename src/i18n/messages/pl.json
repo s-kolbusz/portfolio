@@ -13,6 +13,7 @@
     "main_navigation": "Menu główne",
     "hero": "Start",
     "aspect": "aspect-preview",
+    "ready2order": "ready2order",
     "about": "O mnie",
     "projects": "Projekty",
     "services": "Usługi",
@@ -339,6 +340,7 @@
     "hero": "Liquid on paper, simulated live in your browser.",
     "work": "My web studio: websites for businesses in Podhale, with the design and the price agreed up front.",
     "aspect-preview": "My open-source Payload plugin: crop once, see every layout. Try it here.",
+    "ready2order": "Cut a POS platform’s production bundle in half: four small changes that added up.",
     "about": "Frontend engineer and designer in Zakopane. Building websites since 2016.",
     "projects": "Cut a POS platform’s production bundle in half at ready2order.",
     "services": "Design, code, server and upkeep, in one pair of hands.",
@@ -353,5 +355,38 @@
     "another": "Another photo",
     "own": "Your own photo",
     "stays": "It stays in your browser."
+  },
+  "ready2order": {
+    "label": "ready2order · 2019–2025",
+    "question": "Why did a till app take so long to start on a shop’s tablet?",
+    "causes": {
+      "webpack": {
+        "name": "Webpack config",
+        "why": "legacy, hand-grown"
+      },
+      "bundle": {
+        "name": "One bundle",
+        "why": "everything, on every screen"
+      },
+      "redux": {
+        "name": "Redux",
+        "why": "a second copy of the cache"
+      },
+      "deps": {
+        "name": "Old dependencies",
+        "why": ""
+      }
+    },
+    "listLabel": "ready2order · not one fix",
+    "changes": {
+      "webpack": "Webpack config rewritten",
+      "split": "Code split, dead code out",
+      "redux": "Redux out: Apollo already cached the data",
+      "deps": "Dependencies updated"
+    },
+    "say": "Four small changes that added up.",
+    "door": "The whole story",
+    "result": "−50%",
+    "resultLabel": "production bundle size"
   }
 }

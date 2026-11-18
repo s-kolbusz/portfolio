@@ -13,6 +13,7 @@ export const STOPS: Stop[] = [
   { id: 'hero', href: '/#hero', label: 'hero' },
   { id: 'work', href: '/#work', label: 'stronypodhale.pl', brand: true },
   { id: 'aspect-preview', href: '/#aspect-preview', label: 'aspect' },
+  { id: 'ready2order', href: '/#ready2order', label: 'ready2order' },
   { id: 'about', href: '/#about', label: 'about' },
   { id: 'projects', href: '/#projects', label: 'projects' },
   { id: 'services', href: '/#services', label: 'services' },

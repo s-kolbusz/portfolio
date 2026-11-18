@@ -8,6 +8,9 @@ import { buildHomePageMetadata } from '@/lib/page-metadata'
 const AspectDemo = dynamic(() =>
   import('@/components/sections/aspect-demo').then((m) => ({ default: m.AspectDemo }))
 )
+const Ready2orderScene = dynamic(() =>
+  import('@/components/sections/ready2order-scene').then((m) => ({ default: m.Ready2orderScene }))
+)
 const About = dynamic(() =>
   import('@/components/sections/about').then((m) => ({ default: m.About }))
 )
@@ -43,6 +46,7 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
     <main id="main-content" className="flex min-h-screen flex-col items-center justify-between">
       <Hero />
       <AspectDemo />
+      <Ready2orderScene />
       <About />
       <Projects locale={locale} />
       <Services />

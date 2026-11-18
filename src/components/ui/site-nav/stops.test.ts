@@ -4,8 +4,8 @@ import { STOPS, locate, stopBounds, stopShares } from './stops'
 
 const VH = 900
 // hero track is 4 screens; sections after it as measured on the home page at 1440×900
-const TOPS = [3600, 4846, 6105, 7465, 9517, 10832]
-const MAX = 12120 - VH
+const TOPS = [3600, 4846, 7726, 8985, 10345, 12397, 13712]
+const MAX = 15000 - VH
 
 describe('stopBounds', () => {
   it('starts with the hero and the water sheet, then each section at the reading line', () => {
@@ -18,7 +18,7 @@ describe('stopBounds', () => {
   })
 
   it('stays increasing when sections are missing or out of order', () => {
-    const bounds = stopBounds([100, 50, 50, 50, 50, 50], VH, 0)
+    const bounds = stopBounds([100, 50, 50, 50, 50, 50, 50], VH, 0)
     for (let i = 1; i < bounds.length; i++) expect(bounds[i]).toBeGreaterThan(bounds[i - 1])
   })
 })
