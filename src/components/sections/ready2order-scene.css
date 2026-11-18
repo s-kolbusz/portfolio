@@ -248,16 +248,21 @@
     height 0.7s var(--sys-out),
     filter 0.7s var(--sys-out);
 }
-/* the column's edge the receipt is tucked under: ink fading over the paper's top */
+/* the till's slot the receipt comes out of: a hard edge, no fade; the paper is simply cut by it */
 .r2o-receipt::before {
   content: '';
   position: absolute;
   z-index: 1;
-  inset: 0 0 auto;
-  height: var(--sys-s4);
-  background: linear-gradient(var(--sys-ink), transparent);
+  inset: 0 -6px auto;
+  height: var(--sys-line-2);
+  background: var(--sys-ink);
+  box-shadow: 0 var(--sys-line) 0 var(--r2o-faint);
   pointer-events: none;
-  transition: opacity 0.4s var(--sys-out);
+  opacity: 0;
+  transition: opacity 0.3s var(--sys-out);
+}
+.r2o-receipt[data-cut]::before {
+  opacity: 1;
 }
 .r2o-receipt[aria-expanded='true'] {
   overflow: visible;

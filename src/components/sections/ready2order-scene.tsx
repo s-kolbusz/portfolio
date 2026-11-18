@@ -404,6 +404,15 @@ export function Ready2orderScene() {
         setReceipt(!isOpen())
       }
     }
+    // the slot's edge shows only while the paper is longer than the room it has, so it is cut by it
+    const clipped = new ResizeObserver(() => {
+      if (slot && receipt && paper)
+        receipt.toggleAttribute('data-cut', paper.offsetHeight > slot.offsetHeight + 1)
+    })
+    if (slot && paper) {
+      clipped.observe(slot)
+      clipped.observe(paper)
+    }
     document.addEventListener('click', onReceipt)
     document.addEventListener('keydown', onKey)
     closeReceipt = () => setReceipt(false)
@@ -413,6 +422,7 @@ export function Ready2orderScene() {
     return () => {
       liquid?.stop()
       stage.removeEventListener('click', go)
+      clipped.disconnect()
       document.removeEventListener('click', onReceipt)
       document.removeEventListener('keydown', onKey)
       holder.replaceChildren()

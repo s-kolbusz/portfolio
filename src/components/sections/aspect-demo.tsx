@@ -117,7 +117,8 @@ export function AspectDemo() {
     }
   }, [near, src])
 
-  // On a desktop the whole admin window is shown at most 90% of the screen's height: it is drawn at
+  // On a desktop the whole admin window is shown at most 85% of the screen's height (the owner
+  // wants it to sit comfortably on the screen): it is drawn at
   // its natural size and zoomed down to fit, like a preview of the real thing. CSS zoom (not a
   // transform) so the plugin's pointer maths stays right.
   const adminRef = useRef<HTMLDivElement>(null)
@@ -140,8 +141,8 @@ export function AspectDemo() {
       // one screen holds the window and the photo buttons under it
       const tools = el.closest('.apd')?.querySelector<HTMLElement>('.apd-tools')
       const target = Math.min(
-        window.innerHeight * 0.9,
-        window.innerHeight * 0.96 - (tools?.offsetHeight ?? 44) - 32
+        window.innerHeight * 0.85,
+        window.innerHeight * 0.92 - (tools?.offsetHeight ?? 44) - 32
       )
       let z = 1
       for (let k = 0; k < 3; k++) {
