@@ -295,8 +295,10 @@ export function SiteNav() {
     }
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
     const ruler = rulerRef.current?.getBoundingClientRect()
+    // on touch the scale is a list: the flood starts at the chosen row
+    const list = window.matchMedia('(max-width: 700px), (hover: none)').matches
     const point =
-      ruler && window.innerWidth > 700
+      ruler && !list
         ? { x: rect.left, y: ruler.top }
         : { x: rect.left, y: rect.top + rect.height / 2 }
     setHover(null)
@@ -410,7 +412,9 @@ export function SiteNav() {
         {/* the part you are on, or the one you point at, set at the size of the hero name */}
         <div className="site-menu__word" aria-hidden="true" data-surface>
           <span key={active} className="site-menu__word-in">
-            <span className="w">{STOPS[active].brand ? <Wordmark /> : label(active)}</span>
+            <span className="w" style={{ '--len': label(active).length } as React.CSSProperties}>
+              {STOPS[active].brand ? <Wordmark /> : label(active)}
+            </span>
             <span className="f">{tf(STOPS[active].id)}</span>
           </span>
         </div>
@@ -452,6 +456,11 @@ export function SiteNav() {
                       {String(i + 1).padStart(2, '0')}
                     </span>
                     <span className="ruler__name">{stop.brand ? <Wordmark /> : label(i)}</span>
+                    {here && (
+                      <span className="ruler__mark" aria-hidden="true">
+                        ← {t('here')}
+                      </span>
+                    )}
                     {isHome && lengths[i] > 0 && (
                       <span className="ruler__len" aria-hidden="true">
                         {t('screens', { n: lengths[i].toFixed(1) })}
