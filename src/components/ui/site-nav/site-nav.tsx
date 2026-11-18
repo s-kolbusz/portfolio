@@ -59,7 +59,6 @@ export function SiteNav() {
   const [index, setIndex] = useState(0)
   const [hover, setHover] = useState<number | null>(null)
   const [shares, setShares] = useState<number[]>(() => STOPS.map(() => 1 / STOPS.length))
-  const [lengths, setLengths] = useState<number[]>(() => STOPS.map(() => 0))
   const [solid, setSolid] = useState(!isHome)
   const [flat, setFlat] = useState(false)
 
@@ -103,8 +102,6 @@ export function SiteNav() {
       setIndex(pos.index)
       setSolid(window.scrollY + 90 > (Number.isFinite(tops[0]) ? tops[0] : Infinity))
       setShares((prev) => (prev.every((s, i) => Math.abs(s - next[i]) < 0.002) ? prev : next))
-      const lens = bounds.slice(1).map((end, i) => Math.round(((end - bounds[i]) / vh) * 10) / 10)
-      setLengths((prev) => (prev.every((l, i) => l === lens[i]) ? prev : lens))
     }
     const schedule = () => {
       if (!raf) raf = requestAnimationFrame(measure)
@@ -452,18 +449,10 @@ export function SiteNav() {
                     onBlur={() => setHover((h) => (h === i ? null : h))}
                     aria-current={here ? 'location' : undefined}
                   >
-                    <span className="ruler__no" aria-hidden="true">
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
                     <span className="ruler__name">{stop.brand ? <Wordmark /> : label(i)}</span>
                     {here && (
                       <span className="ruler__mark" aria-hidden="true">
                         ← {t('here')}
-                      </span>
-                    )}
-                    {isHome && lengths[i] > 0 && (
-                      <span className="ruler__len" aria-hidden="true">
-                        {t('screens', { n: lengths[i].toFixed(1) })}
                       </span>
                     )}
                   </Link>

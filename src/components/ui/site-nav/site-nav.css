@@ -369,6 +369,12 @@ html.site-menu-open [data-adapt-theme='pointer'] {
   right: var(--sys-margin);
   top: 64vh;
 }
+/* short screens (720–800 px): the hanging names need the room above the footer */
+@media (max-height: 820px) {
+  .site-menu__route {
+    top: 57vh;
+  }
+}
 .ruler {
   position: relative;
   height: var(--sys-line);
@@ -402,9 +408,9 @@ html.site-menu-open [data-adapt-theme='pointer'] {
   left: 0;
   top: calc(var(--sys-s7) - var(--sys-s3));
   display: block;
-  width: min(100%, 16em);
-  min-width: var(--sys-touch);
-  height: calc(var(--sys-s5) + 4.2em);
+  /* the tick and the name hanging from it; a short part still gets a touch-sized target */
+  width: var(--sys-touch);
+  height: calc(var(--sys-s5) + var(--sys-s1) + 18em);
   font-size: var(--sys-micro);
 }
 .ruler__stop a::before {
@@ -436,37 +442,30 @@ html.site-menu-open [data-adapt-theme='pointer'] {
 .site-menu:not([data-home]) .ruler__here {
   display: none;
 }
-.ruler__no,
-.ruler__name,
-.ruler__len {
+/* every part's name hangs from its tick, read top to bottom like the marks on a measuring tape: written
+   upright they would run into each other, hung they all fit, so the ruler names every part without hover */
+.ruler__name {
   position: absolute;
-  left: 0;
+  top: calc(var(--sys-s5) + var(--sys-s1));
+  left: -0.55em;
+  writing-mode: vertical-rl;
   font: var(--sys-micro) / 1.3 var(--sys-mono);
   letter-spacing: 0.12em;
   white-space: nowrap;
+  color: var(--sys-ink-2);
+  transition: color 0.25s var(--sys-out);
 }
-.ruler__no {
-  top: var(--sys-s5);
-}
-/* the name and length sit under the number, so they never run into the next ticks' numbers */
-.ruler__name {
-  top: calc(var(--sys-s5) + 1.4em);
+.ruler__stop[data-active] .ruler__name {
+  color: var(--sys-ink);
+  font-weight: 700;
 }
 .ruler__name .wm,
 .ruler__name .wm * {
   font: inherit;
   letter-spacing: inherit;
+}
+.ruler__name .wm .str {
   color: inherit;
-}
-.ruler__len {
-  top: calc(var(--sys-s5) + 2.8em);
-  color: var(--sys-ink-2);
-}
-/* names and lengths only for the part in focus; the rest of the ruler is numbers */
-.ruler__stop:not([data-active]) .ruler__name,
-.ruler__stop:not([data-active]) .ruler__len {
-  clip-path: inset(50%);
-  opacity: 0;
 }
 .site-menu__fact,
 .ruler__mark {
@@ -544,7 +543,7 @@ html.site-menu-open [data-adapt-theme='pointer'] {
 }
 
 /* ---------- touch (phones and tablets): no hover, so the scale stands up along the left edge and every
-   part shows its number and name; where you are is the travelled line ending in a crossbar ---------- */
+   part shows its name; where you are is the travelled line ending in a crossbar ---------- */
 @media (max-width: 700px), (hover: none) {
   .site-menu__word,
   .site-menu__fact {
@@ -601,26 +600,11 @@ html.site-menu-open [data-adapt-theme='pointer'] {
     height: var(--sys-line-2);
     margin-top: -1px;
   }
-  .ruler__no,
   .ruler__name,
-  .ruler__stop:not([data-active]) .ruler__name {
+  .ruler__stop[data-active] .ruler__name {
     position: static;
-    clip-path: none;
-    opacity: 1;
-  }
-  .ruler__no {
-    flex: none;
-    width: 2.4em;
-    color: var(--sys-ink-2);
-  }
-  .ruler__stop[data-here] .ruler__no {
+    writing-mode: horizontal-tb;
     color: var(--sys-ink);
-    font-weight: 700;
-  }
-  .ruler__len {
-    display: none;
-  }
-  .ruler__name {
     font:
       900 min(var(--sys-l), 6.6vw) / 1 'Mattone',
       system-ui,
@@ -642,10 +626,8 @@ html.site-menu-open [data-adapt-theme='pointer'] {
 
 /* tablets: the same list, larger, with "here" written beside the part you are on */
 @media (hover: none) and (min-width: 701px) {
-  .ruler__no {
-    font-size: 12px;
-  }
-  .ruler__name {
+  .ruler__name,
+  .ruler__stop[data-active] .ruler__name {
     font-size: min(var(--sys-l), 44px);
   }
   .ruler__mark {
