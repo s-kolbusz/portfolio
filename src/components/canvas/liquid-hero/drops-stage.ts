@@ -38,6 +38,8 @@ export interface DropsFrame {
   targets: { x: number; y: number }[]
   /** up to eight blocks on the ground */
   rects: GroundRect[]
+  /** on paper only: 0 the hero's green, 1 the dark green of the stronypodhale.pl sheet */
+  tint?: number
 }
 
 export interface DropsStageOptions {
@@ -49,6 +51,8 @@ export interface DropsStageOptions {
   /** read every animation frame */
   frame: () => DropsFrame
   onFail: () => void
+  /** the liquid on the page's paper, as the hero draws its drop there, instead of on ink (act 4) */
+  paper?: boolean
 }
 
 export interface DropsStage {
@@ -71,13 +75,14 @@ const BELOW = 0.6
 const SURFACE = `#version 300 es
 precision highp float;
 uniform sampler2D uDens, uDist, uHgt;
-uniform vec2 uRes, uHgtSize; uniform float uTime, uDH;
+uniform vec2 uRes, uHgtSize; uniform float uTime, uDH, uPaper, uTintK;
 uniform vec4 uR[8]; uniform vec4 uRS[8]; uniform float uLW;
 out vec4 o;
 const float ISO = 0.38;
 const vec3 GROUND = vec3(0.169, 0.149, 0.125);
 const vec3 PAPER = vec3(0.984, 0.976, 0.957);
 const vec3 TINT = vec3(0.03, 0.575, 0.363);
+const vec3 DARKG = vec3(0.082, 0.188, 0.122);
 float hsh(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float vnoise(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f*f*(3. - 2.*f);
   return mix(mix(hsh(i), hsh(i + vec2(1, 0)), u.x), mix(hsh(i + vec2(0, 1)), hsh(i + vec2(1, 1)), u.x), u.y); }
@@ -108,7 +113,7 @@ float modules(vec2 q, vec2 lo, vec2 hi, float seed){
   return line;
 }
 vec3 ground(vec2 q){
-  vec3 c = GROUND;
+  vec3 c = mix(GROUND, PAPER, uPaper);
   float line = 0.;
   for (int i = 0; i < 8; i++) {
     float a = uRS[i].x;
@@ -172,8 +177,10 @@ void main(){
   vec3 body = (seen*vec3(0.55, 1.0, 0.76) + TINT*0.5)*(1. - 0.25*curl);
   float F = 0.02 + 0.98*pow(1. - max(n.z, 0.), 5.);
   vec3 r = reflect(vec3(0., 0., -1.), n);
-  vec3 envC = env(r, q)*vec3(0.42, 0.8, 0.6);
-  vec3 col = body*(1. - F*0.45) + envC*F*0.7*0.55;
+  vec3 envC = env(r, q)*mix(vec3(0.42, 0.8, 0.6), vec3(1.), uPaper);
+  // on paper: the hero's drop on its page, the tint itself with the window's reflections
+  body = mix(body, mix(TINT, DARKG, uTintK)*1.04*(1. - 0.35*curl), uPaper);
+  vec3 col = body*(1. - F*mix(0.45, 1., uPaper)) + envC*F*0.7*mix(0.55, 1., uPaper);
   vec3 L = normalize(vec3(-0.55 + 0.12*sin(q.y*7.+uTime*0.21), 0.62 + 0.08*cos(q.x*5.3-uTime*0.17), 0.56));
   float sp = max(dot(r, L), 0.);
   col += vec3(1.)*(pow(sp, 5.)*0.07 + pow(sp, 24.)*0.08 + pow(sp, 220.)*0.6);
@@ -200,7 +207,7 @@ export function startDropsStage(opts: DropsStageOptions): DropsStage {
   }
 }
 
-function run({ canvas, groups, start, frame: read }: DropsStageOptions): DropsStage {
+function run({ canvas, groups, start, frame: read, paper }: DropsStageOptions): DropsStage {
   // on touch screens the scene is drawn at 1.25x at most: an iPad drew 4 million pixels a frame and
   // lagged, worst in low power mode (owner, 2026-11-18). There is no text in this canvas to blur.
   const dprCap = matchMedia('(pointer: coarse)').matches ? 1.25 : 2
@@ -536,7 +543,9 @@ function run({ canvas, groups, start, frame: read }: DropsStageOptions): DropsSt
   gl.uniform2f(gl.getUniformLocation(surface, 'uHgtSize'), JW, JH)
   gl.uniform2f(gl.getUniformLocation(surface, 'uRes'), W, H)
   gl.uniform1f(gl.getUniformLocation(surface, 'uLW'), 1 / CH)
+  gl.uniform1f(gl.getUniformLocation(surface, 'uPaper'), paper ? 1 : 0)
   const uTime = gl.getUniformLocation(surface, 'uTime')
+  const uTintK = gl.getUniformLocation(surface, 'uTintK')
   const uRL = gl.getUniformLocation(surface, 'uR'),
     uRSL = gl.getUniformLocation(surface, 'uRS')
   const rBox = new Float32Array(32),
@@ -544,12 +553,17 @@ function run({ canvas, groups, start, frame: read }: DropsStageOptions): DropsSt
 
   let raf = 0,
     visible = true
-  const io = new IntersectionObserver((entries) => {
-    // a canvas whose edge only touches the screen shows nothing: it does not draw
-    visible = entries.some((e) => e.isIntersecting && e.intersectionRect.height > 1)
-    physics.postMessage({ pause: !visible } satisfies DropsInMessage)
-    if (visible && !raf) raf = requestAnimationFrame(frame)
-  })
+  const io = new IntersectionObserver(
+    (entries) => {
+      // a canvas whose edge only touches the screen shows nothing: it does not draw
+      visible = entries.some((e) => e.isIntersecting && e.intersectionRect.height > 1)
+      physics.postMessage({ pause: !visible } satisfies DropsInMessage)
+      if (visible && !raf) raf = requestAnimationFrame(frame)
+      // a canvas coming in edge first reports a sliver (not drawn); without more thresholds the
+      // observer would not speak again while it grows, and the scene would stay blank
+    },
+    { threshold: [0, 0.01, 0.05, 0.2] }
+  )
   io.observe(canvas)
 
   // as distanceField() in liquid-stage.ts, without the sheet's flood
@@ -670,6 +684,7 @@ function run({ canvas, groups, start, frame: read }: DropsStageOptions): DropsSt
     gl.clear(gl.COLOR_BUFFER_BIT)
     gl.useProgram(surface)
     gl.uniform1f(uTime, now / 1000)
+    gl.uniform1f(uTintK, f.tint ?? 0)
     // the blocks, in the shader's units (canvas heights, y up)
     rBox.fill(0)
     rStyle.fill(0)

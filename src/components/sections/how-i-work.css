@@ -1,0 +1,103 @@
+/* Act 4, the breath: four lines on paper, one read at a time; a drop of the hero's liquid beside it.
+   The section is a scroll track; the stage stays on screen while the page goes through it. */
+
+.hiw {
+  position: relative;
+  width: 100%;
+  height: 360svh;
+  background: var(--sys-paper);
+  color: var(--sys-ink);
+}
+.hiw-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--sys-s5);
+  padding: var(--sys-s7) var(--sys-margin);
+  overflow: hidden;
+}
+.hiw-drop,
+.hiw-liquid {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.hiw-drop {
+  pointer-events: none;
+}
+
+.hiw-line {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  max-width: 25ch;
+  font:
+    700 clamp(22px, 2.5vw, 4.4vh) / 1.16 'Mattone',
+    system-ui,
+    sans-serif;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+  transition: color 0.6s var(--sys-out);
+}
+.hiw-line[data-side='right'] {
+  align-self: flex-end;
+}
+/* a read line fades and stays: at the end all four stand together */
+.hiw-line[data-state='past'] {
+  color: rgba(43, 38, 32, 0.3);
+}
+
+/* the stronypodhale.pl logo, as in the act 2 scene: "strony" and ".pl" in the accent, "podhale" heavy */
+.hiw-mark {
+  display: inline-block;
+  font-family: 'Cabinet Grotesk', system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 1.12em;
+  letter-spacing: -0.035em;
+  color: var(--sys-ink);
+  text-decoration: none;
+}
+.hiw-mark .acc {
+  color: oklch(0.8 0.125 47);
+}
+.hiw-mark .str {
+  font-weight: 800;
+}
+.hiw-line[data-state='past'] .hiw-mark {
+  opacity: 0.4;
+}
+.hiw-mark:hover .str,
+.hiw-mark:focus-visible .str {
+  text-decoration: underline;
+  text-decoration-thickness: var(--sys-line-2);
+  text-underline-offset: 0.12em;
+}
+
+@media (max-width: 700px) {
+  .hiw {
+    height: 340svh;
+  }
+  .hiw-stage {
+    gap: var(--sys-s5);
+    padding: var(--sys-s6) var(--sys-margin);
+  }
+  .hiw-line {
+    max-width: 17ch;
+    font-size: clamp(21px, 6.2vw, 26px);
+  }
+}
+
+/* without motion: no track, the four lines as one calm block */
+@media (prefers-reduced-motion: reduce) {
+  .hiw {
+    height: auto;
+  }
+  .hiw-stage {
+    position: relative;
+    height: auto;
+  }
+}

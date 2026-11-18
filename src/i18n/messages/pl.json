@@ -440,5 +440,12 @@
       "thanks": "Danke!",
       "show": "The whole receipt"
     }
+  },
+  "howIWork": {
+    "title": "Jak pracuję",
+    "alone": "Pracuję sam. Projekt, kod, serwer i utrzymanie są w jednych rękach.",
+    "shelf": "Nie używam szablonów ani cudzych widgetów tam, gdzie decydują o wrażeniu.",
+    "vision": "Do Twojego pomysłu dokładam własną wizję i wyczucie, żeby wyszedł jak najlepiej.",
+    "fixed": "Potrzebujesz sprawdzonej strony w stałej cenie? Od tego jest <mark>stronypodhale.pl</mark>."
   }
 }

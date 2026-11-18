@@ -444,5 +444,12 @@
       "thanks": "Danke!",
       "show": "The whole receipt"
     }
+  },
+  "howIWork": {
+    "title": "How I work",
+    "alone": "I work alone: design, code, server and maintenance stay in one pair of hands.",
+    "shelf": "I don't use templates or off-the-shelf widgets where they shape how a site feels.",
+    "vision": "I add my own vision and taste to your idea, to make it the best it can be.",
+    "fixed": "Need a proven website at a fixed price? That's what <mark>stronypodhale.pl</mark> is for."
   }
 }
