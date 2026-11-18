@@ -43,6 +43,8 @@
 
 .apd-editor {
   min-height: 40vh;
+  /* it grows with the scroll from its top edge, under the texts (aspect-demo.tsx) */
+  transform-origin: 50% 0;
 }
 .apd-wait {
   height: 60vh;

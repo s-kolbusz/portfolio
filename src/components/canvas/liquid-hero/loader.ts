@@ -31,6 +31,8 @@ interface LoaderOptions {
   dpr: number
   ink: string
   terrain: () => Terrain | null
+  /** true while the hero is out of sight (a reload further down the page): the name is set in place, no show */
+  skip?: () => boolean
 }
 
 type Ctx = CanvasRenderingContext2D & { letterSpacing: string }
@@ -45,6 +47,7 @@ export function startLoader({
   dpr,
   ink: FG,
   terrain: getTerrain,
+  skip = () => false,
 }: LoaderOptions): LoaderState {
   el.width = W
   el.height = H
@@ -186,14 +189,16 @@ export function startLoader({
   }
   function draw(now: number) {
     const t = (now - t0) / 1000
+    // the page opened further down: nobody sees the show, so the name is simply in place once the page is ready
+    const quick = still || skip()
     // filling: no faster than the real progress and no faster than 1.1 s for the whole
-    const target = Math.min(st.progress, still ? 1 : t / 1.1)
+    const target = Math.min(st.progress, quick ? 1 : t / 1.1)
     st.shown += (target - st.shown) * 0.12
-    if (target >= 1 && st.shown > 0.996) st.shown = 1
-    if (st.open < 0 && st.shown === 1 && st.glReady) st.open = now + 180 // a short breath after the full fill
-    const o = st.open < 0 || now < st.open ? 0 : still ? 1 : cl((now - st.open) / 1000 / 2.6)
+    if (target >= 1 && (quick || st.shown > 0.996)) st.shown = 1
+    if (st.open < 0 && st.shown === 1 && st.glReady) st.open = now + (quick ? 0 : 180) // a short breath after the full fill
+    const o = st.open < 0 || now < st.open ? 0 : quick ? 1 : cl((now - st.open) / 1000 / 2.6)
     const bt = st.open < 0 || now < st.open ? -1 : (now - st.open) / 1000
-    st.boardT = still && bt >= 0 ? 99 : bt
+    st.boardT = quick && bt >= 0 ? 99 : bt
     const m = smoother(cl(o / 0.72)) // the initials' move: a long, soft start and landing
     const r = cl((o - 0.12) / 0.86) // the rest of the word unfolding (each letter has its own easing)
     el.style.background = 'none'
@@ -212,7 +217,7 @@ export function startLoader({
       bt < 0 ? LIGHT : mixHex(LIGHT, FG, cl((thinned(x + w / 2, y - n.asc / 2, bt) - 0.3) / 0.4))
     word(first, S[0], S[1], n.s1, r, rS, st.shown, tone(S[0], S[1], n.sw * Math.max(r, 0.15)))
     word(last, K[0], K[1], n.k1, r, rK, st.shown, tone(K[0], K[1], n.kw * Math.max(r, 0.15)))
-    if (o >= 1 && bt > 2.55) {
+    if (o >= 1 && (quick || bt > 2.55)) {
       st.handoff = true
       st.boardT = 99
       return

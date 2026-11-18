@@ -11,6 +11,9 @@ import {
   DEFAULT_ASPECT_RATIOS,
 } from 'payload-plugin-aspect-preview/playground'
 
+import { Rise, riseAt } from '@/components/ui/rise'
+import { useReveal } from '@/hooks/use-reveal'
+
 import './aspect-demo.css'
 
 /**
@@ -63,6 +66,12 @@ const startValue = (index: number): AspectPreviewValue => ({
 export function AspectDemo() {
   const t = useTranslations('aspectDemo')
   const sectionRef = useRef<HTMLElement>(null)
+  const headRef = useRef<HTMLElement>(null)
+  const toolsRef = useRef<HTMLDivElement>(null)
+  const editorRef = useRef<HTMLDivElement>(null)
+  // the texts rise from under their lines as the scene comes up; the buttons under the window when they do
+  useReveal(headRef)
+  useReveal(toolsRef, { at: 0.95, back: 1 })
   const [near, setNear] = useState(false)
   const [photo, setPhoto] = useState(0)
   const [own, setOwn] = useState<{ url: string; name: string } | null>(null)
@@ -117,7 +126,7 @@ export function AspectDemo() {
     }
   }, [near, src])
 
-  // On a desktop the whole admin window is shown at most 85% of the screen's height (the owner
+  // On a desktop the whole admin window is shown at most 78% of the screen's height (the owner
   // wants it to sit comfortably on the screen): it is drawn at
   // its natural size and zoomed down to fit, like a preview of the real thing. CSS zoom (not a
   // transform) so the plugin's pointer maths stays right.
@@ -126,6 +135,14 @@ export function AspectDemo() {
     const el = adminRef.current
     if (!el) return
     const fit = () => {
+      // measured at full size: the scroll's growth (below) is only a transform on the wrapper
+      const wrap = el.parentElement
+      const grown = wrap?.style.transform ?? ''
+      if (wrap) wrap.style.transform = ''
+      fitNow()
+      if (wrap) wrap.style.transform = grown
+    }
+    const fitNow = () => {
       if (window.innerWidth <= 900) {
         el.style.zoom = ''
         el.style.width = ''
@@ -141,8 +158,8 @@ export function AspectDemo() {
       // one screen holds the window and the photo buttons under it
       const tools = el.closest('.apd')?.querySelector<HTMLElement>('.apd-tools')
       const target = Math.min(
-        window.innerHeight * 0.85,
-        window.innerHeight * 0.92 - (tools?.offsetHeight ?? 44) - 32
+        window.innerHeight * 0.78,
+        window.innerHeight * 0.9 - (tools?.offsetHeight ?? 44) - 32
       )
       let z = 1
       for (let k = 0; k < 3; k++) {
@@ -162,17 +179,50 @@ export function AspectDemo() {
     }
   }, [near, size])
 
+  // the window comes up a little smaller and grows to its size with the scroll, while the texts above
+  // rise in; once in place it carries no transform at all, so the plugin's own pointer maths is untouched
+  useEffect(() => {
+    const el = editorRef.current
+    if (!el || matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    let frame = 0
+    const grow = () => {
+      frame = 0
+      const top = el.getBoundingClientRect().top
+      const vh = window.innerHeight
+      const p = Math.min(1, Math.max(0, (vh - top) / (vh * 0.75)))
+      const k = 1 - (1 - p) ** 3
+      el.style.transform = p >= 1 ? '' : `scale(${(0.88 + 0.12 * k).toFixed(4)})`
+    }
+    const request = () => {
+      if (!frame) frame = requestAnimationFrame(grow)
+    }
+    grow()
+    window.addEventListener('scroll', request, { passive: true })
+    window.addEventListener('resize', request)
+    return () => {
+      cancelAnimationFrame(frame)
+      window.removeEventListener('scroll', request)
+      window.removeEventListener('resize', request)
+      el.style.transform = ''
+    }
+  }, [])
+
   return (
     <section ref={sectionRef} id="aspect-preview" className="apd" aria-labelledby="apd-title">
-      <header className="apd-head">
-        <p className="apd-label">{t('label')}</p>
+      <header ref={headRef} className="apd-head">
+        <p className="apd-label">
+          <Rise text={t('label')} />
+        </p>
         <h2 id="apd-title" className="apd-lead">
-          {t('question')}
+          <Rise text={t('question')} at={0.12} />
         </h2>
-        <p className="apd-how">{t('how')}</p>
+        <p className="apd-how rv-b" style={riseAt(0.42)}>
+          {t('how')}
+        </p>
       </header>
 
       <div
+        ref={editorRef}
         className="apd-editor"
         style={ratio ? ({ '--apd-ratio': ratio } as CSSProperties) : undefined}
       >
@@ -248,11 +298,11 @@ export function AspectDemo() {
         </div>
       </div>
 
-      <div className="apd-tools">
-        <button type="button" className="apd-door" onClick={nextPhoto}>
+      <div ref={toolsRef} className="apd-tools">
+        <button type="button" className="apd-door rv-b" style={riseAt(0)} onClick={nextPhoto}>
           {t('another')} <span aria-hidden="true">↻</span>
         </button>
-        <label className="apd-door">
+        <label className="apd-door rv-b" style={riseAt(0.1)}>
           {t('own')}
           <input
             type="file"
@@ -267,8 +317,10 @@ export function AspectDemo() {
             }}
           />
         </label>
-        <span className="apd-note">{t('stays')}</span>
-        <span className="apd-get">
+        <span className="apd-note rv-b" style={riseAt(0.2)}>
+          {t('stays')}
+        </span>
+        <span className="apd-get rv-b" style={riseAt(0.3)}>
           <code>{NPM_COMMAND}</code>
           <a href={REPO_URL} target="_blank" rel="noopener" className="apd-door">
             GitHub <span aria-hidden="true">↗</span>

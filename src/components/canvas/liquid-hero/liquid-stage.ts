@@ -256,6 +256,8 @@ async function run(els: LiquidStageElements, opts: LiquidStageOptions, life: Lif
     dpr,
     ink: FG,
     terrain: () => TER,
+    // a reload or a jump further down the page: the hero is out of sight, so its show is skipped
+    skip: () => -track.getBoundingClientRect().top > VH * 0.5,
   })
   life.cleanup(loader.stop)
   TER = await loadTerrain((f) => {
@@ -621,6 +623,9 @@ async function run(els: LiquidStageElements, opts: LiquidStageOptions, life: Lif
   function act(dt: number, P: number) {
     actOn = P > ACT_ON_P ? true : P < ACT_OFF_P ? false : actOn
     actT = Math.min(Math.max(actT + (actOn ? dt : -dt * 1.4), 0), ACT_LEN)
+    // once the stage leaves upwards the scene is simply finished: a fast scroll or a reload further down
+    // must not play its entrance while it slides away (or when it comes back down from above)
+    if (actOn && stageTop < -1) actT = ACT_LEN
     scene.style.visibility = actT > 0 ? 'visible' : 'hidden'
     masks.forEach((el, i) => {
       const k = ease3(cl01((actT - startAt[i]) / 0.8))
@@ -946,13 +951,17 @@ async function run(els: LiquidStageElements, opts: LiquidStageOptions, life: Lif
     last = null
   })
   const scrollNow = () => Math.max(0, -track.getBoundingClientRect().top)
-  let shift = 0,
-    shiftTarget = scrollNow()
+  // the eased scroll starts where the page is (a reload in the middle must not replay the transition
+  // from the top), and a jump of more than a screen (restored scroll, a key, an anchor) is taken at once
+  let shift = scrollNow(),
+    shiftTarget = shift
   life.listen(
     window,
     'scroll',
     () => {
-      shiftTarget = scrollNow()
+      const next = scrollNow()
+      if (Math.abs(next - shiftTarget) > VH) shift = next
+      shiftTarget = next
     },
     { passive: true }
   )
@@ -1114,6 +1123,10 @@ async function run(els: LiquidStageElements, opts: LiquidStageOptions, life: Lif
     gl.useProgram(main)
     gl.bindVertexArray(vao)
     shift += (shiftTarget - shift) * Math.min(dt * 4, 1)
+    // a fast scroll: the transition trails the page by at most half a screen, so it never replays
+    // a part the reader has long scrolled past
+    const lag = shiftTarget - shift
+    if (Math.abs(lag) > VH * 0.5) shift = shiftTarget - Math.sign(lag) * VH * 0.5
     terrainView(shift)
     gl.uniform1f(U('uMorph'), shift * 0.0015)
     gl.uniform1f(U('uTime'), time)

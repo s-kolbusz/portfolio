@@ -11,7 +11,9 @@ import {
   startDropsStage,
   supportsDrops,
 } from '@/components/canvas/liquid-hero/drops-stage'
+import { Rise, riseAt } from '@/components/ui/rise'
 import { usePrefersReducedMotion } from '@/hooks/use-media'
+import { type RevealDetail, useReveal } from '@/hooks/use-reveal'
 import { Link } from '@/i18n/navigation'
 import { useScrollStore } from '@/lib/stores/scroll'
 
@@ -102,7 +104,7 @@ function geometry(W: number, H: number) {
     s3: [inBlock('screens'), shelfAt(2)],
     redux: [inBlock('redux'), { x: mid(block('redux')).x, y: drain }],
   }
-  return { phone, box, shelf, half, block, radius, at, start: mid(box) }
+  return { phone, box, shelf, half, block, radius, at, start: mid(box), drain }
 }
 type Geo = ReturnType<typeof geometry>
 
@@ -115,10 +117,28 @@ const FATE_AT: Partial<Record<GroupKey, [number, number]>> = {
   s3: [0.48, 0.6],
 }
 
-/** the liquid's targets and the ground's blocks at scroll progress p */
-function frameAt(g: Geo, p: number): DropsFrame {
+/**
+ * The scene's entrance, in seconds (played in time, like the stronypodhale.pl act): the texts rise
+ * (useReveal), the map's blocks come up out of the ink one after another, the liquid rises from under
+ * the map into its middle, the path draws, then the first step, the receipt's first line and the caption.
+ */
+const INTRO = {
+  len: 2.3,
+  blocks: 0.25,
+  blockStep: 0.08,
+  liquid: [0.3, 2.3],
+  print: 1.25,
+}
+const ease3 = (t: number) => 1 - (1 - t) ** 3
+/** how far the liquid has risen into the map (0: under it, 1: in place) */
+// a soft start and landing: a sudden pull stretches the body into a teardrop
+const risen = (intro: number) => ease(span(intro, INTRO.liquid[0], INTRO.liquid[1]))
+
+/** the liquid's targets and the ground's blocks at scroll progress p, and the entrance at intro seconds */
+function frameAt(g: Geo, p: number, intro = INTRO.len): DropsFrame {
   const apart = ease(span(p, T.apart[0], T.apart[1]))
   const half = ease(span(p, T.half[0], T.half[1]))
+  const lift = risen(intro)
   const targets = GROUPS.map(({ key }) => {
     const [a, b, c] = g.at[key]
     let x = mix(g.start.x, a.x, apart),
@@ -132,7 +152,7 @@ function frameAt(g: Geo, p: number): DropsFrame {
       x = mix(x, c.x, half)
       y = mix(y, c.y, half)
     }
-    return { x, y }
+    return { x, y: y + (1 - lift) * (g.drain - g.start.y) }
   })
   const gone = span(p, 0.44, 0.6)
   const r = (b: Box, a: number, more: Partial<GroundRect> = {}): GroundRect => ({
@@ -152,6 +172,12 @@ function frameAt(g: Geo, p: number): DropsFrame {
     r(g.box, half * 0.8, { dashed: true }),
     r(g.half, half * 1.2, { modules: 1 }),
   ]
+  // the blocks come up one after another
+  rects.forEach((rect, i) => {
+    rect.a *= ease3(
+      span(intro, INTRO.blocks + i * INTRO.blockStep, INTRO.blocks + i * INTRO.blockStep + 0.6)
+    )
+  })
   return { targets, rects }
 }
 
@@ -168,6 +194,8 @@ export function Ready2orderScene() {
   const trackRef = useRef<HTMLElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
   const liquidRef = useRef<HTMLDivElement>(null)
+  // the entrance: texts rise when the stage is halfway up the screen (the stage gets data-in)
+  useReveal(stageRef, { at: 0.5, back: 0.8 })
 
   useEffect(() => {
     if (reduced) return
@@ -189,6 +217,9 @@ export function Ready2orderScene() {
     let frame = 0
     let p = 0
     let geo = geometry(stage.clientWidth, stage.clientHeight)
+    // the entrance's clock: already in place when the page opens past it, else it plays from 0
+    let intro = stage.hasAttribute('data-in') ? INTRO.len : 0
+    let introOn = intro > 0
 
     // the real liquid; without WebGL2 cut-out drops and drawn boxes do the same, plainer
     let liquid: DropsStage | null = null
@@ -205,8 +236,9 @@ export function Ready2orderScene() {
       liquid = startDropsStage({
         canvas,
         groups: geo.radius,
-        start: geo.start,
-        frame: () => frameAt(geo, p),
+        // before the entrance the liquid waits under the map
+        start: intro > 0 ? geo.start : { x: geo.start.x, y: geo.drain },
+        frame: () => frameAt(geo, p, intro),
         onFail: () => delete stage.dataset.liquid,
       })
     }
@@ -299,25 +331,27 @@ export function Ready2orderScene() {
       ticks.forEach((el, i) => el.toggleAttribute('aria-current', i === now))
       // the receipt prints line by line, and takes its lines back when the page scrolls up
       rows.forEach((el) => {
-        const on = now + 1 >= Number(el.dataset.print)
+        const on = intro >= INTRO.print && now + 1 >= Number(el.dataset.print)
         if ((el.dataset.on === '1') !== on) el.dataset.on = on ? '1' : '0'
       })
       if (door) door.tabIndex = now === 3 ? 0 : -1
-      // labels fade in and out over their own stretch of the scroll
+      // labels rise from under their line in their stretch of the scroll and leave upward after it
+      // (the steps' own movement); one marked data-intro waits for the entrance to reach it
       for (const el of fades) {
         const [a, b, c, d] = (el.dataset.show ?? '0 0 1 1').split(' ').map(Number)
-        const o = Math.min(span(p, a, b), 1 - span(p, c, d))
-        el.style.opacity = String(o)
-        el.style.visibility = o > 0.01 ? 'visible' : 'hidden'
+        const wait = intro < Number(el.dataset.intro ?? 0)
+        const state = p >= (c + d) / 2 ? 'past' : p >= (a + b) / 2 && !wait ? 'now' : 'next'
+        if (el.dataset.state !== state) el.dataset.state = state
       }
       // without WebGL2: the same story with cut-out drops and drawn boxes
       if (!stage.dataset.liquid) {
-        const f = frameAt(geo, p)
+        const f = frameAt(geo, p, intro)
         const apart = span(p, T.apart[0], T.apart[0] + 0.06)
         if (whole) {
           const d = Math.min(geo.box.w, geo.box.h) * 0.86
+          const y = geo.start.y + (1 - risen(intro)) * (geo.drain - geo.start.y)
           whole.style.width = `${d}px`
-          whole.style.transform = `translate(${geo.start.x - d / 2}px, ${geo.start.y - d / 2}px)`
+          whole.style.transform = `translate(${geo.start.x - d / 2}px, ${y - d / 2}px)`
           whole.style.opacity = String(1 - apart)
         }
         drops.forEach((el, i) => {
@@ -369,6 +403,34 @@ export function Ready2orderScene() {
     }
     stage.addEventListener('click', go)
 
+    // the entrance plays in time; going back up it runs backwards, 1.4x faster (as the texts do)
+    let introFrame = 0
+    let introPrev = 0
+    const tick = (now: number) => {
+      const dt = Math.min((now - introPrev) / 1000, 0.05)
+      introPrev = now
+      intro = Math.min(INTRO.len, Math.max(0, intro + (introOn ? dt : -dt * 1.4)))
+      last = -1
+      draw()
+      introFrame =
+        (introOn && intro < INTRO.len) || (!introOn && intro > 0) ? requestAnimationFrame(tick) : 0
+    }
+    const onReveal = (e: Event) => {
+      const { on, instant } = (e as CustomEvent<RevealDetail>).detail
+      introOn = on
+      cancelAnimationFrame(introFrame)
+      introFrame = 0
+      if (instant) {
+        intro = on ? INTRO.len : 0
+        last = -1
+        request()
+        return
+      }
+      introPrev = performance.now()
+      introFrame = requestAnimationFrame(tick)
+    }
+    stage.addEventListener('rv', onReveal)
+
     // the receipt: pulled up to its whole length, and tucked back in
     const slot = stage.querySelector<HTMLElement>('.r2o-slot')
     const receipt = stage.querySelector<HTMLElement>('.r2o-receipt')
@@ -376,19 +438,23 @@ export function Ready2orderScene() {
     const isOpen = () => receipt?.getAttribute('aria-expanded') === 'true'
     const setReceipt = (open: boolean) => {
       if (!slot || !receipt || !paper || open === isOpen()) return
-      const from = receipt.offsetHeight
       // no higher than the column: from the slot's bottom up to the top of the column
       const to = open
         ? Math.min(paper.offsetHeight, slot.offsetTop + slot.offsetHeight)
         : slot.offsetHeight
-      receipt.style.height = `${from}px`
+      receipt.style.height = `${receipt.offsetHeight}px`
       void receipt.offsetHeight
       receipt.setAttribute('aria-expanded', String(open))
+      receipt.dataset.lift = '1'
       receipt.style.height = `${to}px`
       const done = (e: TransitionEvent) => {
         if (e.propertyName !== 'height') return
         receipt.removeEventListener('transitionend', done)
-        if (!isOpen()) receipt.style.height = ''
+        // back into its slot: its own height again, under the slot's fade
+        if (!isOpen()) {
+          receipt.style.height = ''
+          delete receipt.dataset.lift
+        }
       }
       receipt.addEventListener('transitionend', done)
     }
@@ -404,14 +470,14 @@ export function Ready2orderScene() {
         setReceipt(!isOpen())
       }
     }
-    // the slot's edge shows only while the paper is longer than the room it has, so it is cut by it
-    const clipped = new ResizeObserver(() => {
-      if (slot && receipt && paper)
-        receipt.toggleAttribute('data-cut', paper.offsetHeight > slot.offsetHeight + 1)
+    // the slot fades the paper only while the paper is longer than the room it has
+    const fits = new ResizeObserver(() => {
+      if (slot && paper)
+        slot.toggleAttribute('data-over', paper.offsetHeight > slot.offsetHeight + 1)
     })
     if (slot && paper) {
-      clipped.observe(slot)
-      clipped.observe(paper)
+      fits.observe(slot)
+      fits.observe(paper)
     }
     document.addEventListener('click', onReceipt)
     document.addEventListener('keydown', onKey)
@@ -422,7 +488,9 @@ export function Ready2orderScene() {
     return () => {
       liquid?.stop()
       stage.removeEventListener('click', go)
-      clipped.disconnect()
+      stage.removeEventListener('rv', onReveal)
+      cancelAnimationFrame(introFrame)
+      fits.disconnect()
       document.removeEventListener('click', onReceipt)
       document.removeEventListener('keydown', onKey)
       holder.replaceChildren()
@@ -444,7 +512,8 @@ export function Ready2orderScene() {
   const intro = (
     <>
       <a
-        className="r2o-logo"
+        className="r2o-logo rv-b"
+        style={riseAt(0)}
         href="https://ready2order.com"
         target="_blank"
         rel="noopener noreferrer"
@@ -457,11 +526,13 @@ export function Ready2orderScene() {
           height={108}
         />
       </a>
-      <p className="r2o-label">{t('label')}</p>
+      <p className="r2o-label">
+        <Rise text={t('label')} at={0.08} />
+      </p>
       <h2 id="r2o-title" className="r2o-ask">
-        {t('question')}
+        <Rise text={t('question')} at={0.16} />
       </h2>
-      <p className="r2o-who">
+      <p className="r2o-who rv-b" style={riseAt(0.5)}>
         {t('who')}{' '}
         <a href="https://ready2order.com" target="_blank" rel="noopener noreferrer">
           {t('site')} <span aria-hidden="true">↗</span>
@@ -482,7 +553,7 @@ export function Ready2orderScene() {
     </div>
   )
   const receipt = (
-    <div className="r2o-slot">
+    <div className="r2o-slot rv-b" style={riseAt(1.1)}>
       {/* tucked under the column's edge; a click or tap pulls the whole receipt up over the steps */}
       <div
         className="r2o-receipt"
@@ -537,8 +608,10 @@ export function Ready2orderScene() {
   // a label's place (block:where) and when it shows (in, full, out, gone: scroll fractions)
   const label = (at: string, show: string, name: string, fate?: string) => (
     <p className="r2o-tag" data-at={at} data-show={show}>
-      {name}
-      {fate ? <em>{fate}</em> : null}
+      <span className="r2o-in">
+        {name}
+        {fate ? <em>{fate}</em> : null}
+      </span>
     </p>
   )
 
@@ -567,10 +640,10 @@ export function Ready2orderScene() {
               {STEP_KEYS.map((key, i) => (
                 <li key={key}>
                   <button type="button" data-tick={i}>
-                    <span className="r2o-track">
+                    <span className="r2o-track rv-l" style={riseAt(0.6 + i * 0.1)}>
                       <span data-fill />
                     </span>
-                    <span className="r2o-tick">
+                    <span className="r2o-tick rv-b" style={riseAt(0.7 + i * 0.1)}>
                       {String(i + 1).padStart(2, '0')} {t(`steps.${key}.short`)}
                     </span>
                   </button>
@@ -593,23 +666,25 @@ export function Ready2orderScene() {
         </div>
 
         <div className="r2o-map" aria-hidden="true">
-          <p className="r2o-cap" data-at="box:above" data-show="-1 0 0.14 0.17">
-            {t('map.whole')} · <b>100%</b>
+          <p className="r2o-cap" data-at="box:above" data-show="-1 0 0.14 0.17" data-intro="1.5">
+            <span className="r2o-in">
+              {t('map.whole')} · <b>100%</b>
+            </span>
           </p>
           <p className="r2o-cap" data-at="box:above" data-show="0.17 0.2 0.38 0.41">
-            {t('map.apart')}
+            <span className="r2o-in">{t('map.apart')}</span>
           </p>
           <p className="r2o-cap" data-at="box:above" data-show="0.41 0.44 0.64 0.67">
-            {t('map.fates')}
+            <span className="r2o-in">{t('map.fates')}</span>
           </p>
           <p className="r2o-cap" data-at="box:above" data-show="0.67 0.7 2 2">
-            {t('map.before')} · 100%
+            <span className="r2o-in">{t('map.before')} · 100%</span>
           </p>
           <p className="r2o-cap" data-at="box:below" data-show="0.2 0.28 0.64 0.68">
-            {t('map.illustrative')}
+            <span className="r2o-in">{t('map.illustrative')}</span>
           </p>
           <p className="r2o-cap" data-at="box:below" data-show="0.7 0.78 2 2">
-            {t('map.metric')}
+            <span className="r2o-in">{t('map.metric')}</span>
           </p>
           {label('app', '0.2 0.28 0.46 0.52', t('parts.app.name'))}
           {label('deps', '0.2 0.28 0.46 0.52', t('parts.deps.name'))}
@@ -621,7 +696,7 @@ export function Ready2orderScene() {
           {label('shelf', '0.5 0.56 2 2', t('parts.shelf.name'), t('parts.shelf.fate'))}
           {label('half', '0.72 0.8 2 2', `${t('map.after')} · 50%`)}
           <p className="r2o-big" data-at="half:band" data-show="0.74 0.82 2 2">
-            {t('result')}
+            <span className="r2o-in">{t('result')}</span>
           </p>
         </div>
       </div>
