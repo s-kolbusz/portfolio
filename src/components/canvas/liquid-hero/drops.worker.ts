@@ -91,9 +91,11 @@ let acc = 0,
 let light = false
 const timing = { skip: 0, n: 0, ms: 0 }
 const LIGHT_MS = 6.5 // ms a full step may cost: 120 of them take 780 ms of every second
-// a light step covers at most this many base steps (100 ms). With 4, the iPad's ~85 ms steps covered
-// only 33 ms of liquid time each: the liquid ran at 40% speed, in slow motion (owner, 2026-11-18)
-const MAX_D = 12
+// a light step covers at most this many base steps (250 ms), and a tick counts at most that much
+// elapsed time. With 4, the iPad's ~85 ms steps covered only 33 ms of liquid time each (40% speed);
+// with 12 (and elapsed time capped at 100 ms), its 143 ms steps on 2026-11-20 still ran at 70%:
+// slow motion both times (owner)
+const MAX_D = 30
 
 function init(d: DropsInit) {
   const dy = (d.spacing * Math.sqrt(3)) / 2
@@ -307,7 +309,7 @@ function tick() {
   timer = null
   if (!sim || paused) return
   const now = performance.now()
-  acc += Math.min((now - tPrev) / 1000, 0.1) * STEPS_PER_SECOND
+  acc += Math.min((now - tPrev) / 1000, light ? MAX_D / STEPS_PER_SECOND : 0.1) * STEPS_PER_SECOND
   tPrev = now
   let n = 0,
     steps = 0
