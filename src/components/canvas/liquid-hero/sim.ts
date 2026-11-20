@@ -173,26 +173,50 @@ export function createSim({
     }
   }
 
-  // neighbour list (indices), built once after moving; distances computed on the fly
+  // neighbour list (indices), built once after moving; distances computed on the fly. Each pair is
+  // listed once, under one of its two particles: the rest of its own cell after it, plus four of the
+  // eight cells around (right, and the three above), so every pair is met exactly once without
+  // walking all nine cells (2026-11-20: the iPad spent 75 ms a step, a third of it here)
   const MAXN = 48
   const nb = new Int32Array(N * MAXN),
     nbc = new Int32Array(N)
+  const FWD = [
+    [1, 0],
+    [-1, 1],
+    [0, 1],
+    [1, 1],
+  ]
+  // the pairs that touch (closer than one radius), found in the density pass with their distance and
+  // direction: relaxation walks only these, and viscosity and smoothing reuse the distance instead of
+  // measuring every pair again
+  const pI = new Int32Array(N * MAXN),
+    pJ = new Int32Array(N * MAXN),
+    pQ = new Float32Array(N * MAXN),
+    pUX = new Float32Array(N * MAXN),
+    pUY = new Float32Array(N * MAXN)
+  let NP = 0
   function buildNeighbors() {
     rebuild()
     for (let i = 0; i < N; i++) {
       let c = 0
-      const cx = Math.floor(x[i]) + 2,
-        cy = Math.floor(y[i]) + 2
-      for (let gy = cy - 1; gy <= cy + 1 && c < MAXN; gy++) {
-        if (gy < 0 || gy >= GH) continue
-        for (let gx = cx - 1; gx <= cx + 1 && c < MAXN; gx++) {
-          if (gx < 0 || gx >= GW) continue
-          for (let j = head[gy * GW + gx]; j !== -1 && c < MAXN; j = next[j]) {
-            if (j <= i) continue
-            const ddx = x[j] - x[i],
-              ddy = y[j] - y[i]
-            if (ddx * ddx + ddy * ddy < 1.21) nb[i * MAXN + c++] = j // headroom for movement during the step
-          }
+      const o = i * MAXN
+      const xi = x[i],
+        yi = y[i]
+      for (let j = next[i]; j !== -1 && c < MAXN; j = next[j]) {
+        const ddx = x[j] - xi,
+          ddy = y[j] - yi
+        if (ddx * ddx + ddy * ddy < 1.21) nb[o + c++] = j // headroom for movement during the step
+      }
+      const cx = Math.min(GW - 1, Math.max(0, Math.floor(xi) + 2)),
+        cy = Math.min(GH - 1, Math.max(0, Math.floor(yi) + 2))
+      for (let f = 0; f < 4 && c < MAXN; f++) {
+        const gx = cx + FWD[f][0],
+          gy = cy + FWD[f][1]
+        if (gx < 0 || gx >= GW || gy >= GH) continue
+        for (let j = head[gy * GW + gx]; j !== -1 && c < MAXN; j = next[j]) {
+          const ddx = x[j] - xi,
+            ddy = y[j] - yi
+          if (ddx * ddx + ddy * ddy < 1.21) nb[o + c++] = j
         }
       }
       nbc[i] = c
@@ -450,28 +474,20 @@ export function createSim({
     for (let i = N - rebelN; i < N; i++)
       grip[i] = clicked ? 0 : Math.min(1, grip[i] + dt / (STEPS_PER_SECOND * fragTime[i]))
 
-    buildNeighbors()
-    // viscosity (pairs i<j)
-    for (let i = 0; i < (P.light ? 0 : N); i++) {
+    // viscosity, on the touching pairs of the last step (they have barely moved since)
+    for (let p = 0; p < (P.light ? 0 : NP); p++) {
       // light mode: no separate viscosity
-      const o = i * MAXN
-      for (let k = 0; k < nbc[i]; k++) {
-        const j = nb[o + k]
-        const ddx = x[j] - x[i],
-          ddy = y[j] - y[i],
-          r2 = ddx * ddx + ddy * ddy
-        if (r2 >= 1 || r2 < 1e-12) continue
-        const r = Math.sqrt(r2),
-          ux = ddx / r,
-          uy = ddy / r
-        const u = (vx[i] - vx[j]) * ux + (vy[i] - vy[j]) * uy
-        if (u > 0) {
-          const I = (1 - r) * (P.sigma * u + P.beta * u * u) * 0.5 * dt
-          vx[i] -= I * ux
-          vy[i] -= I * uy
-          vx[j] += I * ux
-          vy[j] += I * uy
-        }
+      const i = pI[p],
+        j = pJ[p],
+        ux = pUX[p],
+        uy = pUY[p]
+      const u = (vx[i] - vx[j]) * ux + (vy[i] - vy[j]) * uy
+      if (u > 0) {
+        const I = (1 - pQ[p]) * (P.sigma * u + P.beta * u * u) * 0.5 * dt
+        vx[i] -= I * ux
+        vy[i] -= I * uy
+        vx[j] += I * ux
+        vy[j] += I * uy
       }
     }
     // move
@@ -498,6 +514,7 @@ export function createSim({
     if (doClusters) for (let i = 0; i < N; i++) parent[i] = i
     rhoA.fill(0)
     rhoNA.fill(0)
+    NP = 0
     for (let i = 0; i < N; i++) {
       const o = i * MAXN
       for (let k = 0; k < nbc[i]; k++) {
@@ -506,13 +523,20 @@ export function createSim({
           ddy = y[j] - y[i],
           r2 = ddx * ddx + ddy * ddy
         if (r2 >= 1) continue
-        const a = 1 - Math.sqrt(r2),
+        const q = Math.sqrt(r2),
+          a = 1 - q,
           a2 = a * a,
           a3 = a2 * a
         rhoA[i] += a2
         rhoA[j] += a2
         rhoNA[i] += a3
         rhoNA[j] += a3
+        if (r2 < 1e-12) continue
+        pI[NP] = i
+        pJ[NP] = j
+        pQ[NP] = q
+        pUX[NP] = ddx / q
+        pUY[NP++] = ddy / q
       }
     }
     // while spreading the liquid wants a looser packing, so it pushes itself out evenly in all directions (up to ~3× the area)
@@ -521,10 +545,10 @@ export function createSim({
       pA[i] = P.k * (rhoA[i] - (rebel[i] ? P.rho0 : rho0))
       pNA[i] = P.kNear * rhoNA[i]
     }
-    for (let i = 0; i < N; i++) {
-      const o = i * MAXN
-      for (let k = 0; k < nbc[i]; k++) {
-        const j = nb[o + k]
+    for (let p = 0; p < NP; p++) {
+      {
+        const i = pI[p],
+          j = pJ[p]
         const ddx = x[j] - x[i],
           ddy = y[j] - y[i],
           r2 = ddx * ddx + ddy * ddy
@@ -552,16 +576,12 @@ export function createSim({
       sy[i] = 0
       wsA[i] = 0
     }
-    for (let i = 0; i < (P.light ? 0 : N); i++) {
+    for (let p = 0; p < (P.light ? 0 : NP); p++) {
       // light mode: no XSPH smoothing
-      const o = i * MAXN
-      for (let k = 0; k < nbc[i]; k++) {
-        const j = nb[o + k]
-        const ddx = x[j] - x[i],
-          ddy = y[j] - y[i],
-          r2 = ddx * ddx + ddy * ddy
-        if (r2 >= 1) continue
-        const a = 1 - Math.sqrt(r2),
+      {
+        const i = pI[p],
+          j = pJ[p]
+        const a = 1 - pQ[p],
           w = a * a
         const dvx = vx[j] - vx[i],
           dvy = vy[j] - vy[i]
