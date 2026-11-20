@@ -75,6 +75,12 @@ let taken = new Uint8Array(0)
 const left = { v: new Int32Array(0) }
 let stepN = 0,
   still = 0
+let fieldW = 0,
+  fieldH = 0
+// light steps: each drop's own mean velocity, carried outside the physics step (see `carry`)
+let mvx = new Float32Array(0),
+  mvy = new Float32Array(0),
+  mn = new Float32Array(0)
 const ptr = { x: -99, y: -99, vx: 0, vy: 0, on: false, hit: 0 }
 let acc = 0,
   tPrev = 0,
@@ -117,6 +123,8 @@ function init(d: DropsInit) {
   Object.assign(sim.P, { pull: 0, anchor: 0, self: 0, cursorPull: 0, life: 0.0003 })
   if (light) goLight()
   used = pts.length
+  fieldW = d.width
+  fieldH = d.height
   G = d.share.length
   const N = sim.N
   for (let i = 0; i < N; i++) {
@@ -139,6 +147,9 @@ function init(d: DropsInit) {
   for (let i = 0; i < used; i++) group[i] = 0
   tx = new Float32Array(G).fill(d.start.x)
   ty = new Float32Array(G).fill(d.start.y)
+  mvx = new Float32Array(G)
+  mvy = new Float32Array(G)
+  mn = new Float32Array(G)
   cx = new Float32Array(G)
   cy = new Float32Array(G)
   cvx = new Float32Array(G)
@@ -179,6 +190,48 @@ function regroup() {
     taken[i] = 1
     left.v[g]--
     group[i] = g
+  }
+}
+
+// A light step covers up to MAX_D base steps, and the physics lets a particle move at most 0.6 radii a
+// step (more splashes it apart). On a device managing ~8 steps a second that capped every drop at a
+// crawl: slow motion, worse the bigger the step (owner's iPad and iPhone, 2026-11-20). So each drop's
+// mean velocity is taken out before the step and carried here, uncapped: the drop travels at full
+// speed as a whole, and only the particles' motion within it is held to the cap.
+function carry(d: number) {
+  if (!sim) return
+  mvx.fill(0)
+  mvy.fill(0)
+  mn.fill(0)
+  for (let i = 0; i < used; i++) {
+    const g = group[i]
+    if (g < 0) continue
+    mvx[g] += sim.vx[i]
+    mvy[g] += sim.vy[i]
+    mn[g]++
+  }
+  for (let g = 0; g < G; g++)
+    if (mn[g]) {
+      mvx[g] /= mn[g]
+      mvy[g] /= mn[g]
+    }
+  for (let i = 0; i < used; i++) {
+    const g = group[i]
+    if (g < 0) continue
+    sim.vx[i] -= mvx[g]
+    sim.vy[i] -= mvy[g]
+  }
+  sim.step(d)
+  const keep = Math.pow(sim.P.drag, d)
+  for (let i = 0; i < used; i++) {
+    const g = group[i]
+    if (g < 0) continue
+    const ux = mvx[g] * keep,
+      uy = mvy[g] * keep
+    sim.vx[i] += ux
+    sim.vy[i] += uy
+    sim.x[i] = Math.min(fieldW - 0.5, Math.max(0.5, sim.x[i] + ux * d))
+    sim.y[i] = Math.min(fieldH - 0.5, Math.max(0.5, sim.y[i] + uy * d))
   }
 }
 
@@ -319,7 +372,7 @@ function tick() {
     if (acc >= 0.5) {
       const d = Math.min(acc, MAX_D)
       steer(d)
-      sim.step(d)
+      carry(d)
       acc -= d
       n = 1
       steps = d
