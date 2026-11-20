@@ -451,11 +451,58 @@
     "shelf": "I don't use templates or off-the-shelf widgets where they shape how a site feels.",
     "vision": "I add my own vision and taste to your idea, to make it the best it can be.",
     "fixed": "Need a proven website at a fixed price? That's what <mark>stronypodhale.pl</mark> is for.",
-    "more": {
-      "alone": "You talk to the one person who draws it, builds it and keeps it running. Nothing gets lost between a designer, a developer and a hosting company, and if something breaks after launch, the person who made it fixes it.",
-      "shelf": "Where a site has to make an impression, its code is written for it: the layout, the motion, the details. So it doesn't look like a thousand other sites, and it loads only what it actually uses.",
-      "vision": "You bring the idea and know your business. I bring the eye: what to cut, what to make bigger, where a visitor should look first. The site stays yours, only sharper than the brief.",
-      "fixed": "It's my studio for local businesses in Podhale: a layout tested on real clients, a price agreed up front, and the same hands behind it."
-    }
+    "roleNames": {
+      "design": "Design",
+      "code": "Code",
+      "server": "Server",
+      "maintenance": "Maintenance",
+      "liquid": "Fluid simulation",
+      "motion": "Animation",
+      "speed": "Performance"
+    },
+    "roleProofs": {
+      "design": "I designed every screen on this site, chose the typeface, and defined the grid and motion.",
+      "code": "I write the code with Claude, review every change, and make the final call on what goes in.",
+      "server": "Your browser received this page’s first byte in {ms} ms on this visit; I set up and maintain the server myself.",
+      "maintenance": "This site was last updated on {date}; the date updates automatically.",
+      "liquid": "I built the green fluid simulation at the top of this page: try moving it with your cursor or finger.",
+      "motion": "I designed and coded every animation on this site.",
+      "speed": "This page fully loaded for you in {s} s, measured in your browser during this visit."
+    },
+    "rolesHint": "Pick a role. See proof.",
+    "relay": {
+      "usual": "Typical project",
+      "mine": "With me",
+      "usualCount": "3 handoffs",
+      "mineCount": "0 handoffs",
+      "people": ["Designer", "Developer", "Host", "Support"]
+    },
+    "ledger": {
+      "own": "Built by me",
+      "engine": "The engine",
+      "note": "Everything on the left was built from scratch for this site. On the right, you’ll find the tools I use to build it.",
+      "map": "On this page",
+      "mapHint": "Pick an item to locate it",
+      "items": {
+        "liquid": ["Fluid", "At the top: drag or touch."],
+        "cursor": ["Cursor", "Move it around; watch it change."],
+        "menu": ["Menu", "Top right: open it, watch it fill."],
+        "r2o": ["ready2order scene", "Watch droplets, receipt printing, bundle map."],
+        "plugin": ["Payload plugin · open source", "Previous scene: compare the photo crops."]
+      }
+    },
+    "case": {
+      "text": "Maciek Piczura came to me with his modeling photos and wanted a portfolio that would stand out. I handled the creative direction, building distinct scenes to showcase his different roles and shoots.",
+      "before": "Client photos",
+      "after": "Finished site",
+      "link": "Visit piczura.com",
+      "scenes": ["Runways", "Verdi Gala", "City", "Deer"]
+    },
+    "end": {
+      "alone": "The server responded in {ms} ms for you.",
+      "shelf": "Liquid, cursor, menu: built from scratch.",
+      "vision": "piczura.com — see where I took Maciek’s photos."
+    },
+    "door": "Visit the site"
   }
 }

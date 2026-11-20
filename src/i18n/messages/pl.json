@@ -447,11 +447,58 @@
     "shelf": "Nie używam szablonów ani cudzych widgetów tam, gdzie decydują o wrażeniu.",
     "vision": "Do Twojego pomysłu dokładam własną wizję i wyczucie, żeby wyszedł jak najlepiej.",
     "fixed": "Potrzebujesz sprawdzonej strony w stałej cenie? Od tego jest <mark>stronypodhale.pl</mark>.",
-    "more": {
-      "alone": "Rozmawiasz z jedną osobą, która stronę rysuje, buduje i utrzymuje. Nic nie ginie między grafikiem, programistą a firmą hostingową, a jeśli coś się zepsuje po starcie, naprawia to ten, kto to zrobił.",
-      "shelf": "Tam, gdzie strona ma zrobić wrażenie, kod powstaje dla niej: układ, ruch, szczegóły. Dlatego nie wygląda jak tysiąc innych stron i ładuje tylko to, czego naprawdę używa.",
-      "vision": "Ty przynosisz pomysł i znasz swoją branżę. Ja dokładam oko: co wyciąć, co powiększyć, gdzie gość ma spojrzeć najpierw. Strona zostaje Twoja, tylko wyraźniejsza niż brief.",
-      "fixed": "To moje studio dla lokalnych firm z Podhala: układ sprawdzony na prawdziwych klientach, cena ustalona z góry i te same ręce za wszystkim."
-    }
+    "roleNames": {
+      "design": "Projekt",
+      "code": "Kod",
+      "server": "Serwer",
+      "maintenance": "Utrzymanie",
+      "liquid": "Fizyka cieczy",
+      "motion": "Animacja",
+      "speed": "Wydajność"
+    },
+    "roleProofs": {
+      "design": "Każdy ekran tej strony zaprojektowałem sam: wybrałem krój pisma, ułożyłem siatkę i zaplanowałem ruch.",
+      "code": "Kod piszę z Claude, a każdą zmianę sprawdzam i sam decyduję, czy ją przyjąć.",
+      "server": "Tyle czekała Twoja przeglądarka na pierwszy bajt tej strony przy tym wejściu; serwer stawiam i utrzymuję sam.",
+      "maintenance": "Ostatnia zmiana na tej stronie: {date}; data aktualizuje się automatycznie.",
+      "liquid": "Zielona ciecz na górze strony to moja symulacja: możesz ją poruszyć kursorem albo palcem.",
+      "motion": "Każdy ruch na tej stronie sam zaprojektowałem i napisałem.",
+      "speed": "Tyle zajęło pełne załadowanie tej strony u Ciebie, według pomiaru z Twojej przeglądarki."
+    },
+    "rolesHint": "Wybierz rolę. Zobacz dowód.",
+    "relay": {
+      "usual": "Zwykle",
+      "mine": "U mnie",
+      "usualCount": "3 przekazania",
+      "mineCount": "0 przekazań",
+      "people": ["Projektant", "Programista", "Hosting", "Serwis"]
+    },
+    "ledger": {
+      "own": "Mój kod",
+      "engine": "Silnik",
+      "note": "To, co widzisz po lewej, powstało od zera dla tej strony. Po prawej znajdziesz narzędzia, z których korzystam przy jej budowie.",
+      "map": "Na tej stronie",
+      "mapHint": "Wskaż element z listy",
+      "items": {
+        "liquid": ["Ciecz", "Na samej górze: porusz kursorem lub palcem."],
+        "cursor": ["Kursor", "Porusz nim, sprawdź, jak zmienia kształt."],
+        "menu": ["Menu", "Prawy górny róg: otwórz, zobacz ciecz."],
+        "r2o": ["Scena ready2order", "Zobacz krople, wydruk paragonu, mapę kodu."],
+        "plugin": ["Plugin do Payload · open source", "Poprzednia scena: porównaj kadry zdjęć."]
+      }
+    },
+    "case": {
+      "text": "Maciek Piczura przyszedł ze zdjęciami i potrzebą widowiskowego portfolio modela. Wziąłem na siebie całą wizję: zamiast albumu powstała strona z osobnymi scenami pokazującymi jego role i sesje.",
+      "before": "Zdjęcia od klienta",
+      "after": "Gotowa strona",
+      "link": "Zobacz piczura.com",
+      "scenes": ["Wybiegi", "Verdi Gala", "Miasto", "Jelenie"]
+    },
+    "end": {
+      "alone": "Serwer odpowiedział Ci w {ms} ms.",
+      "shelf": "Ciecz, kursor i menu powstały od zera.",
+      "vision": "piczura.com — zobacz, co zrobiłem ze zdjęć Maćka."
+    },
+    "door": "Zobacz stronę"
   }
 }
