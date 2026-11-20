@@ -21,10 +21,10 @@
     "contact": "Kontakt",
     "cv": "CV",
     "menu": "Menu",
-    "close": "Close",
-    "elsewhere": "Elsewhere",
-    "in_progress": "in progress",
-    "here": "here"
+    "close": "Zamknij",
+    "elsewhere": "Moje strony",
+    "in_progress": "powstaje",
+    "here": "tutaj"
   },
   "HomePage": {
     "title": "Sebastian Kolbusz",
@@ -45,42 +45,42 @@
     "cta": "Zobacz moje projekty"
   },
   "liquidHero": {
-    "role": "I design and build websites and web apps.",
+    "role": "Frontend developer i projektant",
     "lines": {
-      "shelf": "Nothing off the shelf.",
-      "apart": "I take things apart.",
-      "together": "I put them back together myself."
+      "shelf": "Nie używam gotowców.",
+      "apart": "Rozbieram rzeczy na części.",
+      "together": "Sam składam wszystko z powrotem."
     },
     "cta": "Zobacz moje projekty",
-    "tilt": "TILT"
+    "tilt": "PRZECHYL"
   },
   "signature": {
     "lines": {
       "first": "Strony dla firm z Podhala.",
-      "second": "The design and the price before you pay."
+      "second": "Projekt i cenę poznasz przed zapłatą."
     },
     "link": "Zobacz stronę",
     "alt": "Strona główna stronypodhale.pl z podglądem realizacji piczura.com",
     "pins": {
       "rosette": {
         "title": "16 px",
-        "note": "The parzenica rosette still reads at this size. The name is an address you can say over the phone."
+        "note": "Rozeta z parzenicy jest czytelna nawet w ikonce karty. Adres łatwo podyktować przez telefon."
       },
       "price": {
         "title": "369 zł",
-        "note": "to start, then 85 zł a month, or 1835 zł to own it outright. Every price is on the site."
+        "note": "na początek i 85 zł miesięcznie. Albo 1835 zł jednorazowo i strona jest Twoja. Ceny są na stronie."
       },
       "upfront": {
         "title": "z góry",
-        "note": "Upfront, and from the mountains: you see the design and the price before you pay."
+        "note": "Pracuję na Podhalu. Najpierw oglądasz projekt i sprawdzasz cenę, potem decydujesz."
       },
       "piczura": {
         "title": "piczura.com",
-        "note": "A model's portfolio built with no template, every animation on it written from scratch."
+        "note": "Portfolio modela. Bez szablonu, wszystkie animacje napisałem od zera."
       },
       "free": {
         "title": "0 zł",
-        "note": "if the design is not for you. You pay only once you approve it."
+        "note": "jeśli projekt Ci się nie spodoba. Płacisz dopiero po akceptacji."
       }
     }
   },
@@ -337,108 +337,108 @@
     "returnHome": "Powrót do strony głównej"
   },
   "navFacts": {
-    "hero": "Liquid on paper, simulated live in your browser.",
-    "work": "My web studio: websites for businesses in Podhale, with the design and the price agreed up front.",
-    "aspect-preview": "My open-source Payload plugin: crop once, see every layout. Try it here.",
-    "ready2order": "Cut a POS platform’s production bundle in half: four small changes that added up.",
-    "about": "Frontend engineer and designer in Zakopane. Building websites since 2016.",
-    "projects": "Cut a POS platform’s production bundle in half at ready2order.",
-    "services": "Design, code, server and upkeep, in one pair of hands.",
-    "calculator": "A rebuilt Creality K1. I print on request.",
-    "contact": "Zakopane, Poland. Working remotely."
+    "hero": "Zielona ciecz u góry strony to symulacja liczona na żywo w przeglądarce.",
+    "work": "Prowadzę stronypodhale.pl, gdzie firmy z Podhala widzą projekt i cenę, zanim zapłacą.",
+    "aspect-preview": "Wypróbuj mój plugin open source do Payloada: kadrujesz raz, od razu widzisz wszystkie układy.",
+    "ready2order": "Wprowadziłem cztery drobne zmiany i bundle przy pierwszym ładowaniu był o połowę mniejszy.",
+    "about": "Jestem frontend developerem i projektantem z Zakopanego, a strony robię od 2016 roku.",
+    "projects": "W ready2order ograniczyłem o połowę ilość kodu pobieranego przed pierwszym ekranem.",
+    "services": "Sam zajmuję się projektem, kodem, serwerem i utrzymaniem strony.",
+    "calculator": "Przebudowałem drukarkę Creality K1 i drukuję na zamówienie.",
+    "contact": "Pracuję zdalnie z Zakopanego."
   },
   "aspectDemo": {
     "label": "aspect-preview · open source · Payload CMS",
-    "question": "Where will each layout cut this photo?",
-    "how": "Drag the point, draw a crop, and every ratio follows. Shaded bands mark where a site puts text over the photo. This is the plugin itself, running here without Payload.",
-    "alt": "The photo being edited",
-    "another": "Another photo",
-    "own": "Your own photo",
-    "stays": "It stays in your browser."
+    "question": "Jak to zdjęcie wypadnie w różnych układach?",
+    "how": "Przesuń punkt ostrości lub narysuj kadr, a pozostałe kadry dopasują się same. Zacienione pasy wskazują miejsce na tekst. Tu działa mój plugin bez Payloada.",
+    "alt": "Zdjęcie do kadrowania",
+    "another": "Inne zdjęcie",
+    "own": "Wgraj zdjęcie",
+    "stays": "Zdjęcie zostaje w przeglądarce."
   },
   "ready2order": {
-    "label": "Front end · 2019–2025",
-    "question": "Why did a till app take so long to start on a shop’s tablet?",
-    "who": "The till system of 10,000+ cafés, shops and salons in Austria and Germany.",
+    "label": "Frontend · 2019–2025",
+    "question": "Dlaczego aplikacja POS tak długo się uruchamiała?",
+    "who": "To system POS dla ponad 10 000 kawiarni, sklepów i salonów w Austrii i Niemczech.",
     "site": "ready2order.com",
     "steps": {
       "one": {
-        "title": "One heavy download",
-        "text": "Every tablet loaded the whole app before it showed the first screen.",
-        "short": "Whole"
+        "title": "Jeden ciężki plik",
+        "text": "Przy pierwszym ładowaniu aplikacja pobierała cały bundle, zanim pojawił się pierwszy ekran.",
+        "short": "Całość"
       },
       "apart": {
-        "title": "Taken apart",
-        "text": "Four parts. Only one of them had to be there at the start.",
-        "short": "Apart"
+        "title": "Cztery części",
+        "text": "Rozłożyłem bundle na cztery części. Przy pierwszym ładowaniu potrzebna była tylko jedna.",
+        "short": "Podział"
       },
       "fates": {
-        "title": "Slimmed, split off, thrown out",
-        "text": "Webpack config rewritten · screens split off · Redux out, Apollo already cached the data · dependencies updated.",
-        "short": "Fates"
+        "title": "Cztery zmiany w kodzie",
+        "text": "Przepisałem konfigurację Webpacka · wydzieliłem ekrany · usunąłem Reduxa, bo dane były w cache Apollo · zaktualizowałem zależności",
+        "short": "Zmiany"
       },
       "half": {
-        "title": "Half the size",
-        "text": "Four changes that added up.",
-        "short": "Half"
+        "title": "O połowę mniej",
+        "text": "Po czterech zmianach bundle przy pierwszym ładowaniu był o połowę mniejszy.",
+        "short": "Połowa"
       }
     },
     "map": {
-      "whole": "the production bundle · everything a tablet loads before the first screen",
-      "apart": "the production bundle · taken apart",
-      "fates": "the production bundle · what happened to each part",
-      "before": "before",
-      "after": "after",
-      "illustrative": "illustrative · not to scale",
-      "metric": "JavaScript loaded at start · production build"
+      "whole": "cały bundle · kod pobierany przed pierwszym ekranem",
+      "apart": "bundle · podział na cztery części",
+      "fates": "bundle · co zrobiłem z każdą częścią",
+      "before": "przed",
+      "after": "po",
+      "illustrative": "mapa poglądowa · nie w skali",
+      "metric": "rozmiar bundla przy pierwszym ładowaniu"
     },
     "parts": {
       "app": {
-        "name": "The app’s own code",
-        "fate": "stays · dead code out"
+        "name": "własny kod aplikacji",
+        "fate": "został · wyciąłem martwy kod"
       },
       "deps": {
-        "name": "Dependencies",
-        "fate": "updated · smaller"
+        "name": "zależności",
+        "fate": "zaktualizowałem"
       },
       "screens": {
-        "name": "Screens not needed at start",
+        "name": "ekrany poza pierwszym ładowaniem",
         "fate": ""
       },
       "redux": {
-        "name": "Redux: store, reducers, actions",
-        "fate": "thrown out · Apollo already cached the data"
+        "name": "Redux · store, reducery, akcje",
+        "fate": "usunąłem · dane były już w cache Apollo"
       },
       "dead": {
-        "name": "dead code, scattered through both",
+        "name": "martwy kod aplikacji i bibliotek",
         "fate": ""
       },
       "shelf": {
-        "name": "Screens",
-        "fate": "split off · each loads when it is opened"
+        "name": "ekrany",
+        "fate": "wydzieliłem · każdy ładuje się po otwarciu"
       }
     },
     "result": "−50%",
-    "door": "The whole story",
+    "door": "Cała historia",
     "logo": "ready2order",
-    "stepsLabel": "The story in four steps",
+    "stepsLabel": "Cztery kroki optymalizacji",
     "receipt": {
       "head": "ready2order",
-      "sub": "production build · JavaScript at start",
-      "all": "Everything, before the first screen",
-      "app": "App’s own code",
-      "deps": "Dependencies",
-      "screens": "Screens",
+      "sub": "rozmiar bundla · pierwsze ładowanie",
+      "all": "Cały bundle",
+      "app": "Własny kod",
+      "deps": "Zależności",
+      "screens": "Ekrany",
       "redux": "Redux",
-      "webpack": "Webpack config",
-      "kept": "kept",
-      "updated": "updated",
-      "later": "later",
-      "removed": "removed",
-      "rewritten": "rewritten",
-      "total": "JS at start",
+      "webpack": "Konfiguracja Webpacka",
+      "kept": "został",
+      "updated": "odświeżone",
+      "later": "po otwarciu",
+      "removed": "usunięty",
+      "rewritten": "przepisana",
+      "total": "Bundle: pierwsze ładowanie",
       "thanks": "Danke!",
-      "show": "The whole receipt"
+      "show": "Pokaż paragon"
     }
   },
   "howIWork": {

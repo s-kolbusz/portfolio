@@ -344,9 +344,9 @@
     "hero": "Liquid on paper, simulated live in your browser.",
     "work": "My web studio: websites for businesses in Podhale, with the design and the price agreed up front.",
     "aspect-preview": "My open-source Payload plugin: crop once, see every layout. Try it here.",
-    "ready2order": "Cut a POS platform’s production bundle in half: four small changes that added up.",
+    "ready2order": "Cut the POS app’s bundle size in half on first load with four small changes.",
     "about": "Frontend engineer and designer in Zakopane. Building websites since 2016.",
-    "projects": "Cut a POS platform’s production bundle in half at ready2order.",
+    "projects": "Cut the POS app’s bundle size in half on first load at ready2order.",
     "services": "Design, code, server and upkeep, in one pair of hands.",
     "calculator": "A rebuilt Creality K1. I print on request.",
     "contact": "Zakopane, Poland. Working remotely."
@@ -362,13 +362,13 @@
   },
   "ready2order": {
     "label": "Front end · 2019–2025",
-    "question": "Why did a till app take so long to start on a shop’s tablet?",
-    "who": "The till system of 10,000+ cafés, shops and salons in Austria and Germany.",
+    "question": "Why did the POS app take so long to start?",
+    "who": "A POS system used by 10,000+ cafés, shops and salons in Austria and Germany.",
     "site": "ready2order.com",
     "steps": {
       "one": {
         "title": "One heavy download",
-        "text": "Every tablet loaded the whole app before it showed the first screen.",
+        "text": "On first load, the app downloaded the entire bundle before showing the first screen.",
         "short": "Whole"
       },
       "apart": {
@@ -388,13 +388,13 @@
       }
     },
     "map": {
-      "whole": "the production bundle · everything a tablet loads before the first screen",
+      "whole": "the production bundle · everything loaded before the first screen",
       "apart": "the production bundle · taken apart",
       "fates": "the production bundle · what happened to each part",
       "before": "before",
       "after": "after",
       "illustrative": "illustrative · not to scale",
-      "metric": "JavaScript loaded at start · production build"
+      "metric": "bundle size on first load · production build"
     },
     "parts": {
       "app": {
@@ -403,10 +403,10 @@
       },
       "deps": {
         "name": "Dependencies",
-        "fate": "updated · smaller"
+        "fate": "updated"
       },
       "screens": {
-        "name": "Screens not needed at start",
+        "name": "Screens not needed on first load",
         "fate": ""
       },
       "redux": {
@@ -428,7 +428,7 @@
     "stepsLabel": "The story in four steps",
     "receipt": {
       "head": "ready2order",
-      "sub": "production build · JavaScript at start",
+      "sub": "first-load bundle · production build",
       "all": "Everything, before the first screen",
       "app": "App’s own code",
       "deps": "Dependencies",
@@ -440,7 +440,7 @@
       "later": "later",
       "removed": "removed",
       "rewritten": "rewritten",
-      "total": "JS at start",
+      "total": "Bundle size on first load",
       "thanks": "Danke!",
       "show": "The whole receipt"
     }
