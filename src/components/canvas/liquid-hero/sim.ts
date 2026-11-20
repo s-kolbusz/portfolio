@@ -143,13 +143,16 @@ export function createSim({
   const GW = Math.ceil(width) + 4,
     GH = Math.ceil(height) + 4
   const head = new Int32Array(GW * GH),
-    next = new Int32Array(N)
+    next = new Int32Array(N),
+    cellOf = new Int32Array(N)
   function rebuild() {
     head.fill(-1)
     for (let i = 0; i < N; i++) {
       const cx = Math.min(GW - 1, Math.max(0, Math.floor(x[i]) + 2))
       const cy = Math.min(GH - 1, Math.max(0, Math.floor(y[i]) + 2))
-      const c = cy * GW + cx
+      // (| 0: a particle that is not a number lands in the first cell instead of breaking the lists)
+      const c = (cy * GW + cx) | 0
+      cellOf[i] = c
       next[i] = head[c]
       head[c] = i
     }
@@ -173,70 +176,85 @@ export function createSim({
     }
   }
 
-  // neighbour list (indices), built once after moving; distances computed on the fly. Each pair is
-  // listed once, under one of its two particles: the rest of its own cell after it, plus four of the
-  // eight cells around (right, and the three above), so every pair is met exactly once without
-  // walking all nine cells (2026-11-20: the iPad spent 75 ms a step, a third of it here)
+  // The pairs that touch (closer than one radius), found once a step, right after moving, with their
+  // distance and direction: relaxation walks only these, and viscosity and smoothing reuse the distance
+  // instead of measuring every pair again. Each pair is met once, under one of its two particles: the
+  // rest of its own cell after it, plus four of the eight cells around (right, and the three above).
+  // A particle's pairs lie next to each other (pS[i] … pS[i + 1]), so every pass over the pairs keeps
+  // that particle's own numbers in hand instead of reading and writing them for each pair, and the
+  // search adds up the densities as it goes (2026-11-20: the iPad spent 75–143 ms a step, nearly all
+  // of it in these passes)
   const MAXN = 48
-  const nb = new Int32Array(N * MAXN),
-    nbc = new Int32Array(N)
-  const FWD = [
-    [1, 0],
-    [-1, 1],
-    [0, 1],
-    [1, 1],
-  ]
-  // the pairs that touch (closer than one radius), found in the density pass with their distance and
-  // direction: relaxation walks only these, and viscosity and smoothing reuse the distance instead of
-  // measuring every pair again
-  const pI = new Int32Array(N * MAXN),
+  const pS = new Int32Array(N + 1),
     pJ = new Int32Array(N * MAXN),
     pQ = new Float32Array(N * MAXN),
     pUX = new Float32Array(N * MAXN),
     pUY = new Float32Array(N * MAXN)
-  let NP = 0
-  function buildNeighbors() {
+  // the four cells ahead: the one to the right, then the row above from left to right
+  const FWD = [1, GW - 1, GW, GW + 1]
+  const CELLS = GW * GH
+  function findPairs(dirs: boolean) {
     rebuild()
+    rhoA.fill(0)
+    rhoNA.fill(0)
+    let np = 0
     for (let i = 0; i < N; i++) {
-      let c = 0
-      const o = i * MAXN
+      pS[i] = np
       const xi = x[i],
-        yi = y[i]
-      for (let j = next[i]; j !== -1 && c < MAXN; j = next[j]) {
-        const ddx = x[j] - xi,
-          ddy = y[j] - yi
-        if (ddx * ddx + ddy * ddy < 1.21) nb[o + c++] = j // headroom for movement during the step
-      }
-      const cx = Math.min(GW - 1, Math.max(0, Math.floor(xi) + 2)),
-        cy = Math.min(GH - 1, Math.max(0, Math.floor(yi) + 2))
-      for (let f = 0; f < 4 && c < MAXN; f++) {
-        const gx = cx + FWD[f][0],
-          gy = cy + FWD[f][1]
-        if (gx < 0 || gx >= GW || gy >= GH) continue
-        for (let j = head[gy * GW + gx]; j !== -1 && c < MAXN; j = next[j]) {
+        yi = y[i],
+        ci = cellOf[i],
+        end = np + MAXN
+      let ri = rhoA[i],
+        rni = rhoNA[i]
+      // the cells sit two in from every edge of the grid, so a cell ahead is never across an edge
+      for (let f = -1; f < 4 && np < end; f++) {
+        let j
+        if (f < 0) j = next[i]
+        else {
+          const c = ci + FWD[f]
+          if (c >= CELLS) break
+          j = head[c]
+        }
+        for (; j !== -1 && np < end; j = next[j]) {
           const ddx = x[j] - xi,
-            ddy = y[j] - yi
-          if (ddx * ddx + ddy * ddy < 1.21) nb[o + c++] = j
+            ddy = y[j] - yi,
+            r2 = ddx * ddx + ddy * ddy
+          if (r2 >= 1) continue
+          const q = Math.sqrt(r2),
+            a = 1 - q,
+            a2 = a * a,
+            a3 = a2 * a
+          ri += a2
+          rni += a3
+          rhoA[j] += a2
+          rhoNA[j] += a3
+          if (r2 < 1e-12) continue
+          pJ[np] = j
+          pQ[np] = q
+          if (dirs) {
+            pUX[np] = ddx / q
+            pUY[np] = ddy / q
+          }
+          np++
         }
       }
-      nbc[i] = c
+      rhoA[i] = ri
+      rhoNA[i] = rni
     }
+    pS[N] = np
   }
 
   // clusters: union-find, computed every few steps (without the rebel)
   const parent = new Int32Array(N),
-    label = new Int32Array(N)
+    label = new Int32Array(N),
+    sizeOf = new Int32Array(N),
+    roots = new Int32Array(N)
   const find = (a: number) => {
     while (parent[a] !== a) {
       parent[a] = parent[parent[a]]
       a = parent[a]
     }
     return a
-  }
-  const unite = (a: number, b: number) => {
-    a = find(a)
-    b = find(b)
-    if (a !== b) parent[a] = b
   }
   const state: SimState = {
     mainMass: N - rebelN,
@@ -391,13 +409,15 @@ export function createSim({
         ax += ((center.x - state.mainX) * P.anchor - state.mainVX * ad) * free
         ay += ((center.y - state.mainY) * P.anchor - state.mainVY * ad) * free
         // the body's own weight: stretched parts pull back towards the centre of mass
-        const ox = x[i] - state.mainX,
-          oy = y[i] - state.mainY,
-          od = Math.hypot(ox, oy)
-        if (od > restR * 0.45) {
-          const g = (P.self * free * (od - restR * 0.45)) / od
-          ax -= ox * g
-          ay -= oy * g
+        if (P.self !== 0) {
+          const ox = x[i] - state.mainX,
+            oy = y[i] - state.mainY,
+            od = Math.hypot(ox, oy)
+          if (od > restR * 0.45) {
+            const g = (P.self * free * (od - restR * 0.45)) / od
+            ax -= ox * g
+            ay -= oy * g
+          }
         }
         // life: smooth, large swirls inside the body
         const s = P.life
@@ -405,20 +425,24 @@ export function createSim({
         ay += s * Math.cos(x[i] * 0.14 - t * 0.009) * Math.sin(y[i] * 0.12 + t * 0.007)
       } else {
         // a torn-off drop: the body pulls it, the weaker the less of it is left; stronger up close (merging)
-        const ddx = state.mainX - x[i],
-          ddy = state.mainY - y[i]
-        const d = Math.max(Math.hypot(ddx, ddy), 3)
-        const g = (P.pull * M * 6) / Math.sqrt(d)
-        ax += (ddx / d) * g
-        ay += (ddy / d) * g
+        if (P.pull !== 0) {
+          const ddx = state.mainX - x[i],
+            ddy = state.mainY - y[i]
+          const d = Math.max(Math.hypot(ddx, ddy), 3)
+          const g = (P.pull * M * 6) / Math.sqrt(d)
+          ax += (ddx / d) * g
+          ay += (ddy / d) * g
+        }
         // the rebel pulls it gently too
-        const bx = rebelState.x - x[i],
-          by = rebelState.y - y[i],
-          bd = Math.hypot(bx, by)
-        if (bd < 16 && bd > 2) {
-          const s = (P.cursorPull * (rebelState.mass / 100)) / bd
-          ax += bx * s
-          ay += by * s
+        if (P.cursorPull !== 0) {
+          const bx = rebelState.x - x[i],
+            by = rebelState.y - y[i],
+            bd = Math.hypot(bx, by)
+          if (bd < 16 && bd > 2) {
+            const s = (P.cursorPull * (rebelState.mass / 100)) / bd
+            ax += bx * s
+            ay += by * s
+          }
         }
       }
 
@@ -475,148 +499,176 @@ export function createSim({
       grip[i] = clicked ? 0 : Math.min(1, grip[i] + dt / (STEPS_PER_SECOND * fragTime[i]))
 
     // viscosity, on the touching pairs of the last step (they have barely moved since)
-    for (let p = 0; p < (P.light ? 0 : NP); p++) {
-      // light mode: no separate viscosity
-      const i = pI[p],
-        j = pJ[p],
-        ux = pUX[p],
-        uy = pUY[p]
-      const u = (vx[i] - vx[j]) * ux + (vy[i] - vy[j]) * uy
-      if (u > 0) {
-        const I = (1 - pQ[p]) * (P.sigma * u + P.beta * u * u) * 0.5 * dt
-        vx[i] -= I * ux
-        vy[i] -= I * uy
-        vx[j] += I * ux
-        vy[j] += I * uy
+    // light mode: no separate viscosity
+    if (!P.light) {
+      const sig = P.sigma * 0.5 * dt,
+        bet = P.beta * 0.5 * dt
+      for (let i = 0; i < N; i++) {
+        const e = pS[i + 1]
+        let p = pS[i]
+        if (p === e) continue
+        let vxi = vx[i],
+          vyi = vy[i]
+        for (; p < e; p++) {
+          const j = pJ[p],
+            ux = pUX[p],
+            uy = pUY[p]
+          const u = (vxi - vx[j]) * ux + (vyi - vy[j]) * uy
+          if (u > 0) {
+            // never more than stops the pair's approach: with a big step (ready2order's light steps
+            // reach 30) a bigger impulse turned the approach around, grew from pair to pair and ended
+            // in numbers that are not numbers (2026-11-20). A base step never comes near this limit.
+            const I = Math.min((1 - pQ[p]) * (sig * u + bet * u * u), 0.5 * u)
+            vxi -= I * ux
+            vyi -= I * uy
+            vx[j] += I * ux
+            vy[j] += I * uy
+          }
+        }
+        vx[i] = vxi
+        vy[i] = vyi
       }
     }
     // move
+    // one move may not jump more than P.maxMove radii: with a big step (light mode) the liquid does not splash apart
+    const vmax = Math.min(0.6, (P.maxMove ?? 0.6) / dt),
+      vmax2 = vmax * vmax,
+      xMax = width - 0.5,
+      yMax = height - 0.5
     for (let i = 0; i < N; i++) {
-      px[i] = x[i]
-      py[i] = y[i]
-      // one move may not jump more than P.maxMove radii: with a big step (light mode) the liquid does not splash apart
-      const vmax = Math.min(0.6, (P.maxMove ?? 0.6) / dt)
-      const s = Math.hypot(vx[i], vy[i])
-      if (s > vmax) {
-        vx[i] *= vmax / s
-        vy[i] *= vmax / s
+      let xi = x[i],
+        yi = y[i],
+        vxi = vx[i],
+        vyi = vy[i]
+      px[i] = xi
+      py[i] = yi
+      const s2 = vxi * vxi + vyi * vyi
+      if (s2 > vmax2) {
+        const m = vmax / Math.sqrt(s2)
+        vx[i] = vxi *= m
+        vy[i] = vyi *= m
       }
-      x[i] += vx[i] * dt
-      y[i] += vy[i] * dt
-      if (x[i] < 0.5) x[i] = 0.5
-      else if (x[i] > width - 0.5) x[i] = width - 0.5
-      if (y[i] < 0.5) y[i] = 0.5
-      else if (y[i] > height - 0.5) y[i] = height - 0.5
+      xi += vxi * dt
+      yi += vyi * dt
+      x[i] = xi < 0.5 ? 0.5 : xi > xMax ? xMax : xi
+      y[i] = yi < 0.5 ? 0.5 : yi > yMax ? yMax : yi
     }
-    buildNeighbors()
-    // double density relaxation: densities first (pairs), then displacements (pairs)
+    // the touching pairs and the densities, then double density relaxation: displacements (pairs)
+    findPairs(!P.light)
     const doClusters = Math.floor(t / 6) !== Math.floor((t - dt) / 6)
     if (doClusters) for (let i = 0; i < N; i++) parent[i] = i
-    rhoA.fill(0)
-    rhoNA.fill(0)
-    NP = 0
-    for (let i = 0; i < N; i++) {
-      const o = i * MAXN
-      for (let k = 0; k < nbc[i]; k++) {
-        const j = nb[o + k]
-        const ddx = x[j] - x[i],
-          ddy = y[j] - y[i],
-          r2 = ddx * ddx + ddy * ddy
-        if (r2 >= 1) continue
-        const q = Math.sqrt(r2),
-          a = 1 - q,
-          a2 = a * a,
-          a3 = a2 * a
-        rhoA[i] += a2
-        rhoA[j] += a2
-        rhoNA[i] += a3
-        rhoNA[j] += a3
-        if (r2 < 1e-12) continue
-        pI[NP] = i
-        pJ[NP] = j
-        pQ[NP] = q
-        pUX[NP] = ddx / q
-        pUY[NP++] = ddy / q
-      }
-    }
     // while spreading the liquid wants a looser packing, so it pushes itself out evenly in all directions (up to ~3× the area)
-    const rho0 = P.rho0 * (1 - 0.7 * (P.spread || 0))
+    // relaxation: stronger with a bigger step (P.relaxPow), so cohesion per second stays similar
+    const rho0 = P.rho0 * (1 - 0.7 * (P.spread || 0)),
+      half = 0.25 * relaxDt
     for (let i = 0; i < N; i++) {
-      pA[i] = P.k * (rhoA[i] - (rebel[i] ? P.rho0 : rho0))
-      pNA[i] = P.kNear * rhoNA[i]
+      pA[i] = P.k * (rhoA[i] - (rebel[i] ? P.rho0 : rho0)) * half
+      pNA[i] = P.kNear * rhoNA[i] * half
     }
-    for (let p = 0; p < NP; p++) {
-      {
-        const i = pI[p],
-          j = pJ[p]
-        const ddx = x[j] - x[i],
-          ddy = y[j] - y[i],
+    for (let i = 0; i < N; i++) {
+      const e = pS[i + 1]
+      let p = pS[i]
+      if (p === e) continue
+      const pai = pA[i],
+        pni = pNA[i],
+        ri = rebel[i]
+      let xi = x[i],
+        yi = y[i]
+      for (; p < e; p++) {
+        const j = pJ[p]
+        const ddx = x[j] - xi,
+          ddy = y[j] - yi,
           r2 = ddx * ddx + ddy * ddy
         if (r2 >= 1 || r2 < 1e-12) continue
         const q = Math.sqrt(r2),
           a = 1 - q
-        // relaxation: stronger with a bigger step (P.relaxPow), so cohesion per second stays similar
-        let D = ((pA[i] + pA[j]) * 0.5 * a + (pNA[i] + pNA[j]) * 0.5 * a * a) * 0.5 * relaxDt
-        // the rebel pushes and drags, but never sticks to the body for good
-        if (rebel[i] !== rebel[j] && D < 0) D *= 0.08
-        const ux = (ddx / q) * D,
-          uy = (ddy / q) * D
+        let D = ((pai + pA[j]) * a + (pni + pNA[j]) * a * a) / q
+        if (ri !== rebel[j]) {
+          // the rebel pushes and drags, but never sticks to the body for good
+          if (D < 0) D *= 0.08
+        } else if (doClusters && q < 0.85) {
+          let ra = i,
+            rb = j
+          while (parent[ra] !== ra) ra = parent[ra] = parent[parent[ra]]
+          while (parent[rb] !== rb) rb = parent[rb] = parent[parent[rb]]
+          if (ra !== rb) parent[ra] = rb
+        }
+        const ux = ddx * D,
+          uy = ddy * D
         x[j] += ux
         y[j] += uy
-        x[i] -= ux
-        y[i] -= uy
-        if (doClusters && q < 0.85 && rebel[i] === rebel[j]) unite(i, j)
+        xi -= ux
+        yi -= uy
       }
+      x[i] = xi
+      y[i] = yi
     }
     // velocity from displacement + XSPH smoothing
+    const idt = 1 / dt
     for (let i = 0; i < N; i++) {
-      vx[i] = (x[i] - px[i]) / dt
-      vy[i] = (y[i] - py[i]) / dt
-      sx[i] = 0
-      sy[i] = 0
-      wsA[i] = 0
+      vx[i] = (x[i] - px[i]) * idt
+      vy[i] = (y[i] - py[i]) * idt
     }
-    for (let p = 0; p < (P.light ? 0 : NP); p++) {
-      // light mode: no XSPH smoothing
-      {
-        const i = pI[p],
-          j = pJ[p]
-        const a = 1 - pQ[p],
-          w = a * a
-        const dvx = vx[j] - vx[i],
-          dvy = vy[j] - vy[i]
-        sx[i] += dvx * w
-        sy[i] += dvy * w
-        sx[j] -= dvx * w
-        sy[j] -= dvy * w
-        wsA[i] += w
-        wsA[j] += w
+    // light mode: no XSPH smoothing
+    if (!P.light) {
+      sx.fill(0)
+      sy.fill(0)
+      wsA.fill(0)
+      for (let i = 0; i < N; i++) {
+        const e = pS[i + 1]
+        let p = pS[i]
+        if (p === e) continue
+        const vxi = vx[i],
+          vyi = vy[i]
+        let sxi = sx[i],
+          syi = sy[i],
+          wi = wsA[i]
+        for (; p < e; p++) {
+          const j = pJ[p]
+          const a = 1 - pQ[p],
+            w = a * a
+          const dvx = (vx[j] - vxi) * w,
+            dvy = (vy[j] - vyi) * w
+          sxi += dvx
+          syi += dvy
+          wi += w
+          sx[j] -= dvx
+          sy[j] -= dvy
+          wsA[j] += w
+        }
+        sx[i] = sxi
+        sy[i] = syi
+        wsA[i] = wi
       }
+      const k = P.xsph * 4
+      for (let i = 0; i < N; i++)
+        if (wsA[i] > 0) {
+          vx[i] += (sx[i] / wsA[i]) * k
+          vy[i] += (sy[i] / wsA[i]) * k
+        }
     }
-    for (let i = 0; i < N; i++)
-      if (wsA[i] > 0) {
-        vx[i] += (sx[i] / wsA[i]) * P.xsph * 4
-        vy[i] += (sy[i] / wsA[i]) * P.xsph * 4
-      }
 
     if (doClusters) clusters()
   }
 
   function clusters() {
-    const size = new Map<number, number>()
+    // sizes per root, the roots kept in the order they are first met
+    let nr = 0
     for (let i = 0; i < N; i++) {
       if (rebel[i]) continue
       const r = find(i)
       label[i] = r
-      size.set(r, (size.get(r) || 0) + 1)
+      if (sizeOf[r]++ === 0) roots[nr++] = r
     }
     let main = -1,
       mainSize = 0
-    for (const [r, s] of size)
+    for (let k = 0; k < nr; k++) {
+      const s = sizeOf[roots[k]]
       if (s > mainSize) {
-        main = r
+        main = roots[k]
         mainSize = s
       }
+    }
     let mx = 0,
       my = 0,
       mvx = 0,
@@ -637,18 +689,20 @@ export function createSim({
     state.mainVX = mvx / mainSize
     state.mainVY = mvy / mainSize
     const list: number[] = []
-    for (const [r, s] of size) if (r !== main && s >= 5) list.push(s)
-    // fragments of the cursor drop: their size sets how fast they come back
-    const rs = new Map<number, number>()
-    for (let i = N - rebelN; i < N; i++) {
-      const r = find(i)
-      rs.set(r, (rs.get(r) || 0) + 1)
+    for (let k = 0; k < nr; k++) {
+      const r = roots[k],
+        s = sizeOf[r]
+      if (r !== main && s >= 5) list.push(s)
+      sizeOf[r] = 0
     }
+    // fragments of the cursor drop: their size sets how fast they come back
+    for (let i = N - rebelN; i < N; i++) sizeOf[find(i)]++
     for (let i = N - rebelN; i < N; i++) {
-      const frac = (rs.get(find(i)) ?? 0) / rebelN
+      const frac = sizeOf[find(i)] / rebelN
       fragMul[i] = frac > 0.9 ? 1 : 0.5 + 1.2 * (1 - Math.sqrt(frac))
       fragTime[i] = frac > 0.9 ? 0.7 : 0.2 + 2.2 * Math.sqrt(frac)
     }
+    for (let i = N - rebelN; i < N; i++) sizeOf[find(i)] = 0
     state.pieces = list.length
     state.pieceList = list
   }

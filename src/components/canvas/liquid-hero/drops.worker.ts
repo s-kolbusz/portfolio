@@ -50,7 +50,8 @@ const scope = self as unknown as WorkerScope
 const SPRING = 0.002,
   DAMP = 0.04,
   GATHER = 0.0005,
-  GATHER_MAX = 0.02
+  GATHER_MAX = 0.02,
+  LIFE = 0.0003
 
 let sim: Sim | null = null
 let used = 0
@@ -67,6 +68,13 @@ let cx = new Float32Array(0),
   cn = new Float32Array(0)
 let ax = new Float32Array(0),
   ay = new Float32Array(0)
+// light steps: each drop's size at rest, the pull to its target at its middle, and how far it moved
+let restR = new Float32Array(0),
+  bodyR = new Float32Array(0)
+let gmx = new Float32Array(0),
+  gmy = new Float32Array(0)
+let mcx = new Float32Array(0),
+  mcy = new Float32Array(0)
 let lastTx = new Float32Array(0),
   lastTy = new Float32Array(0)
 let pairD = new Float32Array(0)
@@ -120,7 +128,7 @@ function init(d: DropsInit) {
   })
   // only the liquid's own forces: no pull to a main body, no return to the middle, no own weight;
   // the slow swirling stays, so the liquid never stands dead still
-  Object.assign(sim.P, { pull: 0, anchor: 0, self: 0, cursorPull: 0, life: 0.0003 })
+  Object.assign(sim.P, { pull: 0, anchor: 0, self: 0, cursorPull: 0, life: LIFE })
   if (light) goLight()
   used = pts.length
   fieldW = d.width
@@ -157,6 +165,12 @@ function init(d: DropsInit) {
   cn = new Float32Array(G)
   ax = new Float32Array(G)
   ay = new Float32Array(G)
+  restR = Float32Array.from(cap, (n) => Math.sqrt((n * d.spacing * dy) / Math.PI))
+  bodyR = new Float32Array(G)
+  gmx = new Float32Array(G)
+  gmy = new Float32Array(G)
+  mcx = new Float32Array(G)
+  mcy = new Float32Array(G)
   lastTx = new Float32Array(G).fill(NaN)
   lastTy = new Float32Array(G).fill(NaN)
   pairD = new Float32Array(used * G)
@@ -198,6 +212,9 @@ function regroup() {
 // crawl: slow motion, worse the bigger the step (owner's iPad and iPhone, 2026-11-20). So each drop's
 // mean velocity is taken out before the step and carried here, uncapped: the drop travels at full
 // speed as a whole, and only the particles' motion within it is held to the cap.
+// The drop's own path is worked out in base steps (a spring to the target, as the full physics does
+// it): taken in one step of 250 ms the same spring overshot further every step, threw the drops
+// against the edges of the field and in the end broke the physics (measured 2026-11-20).
 function carry(d: number) {
   if (!sim) return
   mvx.fill(0)
@@ -221,17 +238,42 @@ function carry(d: number) {
     sim.vx[i] -= mvx[g]
     sim.vy[i] -= mvy[g]
   }
+  const drag = sim.P.drag
+  for (let g = 0; g < G; g++) {
+    if (!mn[g]) continue
+    const gk = GATHER * grip[g],
+      gm = GATHER_MAX * (grip[g] > 1 ? 2 : 1)
+    const x0 = cx[g] / cn[g],
+      y0 = cy[g] / cn[g]
+    let px = x0,
+      py = y0,
+      ux = mvx[g],
+      uy = mvy[g]
+    for (let left = d; left > 1e-6; left -= 1) {
+      const f = Math.min(1, left),
+        keep = f === 1 ? drag : Math.pow(drag, f)
+      const ox = tx[g] - px,
+        oy = ty[g] - py
+      ux = (ux + (ox * SPRING - ux * DAMP + Math.max(-gm, Math.min(gm, ox * gk))) * f) * keep
+      uy = (uy + (oy * SPRING - uy * DAMP + Math.max(-gm, Math.min(gm, oy * gk))) * f) * keep
+      px += ux * f
+      py += uy * f
+    }
+    mvx[g] = ux
+    mvy[g] = uy
+    mcx[g] = px - x0
+    mcy[g] = py - y0
+  }
+  // the slow swirling per step grows with the step's square; eased so a big step swirls like a small one
+  sim.P.life = LIFE / Math.sqrt(Math.max(1, d))
   sim.step(d)
-  const keep = Math.pow(sim.P.drag, d)
   for (let i = 0; i < used; i++) {
     const g = group[i]
     if (g < 0) continue
-    const ux = mvx[g] * keep,
-      uy = mvy[g] * keep
-    sim.vx[i] += ux
-    sim.vy[i] += uy
-    sim.x[i] = Math.min(fieldW - 0.5, Math.max(0.5, sim.x[i] + ux * d))
-    sim.y[i] = Math.min(fieldH - 0.5, Math.max(0.5, sim.y[i] + uy * d))
+    sim.vx[i] += mvx[g]
+    sim.vy[i] += mvy[g]
+    sim.x[i] = Math.min(fieldW - 0.5, Math.max(0.5, sim.x[i] + mcx[g]))
+    sim.y[i] = Math.min(fieldH - 0.5, Math.max(0.5, sim.y[i] + mcy[g]))
   }
 }
 
@@ -271,6 +313,17 @@ function steer(d: number) {
     if (!cn[g]) continue
     ax[g] = (tx[g] - cx[g] / cn[g]) * SPRING - (cvx[g] / cn[g]) * DAMP
     ay[g] = (ty[g] - cy[g] / cn[g]) * SPRING - (cvy[g] / cn[g]) * DAMP
+    const gk = GATHER * grip[g],
+      gm = GATHER_MAX * (grip[g] > 1 ? 2 : 1)
+    gmx[g] = Math.max(-gm, Math.min(gm, (tx[g] - cx[g] / cn[g]) * gk))
+    gmy[g] = Math.max(-gm, Math.min(gm, (ty[g] - cy[g] / cn[g]) * gk))
+    // the size of the body this drop is part of: drops sent to the same place lie together as one
+    let area = 0
+    for (let h = 0; h < G; h++) {
+      const near = 1 - Math.hypot(tx[h] - tx[g], ty[h] - ty[g]) / (restR[g] + restR[h])
+      if (near > 0) area += restR[h] * restR[h] * near
+    }
+    bodyR[g] = Math.sqrt(area)
   }
   const N = sim.N
   for (let i = 0; i < N; i++) {
@@ -284,8 +337,26 @@ function steer(d: number) {
       gm = GATHER_MAX * (grip[g] > 1 ? 2 : 1)
     const gx = Math.max(-gm, Math.min(gm, (tx[g] - sim.x[i]) * gk)),
       gy = Math.max(-gm, Math.min(gm, (ty[g] - sim.y[i]) * gk))
-    sim.vx[i] += (ax[g] + gx) * d
-    sim.vy[i] += (ay[g] + gy) * d
+    if (light) {
+      // Light steps: the drop as a whole is moved in `carry`; here only what shapes it. The physics
+      // pushes back against squeezing once a step, however big the step, while this pull grew with the
+      // step's square: at the iPad's ~14 base steps a step it packed the drops to twice the density,
+      // (the one body before it comes apart: to a third of its area), so every step measured two to
+      // four times the pairs and cost that much more (measured 2026-11-20). Inside the drop the pull
+      // is therefore eased with the step's size; particles that strayed outside it are still gathered
+      // at full strength. Eased all the way (1 / d, the same push per step as a base step) the drops
+      // kept their full size, but holes left by a merge took seconds to close; 1 / √d closes them.
+      const ox = tx[g] - sim.x[i],
+        oy = ty[g] - sim.y[i]
+      const out = Math.min(1, Math.max(0, (Math.sqrt(ox * ox + oy * oy) / bodyR[g] - 0.9) * 2))
+      const soft = 1 / Math.sqrt(d)
+      const k = d <= 1 ? d : soft + (d - soft) * out * out * (3 - 2 * out)
+      sim.vx[i] += (gx - gmx[g]) * k
+      sim.vy[i] += (gy - gmy[g]) * k
+    } else {
+      sim.vx[i] += (ax[g] + gx) * d
+      sim.vy[i] += (ay[g] + gy) * d
+    }
     if (ptr.on) {
       const ddx = sim.x[i] - ptr.x,
         ddy = sim.y[i] - ptr.y
