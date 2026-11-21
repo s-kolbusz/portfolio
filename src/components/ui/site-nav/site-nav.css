@@ -1,0 +1,688 @@
+/* The site's navigation ("Skala"): a thin bar (initials, the page's scale, MENU) and a menu that the hero's
+   liquid pours in, where the scale becomes the menu. Every size and gap comes from the size system
+   (src/app/system.css). Dark green and orange belong to stronypodhale.pl and stay out (except its logo). */
+
+@font-face {
+  font-family: 'Mattone';
+  font-weight: 900;
+  font-display: swap;
+  src: url('/fonts/mattone/Mattone-Black.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Mattone';
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/mattone/Mattone-Bold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Cabinet Grotesk';
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/cabinet/cabinet-grotesk-variable.woff2') format('woff2');
+}
+
+/* the cursor follows the water sheet's dark palette (liquid-stage.ts); over the paper menu it is ink again */
+html.site-menu-open [data-adapt-theme='pointer'] {
+  --foreground: oklch(0.2 0.015 55);
+}
+
+/* stronypodhale.pl exactly as its logo: "strony" and ".pl" light in its orange, "podhale" heavy */
+.site-menu .wm {
+  font-family: 'Cabinet Grotesk', system-ui, sans-serif;
+  letter-spacing: -0.035em;
+}
+.site-menu .wm .acc {
+  color: oklch(0.72 0.14 47);
+  font-weight: 500;
+}
+.site-menu .wm .str {
+  font-weight: 800;
+}
+
+/* ---------- the bar ---------- */
+.site-bar {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 70;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--sys-s3) var(--sys-margin) var(--sys-s2);
+  color: var(--sys-ink);
+  pointer-events: none;
+  transition: color 0.45s ease;
+}
+.site-bar.dark {
+  color: var(--sys-light);
+}
+.site-bar[data-menu='open'],
+.site-bar[data-menu='leaving'] {
+  color: var(--sys-ink);
+}
+.site-bar[data-menu='closing'] .site-bar__toggle {
+  color: var(--sys-ink);
+}
+/* a paper margin under the bar where it crosses the page's own text (not over the hero or the water) */
+.site-bar::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 calc(-1 * var(--sys-s3));
+  z-index: -1;
+  background: linear-gradient(var(--sys-paper) 52%, rgba(251, 249, 244, 0));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.site-bar[data-solid]:not([data-menu])::before {
+  opacity: 1;
+}
+/* over a dark scene (ready2order) the margin is ink, so the light bar stays readable */
+.site-bar.dark::before {
+  background: linear-gradient(var(--sys-ink) 52%, rgba(43, 38, 32, 0));
+}
+.site-bar a,
+.site-bar button {
+  pointer-events: auto;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.site-bar button {
+  border: 0;
+  margin: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+/* comes in after the loader, from under the top edge */
+.site-bar > * {
+  transition:
+    opacity 0.6s ease,
+    transform 0.8s var(--sys-out);
+}
+.site-bar:not([data-ready]) > * {
+  opacity: 0;
+  transform: translateY(calc(-1 * var(--sys-s1)));
+}
+
+.site-bar__sk {
+  display: flex;
+  font:
+    900 19px/1 'Mattone',
+    system-ui,
+    sans-serif;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  /* even padding: the cursor ring and the focus ring sit evenly around the letters */
+  padding: var(--sys-s1);
+  margin: calc(-1 * var(--sys-s1));
+}
+/* while S and K are on their way from the hero name, the corner waits for them */
+.site-bar[data-sk='away'] .site-bar__sk,
+.site-bar[data-back] .site-bar__sk {
+  opacity: 0;
+  pointer-events: none;
+  transition: none;
+}
+.site-bar > .site-sk-fly {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 1;
+  transition: none;
+  transform: none;
+}
+.site-sk-fly span {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  font:
+    900 19px/1 'Mattone',
+    system-ui,
+    sans-serif;
+  will-change: transform, font-size;
+}
+
+.site-bar__right {
+  display: flex;
+  align-items: center;
+  gap: var(--sys-s4);
+}
+.site-bar__where {
+  display: flex;
+  align-items: center;
+  gap: var(--sys-s2);
+  padding: var(--sys-s1);
+  margin: calc(-1 * var(--sys-s1));
+  font: 11px/1 var(--sys-mono) !important;
+  letter-spacing: 0.14em;
+  transition: opacity 0.35s ease;
+}
+.site-bar[data-menu] .site-bar__where {
+  opacity: 0;
+  pointer-events: none;
+}
+.site-bar__no {
+  opacity: 0.6;
+}
+.site-bar__name {
+  display: block;
+  overflow: hidden;
+  padding: 2px 0;
+  margin: -2px 0;
+}
+.site-bar__name-in {
+  display: block;
+  animation: site-name-in 0.55s var(--sys-out);
+}
+@keyframes site-name-in {
+  from {
+    transform: translateY(105%);
+  }
+}
+
+.site-bar__toggle {
+  padding: var(--sys-s1) !important;
+  margin: calc(-1 * var(--sys-s1)) !important;
+  font: var(--sys-label) / 1 var(--sys-mono) !important;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+.site-bar__toggle-wrap {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  /* the last letter's tracking is not part of the word */
+  margin-right: -0.3em;
+}
+/* the button is as wide as the word showing; the other one waits out of the flow */
+.site-bar__toggle-wrap > span {
+  display: block;
+  transition:
+    transform 0.55s cubic-bezier(0.7, 0, 0.2, 1),
+    opacity 0.3s ease;
+}
+.site-bar__toggle-b {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translateY(110%);
+  opacity: 0;
+}
+.site-bar[data-menu='open'] .site-bar__toggle-a {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translateY(-110%);
+  opacity: 0;
+}
+.site-bar[data-menu='open'] .site-bar__toggle-b {
+  position: static;
+  transform: none;
+  opacity: 1;
+}
+
+/* the bar's scale: a hairline, a tick where each part begins, the travelled part heavier, a pointer at your place */
+.scale {
+  display: block;
+  width: 150px;
+  padding: 6px 0;
+}
+.scale__line {
+  position: relative;
+  display: block;
+  height: var(--sys-line);
+  background: currentColor;
+}
+.scale__done {
+  position: absolute;
+  left: 0;
+  top: -1px;
+  height: var(--sys-line-2);
+  width: calc(var(--pos, 0) * 100%);
+  background: currentColor;
+}
+.scale__tick {
+  position: absolute;
+  top: -3px;
+  width: var(--sys-line);
+  height: 7px;
+  background: currentColor;
+}
+.scale__tick--end {
+  left: auto;
+  right: 0;
+}
+.scale__here {
+  position: absolute;
+  top: -5px;
+  left: calc(var(--pos, 0) * 100%);
+  width: 2px;
+  height: 11px;
+  margin-left: -1px;
+  background: currentColor;
+}
+
+/* ---------- the menu ---------- */
+.site-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 65;
+  color: var(--sys-ink);
+  overscroll-behavior: contain;
+}
+.site-menu[data-phase='closed'] {
+  visibility: hidden;
+  pointer-events: none;
+}
+.site-menu[data-phase='closing'],
+.site-menu[data-phase='leaving'] {
+  pointer-events: none;
+}
+.site-menu[data-flat] {
+  background: var(--sys-paper);
+}
+.site-menu__water {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.site-menu a {
+  color: inherit;
+  text-decoration: none;
+}
+.site-menu ul,
+.site-menu ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* what the liquid leaves behind surfaces once the paper is clean there (--d per part) */
+.site-menu [data-surface] {
+  opacity: 0;
+  transform: translateY(var(--sys-s1));
+  transition:
+    opacity 0.6s ease var(--d, 0s),
+    transform 0.9s var(--sys-out) var(--d, 0s);
+}
+.site-menu[data-phase='open'] [data-surface] {
+  opacity: 1;
+  transform: none;
+}
+.site-menu[data-phase='closing'] [data-surface],
+.site-menu[data-phase='leaving'] [data-surface] {
+  transition-duration: 0.3s;
+  transition-delay: 0s;
+}
+
+/* the word: the part you are on or point at, at the size of the hero name; it sets on every change */
+.site-menu__word {
+  position: absolute;
+  left: var(--sys-margin);
+  right: var(--sys-margin);
+  top: 22vh;
+}
+.site-menu__word-in {
+  display: block;
+}
+.site-menu__word .w {
+  display: block;
+  /* the hero name's size, but never wider than the page: Mattone Black runs about 0.8 em a letter */
+  font:
+    900 min(var(--sys-xl), calc((100vw - 2 * var(--sys-margin)) / (var(--len, 8) * 0.8))) / 0.86
+      'Mattone',
+    system-ui,
+    sans-serif;
+  /* room for the descenders (p, y) above the sentence */
+  padding-bottom: 0.16em;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  animation: site-word-in 0.6s var(--sys-out);
+}
+.site-menu__word .f {
+  display: block;
+  max-width: 34ch;
+  margin-top: var(--sys-s3);
+  font:
+    700 var(--sys-lead) / 1.3 'Mattone',
+    system-ui,
+    sans-serif;
+  animation: site-word-in 0.6s var(--sys-out) 0.06s backwards;
+}
+/* wet to dry: it lands a little blurred and dries into ink */
+@keyframes site-word-in {
+  from {
+    opacity: 0;
+    filter: blur(3px);
+    transform: translateY(var(--sys-s1));
+  }
+}
+
+/* the scale as the menu: a full-width ruler of the home page, each part as long as it really is */
+.site-menu__route {
+  position: absolute;
+  left: var(--sys-margin);
+  right: var(--sys-margin);
+  top: 64vh;
+}
+/* short screens (720–800 px): the hanging names need the room above the footer */
+@media (max-height: 820px) {
+  .site-menu__route {
+    top: 57vh;
+  }
+}
+.ruler {
+  position: relative;
+  height: var(--sys-line);
+  background: var(--sys-ink);
+}
+.ruler__done {
+  position: absolute;
+  left: 0;
+  top: -1px;
+  height: var(--sys-line-2);
+  width: calc(var(--pos, 0) * 100%);
+  background: var(--sys-ink);
+}
+.site-menu:not([data-home]) .ruler__done {
+  display: none;
+}
+.ruler__stop {
+  position: absolute;
+  left: calc(var(--start) * 100%);
+  width: calc(var(--share) * 100%);
+  top: calc(-1 * var(--sys-s7));
+  height: calc(var(--sys-s7) + var(--sys-s8));
+}
+/* the band around the line answers the pointer; the link itself is the tick and its label, so the
+   cursor ring and the keyboard focus ring wrap the same, sensible box */
+.ruler__stop {
+  cursor: pointer;
+}
+.ruler__stop a {
+  position: absolute;
+  left: 0;
+  top: calc(var(--sys-s7) - var(--sys-s3));
+  display: block;
+  /* the tick and the name hanging from it; a short part still gets a touch-sized target */
+  width: var(--sys-touch);
+  height: calc(var(--sys-s5) + var(--sys-s1) + 18em);
+  font-size: var(--sys-micro);
+}
+.ruler__stop a::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: calc(var(--sys-s3) - var(--sys-s1));
+  width: var(--sys-line);
+  height: var(--sys-s2);
+  background: var(--sys-ink);
+  transition:
+    height 0.25s var(--sys-out),
+    top 0.25s var(--sys-out);
+}
+.ruler__stop[data-active] a::before {
+  top: 0;
+  height: var(--sys-s5);
+}
+/* where you are: the same ink pointer as on the bar's scale */
+.ruler__here {
+  position: absolute;
+  top: calc(-1 * var(--sys-s2));
+  left: calc(var(--pos, 0) * 100%);
+  width: 2px;
+  height: var(--sys-s4);
+  margin-left: -1px;
+  background: var(--sys-ink);
+}
+.site-menu:not([data-home]) .ruler__here {
+  display: none;
+}
+/* every part's name hangs from its tick, read top to bottom like the marks on a measuring tape: written
+   upright they would run into each other, hung they all fit, so the ruler names every part without hover */
+.ruler__name {
+  position: absolute;
+  top: calc(var(--sys-s5) + var(--sys-s1));
+  left: -0.55em;
+  writing-mode: vertical-rl;
+  font: var(--sys-micro) / 1.3 var(--sys-mono);
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+  color: var(--sys-ink-2);
+  transition: color 0.25s var(--sys-out);
+}
+.ruler__stop[data-active] .ruler__name {
+  color: var(--sys-ink);
+  font-weight: 700;
+}
+.ruler__name .wm,
+.ruler__name .wm * {
+  font: inherit;
+  letter-spacing: inherit;
+}
+.ruler__name .wm .str {
+  color: inherit;
+}
+.site-menu__fact,
+.ruler__mark {
+  display: none;
+}
+
+.site-menu__foot {
+  position: absolute;
+  left: var(--sys-margin);
+  right: var(--sys-margin);
+  bottom: var(--sys-s5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sys-s1);
+  font: var(--sys-label) / 1.5 var(--sys-mono);
+  letter-spacing: 0.04em;
+}
+.site-menu__foot .row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--sys-s3);
+}
+.site-menu__foot .muted {
+  color: var(--sys-ink-2);
+}
+.site-menu__foot a {
+  display: inline-block;
+  min-width: var(--sys-s3);
+  padding: 3px 0;
+  text-align: center;
+  text-decoration: underline;
+  text-decoration-color: rgba(43, 38, 32, 0.3);
+  text-decoration-thickness: var(--sys-line);
+  text-underline-offset: 5px;
+}
+.site-menu__foot .lang a {
+  text-decoration-color: transparent;
+  color: var(--sys-ink-2);
+}
+.site-menu__foot .lang a[aria-current] {
+  color: var(--sys-ink);
+  text-decoration-color: currentColor;
+}
+@media (hover: hover) {
+  .site-menu__foot a:hover {
+    text-decoration-color: currentColor;
+  }
+}
+
+/* ---------- phones: a smaller bar ---------- */
+@media (max-width: 700px) {
+  .site-bar {
+    padding-top: var(--sys-s2);
+  }
+  .site-bar__sk {
+    font-size: 17px;
+  }
+  .site-bar__right {
+    gap: var(--sys-s2);
+  }
+  .site-bar__where {
+    gap: var(--sys-s1);
+    font-size: 10px !important;
+    letter-spacing: 0.1em;
+  }
+  .site-bar__no {
+    display: none;
+  }
+  .scale {
+    width: 72px;
+  }
+  .site-bar__toggle {
+    font-size: 11px !important;
+  }
+}
+
+/* ---------- touch (phones and tablets): no hover, so the scale stands up along the left edge and every
+   part shows its name; where you are is the travelled line ending in a crossbar ---------- */
+@media (max-width: 700px), (hover: none) {
+  .site-menu__word,
+  .site-menu__fact {
+    display: none;
+  }
+  .site-menu__route {
+    left: var(--sys-margin);
+    right: var(--sys-margin);
+    top: calc(var(--sys-s7) + var(--sys-s2));
+    bottom: auto;
+  }
+  .ruler {
+    --row: var(--sys-s5);
+    width: var(--sys-line);
+    height: calc(9 * var(--row));
+  }
+  .ruler__done {
+    top: 0;
+    left: -1px;
+    width: var(--sys-line-2);
+    height: calc((var(--here, 0) + 0.5) * var(--row));
+  }
+  .ruler__here {
+    display: none;
+  }
+  /* each row is 48 px: a touch target above the 44 px minimum, no gaps between rows */
+  .ruler__stop {
+    position: absolute;
+    left: 0;
+    width: calc(100vw - 2 * var(--sys-margin));
+    top: calc(var(--i) * var(--row));
+    height: var(--row);
+  }
+  .ruler__stop a {
+    inset: 0;
+    top: 0;
+    width: auto;
+    height: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--sys-s2);
+    padding-left: var(--sys-s3);
+  }
+  .ruler__stop a::before,
+  .ruler__stop[data-active] a::before {
+    top: 50%;
+    left: 0;
+    width: var(--sys-s1);
+    height: var(--sys-line);
+  }
+  .ruler__stop[data-here] a::before {
+    left: -1px;
+    width: var(--sys-s2);
+    height: var(--sys-line-2);
+    margin-top: -1px;
+  }
+  .ruler__name,
+  .ruler__stop[data-active] .ruler__name {
+    position: static;
+    writing-mode: horizontal-tb;
+    color: var(--sys-ink);
+    font:
+      900 min(var(--sys-l), 6.6vw) / 1 'Mattone',
+      system-ui,
+      sans-serif;
+    letter-spacing: -0.02em;
+  }
+  .ruler__name .wm {
+    font-family: 'Cabinet Grotesk', system-ui, sans-serif;
+    letter-spacing: -0.035em;
+  }
+  .ruler__name .wm .acc {
+    color: oklch(0.72 0.14 47);
+    font-weight: 500;
+  }
+  .ruler__name .wm .str {
+    font-weight: 800;
+  }
+}
+
+/* tablets: the same list, larger, with "here" written beside the part you are on */
+@media (hover: none) and (min-width: 701px) {
+  .ruler__name,
+  .ruler__stop[data-active] .ruler__name {
+    font-size: min(var(--sys-l), 44px);
+  }
+  .ruler__mark {
+    display: block;
+    flex: none;
+    font: var(--sys-micro) / 1 var(--sys-mono);
+    letter-spacing: 0.12em;
+    color: var(--sys-ink-2);
+  }
+}
+@media (hover: none) and (min-width: 701px) and (min-height: 1000px) {
+  .ruler {
+    --row: var(--sys-s6);
+  }
+  .site-menu__route {
+    top: calc(var(--sys-s8) + var(--sys-s4));
+  }
+}
+
+/* phones: the footer keeps contact and language; the elsewhere links are parts of the list already */
+@media (max-width: 700px) {
+  .site-menu__foot {
+    gap: 0;
+    bottom: var(--sys-s3);
+  }
+  .site-menu__foot .row:first-child {
+    display: none;
+  }
+  .site-menu__foot .row {
+    gap: 0 var(--sys-s2);
+  }
+  /* 44 px tall touch targets, the underline stays at the text */
+  .site-menu__foot li {
+    padding: 10px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-bar > *,
+  .site-menu [data-surface],
+  .site-bar__toggle-wrap > span,
+  .ruler__stop a::before {
+    transition-duration: 0.01s !important;
+    transition-delay: 0s !important;
+  }
+  .site-bar__name-in,
+  .site-menu__word .w,
+  .site-menu__word .f {
+    animation: none;
+  }
+}
+
+@media print {
+  .site-bar,
+  .site-menu {
+    display: none;
+  }
+}

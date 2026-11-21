@@ -120,6 +120,8 @@ const eslintConfig = defineConfig([
     'playwright-report/**',
     'test-results/**',
     'next-env.d.ts',
+    // design sandboxes (test pages kept as references, not part of the app)
+    'cook/**',
   ]),
 ])
 

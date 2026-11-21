@@ -1,0 +1,386 @@
+/* Act 3, aspect-preview: the plugin's own editor, themed with the size system (system.css).
+   Only the plugin's public --apv-* variables and a few surface rules change: its layout and
+   behaviour stay as they ship, because the point of the scene is that this is the real thing. */
+
+.apd {
+  width: 100%;
+  background: var(--sys-paper);
+  color: var(--sys-ink);
+  padding: var(--sys-s8) var(--sys-margin) var(--sys-s7);
+}
+
+.apd-head {
+  display: grid;
+  gap: var(--sys-s3);
+  max-width: 34rem;
+  margin-bottom: var(--sys-s6);
+}
+.apd-label,
+.apd-door,
+.apd-note {
+  font: var(--sys-label) / 1 var(--sys-mono);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin: 0;
+}
+.apd-lead {
+  margin: 0;
+  max-width: 24ch;
+  font:
+    700 var(--sys-lead) / 1.3 'Mattone',
+    system-ui,
+    sans-serif;
+}
+.apd-how {
+  margin: 0;
+  max-width: 44ch;
+  font:
+    400 15px / 1.45 'Mattone',
+    system-ui,
+    sans-serif;
+  color: var(--sys-ink-2);
+}
+
+.apd-editor {
+  min-height: 40vh;
+  /* it grows with the scroll from its top edge, under the texts (aspect-demo.tsx) */
+  transform-origin: 50% 0;
+}
+.apd-wait {
+  height: 60vh;
+  background: var(--sys-light);
+}
+
+.apd-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sys-s2) var(--sys-s4);
+  margin-top: var(--sys-s4);
+}
+.apd-door {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  min-height: var(--sys-touch);
+  padding: 0;
+  border: 0;
+  border-bottom: var(--sys-line) solid var(--sys-ink);
+  background: none;
+  color: var(--sys-ink);
+  cursor: pointer;
+  text-decoration: none;
+}
+.apd-door:focus-within {
+  outline: var(--sys-line) solid var(--sys-ink);
+  outline-offset: 4px;
+}
+.apd-note {
+  font-size: var(--sys-micro);
+  letter-spacing: 0.12em;
+  color: var(--sys-ink-2);
+}
+.apd-get {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sys-s3);
+  margin-left: auto;
+}
+.apd-get code {
+  font: 13px / 1 var(--sys-mono);
+  padding: var(--sys-s2) var(--sys-s3);
+  background: var(--sys-light);
+}
+/* the GitHub link beside the command: the same type as the command, so the two sit on one line */
+.apd-get .apd-door {
+  font: 13px / 1 var(--sys-mono);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* the plugin's theme: the editor and the preview grid each declare the variables, so both */
+.apd :is(.focal-editor, .focal-preview) {
+  --apv-bg: var(--sys-paper);
+  --apv-bg-subtle: var(--sys-paper);
+  --apv-bg-muted: var(--sys-light);
+  --apv-bg-inverse: var(--sys-ink);
+  --apv-on-inverse: var(--sys-paper);
+  --apv-border: rgba(43, 38, 32, 0.22);
+  --apv-border-strong: var(--sys-ink);
+  --apv-border-hover: var(--sys-ink);
+  --apv-border-focus: var(--sys-ink);
+  --apv-text: var(--sys-ink);
+  --apv-text-strong: var(--sys-ink);
+  --apv-text-soft: var(--sys-ink-2);
+  --apv-text-muted: var(--sys-ink-2);
+  --apv-text-disabled: rgba(43, 38, 32, 0.4);
+  --apv-radius-s: 0;
+  --apv-radius-m: 0;
+  font-family: var(--sys-mono);
+}
+/* ——— the Payload admin, drawn as a wireframe: only the plugin's field is live ———
+   Proportions follow Payload 3's media edit view: a 240 px nav, a slim app header with
+   breadcrumbs, the document header (title, Edit/API tabs, dates and Save), then the fields.
+   The whole window is at most 90% of the screen's height on a desktop. */
+.apd-admin {
+  --apd-line: rgba(43, 38, 32, 0.18);
+  display: flex;
+  margin-inline: auto;
+  border: var(--sys-line) solid var(--sys-ink);
+  background: var(--sys-paper);
+  font: 12px / 1.4 var(--sys-mono);
+  color: var(--sys-ink-2);
+}
+.apd-admin [inert] {
+  user-select: none;
+}
+.apd-admin__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 0 0 240px;
+  padding: 72px var(--sys-s4) var(--sys-s4);
+  border-right: var(--sys-line) solid var(--apd-line);
+  font-size: 13px;
+}
+.apd-admin__group {
+  margin-top: var(--sys-s2);
+  font-size: var(--sys-micro);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.apd-admin__group:first-child {
+  margin-top: 0;
+}
+.apd-admin__nav .is-on {
+  color: var(--sys-ink);
+  font-weight: 700;
+}
+.apd-admin__logout {
+  margin-top: auto;
+  opacity: 0.6;
+}
+.apd-admin__main {
+  flex: 1;
+  min-width: 0;
+}
+.apd-admin__bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sys-s2);
+  height: 56px;
+  padding: 0 var(--sys-s5);
+  border-bottom: var(--sys-line) solid var(--apd-line);
+}
+.apd-admin__crumbs {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.apd-admin__crumbs i {
+  font-style: normal;
+  opacity: 0.45;
+}
+.apd-admin__mark {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(43, 38, 32, 0.45);
+  transform: rotate(45deg) scale(0.8);
+}
+.apd-admin__avatar {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: var(--sys-line) solid rgba(43, 38, 32, 0.4);
+}
+.apd-admin__doc {
+  padding: 0 var(--sys-s5) var(--sys-s4);
+}
+.apd-admin__head {
+  border-bottom: var(--sys-line) solid var(--apd-line);
+  margin: 0 calc(-1 * var(--sys-s5));
+  padding: var(--sys-s4) var(--sys-s5) 0;
+}
+.apd-admin__title {
+  margin: 0 0 var(--sys-s2);
+  font:
+    700 26px / 1.1 'Mattone',
+    system-ui,
+    sans-serif;
+  color: var(--sys-ink-2);
+  overflow-wrap: anywhere;
+}
+.apd-admin__tabs {
+  display: flex;
+  gap: var(--sys-s3);
+}
+.apd-admin__tabs span {
+  padding: 6px 0;
+}
+.apd-admin__tabs .is-on {
+  color: var(--sys-ink);
+  border-bottom: 2px solid rgba(43, 38, 32, 0.6);
+}
+.apd-admin__controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sys-s2);
+  margin: 0 calc(-1 * var(--sys-s5));
+  padding: 10px var(--sys-s5);
+  border-top: var(--sys-line) solid var(--apd-line);
+}
+.apd-admin__controls b {
+  font-weight: 700;
+  color: var(--sys-ink-2);
+}
+.apd-admin__save {
+  padding: 6px var(--sys-s2);
+  background: rgba(43, 38, 32, 0.55);
+  color: var(--sys-paper);
+}
+.apd-admin__fields {
+  padding-top: var(--sys-s3);
+}
+.apd-admin__upload {
+  display: flex;
+  align-items: center;
+  gap: var(--sys-s2);
+  padding: 10px;
+  margin-bottom: var(--sys-s2);
+  border: var(--sys-line) solid var(--apd-line);
+}
+.apd-admin__upload i {
+  font-style: normal;
+  opacity: 0.7;
+}
+.apd-admin__thumb {
+  flex: 0 0 auto;
+  width: 64px;
+  height: 44px;
+  background: var(--sys-light) center / cover no-repeat;
+  filter: grayscale(1);
+  opacity: 0.6;
+}
+.apd-admin__chip {
+  margin-left: auto;
+  padding: 4px 10px;
+  border: var(--sys-line) solid rgba(43, 38, 32, 0.3);
+}
+.apd-admin__label {
+  display: block;
+  margin-bottom: 6px;
+}
+.apd-admin__input {
+  display: block;
+  padding: 8px var(--sys-s2);
+  border: var(--sys-line) solid var(--apd-line);
+  color: rgba(43, 38, 32, 0.45);
+}
+/* the photo is drawn no taller than most of the screen; the whole window is then zoomed to fit
+   90% of it (see AspectDemo) */
+@media (min-width: 901px) {
+  .apd .focal-editor__image-wrapper {
+    max-width: min(100%, calc(var(--apd-cap, 62svh) * var(--apd-ratio, 1.5)));
+  }
+}
+/* the plugin's own panel, in ink: the one live part of the drawing */
+.apd .focal-editor {
+  margin-top: var(--sys-s3);
+  border-color: var(--sys-ink);
+}
+/* the plugin hard-codes teal and orange for these; here they are ink: CSS on light, Crop inverted */
+.apd .focal-preview__card-source {
+  font: 400 var(--sys-micro) / 1.4 var(--sys-mono);
+  letter-spacing: 0.12em;
+}
+.apd .focal-preview__card-source--css {
+  color: var(--sys-ink);
+  background: var(--sys-light);
+}
+.apd .focal-preview__card-source--crop {
+  color: var(--sys-paper);
+  background: var(--sys-ink);
+}
+/* paper does not lift: the cards stay put under the pointer */
+.apd .focal-preview__card:hover {
+  transform: none;
+  box-shadow: none;
+}
+.apd .focal-preview__card-name {
+  font: 400 var(--sys-micro) / 1.4 var(--sys-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+/* below 900 px the plugin stacks the columns and drops the sticky left column */
+@media (min-width: 901px) {
+  .apd .focal-editor__left {
+    top: var(--sys-s7);
+  }
+}
+
+/* stacked, the plugin's flex-start alignment shrinks the preview column to half the width */
+@media (max-width: 900px) {
+  .apd-admin__nav {
+    display: none;
+  }
+  .apd-admin__controls > span:first-child {
+    display: none;
+  }
+  .apd .focal-editor__right {
+    width: 100%;
+  }
+}
+
+@media (max-width: 700px) {
+  /* on a phone the finger is the input: the number fields would push the photo a screen down */
+  .apd .focal-editor__toolbar-inputs {
+    display: none;
+  }
+  /* two narrow columns read as a contact sheet; one column of six is a long scroll */
+  .apd .focal-preview__grid {
+    columns: 2;
+    column-gap: var(--sys-s1);
+  }
+  .apd {
+    padding: var(--sys-s7) var(--sys-margin) var(--sys-s6);
+  }
+  .apd-admin__bar,
+  .apd-admin__doc {
+    padding-inline: var(--sys-s2);
+  }
+  .apd-admin__head,
+  .apd-admin__controls {
+    margin-inline: calc(-1 * var(--sys-s2));
+    padding-inline: var(--sys-s2);
+  }
+  /* on a phone the admin is only suggested (path, title), so the plugin starts on the first screen */
+  .apd-admin__upload,
+  .apd-admin__label,
+  .apd-admin__input {
+    display: none;
+  }
+  .apd .focal-editor {
+    padding: var(--sys-s1);
+  }
+  .apd-get {
+    margin-left: 0;
+  }
+  .apd-get code,
+  .apd-get .apd-door {
+    font-size: 11px;
+  }
+  .apd-get code {
+    padding: var(--sys-s2);
+    white-space: nowrap;
+  }
+}

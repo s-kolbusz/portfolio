@@ -7,6 +7,8 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
+  // the day of the build, shown in act 4 as the site's last change (how-i-work.tsx)
+  env: { BUILD_DATE: new Date().toISOString().slice(0, 10) },
   experimental: {
     optimizePackageImports: ['@phosphor-icons/react', 'gsap', 'lenis'],
   },

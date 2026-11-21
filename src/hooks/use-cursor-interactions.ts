@@ -5,6 +5,8 @@ import { useEffect, useRef } from 'react'
 import { gsap } from '@/lib/gsap-core'
 import { useCursorStore, type CursorVariant } from '@/lib/stores'
 
+const interactive = (el: HTMLElement | null) => el?.closest<HTMLElement>('a[href], button') ?? null
+
 export function useCursorInteractions(enabled = true) {
   const setVariant = useCursorStore((state) => state.setVariant)
   const setMagneticTarget = useCursorStore((state) => state.setMagneticTarget)
@@ -17,10 +19,7 @@ export function useCursorInteractions(enabled = true) {
       const cursorEl = target.closest('[data-cursor]') as HTMLElement
 
       // Check if element is visible enough to interact with
-      const isVisible = (el: HTMLElement) => {
-        const style = window.getComputedStyle(el)
-        return parseFloat(style.opacity) > 0.9 && style.visibility !== 'hidden'
-      }
+      const isVisible = (el: HTMLElement) => window.getComputedStyle(el).visibility !== 'hidden'
 
       if (cursorEl && isVisible(cursorEl)) {
         const type = cursorEl.getAttribute('data-cursor')
@@ -30,9 +29,10 @@ export function useCursorInteractions(enabled = true) {
             setMagneticTarget(cursorEl)
           }
         }
-      } else if ((target.tagName === 'A' || target.tagName === 'BUTTON') && isVisible(target)) {
+      } else if (interactive(target) && isVisible(interactive(target)!)) {
+        // anything inside a link or a button counts (letters, spans), not only the element itself
         setVariant('button')
-        setMagneticTarget(target)
+        setMagneticTarget(interactive(target))
       } else if (
         target.tagName === 'INPUT' &&
         (target as HTMLInputElement).type === 'range' &&
@@ -57,10 +57,9 @@ export function useCursorInteractions(enabled = true) {
         setVariant('default')
         setMagneticTarget(null)
       } else if (
-        (target.tagName === 'A' ||
-          target.tagName === 'BUTTON' ||
+        (interactive(target) ||
           (target.tagName === 'INPUT' && (target as HTMLInputElement).type === 'range')) &&
-        !related?.closest('a, button, input[type="range"]')
+        !related?.closest?.('a, button, input[type="range"]')
       ) {
         setVariant('default')
         setMagneticTarget(null)

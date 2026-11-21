@@ -115,19 +115,24 @@ test.skip('lightbox restores focus to the trigger after keyboard close', async (
   await expect(trigger).toBeFocused()
 })
 
-test('dock navigation exposes current position semantics', async ({ page }) => {
+test('the menu opens as a dialog, marks where you are and closes with Escape', async ({ page }) => {
   await page.goto('/en')
 
-  // Find the visible navigation
-  const dockNav = page
-    .getByRole('navigation', { name: /main navigation/i })
-    .filter({ visible: true })
-    .first()
-  await expect(dockNav).toBeVisible()
+  const toggle = page.getByRole('button', { name: /^menu$/i })
+  await expect(toggle).toBeVisible({ timeout: 15000 })
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false')
 
-  const dockHomeLink = dockNav.getByRole('link', { name: /home/i })
-  await expect(dockHomeLink).toBeVisible()
-  await expect(dockHomeLink).toHaveAttribute('aria-current', 'location')
+  await toggle.click()
+  const menu = page.getByRole('dialog', { name: /menu/i })
+  await expect(menu).toBeVisible()
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true')
+
+  const nav = menu.getByRole('navigation', { name: /main navigation/i })
+  await expect(nav.getByRole('link', { name: /home/i })).toHaveAttribute('aria-current', 'location')
+
+  await page.keyboard.press('Escape')
+  await expect(menu).toBeHidden()
+  await expect(toggle).toBeFocused()
 })
 
 test('custom cursor is available on non-home routes when reduced motion is off', async ({
@@ -150,31 +155,23 @@ test('reduced-motion users do not get custom cursor or WebGL hero scene', async 
 
 test('target sizes meet WCAG 2.2 minimum requirements', async ({ page }) => {
   await page.goto('/en')
-  await page.waitForTimeout(1000)
 
-  const dockLinks = page.locator('.dock-nav a')
-  const count = await dockLinks.count()
+  const toggle = page.getByRole('button', { name: /^menu$/i })
+  await expect(toggle).toBeVisible({ timeout: 15000 })
+  await toggle.click()
+
+  const targets = page.locator('#site-menu a, .site-bar button[aria-controls]')
+  await expect(page.getByRole('dialog', { name: /menu/i })).toBeVisible()
+  await page.waitForTimeout(1600)
+  const count = await targets.count()
+  expect(count).toBeGreaterThan(0)
 
   for (let i = 0; i < count; i++) {
-    const box = await dockLinks.nth(i).boundingBox()
+    const box = await targets.nth(i).boundingBox()
     if (box) {
       // WCAG 2.2 AA target size is 24x24 CSS pixels
       expect(box.width).toBeGreaterThanOrEqual(24)
       expect(box.height).toBeGreaterThanOrEqual(24)
     }
   }
-})
-
-test('theme toggle changes class on html element', async ({ page }) => {
-  await page.goto('/en')
-
-  const themeToggle = page.getByLabel(/toggle theme/i)
-  await expect(themeToggle).toBeVisible()
-
-  const html = page.locator('html')
-  const initialTheme = await html.getAttribute('class')
-
-  await themeToggle.click()
-  const toggledTheme = await html.getAttribute('class')
-  expect(toggledTheme).not.toEqual(initialTheme)
 })
