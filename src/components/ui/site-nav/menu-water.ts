@@ -11,52 +11,76 @@ const FRAGMENT = `#version 300 es
 precision highp float;
 uniform vec2 uRes, uOrigin;
 uniform float uDpr, uTime, uR, uMode;      // uMode 0: paper poured by a green front; 1: green flood
-out vec4 o;
+out vec4 o;   // premultiplied: the page shows through the liquid
 const vec3 PAPER = vec3(0.984, 0.976, 0.957);
-const vec3 LIQUID = vec3(0.059, 0.616, 0.388);   // the hero's liquid (#0f9d63)
-const vec3 DEEP = vec3(0.027, 0.42, 0.255);
+const vec3 TINT = vec3(0.03, 0.575, 0.363);     // the hero's liquid
 float hsh(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453); }
 float vnoise(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f*f*(3.-2.*f);
   return mix(mix(hsh(i), hsh(i+vec2(1,0)), u.x), mix(hsh(i+vec2(0,1)), hsh(i+vec2(1,1)), u.x), u.y); }
 
-// shading of a rounded body of liquid from its distance field d (<0 inside) and its thickness w
-vec3 liquidBody(float d, float w, out float spec){
-  float t = clamp(-d/max(w, 1.), 0., 1.);
-  float hgt = sqrt(t)*w*0.55;
-  vec3 nrm = normalize(vec3(-dFdx(hgt), -dFdy(hgt), 1.));
-  vec3 L = normalize(vec3(-0.45, 0.55, 0.7));
-  spec = pow(max(dot(nrm, normalize(L + vec3(0., 0., 1.))), 0.), 70.);
-  vec3 c = mix(DEEP, LIQUID, smoothstep(0., 0.35, t));
-  c += vec3(0.25, 0.45, 0.35)*0.3*(1. - smoothstep(0.2, 0.8, t))*smoothstep(0.03, 0.2, t);
-  return c;
+// A bead of liquid lying across the front, u px in from its outer edge, B px wide, drawn like the hero's glass:
+// no diffuse shading (that made it plasticine, and a dark charred rim at the edge), but a tinted see-through body,
+// a softly rolled-under edge that reflects the room, and a glint that comes and goes along the front.
+// Returns premultiplied colour and coverage.
+vec4 bead(float u, float B, vec2 dir, vec2 q, float opaque){
+  float s = clamp(u/max(B, 1.), 0.001, 0.999);
+  float c = 2.*s - 1.;
+  float hh = sqrt(max(1. - c*c, 0.));
+  // slope across the bead: steep at both edges, flat on top; capped so the edges roll under, not fold
+  float slope = clamp(-c/max(hh, 0.18), -5.5, 5.5)*0.8;
+  vec3 n = normalize(vec3(dir*slope, 1.));
+  float curl = smoothstep(0.55, 0.95, abs(c));
+  vec3 r = reflect(vec3(0., 0., -1.), n);
+  vec3 L = normalize(vec3(-0.55 + 0.12*sin(q.y*7. + uTime*0.21), 0.62 + 0.08*cos(q.x*5.3 - uTime*0.17), 0.56));
+  // the room it reflects: light above, a little grey below (as the hero's env)
+  vec3 env = mix(vec3(0.70, 0.72, 0.68), vec3(0.99, 0.98, 0.95), smoothstep(-0.35, 0.45, r.y));
+  env += vec3(0.25)*smoothstep(0.5, 0.9, dot(r, L));
+  float F = 0.02 + 0.98*pow(1. - max(n.z, 0.), 5.);
+  // body: the hero green, a little less light through where the edge rolls under
+  float a = mix(0.62, 1., opaque);
+  vec3 body = TINT*(1. - 0.18*curl)*a;
+  vec3 col = body*(1. - F) + env*F*0.6;
+  a = a*(1. - F) + F*0.6;
+  // a soft glint, broken up along the front so it never runs round as a bright line
+  float sp = max(dot(r, L), 0.);
+  float glint = (pow(sp, 6.)*0.04 + pow(sp, 40.)*0.12)*(0.35 + 0.65*smoothstep(0.35, 0.75, vnoise(q*4.2 + uTime*0.15)));
+  col += vec3(1.)*glint;
+  a = min(a + glint*0.5, 1.);
+  return vec4(col, a);
 }
 
 void main(){
   vec2 p = gl_FragCoord.xy;
   vec2 q = p/uRes.y;
-  float aa = 1.2*uDpr;
+  float soft = 2.2*uDpr;   // a wet edge is a few pixels soft, not cut
   // the front: uneven like the hero's flood, and it keeps moving as it runs
-  float n = vnoise(q*2.3 + vec2(uTime*0.06, -uTime*0.05))*0.65 + vnoise(q*5.7 - vec2(uTime*0.09))*0.35;
-  float d = length(p - uOrigin) - uR*(0.62 + 0.76*n);
-  float shadow = 0.16*(1. - smoothstep(0., 22.*uDpr, d))*step(0., d);
-  float inside = smoothstep(aa, -aa, d);
-  vec3 col;
-  float spec;
+  float n = vnoise(q*2.0 + vec2(uTime*0.04, -uTime*0.03))*0.75 + vnoise(q*4.3 - vec2(uTime*0.05))*0.25;
+  float d = length(p - uOrigin) - uR*(0.62 + 0.5*n);
+  vec2 g = vec2(dFdx(d), dFdy(d));
+  vec2 dir = length(g) > 1e-4 ? normalize(g) : vec2(0.);
+  float u = -d;
+  // a faint, wide shadow just ahead of the liquid (the hero casts one too), no dark line
+  float shadow = 0.05*(1. - smoothstep(0., 34.*uDpr, d))*smoothstep(-soft, soft, d);
+  vec4 col;
   if (uMode > 0.5) {
-    // the flood: all liquid, with its rounded front lit
-    col = liquidBody(d, 60.*uDpr, spec) + vec3(0.85, 1., 0.92)*spec*0.5;
+    // the flood: an opaque body with the same soft front, so the page can change underneath
+    float B = 70.*uDpr;
+    vec4 b = bead(min(u, B*0.5), B, dir, q, 1.);
+    float inside = smoothstep(-soft, soft, u);
+    col = b*inside;
   } else {
-    // while small it is all liquid (a drop out of the button); as it grows, paper opens up behind it
-    float band = min(uR*0.62*0.75, (40. + 80.*vnoise(q*3.1 + vec2(-uTime*0.08, uTime*0.07)))*uDpr);
-    float t = clamp(-d/max(band, 1.), 0., 1.);
-    vec3 liquid = liquidBody(d, band*0.35, spec);
-    float cover = 1. - smoothstep(0.45, 1., t);
-    col = mix(PAPER, liquid, cover) + vec3(0.85, 1., 0.92)*spec*0.6*cover;
-    col *= 1. - 0.035*smoothstep(1.6, 1., -d/max(band, 1.))*step(1., t);   // the paper is wet for a moment
-
+    // while small it is all liquid (a drop out of the button); as it grows, paper opens up behind it.
+    // The bead's width changes slowly along the front, so it reads as one body of liquid, not a charred band.
+    float B = min(uR*0.62*0.75, (48. + 24.*vnoise(q*1.6 + vec2(-uTime*0.05, uTime*0.04)))*uDpr);
+    float inBead = smoothstep(-soft, soft, u)*(1. - smoothstep(B - soft, B + soft, u));
+    vec4 b = bead(u, B, dir, q, 0.);
+    // under the liquid the page is wiped to paper: from its middle on, clean paper shows through it
+    float paperUnder = smoothstep(B*0.5, B*0.78, u);
+    vec4 under = vec4(PAPER*(1. - 0.04*(1. - smoothstep(B, B*1.3, u))), 1.)*paperUnder;   // wet for a moment
+    vec4 bed = b + under*(1. - b.a);
+    col = mix(under, bed, inBead);
   }
-  float a = inside + shadow*(1. - inside);
-  o = vec4(col*inside, a);
+  o = col + vec4(0., 0., 0., shadow)*(1. - col.a);
 }`
 
 export interface MenuWater {
@@ -69,11 +93,12 @@ export interface MenuWater {
   destroy(): void
 }
 
-export const OPEN_SECONDS = 1.3
+export const OPEN_SECONDS = 1.6
 const FLOOD_SECONDS = OPEN_SECONDS / 2
 
-// the front's radius as a share of the full radius at time k (0…1): it gathers, then slows as it spreads
-export const openEase = (k: number) => (k < 0.5 ? 4 * k * k * k : 1 - (-2 * k + 2) ** 3 / 2)
+// the front's radius as a share of the full radius at time k (0…1): it eases in and out without a surge in the
+// middle (the cubic one rushed through the page at 3× its average speed, owner 2026-11-21: "spokojniej")
+export const openEase = (k: number) => k * k * k * (k * (6 * k - 15) + 10)
 
 type State = 'closed' | 'opening' | 'open' | 'closing' | 'flooding' | 'draining'
 
@@ -234,7 +259,7 @@ export function createMenuWater(
     },
     arrival(o, point) {
       // a point is clean paper once the front's deepest dent (0.62 of the radius) is a full band past it
-      const need = (Math.hypot(point.x - o.x, point.y - o.y) + 90) / (0.62 * fullRadius(o))
+      const need = (Math.hypot(point.x - o.x, point.y - o.y) + 80) / (0.62 * fullRadius(o))
       const share = Math.min(Math.max(need, 0), 1)
       let lo = 0,
         hi = 1
