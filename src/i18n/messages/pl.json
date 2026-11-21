@@ -457,21 +457,29 @@
       "speed": "Wydajność"
     },
     "roleProofs": {
-      "design": "Każdy ekran tej strony zaprojektowałem sam: wybrałem krój pisma, ułożyłem siatkę i zaplanowałem ruch.",
-      "code": "Kod piszę z Claude, a każdą zmianę sprawdzam i sam decyduję, czy ją przyjąć.",
+      "design": "Zaprojektowałem piczura.com, portfolio modela Maćka Piczury, w którym każda rola i sesja ma własną scenę zamiast miejsca w albumie.",
+      "code": "Napisałem plugin open source aspect-preview do Payload CMS: kadruję zdjęcia, ustawiam punkt ostrości i podglądam przycięcie na żywo w każdym układzie strony.",
       "server": "Tyle czekała Twoja przeglądarka na pierwszy bajt tej strony przy tym wejściu; serwer stawiam i utrzymuję sam.",
       "maintenance": "Ostatnia zmiana na tej stronie: {date}; data aktualizuje się automatycznie.",
       "liquid": "Zielona ciecz na górze strony to moja symulacja: możesz ją poruszyć kursorem albo palcem.",
       "motion": "Każdy ruch na tej stronie sam zaprojektowałem i napisałem.",
       "speed": "Tyle zajęło pełne załadowanie tej strony u Ciebie, według pomiaru z Twojej przeglądarki."
     },
-    "rolesHint": "Wybierz rolę. Zobacz dowód.",
+    "rolesHint": "Wybierz. Zobacz dowód.",
     "relay": {
       "usual": "Zwykle",
       "mine": "U mnie",
-      "usualCount": "3 przekazania",
-      "mineCount": "0 przekazań",
-      "people": ["Projektant", "Programista", "Hosting", "Serwis"]
+      "usualCount": "Zwykle 4 zespoły",
+      "mineCount": "Jedna osoba",
+      "people": ["Projektant", "Programista", "Hosting", "Serwis"],
+      "project": "Twój projekt",
+      "teams": [
+        "Zespół projektowy",
+        "Zespół programistów",
+        "Zespół infrastruktury",
+        "Zespół utrzymania"
+      ],
+      "line": "Zwykle pracują nad tym różne zespoły. Ja zajmuję się każdym etapem sam."
     },
     "ledger": {
       "own": "Mój kod",
@@ -499,6 +507,22 @@
       "shelf": "Ciecz, kursor i menu powstały od zera.",
       "vision": "piczura.com — zobacz, co zrobiłem ze zdjęć Maćka."
     },
-    "door": "Zobacz stronę"
+    "door": "Zobacz stronę",
+    "roleLinks": {
+      "design": "Zobacz portfolio",
+      "code": "Sprawdź na npm"
+    },
+    "stock": {
+      "liquid": "Kropla, hero i przejścia to jedna symulacja zrobiona dla tej strony. Reaguje na dotyk i kursor, rozdziela się i łączy, załamuje światło i tekst pod sobą.",
+      "menu": "Przycisk otwiera menu strugą tej samej cieczy. Skala ma kreskę dla każdej części strony — wybierz jedną, a ciecz zaleje ekran i odsłoni wybrane miejsce.",
+      "cursor": "Kursor zmienia kształt zależnie od tego, co wskazujesz. Link otacza tą samą ramką co klawiatura, żeby oba sposoby obsługi dawały ten sam znak.",
+      "borrowed": "Podstawę biorę ze sprawdzonych narzędzi: Next.js, React, GSAP, Lenis, next-intl.",
+      "stockLabel": "Z PÓŁKI",
+      "hold": "Przytrzymaj kroplę: wersja z półki",
+      "holdLabel": "Naciśnij i przytrzymaj kroplę, żeby zobaczyć stronę z gotowych elementów.",
+      "placeholder": "Tutaj wpisz swój nagłówek",
+      "cta": "Dowiedz się więcej",
+      "type": "Wybrałem krój Mattone. Kompozycję, rozmiary liter, odstępy i sposób, w jaki tekst pojawia się słowo po słowie, dobrałem tak, żeby prowadzić wzrok po tej stronie."
+    }
   }
 }

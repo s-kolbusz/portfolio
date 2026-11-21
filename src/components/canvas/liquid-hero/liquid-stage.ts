@@ -562,6 +562,7 @@ async function run(els: LiquidStageElements, opts: LiquidStageOptions, life: Lif
 
   // pins: places on the screenshot (fractions of width and height) with notes about decisions in this project
   const hoverNone = matchMedia('(hover: none)').matches
+  const single = VW < 700 || hoverNone
   const pins = Array.from(pinsEl.querySelectorAll<HTMLElement>('.pin')).map((el) => {
     const u = +((PHONE_SHOT ? el.dataset.mu : el.dataset.u) ?? 0),
       v = +((PHONE_SHOT ? el.dataset.mv : el.dataset.v) ?? 0)
@@ -585,8 +586,9 @@ async function run(els: LiquidStageElements, opts: LiquidStageOptions, life: Lif
     }
     const toggle = () => {
       const open = !el.classList.contains('open')
-      // on a narrow screen a note covers the neighbouring pins, so one is open at a time (it stays until you close it)
-      if (open && VW < 700)
+      // on a narrow or touch screen a note covers the neighbouring pins, so one is open at a time
+      // (it stays until you close it, open another, or tap anywhere outside the pins; owner, 2026-11-20)
+      if (open && single)
         for (const o of Array.from(pinsEl.querySelectorAll('.pin.open'))) {
           o.classList.remove('open')
           o.querySelector('button')?.setAttribute('aria-expanded', 'false')
@@ -599,13 +601,23 @@ async function run(els: LiquidStageElements, opts: LiquidStageOptions, life: Lif
       life.listen(el, 'mouseleave', () => el.classList.remove('peek'))
     }
     life.listen(btn, 'click', toggle)
-    // on a narrow screen an open note covers the pins under it: a tap on the note closes it
-    if (VW < 700)
+    // on a narrow or touch screen an open note covers the pins under it: a tap on the note closes it
+    if (single)
       life.listen(note, 'click', () => {
         if (el.classList.contains('open')) toggle()
       })
     return { el, btn }
   })
+  // a tap anywhere outside the pins and their notes closes the open one
+  if (single)
+    life.listen(window, 'pointerdown', (e) => {
+      if ((e.target as Element | null)?.closest?.('.pin')) return
+      for (const p of pins) {
+        if (!p.el.classList.contains('open')) continue
+        p.el.classList.remove('open')
+        p.btn.setAttribute('aria-expanded', 'false')
+      }
+    })
   life.cleanup(() => {
     for (const p of pins) {
       p.el.classList.remove('on', 'open', 'peek')

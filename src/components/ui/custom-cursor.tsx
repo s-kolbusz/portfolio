@@ -358,7 +358,7 @@ export function CustomCursor() {
       <div
         ref={focusLayerRef}
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-9998 overflow-hidden print:hidden"
+        className="cc-focus pointer-events-none fixed inset-0 z-9998 overflow-hidden print:hidden"
       />
     </>
   )

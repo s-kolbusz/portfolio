@@ -92,6 +92,12 @@
   padding: var(--sys-s2) var(--sys-s3);
   background: var(--sys-light);
 }
+/* the GitHub link beside the command: the same type as the command, so the two sit on one line */
+.apd-get .apd-door {
+  font: 13px / 1 var(--sys-mono);
+  letter-spacing: 0;
+  text-transform: none;
+}
 
 /* the plugin's theme: the editor and the preview grid each declare the variables, so both */
 .apd :is(.focal-editor, .focal-preview) {
@@ -369,8 +375,11 @@
   .apd-get {
     margin-left: 0;
   }
-  .apd-get code {
+  .apd-get code,
+  .apd-get .apd-door {
     font-size: 11px;
+  }
+  .apd-get code {
     padding: var(--sys-s2);
     white-space: nowrap;
   }

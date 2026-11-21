@@ -461,21 +461,24 @@
       "speed": "Performance"
     },
     "roleProofs": {
-      "design": "I designed every screen on this site, chose the typeface, and defined the grid and motion.",
-      "code": "I write the code with Claude, review every change, and make the final call on what goes in.",
+      "design": "I designed piczura.com for model Maciek Piczura, giving each role and shoot its own scene instead of a conventional photo album.",
+      "code": "I built aspect-preview, an open-source Payload CMS plugin for cropping photos, setting focal points, and previewing crops live across page layouts.",
       "server": "Your browser received this page’s first byte in {ms} ms on this visit; I set up and maintain the server myself.",
       "maintenance": "This site was last updated on {date}; the date updates automatically.",
       "liquid": "I built the green fluid simulation at the top of this page: try moving it with your cursor or finger.",
       "motion": "I designed and coded every animation on this site.",
       "speed": "This page fully loaded for you in {s} s, measured in your browser during this visit."
     },
-    "rolesHint": "Pick a role. See proof.",
+    "rolesHint": "Pick one. See proof.",
     "relay": {
       "usual": "Typical project",
       "mine": "With me",
-      "usualCount": "3 handoffs",
-      "mineCount": "0 handoffs",
-      "people": ["Designer", "Developer", "Host", "Support"]
+      "usualCount": "Typically 4 teams",
+      "mineCount": "Just me",
+      "people": ["Designer", "Developer", "Host", "Support"],
+      "project": "Your project",
+      "teams": ["Design team", "Engineering team", "Infrastructure team", "Maintenance team"],
+      "line": "This usually involves several teams. I handle every stage by myself."
     },
     "ledger": {
       "own": "Built by me",
@@ -503,6 +506,22 @@
       "shelf": "Liquid, cursor, menu: built from scratch.",
       "vision": "piczura.com — see where I took Maciek’s photos."
     },
-    "door": "Visit the site"
+    "door": "Visit the site",
+    "roleLinks": {
+      "design": "Explore the portfolio",
+      "code": "View on npm"
+    },
+    "stock": {
+      "liquid": "The drop, hero, and transitions share one simulation built for this site. It responds to touch and the cursor, splits, rejoins, and bends light and text beneath it.",
+      "menu": "The button pours the same liquid into a menu, with a tick for each part of this page. Pick one: the liquid floods the screen, then drains to reveal that part.",
+      "cursor": "The cursor changes shape to match what’s underneath. Around links, it uses the keyboard focus frame, giving mouse and keyboard the same visual cue.",
+      "borrowed": "Borrowed foundations, chosen because they’re proven: Next.js, React, GSAP, Lenis, next-intl.",
+      "stockLabel": "OFF THE SHELF",
+      "hold": "Hold for off-the-shelf parts",
+      "holdLabel": "Press and hold the drop to see this page with off-the-shelf parts.",
+      "placeholder": "Your headline goes here",
+      "cta": "Learn more",
+      "type": "I chose Mattone. I designed the layout, type sizes, spacing, and how the text appears word by word to guide your eye through this site."
+    }
   }
 }
