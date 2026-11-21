@@ -40,6 +40,8 @@ export interface DropsFrame {
   rects: GroundRect[]
   /** on paper only: 0 the hero's green, 1 the dark green of the stronypodhale.pl sheet */
   tint?: number
+  /** on ink only: 0 the hero's green, 1 ready2order's blue (the logo's #1493BE), same glass */
+  blue?: number
 }
 
 export interface DropsStageOptions {
@@ -77,7 +79,7 @@ const BELOW = 0.6
 const SURFACE = `#version 300 es
 precision highp float;
 uniform sampler2D uDens, uDist, uHgt;
-uniform vec2 uRes, uHgtSize; uniform float uTime, uDH, uPaper, uTintK;
+uniform vec2 uRes, uHgtSize; uniform float uTime, uDH, uPaper, uTintK, uBlue;
 uniform vec4 uR[8]; uniform vec4 uRS[8]; uniform float uLW;
 out vec4 o;
 const float ISO = 0.38;
@@ -85,6 +87,9 @@ const vec3 GROUND = vec3(0.169, 0.149, 0.125);
 const vec3 PAPER = vec3(0.984, 0.976, 0.957);
 const vec3 TINT = vec3(0.03, 0.575, 0.363);
 const vec3 DARKG = vec3(0.082, 0.188, 0.122);
+// ready2order's blue, the logo's #1493BE; the glass filters below are the hero's green ones turned
+// to the same hue (+38 degrees, saturation and value kept), so only the hue changes
+const vec3 R2O = vec3(0.078, 0.576, 0.745);
 float hsh(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float vnoise(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f*f*(3. - 2.*f);
   return mix(mix(hsh(i), hsh(i + vec2(1, 0)), u.x), mix(hsh(i + vec2(0, 1)), hsh(i + vec2(1, 1)), u.x), u.y); }
@@ -158,7 +163,8 @@ void main(){
   vec2 q = gl_FragCoord.xy / uRes.y;
   // shadow and gathered light behind the liquid, as in the hero
   float sd = dens(q - vec2(0.012, -0.018));
-  vec3 wall = ground(q)*(1. - 0.14*smoothstep(ISO*0.4, ISO*1.4, sd)) + TINT*smoothstep(ISO*1.4, 1.6, sd)*0.12;
+  vec3 tint = mix(TINT, R2O, uBlue);
+  vec3 wall = ground(q)*(1. - 0.14*smoothstep(ISO*0.4, ISO*1.4, sd)) + tint*smoothstep(ISO*1.4, 1.6, sd)*0.12;
   float f = dens(q);
   float fw = fwidth(f);
   float cover = smoothstep(ISO - max(fw*2., 0.02), ISO + max(fw*2., 0.02), f);
@@ -176,10 +182,10 @@ void main(){
   // green glass over ink: what is under it, bent and tinted (the hero's drop on its dark sheet)
   // the map's lines only faintly through the glass: bent hard lines read as cracks
   vec3 seen = mix(GROUND, ground(q - n.xy*0.028), 0.3);
-  vec3 body = (seen*vec3(0.55, 1.0, 0.76) + TINT*0.5)*(1. - 0.25*curl);
+  vec3 body = (seen*mix(vec3(0.55, 1.0, 0.76), vec3(0.55, 0.955, 1.0), uBlue) + tint*0.5)*(1. - 0.25*curl);
   float F = 0.02 + 0.98*pow(1. - max(n.z, 0.), 5.);
   vec3 r = reflect(vec3(0., 0., -1.), n);
-  vec3 envC = env(r, q)*mix(vec3(0.42, 0.8, 0.6), vec3(1.), uPaper);
+  vec3 envC = env(r, q)*mix(mix(vec3(0.42, 0.8, 0.6), vec3(0.42, 0.76, 0.8), uBlue), vec3(1.), uPaper);
   // on paper: the hero's drop on its page, the tint itself with the window's reflections
   body = mix(body, mix(TINT, DARKG, uTintK)*1.04*(1. - 0.35*curl), uPaper);
   vec3 col = body*(1. - F*mix(0.45, 1., uPaper)) + envC*F*0.7*mix(0.55, 1., uPaper);
@@ -441,6 +447,7 @@ function run({ canvas, groups, start, frame: read, paper, shape }: DropsStageOpt
   gl.uniform1f(gl.getUniformLocation(surface, 'uPaper'), paper ? 1 : 0)
   const uTime = gl.getUniformLocation(surface, 'uTime')
   const uTintK = gl.getUniformLocation(surface, 'uTintK')
+  const uBlue = gl.getUniformLocation(surface, 'uBlue')
   const uRL = gl.getUniformLocation(surface, 'uR'),
     uRSL = gl.getUniformLocation(surface, 'uRS')
   const rBox = new Float32Array(32),
@@ -569,6 +576,7 @@ function run({ canvas, groups, start, frame: read, paper, shape }: DropsStageOpt
     gl.useProgram(surface)
     gl.uniform1f(uTime, now / 1000)
     gl.uniform1f(uTintK, f.tint ?? 0)
+    gl.uniform1f(uBlue, f.blue ?? 0)
     // the blocks, in the shader's units (canvas heights, y up)
     rBox.fill(0)
     rStyle.fill(0)

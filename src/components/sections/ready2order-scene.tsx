@@ -178,7 +178,9 @@ function frameAt(g: Geo, p: number, intro = INTRO.len): DropsFrame {
       span(intro, INTRO.blocks + i * INTRO.blockStep, INTRO.blocks + i * INTRO.blockStep + 0.6)
     )
   })
-  return { targets, rects }
+  // the liquid comes up the hero's green and turns ready2order's blue as it rises into the map,
+  // as the stronypodhale.pl liquid darkens into that brand's green
+  return { targets, rects, blue: ease(span(intro, INTRO.liquid[0] + 0.4, INTRO.liquid[1])) }
 }
 
 /**
