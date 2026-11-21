@@ -501,7 +501,7 @@
       "link": "Visit piczura.com",
       "scenes": ["Runways", "Verdi Gala", "City", "Deer"],
       "came": "Maciek Piczura, a fashion model, came to me with photos from shows and shoots.",
-      "asked": "He wanted a striking portfolio and expected a photo gallery.",
+      "asked": "He wanted a striking portfolio and expected <x>a photo gallery</x>.",
       "gave": "I proposed and built a site where each role and shoot has its own scene, motion, and typography.",
       "files": "The client's photos",
       "pick": "Pick a scene"

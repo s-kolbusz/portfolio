@@ -502,7 +502,7 @@
       "link": "Zobacz piczura.com",
       "scenes": ["Wybiegi", "Verdi Gala", "Miasto", "Jelenie"],
       "came": "Model Maciek Piczura przyszedł do mnie ze zdjęciami z pokazów i sesji.",
-      "asked": "Potrzebował efektownego portfolio i spodziewał się galerii zdjęć.",
+      "asked": "Potrzebował efektownego portfolio i spodziewał się <x>galerii zdjęć</x>.",
       "gave": "Zaproponowałem i zbudowałem stronę, na której każda rola i sesja ma własną scenę, ruch i typografię.",
       "files": "Zdjęcia od klienta",
       "pick": "Wybierz scenę"
