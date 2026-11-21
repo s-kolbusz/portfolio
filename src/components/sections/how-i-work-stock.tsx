@@ -233,7 +233,9 @@ export function HowIWorkStock() {
       const m = glide(span(p, T.words))
       const x = lerp(boxAt.x, drop.x, m)
       const y = lerp(boxAt.y, drop.y, m)
-      return { x, y: lerp(H + R * 4, y, k) }
+      // at the very end it runs out through the bottom again, on to the next screen
+      const out = glide(span(p, [0.95, 1]))
+      return { x, y: lerp(lerp(H + R * 4, y, k), H + R * 4, out) }
     }
     const free = () => {
       liquid?.stop()
