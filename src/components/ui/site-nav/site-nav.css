@@ -776,8 +776,12 @@ html.site-menu-open [data-adapt-theme='pointer'] {
     line-height: 0.86;
     letter-spacing: -0.04em;
   }
-  .sign__value {
+  /* a price or an address never breaks inside itself */
+  .sign__value,
+  .sign__note,
+  .sign__mark {
     display: block;
+    white-space: nowrap;
   }
   .sign--name {
     font-size: clamp(44px, 5vw, 96px);
