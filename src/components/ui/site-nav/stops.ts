@@ -14,6 +14,9 @@ export const STOPS: Stop[] = [
   { id: 'work', href: '/#work', label: 'stronypodhale.pl', brand: true },
   { id: 'aspect-preview', href: '/#aspect-preview', label: 'aspect' },
   { id: 'ready2order', href: '/#ready2order', label: 'ready2order' },
+  // act 4: the line, the page off the shelf and piczura.com are one part; the price list closes it
+  { id: 'how-i-work', href: '/#how-i-work', label: 'how_i_work' },
+  { id: 'prices', href: '/#prices', label: 'prices' },
   { id: 'about', href: '/#about', label: 'about' },
   { id: 'projects', href: '/#projects', label: 'projects' },
   { id: 'services', href: '/#services', label: 'services' },

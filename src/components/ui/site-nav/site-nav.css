@@ -554,11 +554,19 @@ html.site-menu-open [data-adapt-theme='pointer'] {
     right: var(--sys-margin);
     top: calc(var(--sys-s7) + var(--sys-s2));
     bottom: auto;
+    /* on short phones the list scrolls above the footer (room measured on open); the 2 px inset keeps
+       the travelled line, which starts 1 px left of the scale, inside the scrolling box */
+    max-height: var(--route-room, none);
+    overflow: hidden auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    margin-left: -2px;
+    padding-left: 2px;
   }
   .ruler {
     --row: var(--sys-s5);
     width: var(--sys-line);
-    height: calc(9 * var(--row));
+    height: calc(var(--stops, 9) * var(--row));
   }
   .ruler__done {
     top: 0;

@@ -87,11 +87,11 @@ export function SiteNav() {
         return el ? el.getBoundingClientRect().top + window.scrollY : Infinity
       })
       const max = document.documentElement.scrollHeight - vh
-      const bounds = stopBounds(
-        tops.map((top) => (Number.isFinite(top) ? top : max)),
-        vh,
-        max
-      )
+      // a section missing from the page gets no length: it starts where the next one does
+      for (let i = tops.length - 1; i >= 0; i--) {
+        if (!Number.isFinite(tops[i])) tops[i] = i + 1 < tops.length ? tops[i + 1] : max
+      }
+      const bounds = stopBounds(tops, vh, max)
       const pos = locate(window.scrollY, bounds)
       const next = stopShares(bounds)
       const before = next.slice(0, pos.index).reduce((a, b) => a + b, 0)
@@ -183,6 +183,13 @@ export function SiteNav() {
     const o = buttonCentre()
     openFrom.current = o
     const water = ensureWater()
+    // the list of parts may not run into the footer: what is left above it, the list scrolls within
+    const route = menuRef.current?.querySelector<HTMLElement>('.site-menu__route')
+    const foot = menuRef.current?.querySelector<HTMLElement>('.site-menu__foot')
+    if (route && foot) {
+      const room = foot.getBoundingClientRect().top - route.getBoundingClientRect().top - 16
+      route.style.setProperty('--route-room', `${Math.max(room, 96)}px`)
+    }
     // measured while the menu is still closed (laid out, invisible), so the transitions start with these delays:
     // every part surfaces once the liquid has left clean paper over all of it
     menuRef.current?.querySelectorAll<HTMLElement>('[data-surface]').forEach((el) => {
@@ -207,6 +214,12 @@ export function SiteNav() {
     const menu = menuRef.current
     const here = menu?.querySelector<HTMLElement>('a[aria-current]') ?? menu?.querySelector('nav a')
     here?.focus({ preventScroll: true })
+    // a list that scrolls opens with the current part in view
+    const route = menu?.querySelector<HTMLElement>('.site-menu__route')
+    if (route && here && route.scrollHeight > route.clientHeight + 1) {
+      const at = here.getBoundingClientRect().top - route.getBoundingClientRect().top
+      route.scrollTop += at - (route.clientHeight - here.offsetHeight) / 2
+    }
   }, [phase])
 
   const closeMenu = useCallback(
@@ -225,7 +238,13 @@ export function SiteNav() {
   useEffect(() => {
     const menu = menuRef.current
     if (phase !== 'open' || !menu) return
-    const stop = (e: Event) => e.preventDefault()
+    // except inside the list of parts when it is taller than the room above the footer (short phones)
+    const route = menu.querySelector<HTMLElement>('.site-menu__route')
+    const stop = (e: Event) => {
+      const scrolls = route && route.scrollHeight > route.clientHeight + 1
+      if (scrolls && route.contains(e.target as Node)) return
+      e.preventDefault()
+    }
     menu.addEventListener('wheel', stop, { passive: false })
     menu.addEventListener('touchmove', stop, { passive: false })
     return () => {
@@ -421,7 +440,7 @@ export function SiteNav() {
             ref={rulerRef}
             className="ruler"
             data-scale
-            style={{ '--here': index } as React.CSSProperties}
+            style={{ '--here': index, '--stops': STOPS.length } as React.CSSProperties}
           >
             <li className="ruler__done" aria-hidden="true" />
             <li className="ruler__here" aria-hidden="true" />
