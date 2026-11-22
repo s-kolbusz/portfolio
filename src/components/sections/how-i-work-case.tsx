@@ -54,8 +54,6 @@ const T = {
   play: [0.69, 0.73], // the recording takes over
   gave: 0.6, // the answer replaces the struck sentence
 } as const
-/** how long each scene plays before the next one, ms */
-const TURN = 5200
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v))
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t
@@ -109,13 +107,6 @@ export function HowIWorkCase() {
   const [playing, setPlaying] = useState(false)
   const names = t.raw('case.scenes') as string[]
   useReveal(trackRef, { at: 0.6 })
-
-  // the scenes turn over by themselves until the visitor picks one
-  useEffect(() => {
-    if (!playing || !auto || reduced) return
-    const id = window.setInterval(() => setScene((s) => (s + 1) % SCENES.length), TURN)
-    return () => window.clearInterval(id)
-  }, [playing, auto, reduced])
 
   // only the scene on show plays, and only while the frame is on the screen; the first one starts
   // where the assembled photos left it
@@ -318,6 +309,13 @@ export function HowIWorkCase() {
     }
   }, [reduced])
 
+  // the scenes turn over by themselves until the visitor picks one: each plays once to its end and
+  // hands over to the next (a fixed interval cut the shorter clips after they had looped back to
+  // their first frame, a visible jump); a picked scene loops
+  const next = () => {
+    if (auto && playing) setScene((s) => (s + 1) % SCENES.length)
+  }
+
   const pick = (i: number) => {
     setAuto(false)
     setScene(i)
@@ -393,7 +391,8 @@ export function HowIWorkCase() {
                 src={`/video/act4/piczura-${s}.mp4`}
                 poster={i === 0 ? undefined : `/video/act4/piczura-${s}.jpg`}
                 muted
-                loop
+                loop={!auto}
+                onEnded={next}
                 playsInline
                 preload={i === 0 ? 'auto' : 'none'}
                 aria-label={names[i]}
