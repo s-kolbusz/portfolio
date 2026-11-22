@@ -21,7 +21,7 @@
   --pz-gold-text: #806129;
   position: relative;
   width: 100%;
-  height: 610svh; /* TRACK + DRIVE in how-i-work-case.tsx, set there too */
+  height: 640svh; /* TRACK + DRIVE in how-i-work-case.tsx, set there too */
   background: var(--sys-paper);
   color: var(--sys-ink);
 }

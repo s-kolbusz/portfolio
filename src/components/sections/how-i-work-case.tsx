@@ -8,8 +8,6 @@ import { Rise } from '@/components/ui/rise'
 import { usePrefersReducedMotion } from '@/hooks/use-media'
 import { useReveal } from '@/hooks/use-reveal'
 
-import { FrameSequence } from './how-i-work-case-frames'
-
 import './how-i-work-case.css'
 
 const SCENES = ['wybiegi', 'verdi', 'miasto', 'jelenie'] as const
@@ -29,20 +27,14 @@ const BAR: [string, number, boolean?][] = [
   ['Projekty', 827],
   ['Karta', 938],
 ]
-/**
- * The Runways scene of piczura.com as frames taken from the live site (1920 x 1200, scaled to
- * 1600 x 1000) every 10 px of its scroll, from the layout the photos assemble into (scroll 1838)
- * to the scene's end. The visitor's scroll moves through them: no recording speed, no autoplayed
- * scroll.
- */
-const RUNWAYS = {
-  count: 253,
-  url: (i: number) => `/video/act4/wybiegi/${String(i).padStart(3, '0')}.webp`,
-}
-/** the track's height without the Runways scroll, svh (the stage is 100svh and sticks) */
+/** the track's height without the scenes' scroll, svh (the stage is 100svh and sticks) */
 const TRACK = 440
-/** the scroll, in svh, that moves through the whole Runways scene once the frame has grown */
-const DRIVE = 170
+/**
+ * Once the frame has grown the stage holds still and the scroll turns the scenes over, DRIVE svh
+ * for all four: each one's recording plays once, at its own speed, and stops on its last frame
+ * (the Runways one is 60 fps, taken from the live site at a steady scroll with its bar held still).
+ */
+const DRIVE = 200
 
 /**
  * The scene is laid out in a 1000 x 625 space (the recordings' 16:10) and scaled to its box, so the
@@ -65,7 +57,7 @@ const T = {
   title: [0.44, 0.56], // the show's name is written above it
   ring: [0.54, 0.6], // and one frame is circled, the way the site picks one
   grow: [0.6, 0.72], // the frame grows to the screen
-  play: [0.69, 0.73], // the page takes over; from here the visitor scrolls it (DRIVE)
+  play: [0.69, 0.73], // the recording takes over; from here the scroll turns the scenes (DRIVE)
   gave: 0.6, // the answer replaces the struck sentence
 } as const
 
@@ -107,9 +99,9 @@ const STRIP_W = FRAMES[2]!.x + FRAMES[2]!.w + KH * 0.06 - STRIP.x
  * expected a gallery. Three of his runway photos land in an even album under their file names, and
  * the expectation is written under them. Scrolling, the album closes into a strip of film on
  * piczura.com's paper, the show's name is written above it in the site's italic, and the frame
- * grows to the screen and turns into the live page of that very scene, which the visitor then
- * scrolls through inside the frame. The struck-out gallery is replaced by what was made instead;
- * the other scene names show recordings of the other scenes.
+ * grows to the screen and turns into the recording of that very scene. The stage then holds still
+ * while the scroll turns the scenes over (the close covers it after); the struck-out gallery is
+ * replaced by what was made instead, and the scene names pick a scene by hand.
  */
 export function HowIWorkCase() {
   const t = useTranslations('howIWork')
@@ -121,8 +113,7 @@ export function HowIWorkCase() {
   const names = t.raw('case.scenes') as string[]
   useReveal(trackRef, { at: 0.6 })
 
-  // a picked recording plays, and only while the frame is on the screen; Runways is scrolled, not
-  // played
+  // the scene on show plays once from its start, and only while the frame is on the screen
   useEffect(() => {
     const stage = stageRef.current
     if (!stage) return
@@ -149,18 +140,9 @@ export function HowIWorkCase() {
     const came = q<HTMLElement>('.cs-came')
     const foot = q<HTMLElement>('.cs-foot')
     const videos = q<HTMLElement>('.cs-rec')
-    // the Runways frames: fetched once the section is near, the first one shown from the start
-    const canvas = q<HTMLCanvasElement>('.cs-runways')
-    const frames = canvas
-      ? new FrameSequence(canvas, RUNWAYS.count, RUNWAYS.url, {
-          // 10 px of piczura.com's scroll at 1920 wide, in the 1600 px frames
-          step: (10 * 1600) / 1920,
-          // its bar, down to the rule under it
-          top: 60,
-          // drawn from frame 33, where nothing shows through it
-          bar: 33,
-        })
-      : null
+    // the recordings load only once the section is near
+    const clips = Array.from(stage.querySelectorAll<HTMLVideoElement>('video'))
+    let near = false
 
     let W = 0
     let H = 0
@@ -288,11 +270,12 @@ export function HowIWorkCase() {
 
     let frameReq = 0
     let was = false
+    let shown = 0
     const draw = () => {
       frameReq = 0
       const rect = track.getBoundingClientRect()
-      // the scroll through the track: the beats take TRACK - 100 svh of it, and once the page has
-      // taken over (T.play), DRIVE svh more move through the Runways scene before the rest
+      // the scroll through the track: the beats take TRACK - 100 svh of it, and once the recording
+      // has taken over (T.play), DRIVE svh more turn the scenes over before the rest
       const unit = Math.max(1, rect.height - window.innerHeight) / (TRACK - 100 + DRIVE)
       const beats = (TRACK - 100) * unit
       const drive = DRIVE * unit
@@ -301,13 +284,27 @@ export function HowIWorkCase() {
       const sb = s < at ? s : s < at + drive ? at : s - drive
       p = reduced ? 1 : clamp01(sb / beats)
       place()
-      if (rect.top < window.innerHeight * 2.5 && rect.bottom > -window.innerHeight) frames?.load()
-      frames?.show(reduced ? 0 : clamp01((s - at) / drive) * (RUNWAYS.count - 1))
-      const on = p >= T.play[1] && rect.top < window.innerHeight && rect.bottom > 0
+      if (!near && rect.top < window.innerHeight * 2.5 && rect.bottom > -window.innerHeight) {
+        near = true
+        clips.forEach((v) => {
+          v.preload = 'auto'
+          v.load()
+        })
+      }
+      // which scene the scroll is on; it switches only when the scroll crosses into another one, so
+      // a name picked by hand holds until then
+      const turned = Math.min(
+        SCENES.length - 1,
+        Math.floor(clamp01((s - at) / drive) * SCENES.length)
+      )
+      if (turned !== shown) {
+        shown = turned
+        setScene(turned)
+      }
+      const on = !reduced && s >= at && rect.top < window.innerHeight && rect.bottom > 0
       if (on !== was) {
         was = on
         setPlaying(on)
-        if (!on) setScene(0)
       }
     }
     const request = () => {
@@ -324,7 +321,6 @@ export function HowIWorkCase() {
     window.addEventListener('resize', onResize)
     return () => {
       cancelAnimationFrame(frameReq)
-      frames?.dispose()
       window.removeEventListener('scroll', request)
       window.removeEventListener('resize', onResize)
     }
@@ -401,28 +397,19 @@ export function HowIWorkCase() {
           </div>
 
           <div className="cs-rec">
-            <canvas
-              className="cs-runways"
-              role="img"
-              aria-label={names[0]}
-              data-on={scene === 0 || undefined}
-            />
-            {SCENES.map((s, i) =>
-              i === 0 ? null : (
-                <video
-                  key={s}
-                  src={`/video/act4/piczura-${s}.mp4`}
-                  poster={`/video/act4/piczura-${s}.jpg`}
-                  muted
-                  loop
-                  playsInline
-                  preload="none"
-                  aria-label={names[i]}
-                  data-i={i}
-                  data-on={i === scene || undefined}
-                />
-              )
-            )}
+            {SCENES.map((s, i) => (
+              <video
+                key={s}
+                src={`/video/act4/piczura-${s}.mp4`}
+                poster={`/video/act4/piczura-${s}.jpg`}
+                muted
+                playsInline
+                preload="none"
+                aria-label={names[i]}
+                data-i={i}
+                data-on={i === scene || undefined}
+              />
+            ))}
           </div>
         </div>
 
