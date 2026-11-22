@@ -542,9 +542,10 @@ html.site-menu-open [data-adapt-theme='pointer'] {
   }
 }
 
-/* ---------- touch (phones and tablets): no hover, so the scale stands up along the left edge and every
-   part shows its name; where you are is the travelled line ending in a crossbar ---------- */
-@media (max-width: 700px), (hover: none) {
+/* ---------- the menu as a list (everywhere since 2026-11-22; on desktop the names hanging from a proportional
+   ruler were hard to read): the scale stands up along the left edge and every part shows its name; where you are
+   is the travelled line ending in a crossbar. Desktop extras follow this block ---------- */
+@media all {
   .site-menu__word,
   .site-menu__fact {
     display: none;
@@ -673,6 +674,91 @@ html.site-menu-open [data-adapt-theme='pointer'] {
   }
 }
 
+/* ---------- desktop: the list on the left, the part's sentence on the right; the character is in the motion:
+   rows surface one after another behind the liquid, the ink runs along the line to the part you point at,
+   and that name dries from a blur into ink ---------- */
+@media (hover: hover) and (min-width: 701px) {
+  .site-menu__route {
+    top: 15vh;
+    right: auto;
+    width: 46vw;
+  }
+  .ruler {
+    --row: min(52px, calc((100vh - 330px) / var(--stops, 11)));
+    background: var(--sys-ink-2);
+  }
+  .ruler__stop {
+    width: 46vw;
+  }
+  .ruler__stop a {
+    padding-left: var(--sys-s4);
+  }
+  .ruler__name,
+  .ruler__stop[data-active] .ruler__name {
+    font-size: calc(var(--row) * 0.62);
+    opacity: 0.42;
+    transition:
+      opacity 0.35s var(--sys-out),
+      transform 0.45s var(--sys-out),
+      filter 0.45s var(--sys-out);
+  }
+  .ruler__stop[data-here] .ruler__name,
+  .ruler__stop[data-active] .ruler__name {
+    opacity: 1;
+  }
+  .ruler__stop[data-active]:not([data-here]) .ruler__name {
+    transform: translateX(var(--sys-s1));
+  }
+  .ruler__stop[data-here] a::before {
+    width: var(--sys-s3);
+  }
+  /* the ink runs down (or back up) the line to the part you point at, then waits there */
+  .ruler__here {
+    display: block;
+    top: 0;
+    left: -1px;
+    width: var(--sys-line-2);
+    height: calc((var(--to, 0) + 0.5) * var(--row));
+    margin-left: 0;
+    opacity: 0.32;
+    transition: height 0.55s var(--sys-out);
+  }
+  .site-menu:not([data-home]) .ruler__here {
+    display: block;
+  }
+  .ruler__mark {
+    display: block;
+    flex: none;
+    font: var(--sys-micro) / 1 var(--sys-mono);
+    letter-spacing: 0.12em;
+    color: var(--sys-ink-2);
+  }
+  /* the rows surface top to bottom, wet to dry, after the liquid has cleared the paper under them */
+  .site-menu[data-phase='open'] .ruler__stop {
+    animation: site-row-in 0.6s var(--sys-out) backwards;
+    animation-delay: calc(var(--d, 0s) + var(--i) * 45ms);
+  }
+  .site-menu__word {
+    display: block;
+    left: 56vw;
+    top: 15vh;
+  }
+  .site-menu__word .w {
+    display: none;
+  }
+  .site-menu__word .f {
+    margin-top: 0;
+    max-width: 30ch;
+  }
+}
+@keyframes site-row-in {
+  from {
+    opacity: 0;
+    filter: blur(3px);
+    transform: translateY(var(--sys-s1));
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .site-bar > *,
   .site-menu [data-surface],
@@ -682,6 +768,7 @@ html.site-menu-open [data-adapt-theme='pointer'] {
     transition-delay: 0s !important;
   }
   .site-bar__name-in,
+  .site-menu[data-phase='open'] .ruler__stop,
   .site-menu__word .w,
   .site-menu__word .f {
     animation: none;

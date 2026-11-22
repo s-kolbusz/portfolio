@@ -65,7 +65,6 @@ export function SiteNav() {
   const toggleRef = useRef<HTMLButtonElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const rulerRef = useRef<HTMLOListElement>(null)
   const skRef = useRef<HTMLAnchorElement>(null)
   const waterRef = useRef<MenuWater | null>(null)
   const alongRef = useRef(0)
@@ -309,14 +308,9 @@ export function SiteNav() {
       scrollTo(id)
       return
     }
+    // the scale is a list: the flood starts at the chosen row
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
-    const ruler = rulerRef.current?.getBoundingClientRect()
-    // on touch the scale is a list: the flood starts at the chosen row
-    const list = window.matchMedia('(max-width: 700px), (hover: none)').matches
-    const point =
-      ruler && !list
-        ? { x: rect.left, y: ruler.top }
-        : { x: rect.left, y: rect.top + rect.height / 2 }
+    const point = { x: rect.left, y: rect.top + rect.height / 2 }
     setHover(null)
     setPhase('leaving')
     water.navigate(
@@ -437,10 +431,11 @@ export function SiteNav() {
 
         <nav className="site-menu__route" aria-label={t('main_navigation')} data-surface>
           <ol
-            ref={rulerRef}
             className="ruler"
             data-scale
-            style={{ '--here': index, '--stops': STOPS.length } as React.CSSProperties}
+            style={
+              { '--here': index, '--to': active, '--stops': STOPS.length } as React.CSSProperties
+            }
           >
             <li className="ruler__done" aria-hidden="true" />
             <li className="ruler__here" aria-hidden="true" />
