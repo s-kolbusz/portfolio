@@ -14,8 +14,8 @@
     "hero": "Start",
     "aspect": "aspect-preview",
     "ready2order": "ready2order",
-    "how_i_work": "How I work",
-    "prices": "Prices",
+    "how_i_work": "Jak pracuję",
+    "prices": "Cennik",
     "about": "O mnie",
     "projects": "Projekty",
     "services": "Usługi",
@@ -338,13 +338,28 @@
     "description": "Strona, której szukasz, mogła zostać usunięta lub jest tymczasowo niedostępna.",
     "returnHome": "Powrót do strony głównej"
   },
+  "navSigns": {
+    "work": "od 369 zł na start",
+    "before": "przed",
+    "after": "po",
+    "crafts": ["Projekt", "Kod", "Serwer", "Utrzymanie"],
+    "prices": [
+      ["130 zł/h", "kontrakt"],
+      ["200 zł/h", "konsultacje"],
+      ["od 30 000 zł", "aplikacja albo MVP"]
+    ],
+    "about": "robię strony od",
+    "services": "Od projektu po utrzymanie",
+    "calculator": "Creality, przebudowana · druk na zamówienie",
+    "contact": "Zakopane · pracuję zdalnie"
+  },
   "navFacts": {
     "hero": "Zielona ciecz u góry strony to symulacja liczona na żywo w przeglądarce.",
     "work": "Prowadzę stronypodhale.pl, gdzie firmy z Podhala widzą projekt i cenę, zanim zapłacą.",
     "aspect-preview": "Wypróbuj mój plugin open source do Payloada: kadrujesz raz, od razu widzisz wszystkie układy.",
     "ready2order": "Wprowadziłem cztery drobne zmiany i bundle przy pierwszym ładowaniu był o połowę mniejszy.",
-    "how-i-work": "This usually involves several teams. I handle every stage by myself.",
-    "prices": "Contract work from €45 an hour, web apps from €10,000, custom websites from €4,300.",
+    "how-i-work": "Zwykle pracują nad tym różne zespoły. Ja zajmuję się każdym etapem sam.",
+    "prices": "Kontrakt od 130 zł za godzinę, aplikacje od 30 000 zł, strony kreatywne od 10 945 zł.",
     "about": "Jestem frontend developerem i projektantem z Zakopanego, a strony robię od 2016 roku.",
     "projects": "W ready2order ograniczyłem o połowę ilość kodu pobieranego przed pierwszym ekranem.",
     "services": "Sam zajmuję się projektem, kodem, serwerem i utrzymaniem strony.",

@@ -342,6 +342,21 @@
     "description": "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
     "returnHome": "Return to Home"
   },
+  "navSigns": {
+    "work": "from 369 zł to start",
+    "before": "before",
+    "after": "after",
+    "crafts": ["Design", "Code", "Server", "Upkeep"],
+    "prices": [
+      ["€45/h", "contract"],
+      ["€60/h", "consulting"],
+      ["from €10,000", "web app or MVP"]
+    ],
+    "about": "building websites since",
+    "services": "From design to upkeep",
+    "calculator": "Creality, rebuilt · prints on request",
+    "contact": "Zakopane · working remotely"
+  },
   "navFacts": {
     "hero": "Liquid on paper, simulated live in your browser.",
     "work": "My web studio: websites for businesses in Podhale, with the design and the price agreed up front.",

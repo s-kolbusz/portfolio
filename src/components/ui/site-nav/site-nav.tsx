@@ -10,6 +10,7 @@ import { isHomeRoute, isProjectDetailRoute, isServicesRoute } from '@/lib/route-
 import { useScrollStore } from '@/lib/stores'
 
 import { createMenuWater, type MenuWater } from './menu-water'
+import { NavSign } from './nav-sign'
 import { useSkFlight } from './sk-flight'
 import { STOPS, locate, stopBounds, stopShares } from './stops'
 
@@ -419,12 +420,10 @@ export function SiteNav() {
       >
         <canvas ref={canvasRef} className="site-menu__water" aria-hidden="true" />
 
-        {/* the part you are on, or the one you point at, set at the size of the hero name */}
+        {/* the part you are on, or the one you point at: its sign and its sentence (desktop only) */}
         <div className="site-menu__word" aria-hidden="true" data-surface>
           <span key={active} className="site-menu__word-in">
-            <span className="w" style={{ '--len': label(active).length } as React.CSSProperties}>
-              {STOPS[active].brand ? <Wordmark /> : label(active)}
-            </span>
+            <NavSign id={STOPS[active].id} wordmark={<Wordmark />} />
             <span className="f">{tf(STOPS[active].id)}</span>
           </span>
         </div>
