@@ -151,7 +151,16 @@ export function HowIWorkCase() {
     const videos = q<HTMLElement>('.cs-rec')
     // the Runways frames: fetched once the section is near, the first one shown from the start
     const canvas = q<HTMLCanvasElement>('.cs-runways')
-    const frames = canvas ? new FrameSequence(canvas, RUNWAYS.count, RUNWAYS.url) : null
+    const frames = canvas
+      ? new FrameSequence(canvas, RUNWAYS.count, RUNWAYS.url, {
+          // 10 px of piczura.com's scroll at 1920 wide, in the 1600 px frames
+          step: (10 * 1600) / 1920,
+          // its bar, down to the rule under it
+          top: 60,
+          // drawn from frame 33, where nothing shows through it
+          bar: 33,
+        })
+      : null
 
     let W = 0
     let H = 0
