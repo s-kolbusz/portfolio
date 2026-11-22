@@ -11,6 +11,9 @@ import { useReveal } from '@/hooks/use-reveal'
 import './how-i-work-case.css'
 
 const SCENES = ['wybiegi', 'verdi', 'miasto', 'jelenie'] as const
+/** each scene's recording, /video/act4/<name>.mp4 and .jpg (a new cut gets a new name, so no
+ * browser keeps showing the old one from its cache) */
+const CLIPS = ['piczura-wybiegi-60', 'piczura-verdi', 'piczura-miasto', 'piczura-jelenie']
 /** three photos from the Dubai Fashion Week show, the ones the Runways scene of piczura.com is built from */
 const PHOTOS = [0, 1, 2].map((i) => `/images/act4/piczura-dubai-${i}.webp`)
 /** the files' own names, the way they arrived */
@@ -213,6 +216,7 @@ export function HowIWorkCase() {
     }
 
     let p = 0
+    let placed = -1
     const place = () => {
       const land = span(p, T.land)
       const strip = glide(span(p, T.strip))
@@ -283,7 +287,12 @@ export function HowIWorkCase() {
       const at = T.play[1] * beats
       const sb = s < at ? s : s < at + drive ? at : s - drive
       p = reduced ? 1 : clamp01(sb / beats)
-      place()
+      // while the scenes turn, nothing in the scene moves: leave the page alone so the recording
+      // plays without the style work of every scroll frame
+      if (p !== placed) {
+        placed = p
+        place()
+      }
       if (!near && rect.top < window.innerHeight * 2.5 && rect.bottom > -window.innerHeight) {
         near = true
         clips.forEach((v) => {
@@ -312,6 +321,7 @@ export function HowIWorkCase() {
     }
     const onResize = () => {
       measure()
+      placed = -1
       request()
     }
     void document.fonts.ready.then(onResize)
@@ -400,8 +410,8 @@ export function HowIWorkCase() {
             {SCENES.map((s, i) => (
               <video
                 key={s}
-                src={`/video/act4/piczura-${s}.mp4`}
-                poster={`/video/act4/piczura-${s}.jpg`}
+                src={`/video/act4/${CLIPS[i]}.mp4`}
+                poster={`/video/act4/${CLIPS[i]}.jpg`}
                 muted
                 playsInline
                 preload="none"
