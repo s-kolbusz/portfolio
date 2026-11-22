@@ -231,7 +231,8 @@ b.cs-bar {
   overflow: visible;
   fill: none;
   stroke: var(--pz-gold);
-  stroke-width: 2;
+  /* 3.2 px at 1920 wide, as on piczura.com, in the scene's 1000 units */
+  stroke-width: 1.67;
   stroke-linecap: round;
   pointer-events: none;
 }
@@ -241,9 +242,6 @@ b.cs-bar {
 .cs-ring path {
   stroke-dasharray: 1 1;
   stroke-dashoffset: calc(1 - var(--draw, 0));
-}
-.cs-ring path + path {
-  opacity: 0.55;
 }
 
 /* the recordings take over the frame */

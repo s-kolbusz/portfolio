@@ -13,7 +13,7 @@ import './how-i-work-case.css'
 const SCENES = ['wybiegi', 'verdi', 'miasto', 'jelenie'] as const
 /** each scene's recording, /video/act4/<name>.mp4 and .jpg (a new cut gets a new name, so no
  * browser keeps showing the old one from its cache) */
-const CLIPS = ['piczura-wybiegi-60', 'piczura-verdi', 'piczura-miasto', 'piczura-jelenie']
+const CLIPS = ['piczura-wybiegi-2', 'piczura-verdi-2', 'piczura-miasto-2', 'piczura-jelenie-2']
 /** three photos from the Dubai Fashion Week show, the ones the Runways scene of piczura.com is built from */
 const PHOTOS = [0, 1, 2].map((i) => `/images/act4/piczura-dubai-${i}.webp`)
 /** the files' own names, the way they arrived */
@@ -35,7 +35,7 @@ const TRACK = 440
 /**
  * Once the frame has grown the stage holds still and the scroll turns the scenes over, DRIVE svh
  * for all four: each one's recording plays once, at its own speed, and stops on its last frame
- * (the Runways one is 60 fps, taken from the live site at a steady scroll with its bar held still).
+ * (all four are 60 fps, taken frame by frame from the live site with its sound switched off).
  */
 const DRIVE = 200
 
@@ -47,8 +47,12 @@ const DRIVE = 200
 const SW = 1000
 const SH = 625
 const ALBUM = { w: 300, h: 500, gap: 50, y: 40 }
-const KH = 212 // the strip's height (piczura.com: frame 0.76, padding 0.12, gap 0.06 of it)
-const STRIP = { x: 204, y: 379 }
+// the strip as the live site has it at the hand-off (1920 x 1200, scroll 1838: 653 x 400 px at
+// 394, 731), its height (piczura.com: frame 0.76, padding 0.12, gap 0.06 of it), and the tilt of
+// its row (.fr-wb-pas: rotate -0.8deg)
+const KH = 208.3
+const STRIP = { x: 205.3, y: 380.6 }
+const TILT = -0.8
 
 /** the scroll through the track, 0..1 */
 const T = {
@@ -96,6 +100,33 @@ const FRAMES: Box[] = (() => {
   })
 })()
 const STRIP_W = FRAMES[2]!.x + FRAMES[2]!.w + KH * 0.06 - STRIP.x
+/**
+ * piczura.com's ring around the picked frame: its own first loop (the second is not drawn yet at
+ * the hand-off), in a box 1.28 x 1.2 of the frame, set out in that box's own units so the stroke
+ * keeps one width (3.2 px at 1920 wide on the site) instead of stretching with the box
+ */
+const RING = (() => {
+  const f = FRAMES[0]!
+  const w = f.w * 1.28
+  const h = f.h * 1.2
+  let n = 0
+  const d = 'M58 4C84 6 98 24 97 50S80 96 50 96 3 78 4 49 26 3 55 5c8 0 14 2 19 5'.replace(
+    /-?\d*\.?\d+/g,
+    (v) => ((Number(v) * (n++ % 2 ? h : w)) / 100).toFixed(2)
+  )
+  return { x: f.x - f.w * 0.14, y: f.y - f.h * 0.1, w, h, d }
+})()
+/** the strip's middle, which its row turns about */
+const PIVOT = { x: STRIP.x + STRIP_W / 2, y: STRIP.y + KH / 2 }
+/** a box turned with the row by `deg` about PIVOT: where its middle goes */
+const turn = (b: Box, deg: number): Box => {
+  const r = (deg * Math.PI) / 180
+  const dx = b.x + b.w / 2 - PIVOT.x
+  const dy = b.y + b.h / 2 - PIVOT.y
+  const cx = PIVOT.x + dx * Math.cos(r) - dy * Math.sin(r)
+  const cy = PIVOT.y + dx * Math.sin(r) + dy * Math.cos(r)
+  return { ...b, x: cx - b.w / 2, y: cy - b.h / 2 }
+}
 
 /**
  * Act 4, line 3: "I add my own vision" (owner, 2026-11-21). Maciek Piczura came with photos and
@@ -268,8 +299,10 @@ export function HowIWorkCase() {
         const f = FRAMES[i]!
         // the frames close in one after another, the last one first: the strip pulls them in
         const ki = glide((strip - (2 - i) * 0.08) / 0.84)
-        const at = mix({ ...c, y: c.y - (1 - k) * 90 }, f, ki)
-        el.style.transform = `translate(${at.x.toFixed(2)}px, ${at.y.toFixed(2)}px) rotate(${((1 - k) * (i === 1 ? 3 : -3)).toFixed(2)}deg)`
+        // in the strip they tilt with its row, about its middle
+        const tilt = TILT * ki
+        const at = turn(mix({ ...c, y: c.y - (1 - k) * 90 }, f, ki), tilt)
+        el.style.transform = `translate(${at.x.toFixed(2)}px, ${at.y.toFixed(2)}px) rotate(${((1 - k) * (i === 1 ? 3 : -3) + tilt).toFixed(2)}deg)`
         el.style.width = `${at.w.toFixed(2)}px`
         el.style.height = `${at.h.toFixed(2)}px`
         el.style.opacity = String(k)
@@ -408,7 +441,13 @@ export function HowIWorkCase() {
             <div
               className="cs-film"
               aria-hidden="true"
-              style={{ left: STRIP.x, top: STRIP.y, width: STRIP_W, height: KH }}
+              style={{
+                left: STRIP.x,
+                top: STRIP.y,
+                width: STRIP_W,
+                height: KH,
+                rotate: `${TILT}deg`,
+              }}
             />
             {PHOTOS.map((src, i) => (
               <figure key={src} className="cs-photo" aria-hidden="true">
@@ -419,21 +458,18 @@ export function HowIWorkCase() {
             ))}
             <svg
               className="cs-ring"
-              viewBox="0 0 100 100"
-              preserveAspectRatio="none"
+              viewBox={`0 0 ${RING.w} ${RING.h}`}
               aria-hidden="true"
               style={{
-                left: FRAMES[0]!.x - FRAMES[0]!.w * 0.14,
-                top: FRAMES[0]!.y - FRAMES[0]!.h * 0.1,
-                width: FRAMES[0]!.w * 1.28,
-                height: FRAMES[0]!.h * 1.2,
+                left: RING.x,
+                top: RING.y,
+                width: RING.w,
+                height: RING.h,
+                rotate: `${TILT}deg`,
+                transformOrigin: `${PIVOT.x - RING.x}px ${PIVOT.y - RING.y}px`,
               }}
             >
-              <path
-                pathLength="1"
-                d="M58 4C84 6 98 24 97 50S80 96 50 96 3 78 4 49 26 3 55 5c8 0 14 2 19 5"
-              />
-              <path pathLength="1" d="M44 8C20 12 6 30 7 52s19 41 45 41 42-20 41-44S76 7 47 8" />
+              <path pathLength="1" d={RING.d} />
             </svg>
           </div>
 
