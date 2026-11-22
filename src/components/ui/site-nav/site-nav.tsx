@@ -287,9 +287,11 @@ export function SiteNav() {
   const scrollTo = (id: string) => {
     const target = id === 'hero' ? 0 : document.getElementById(id)
     if (target === null) return
-    if (lenis) lenis.scrollTo(target, { immediate: true, force: true })
+    // a part laid over the one before it is landed on where it covers the screen
+    const offset = (STOPS.find((stop) => stop.id === id)?.land ?? 0) * window.innerHeight
+    if (lenis) lenis.scrollTo(target, { immediate: true, force: true, offset })
     else if (target === 0) window.scrollTo(0, 0)
-    else target.scrollIntoView()
+    else window.scrollTo(0, target.getBoundingClientRect().top + window.scrollY + offset)
   }
 
   // choosing: the liquid floods from the chosen tick, the page moves while covered, the flood drains
@@ -462,7 +464,7 @@ export function SiteNav() {
                     onBlur={() => setHover((h) => (h === i ? null : h))}
                     aria-current={here ? 'location' : undefined}
                   >
-                    <span className="ruler__name">{stop.brand ? <Wordmark /> : label(i)}</span>
+                    <span className="ruler__name">{stop.id === 'work' ? <Wordmark /> : label(i)}</span>
                     {here && (
                       <span className="ruler__mark" aria-hidden="true">
                         ← {t('here')}

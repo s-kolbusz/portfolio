@@ -4,7 +4,7 @@ import { STOPS, locate, stopBounds, stopShares } from './stops'
 
 const VH = 900
 // hero track is 4 screens; sections after it as measured on the home page at 1440×900
-const TOPS = [3600, 4846, 7726, 8500, 9500, 10345, 11000, 12397, 13712]
+const TOPS = [3600, 4846, 7726, 8500, 9000, 9500, 10345, 11000, 12397, 13712]
 const MAX = 15000 - VH
 
 describe('stopBounds', () => {
@@ -18,7 +18,7 @@ describe('stopBounds', () => {
   })
 
   it('stays increasing when sections are missing or out of order', () => {
-    const bounds = stopBounds([100, 50, 50, 50, 50, 50, 50, 50, 50], VH, 0)
+    const bounds = stopBounds([100, 50, 50, 50, 50, 50, 50, 50, 50, 50], VH, 0)
     for (let i = 1; i < bounds.length; i++) expect(bounds[i]).toBeGreaterThan(bounds[i - 1])
   })
 })
@@ -50,5 +50,14 @@ describe('stopShares', () => {
     const shares = stopShares(stopBounds(TOPS, VH, MAX))
     expect(shares.reduce((a, b) => a + b, 0)).toBeCloseTo(1)
     expect(Math.min(...shares)).toBeGreaterThan(0.04)
+  })
+})
+
+describe('a part laid over the one before it', () => {
+  it('starts where it covers the screen, not at the reading line', () => {
+    const bounds = stopBounds(TOPS, VH, MAX)
+    const prices = STOPS.findIndex((stop) => stop.id === 'prices')
+    expect(bounds[prices]).toBe(TOPS[prices - 2] + 0.25 * VH)
+    expect(bounds[prices - 1]).toBe(TOPS[prices - 3] - 0.4 * VH)
   })
 })

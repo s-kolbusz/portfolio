@@ -7,6 +7,14 @@ export interface Stop {
   href: string
   label: string
   brand?: boolean
+  /**
+   * where the part begins, in screens scrolled after its element's top reached the top of the screen;
+   * by default −READING_LINE (its top passes the reading line). A section laid over the end of the one
+   * before it starts when it actually covers the screen, not when its element does.
+   */
+  at?: number
+  /** where a jump from the menu lands, in screens past the element's top (default 0) */
+  land?: number
 }
 
 export const STOPS: Stop[] = [
@@ -14,9 +22,13 @@ export const STOPS: Stop[] = [
   { id: 'work', href: '/#work', label: 'stronypodhale.pl', brand: true },
   { id: 'aspect-preview', href: '/#aspect-preview', label: 'aspect' },
   { id: 'ready2order', href: '/#ready2order', label: 'ready2order' },
-  // act 4: the line, the page off the shelf and piczura.com are one part; the price list closes it
+  // act 4 is three parts (owner, 2026-11-22): the line with the page off the shelf, piczura.com, the prices
   { id: 'how-i-work', href: '/#how-i-work', label: 'how_i_work' },
-  { id: 'prices', href: '/#prices', label: 'prices' },
+  { id: 'piczura', href: '/#piczura', label: 'piczura.com', brand: true },
+  // the close starts 150svh over piczura's last frame (how-i-work-end.css); its paper covers half the
+  // screen a quarter of a screen after the close pins and all of it after half (S.cover in
+  // how-i-work-end.tsx); a jump lands on the covered sheet
+  { id: 'prices', href: '/#prices', label: 'prices', at: 0.25, land: 0.5 },
   { id: 'about', href: '/#about', label: 'about' },
   { id: 'projects', href: '/#projects', label: 'projects' },
   { id: 'services', href: '/#services', label: 'services' },
@@ -43,7 +55,12 @@ export interface Position {
  * `tops` are the document tops of the sections after the hero (aspect-preview…contact).
  */
 export function stopBounds(tops: number[], viewport: number, maxScroll: number): number[] {
-  const starts = [0, SHEET_DARK_AT * viewport, ...tops.map((top) => top - READING_LINE * viewport)]
+  const after = STOPS.slice(2)
+  const starts = [
+    0,
+    SHEET_DARK_AT * viewport,
+    ...tops.map((top, i) => top + (after[i]?.at ?? -READING_LINE) * viewport),
+  ]
   const end = Math.max(maxScroll, starts[starts.length - 1] + 1)
   const bounds = [...starts, end]
   // keep the bounds increasing, whatever the layout does

@@ -347,6 +347,7 @@
     "before": "before",
     "after": "after",
     "crafts": ["Design", "Code", "Server", "Upkeep"],
+    "piczura": ["Runways", "Verdi Gala", "City", "Deer"],
     "prices": [
       ["€45/h", "contract"],
       ["€60/h", "consulting"],
@@ -363,6 +364,7 @@
     "aspect-preview": "My open-source Payload plugin: crop once, see every layout. Try it here.",
     "ready2order": "Cut the POS app’s bundle size in half on first load with four small changes.",
     "how-i-work": "This usually involves several teams. I handle every stage by myself.",
+    "piczura": "A fashion model expected a photo gallery; he got a site where every role has its own scene.",
     "prices": "Contract work from €45 an hour, web apps from €10,000, custom websites from €4,300.",
     "about": "Frontend engineer and designer in Zakopane. Building websites since 2016.",
     "projects": "Cut the POS app’s bundle size in half on first load at ready2order.",

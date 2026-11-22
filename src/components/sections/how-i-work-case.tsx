@@ -405,6 +405,7 @@ export function HowIWorkCase() {
   return (
     <section
       ref={trackRef}
+      id="piczura"
       className="cs"
       style={{ height: `${TRACK + DRIVE}svh` }}
       aria-labelledby="cs-title"

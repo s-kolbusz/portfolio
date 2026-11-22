@@ -50,6 +50,14 @@ export function NavSign({ id, wordmark }: { id: string; wordmark: ReactNode }) {
           ))}
         </span>
       )
+    case 'piczura':
+      return (
+        <span className="sign sign--names">
+          {(t.raw('piczura') as string[]).map((scene) => (
+            <span key={scene}>{scene}</span>
+          ))}
+        </span>
+      )
     case 'prices':
       return (
         <span className="sign sign--prices">
