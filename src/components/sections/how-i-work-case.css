@@ -267,6 +267,11 @@ b.cs-bar {
 .cs-rec > [data-on] {
   opacity: 1;
 }
+/* a recording rewinding to its first frame dissolves into the photos under it (the same frame) */
+.cs-rec > [data-on][data-rewind] {
+  opacity: 0;
+  transition-duration: 0.2s;
+}
 
 /* under the frame: the expectation, struck out, then what was made instead; the scenes beside it */
 .cs-foot {

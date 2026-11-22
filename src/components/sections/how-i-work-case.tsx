@@ -116,16 +116,45 @@ export function HowIWorkCase() {
   const names = t.raw('case.scenes') as string[]
   useReveal(trackRef, { at: 0.6 })
 
-  // the scene on show plays once from its start, and only while the frame is on the screen
+  // the scene on show plays once from its start, and only while the frame is on the screen. A
+  // recording that is left goes back to its first frame, so the next time it comes up (the
+  // Runways one crossfades over the assembled photos, which match that frame) it starts clean
+  // instead of showing where it stopped and then jumping
   useEffect(() => {
     const stage = stageRef.current
     if (!stage) return
+    const timers: number[] = []
     stage.querySelectorAll<HTMLVideoElement>('video').forEach((v) => {
-      if (playing && Number(v.dataset.i) === scene && !reduced) {
-        v.currentTime = 0
+      const i = Number(v.dataset.i)
+      if (playing && i === scene && !reduced) {
+        if (v.currentTime > 0.05) v.currentTime = 0
+        v.removeAttribute('data-rewind')
         void v.play().catch(() => {})
-      } else v.pause()
+        return
+      }
+      v.pause()
+      if (v.currentTime < 0.05) return
+      if (i === 0 && scene === 0) {
+        // the scroll went back over the hand-off while Runways was on show: it dissolves into the
+        // photos underneath (the same frame), rewinds unseen and comes back
+        v.setAttribute('data-rewind', '')
+        timers.push(
+          window.setTimeout(() => {
+            const back = () => v.removeAttribute('data-rewind')
+            v.addEventListener('seeked', back, { once: true })
+            v.currentTime = 0
+          }, 220)
+        )
+      } else {
+        // a scene the scroll left fades out first (0.6 s), then rewinds
+        timers.push(
+          window.setTimeout(() => {
+            if (!v.hasAttribute('data-on')) v.currentTime = 0
+          }, 700)
+        )
+      }
     })
+    return () => timers.forEach((t) => window.clearTimeout(t))
   }, [scene, playing, reduced])
 
   useEffect(() => {
@@ -310,7 +339,9 @@ export function HowIWorkCase() {
         shown = turned
         setScene(turned)
       }
-      const on = !reduced && s >= at && rect.top < window.innerHeight && rect.bottom > 0
+      // a little slack below the hand-off, so a scroll resting on it does not flicker on and off
+      const on =
+        !reduced && s >= at - (was ? 24 : 0) && rect.top < window.innerHeight && rect.bottom > 0
       if (on !== was) {
         was = on
         setPlaying(on)
