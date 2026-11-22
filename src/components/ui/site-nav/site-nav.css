@@ -690,8 +690,12 @@ html.site-menu-open [data-adapt-theme='pointer'] {
   .ruler__stop {
     width: 46vw;
   }
+  /* the link (and so the cursor and focus ring) is the name, not the whole row; the row still answers a click */
   .ruler__stop a {
+    right: auto;
+    width: max-content;
     padding-left: var(--sys-s4);
+    padding-right: var(--sys-s2);
   }
   .ruler__name,
   .ruler__stop[data-active] .ruler__name {
