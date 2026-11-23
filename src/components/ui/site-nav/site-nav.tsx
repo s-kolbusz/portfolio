@@ -326,6 +326,28 @@ export function SiteNav() {
     )
   }
 
+  // the short path (owner, 2026-11-23): prices and contact sit in the bar on every screen; the jump floods from
+  // the word, the page moves while covered, so no pinned scene has to be scrolled through on the way
+  const SHORT = ['prices', 'contact'].map((id) => STOPS.findIndex((stop) => stop.id === id))
+  const jump = (e: React.MouseEvent, i: number) => {
+    if (!isHome) return
+    e.preventDefault()
+    const id = STOPS[i].id
+    const water = ensureWater()
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (!water || reduce) {
+      scrollTo(id)
+      return
+    }
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+    setPhase('leaving')
+    water.navigate(
+      { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 },
+      () => scrollTo(id),
+      () => setPhase('closed')
+    )
+  }
+
   const toTop = (e: React.MouseEvent) => {
     if (!isHome) return
     e.preventDefault()
@@ -389,6 +411,19 @@ export function SiteNav() {
               </span>
             </button>
           )}
+          <nav className="site-bar__short" aria-label={t('short')}>
+            {SHORT.map((i) => (
+              <Link
+                key={STOPS[i].id}
+                href={STOPS[i].href}
+                className="site-bar__go"
+                tabIndex={phase === 'closed' ? undefined : -1}
+                onClick={(e) => jump(e, i)}
+              >
+                {label(i)}
+              </Link>
+            ))}
+          </nav>
           <button
             ref={toggleRef}
             type="button"
@@ -464,7 +499,9 @@ export function SiteNav() {
                     onBlur={() => setHover((h) => (h === i ? null : h))}
                     aria-current={here ? 'location' : undefined}
                   >
-                    <span className="ruler__name">{stop.id === 'work' ? <Wordmark /> : label(i)}</span>
+                    <span className="ruler__name">
+                      {stop.id === 'work' ? <Wordmark /> : label(i)}
+                    </span>
                     {here && (
                       <span className="ruler__mark" aria-hidden="true">
                         ← {t('here')}
