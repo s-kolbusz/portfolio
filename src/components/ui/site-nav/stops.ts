@@ -29,10 +29,8 @@ export const STOPS: Stop[] = [
   // screen a quarter of a screen after the close pins and all of it after half (S.cover in
   // how-i-work-end.tsx); a jump lands on the covered sheet
   { id: 'prices', href: '/#prices', label: 'prices', at: 0.25, land: 0.5 },
-  { id: 'about', href: '/#about', label: 'about' },
-  { id: 'projects', href: '/#projects', label: 'projects' },
-  { id: 'services', href: '/#services', label: 'services' },
-  { id: 'calculator', href: '/#calculator', label: 'calculator' },
+  // about, projects, services and the print calculator left the home page on 2026-11-24 (owner): the
+  // contact comes right after the prices; the old parts come back only in the new design
   { id: 'contact', href: '/#contact', label: 'contact' },
 ]
 

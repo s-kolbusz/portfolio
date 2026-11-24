@@ -270,15 +270,17 @@
     "disclaimer": "* Szacunki oparte na standardowych ustawieniach. Złożona geometria może wpłynąć na czas i koszt."
   },
   "contact": {
-    "title": "Budujmy Razem",
-    "tagline": "Obecnie przyjmuję nowe projekty. Skontaktuj się, aby porozmawiać o Twoim wizerunku cyfrowym.",
-    "email": "Email",
+    "say": "Napisz do mnie.",
+    "copy": "Kopiuj adres",
+    "copied": "Skopiowano ✓",
+    "open": "Otwórz pocztę",
+    "reply": "Odpisuję w ciągu jednego dnia roboczego.",
+    "phone": "Telefon",
     "linkedin": "LinkedIn",
     "github": "GitHub",
-    "twitter": "X (Twitter)",
-    "city": "Zakopane, Polska",
-    "location_label": "Działam z",
-    "copyright_label": "Copyright"
+    "x": "X",
+    "location": "Zakopane, Polska · zdalnie",
+    "rights": "© {year} Sebastian Kolbusz"
   },
   "cv": {
     "title": "Curriculum Vitae",

@@ -14,18 +14,6 @@ const Ready2orderScene = dynamic(() =>
 const HowIWork = dynamic(() =>
   import('@/components/sections/how-i-work').then((m) => ({ default: m.HowIWork }))
 )
-const About = dynamic(() =>
-  import('@/components/sections/about').then((m) => ({ default: m.About }))
-)
-const Projects = dynamic(() =>
-  import('@/components/sections/projects').then((m) => ({ default: m.Projects }))
-)
-const Services = dynamic(() =>
-  import('@/components/sections/services').then((m) => ({ default: m.Services }))
-)
-const PrintCalculator = dynamic(() =>
-  import('@/components/sections/print-calculator').then((m) => ({ default: m.PrintCalculator }))
-)
 const Contact = dynamic(() =>
   import('@/components/sections/contact').then((m) => ({ default: m.Contact }))
 )
@@ -51,10 +39,6 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
       <AspectDemo />
       <Ready2orderScene />
       <HowIWork />
-      <About />
-      <Projects locale={locale} />
-      <Services />
-      <PrintCalculator />
       <Contact />
     </main>
   )

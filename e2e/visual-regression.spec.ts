@@ -53,8 +53,8 @@ test.describe('visual regression', () => {
     await page.waitForTimeout(2000)
 
     // Verify some non-hero content is visible before taking screenshot
-    await expect(page.locator('#about')).toBeVisible()
-    await expect(page.locator('#projects')).toBeVisible()
+    await expect(page.locator('#prices')).toBeAttached()
+    await expect(page.locator('#contact')).toBeVisible()
 
     await expect(page).toHaveScreenshot('homepage-en.png', {
       fullPage: true,

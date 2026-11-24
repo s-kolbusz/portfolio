@@ -274,15 +274,17 @@
     "disclaimer": "* Estimates based on standard settings. Complex geometries may affect final production time and cost."
   },
   "contact": {
-    "title": "Let's Build Together",
-    "tagline": "I'm currently accepting new projects. Reach out to discuss how we can build your next high-performance digital presence.",
-    "email": "Email",
+    "say": "Write to me.",
+    "copy": "Copy address",
+    "copied": "Copied ✓",
+    "open": "Open mail app",
+    "reply": "I reply within one working day.",
+    "phone": "Phone",
     "linkedin": "LinkedIn",
     "github": "GitHub",
-    "twitter": "X (Twitter)",
-    "city": "Zakopane, Poland",
-    "location_label": "Operating From",
-    "copyright_label": "Copyright"
+    "x": "X",
+    "location": "Zakopane, Poland · remote",
+    "rights": "© {year} Sebastian Kolbusz"
   },
   "cv": {
     "title": "Curriculum Vitae",

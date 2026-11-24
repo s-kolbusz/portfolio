@@ -1,41 +1,45 @@
-import type { Icon } from '@phosphor-icons/react'
-import {
-  EnvelopeIcon,
-  GithubLogoIcon,
-  LinkedinLogoIcon,
-  XLogoIcon,
-} from '@phosphor-icons/react/dist/ssr'
+// The ways to reach Sebastian, in the order the contact section lists them under the e-mail.
+// `labelKey` is a key in the `contact` messages; `handle` is what the section shows in large type.
+
+export const CONTACT_EMAIL = 'office@kolbusz.xyz'
 
 interface ContactLink {
   id: string
   labelKey: string
   url: string
-  icon: Icon
+  handle: string
+  /** opens another site (gets ↗ and a new tab) */
+  external: boolean
 }
 
 export const contactLinks: ContactLink[] = [
   {
-    id: 'email',
-    labelKey: 'email',
-    url: 'mailto:office@kolbusz.xyz',
-    icon: EnvelopeIcon,
+    // the number from the public CV; on the site since 2026-11-24 (owner's yes)
+    id: 'phone',
+    labelKey: 'phone',
+    url: 'tel:+48533542880',
+    handle: '+48 533 542 880',
+    external: false,
   },
   {
     id: 'linkedin',
     labelKey: 'linkedin',
     url: 'https://linkedin.com/in/skolbusz',
-    icon: LinkedinLogoIcon,
+    handle: 'in/skolbusz',
+    external: true,
   },
   {
     id: 'github',
     labelKey: 'github',
     url: 'https://github.com/s-kolbusz',
-    icon: GithubLogoIcon,
+    handle: 's-kolbusz',
+    external: true,
   },
   {
-    id: 'twitter',
-    labelKey: 'twitter',
+    id: 'x',
+    labelKey: 'x',
     url: 'https://x.com/s_kolbusz',
-    icon: XLogoIcon,
+    handle: '@s_kolbusz',
+    external: true,
   },
 ]
