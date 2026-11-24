@@ -550,6 +550,144 @@
       "placeholder": "Tutaj wpisz swój nagłówek",
       "cta": "Dowiedz się więcej",
       "type": "Wybrałem krój Mattone. Kompozycję, rozmiary liter, odstępy i sposób, w jaki tekst pojawia się słowo po słowie, dobrałem tak, żeby prowadzić wzrok po tej stronie."
+    },
+    "estimate": {
+      "head": "Wycena",
+      "usualRows": [
+        ["Projekt", "Studio projektowe", "Za godzinę"],
+        ["Kod", "Zespół programistyczny", "Za godzinę"],
+        ["Serwer", "Dostawca hostingu", "Miesięcznie"],
+        ["Utrzymanie", "Zespół wsparcia", "Miesięcznie"]
+      ],
+      "usualTotal": ["Razem", "Do wyceny"],
+      "mineRow": ["Projekt, kod, serwer i utrzymanie", "Według cennika"],
+      "termsLabel": "Warunki",
+      "pricesLabel": "Cennik",
+      "prices": [
+        ["Praca programistyczna na kontrakcie", "130 zł", "za godzinę · 1050 zł za dzień"],
+        ["Konsultacje i audyty", "200 zł", "za godzinę"],
+        ["Aplikacja internetowa / MVP", "od 30 000 zł", "za projekt"],
+        ["Autorska strona z animacjami i narracją", "od 10 945 zł", "za projekt"]
+      ],
+      "contact": "Napisz do mnie",
+      "head2": "Strony dla firm · stałe ceny",
+      "studioPrices": [
+        ["369 zł", "na start + 85 zł miesięcznie"],
+        ["1835 zł", "jednorazowo · strona na własność"]
+      ],
+      "studioGo": "Zobacz stronę",
+      "pick": "Wybierz pozycję",
+      "coversLabel": "Obejmuje",
+      "covers": [
+        [
+          "React, Next.js, TypeScript",
+          "Praca w zespole klienta",
+          "Narzędzia i proces klienta",
+          "Zdalnie, hybrydowo"
+        ],
+        [
+          "Core Web Vitals",
+          "Dostępność WCAG",
+          "Przegląd kodu i architektury",
+          "Raport z priorytetami"
+        ],
+        [
+          "Projekt i design",
+          "Kod w Next.js",
+          "Konfiguracja serwera i hostingu",
+          "Uruchomienie",
+          "Monitoring i naprawa krytycznych problemów po wdrożeniu"
+        ],
+        [
+          "Koncepcja i design",
+          "Ruch i narracja",
+          "Kod",
+          "Konfiguracja i uruchomienie",
+          "Monitoring i naprawa krytycznych problemów po wdrożeniu"
+        ]
+      ],
+      "dragHint": "Przeciągnij kroplę",
+      "hours": "{n, plural, one {# godzina} few {# godziny} many {# godzin} other {# godziny}}",
+      "days": "{n, plural, one {# dzień} few {# dni} many {# dni} other {# dnia}}",
+      "unitSwitch": ["Godziny", "Dni"],
+      "estTotal": "Szacunkowo",
+      "net": "Ceny netto",
+      "fromNote": "Końcową cenę ustalimy po rozmowie o zakresie.",
+      "yours": "Twoja wycena",
+      "send": "Wyślij wycenę",
+      "mailSubject": "Wycena: {offer}",
+      "mailBody": "Dzień dobry, interesuje mnie {offer}. Szacunkowa kwota to {amount}. Chętnie doprecyzuję szczegóły.",
+      "sealedHint": "Wycena przybita",
+      "vatNet": "netto + VAT",
+      "vatGross": "brutto, VAT w cenie",
+      "travel": "Przy pracy hybrydowej koszty dojazdu ustalamy osobno.",
+      "careNote": "Dodatkowe prace serwisowe na życzenie rozliczam według stawki godzinowej.",
+      "vatEu": ""
+    },
+    "level": {
+      "usual": "Zwykle kilka zespołów.",
+      "here": "U mnie jeden kontakt i jeden rachunek."
+    },
+    "offer": {
+      "label": "Cennik",
+      "build": ["Zbuduję to", "dla Ciebie."],
+      "with": ["Pracuję", "z Tobą."],
+      "subs": [
+        "Ty wskazujesz cel. Drogę wybieram ja.",
+        "Twój zespół, Twój proces. Ja się wpasowuję."
+      ],
+      "more": [
+        [
+          ["Czas", "8–12 tygodni"],
+          ["Stos", "Next.js, TypeScript"]
+        ],
+        [
+          ["Czas", "4–8 tygodni"],
+          ["Budowa", "od zera, bez szablonu"]
+        ],
+        [
+          ["Zakres", "Core Web Vitals, WCAG"],
+          ["Zwykle", "4–12 godzin"]
+        ],
+        [
+          ["Gdzie", "zdalnie, hybrydowo"],
+          ["Jak", "Twoje narzędzia i proces"]
+        ]
+      ],
+      "offers": [
+        [
+          "Aplikacja / MVP",
+          "od 30 000 zł",
+          "",
+          "Projekt, kod w Next.js, serwer i start. Jedna osoba od początku do końca.",
+          "o aplikacji"
+        ],
+        [
+          "Strona z ruchem i narracją",
+          "od 10 945 zł",
+          "",
+          "Koncept, projekt, animacje i kod. Strona, którą się pamięta.",
+          "o stronie"
+        ],
+        [
+          "Konsultacje i audyty",
+          "200 zł",
+          "/ h",
+          "Szybkość, dostępność, przegląd kodu. Dostajesz raport z priorytetami.",
+          "o konsultacji"
+        ],
+        [
+          "Praca na kontrakcie",
+          "130 zł",
+          "/ h",
+          "React, Next.js, TypeScript w Twoim zespole. 1050 zł za dzień.",
+          "o kontrakcie"
+        ]
+      ],
+      "shared": "Obie z uruchomieniem i 2 h opieki co miesiąc",
+      "note": "Ceny brutto; kontrakt netto + VAT. Ostateczną cenę ustalamy po krótkiej rozmowie.",
+      "contact": "Napisz do mnie",
+      "about": "Napisz do mnie {about}"
     }
   }
 }

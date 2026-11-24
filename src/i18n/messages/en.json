@@ -549,6 +549,141 @@
       "placeholder": "Your headline goes here",
       "cta": "Learn more",
       "type": "I chose Mattone. I designed the layout, type sizes, spacing, and how the text appears word by word to guide your eye through this site."
+    },
+    "estimate": {
+      "head": "Estimate",
+      "usualRows": [
+        ["Design", "Design studio", "Hourly"],
+        ["Code", "Development team", "Hourly"],
+        ["Server", "Hosting provider", "Monthly"],
+        ["Maintenance", "Support team", "Monthly"]
+      ],
+      "usualTotal": ["Total", "To be estimated"],
+      "mineRow": ["Design, code, server, and maintenance", "Rates below"],
+      "termsLabel": "Terms",
+      "pricesLabel": "Rates",
+      "prices": [
+        ["Contract development", "€45", "per hour · €360 per day"],
+        ["Consulting and audits", "€60", "per hour"],
+        ["Web app / MVP", "from €10,000", "per project"],
+        ["Custom website with motion and storytelling", "from €4,300", "per project"]
+      ],
+      "contact": "Get in touch",
+      "head2": "Business websites · fixed prices",
+      "studioPrices": [
+        ["369 zł", "to start + 85 zł per month"],
+        ["1835 zł", "one-time payment · own your website"]
+      ],
+      "studioGo": "Visit the site",
+      "pick": "Pick a line",
+      "coversLabel": "Includes",
+      "covers": [
+        [
+          "React, Next.js, TypeScript",
+          "Join your team",
+          "Your tools and process",
+          "Remote preferred; hybrid possible"
+        ],
+        [
+          "Core Web Vitals",
+          "WCAG accessibility",
+          "Code and architecture review",
+          "Prioritized report"
+        ],
+        [
+          "Design",
+          "Next.js development",
+          "Server and hosting setup",
+          "Launch",
+          "Post-launch monitoring and critical fixes"
+        ],
+        [
+          "Concept and design",
+          "Motion and storytelling",
+          "Development",
+          "Setup and launch",
+          "Post-launch monitoring and critical fixes"
+        ]
+      ],
+      "dragHint": "Drag the drop",
+      "hours": "{n, plural, one {# hour} other {# hours}}",
+      "days": "{n, plural, one {# day} other {# days}}",
+      "unitSwitch": ["Hours", "Days"],
+      "estTotal": "Estimated",
+      "net": "Prices excl. VAT",
+      "fromNote": "We'll set the final price once we've talked through the scope.",
+      "yours": "Your estimate",
+      "send": "Send this estimate",
+      "mailSubject": "Estimate: {offer}",
+      "mailBody": "Hi, I’m interested in {offer}. The estimate is {amount}. I’d be happy to share more details.",
+      "sealedHint": "Estimate stamped",
+      "vatNet": "net + VAT",
+      "vatGross": "gross, VAT included",
+      "travel": "For hybrid work, travel costs are agreed separately.",
+      "careNote": "Extra maintenance on request is billed at the hourly rate.",
+      "vatEu": "Excl. VAT; reverse charge for EU businesses"
+    },
+    "level": {
+      "usual": "Usually, several teams.",
+      "here": "With me, one contact and one invoice."
+    },
+    "offer": {
+      "label": "Rates",
+      "build": ["I build it", "for you."],
+      "with": ["I work", "with you."],
+      "subs": ["You name the goal. The way there is mine.", "Your team, your process. I fit in."],
+      "more": [
+        [
+          ["Time", "8–12 weeks"],
+          ["Stack", "Next.js, TypeScript"]
+        ],
+        [
+          ["Time", "4–8 weeks"],
+          ["Built", "from scratch"]
+        ],
+        [
+          ["Covers", "Core Web Vitals, WCAG"],
+          ["Typical", "4–12 hours"]
+        ],
+        [
+          ["Where", "remote, hybrid possible"],
+          ["How", "your tools and process"]
+        ]
+      ],
+      "offers": [
+        [
+          "Web app / MVP",
+          "from €10,000",
+          "",
+          "Design, Next.js code, server and launch, from first sketch to release.",
+          "about an app"
+        ],
+        [
+          "Custom website with motion and storytelling",
+          "from €4,300",
+          "",
+          "Concept, design, motion and code, made to be remembered.",
+          "about a website"
+        ],
+        [
+          "Consulting and audits",
+          "€60",
+          "/ h",
+          "Speed, accessibility and code review, with a prioritized report.",
+          "about a consultation"
+        ],
+        [
+          "Contract development",
+          "€45",
+          "/ h",
+          "React, Next.js and TypeScript inside your team. €360 a day.",
+          "about contract work"
+        ]
+      ],
+      "shared": "Both include launch and 2 h of care a month",
+      "note": "Prices exclude VAT; reverse charge for EU businesses. We set the final price after a short call.",
+      "contact": "Write to me",
+      "about": "Write to me {about}"
     }
   }
 }
