@@ -479,28 +479,23 @@
       "speed": "Wydajność"
     },
     "roleProofs": {
-      "design": "Zaprojektowałem piczura.com, portfolio modela Maćka Piczury, w którym każda rola i sesja ma własną scenę zamiast miejsca w albumie.",
+      "design": "W portfolio modela Maćka Piczury każdą rolę i każdą sesję pokazałem na osobnej scenie.",
       "code": "Napisałem plugin open source aspect-preview do Payload CMS: kadruję zdjęcia, ustawiam punkt ostrości i podglądam przycięcie na żywo w każdym układzie strony.",
-      "server": "Tyle czekała Twoja przeglądarka na pierwszy bajt tej strony przy tym wejściu; serwer stawiam i utrzymuję sam.",
-      "maintenance": "Ostatnia zmiana na tej stronie: {date}; data aktualizuje się automatycznie.",
+      "server": "Tyle Twoja przeglądarka czekała na pierwszy bajt przy tym wejściu. Serwer sam postawiłem i utrzymuję.",
+      "maintenance": "To data ostatniej aktualizacji. Zapisuje się sama, gdy wydaję nową wersję.",
       "liquid": "Zielona ciecz na górze strony to moja symulacja: możesz ją poruszyć kursorem albo palcem.",
       "motion": "Każdy ruch na tej stronie sam zaprojektowałem i napisałem.",
       "speed": "Tyle zajęło pełne załadowanie tej strony u Ciebie, według pomiaru z Twojej przeglądarki."
     },
-    "rolesHint": "Wybierz. Zobacz dowód.",
+    "rolesHint": "Wybierz etap i sprawdź",
     "relay": {
       "usual": "Zwykle",
       "mine": "U mnie",
       "usualCount": "Zwykle 4 zespoły",
-      "mineCount": "Jedna osoba",
+      "mineCount": "Tylko ja",
       "people": ["Projektant", "Programista", "Hosting", "Serwis"],
       "project": "Twój projekt",
-      "teams": [
-        "Zespół projektowy",
-        "Zespół programistów",
-        "Zespół infrastruktury",
-        "Zespół utrzymania"
-      ],
+      "teams": ["Projektanci", "Programiści", "Admini", "Serwisanci"],
       "line": "Zwykle pracują nad tym różne zespoły. Ja zajmuję się każdym etapem sam."
     },
     "ledger": {
@@ -523,9 +518,9 @@
       "after": "Gotowa strona",
       "link": "Zobacz piczura.com",
       "scenes": ["Wybiegi", "Verdi Gala", "Miasto", "Jelenie"],
-      "came": "Model Maciek Piczura przyszedł do mnie ze zdjęciami z pokazów i sesji.",
-      "asked": "Potrzebował efektownego portfolio i spodziewał się <x>galerii zdjęć</x>.",
-      "gave": "Zaproponowałem i zbudowałem stronę, na której każda rola i sesja ma własną scenę, ruch i typografię.",
+      "came": "Maciek Piczura jest modelem. Przyszedł do mnie ze zdjęciami z pokazów i sesji.",
+      "asked": "Chciał, żeby jego portfolio się wyróżniało. Spodziewał się <x>galerii zdjęć</x>.",
+      "gave": "Zaproponowałem osobne sceny dla ról i sesji. Każdą zbudowałem wokół innego ruchu i układu liter.",
       "files": "Zdjęcia od klienta",
       "pick": "Wybierz scenę"
     },
@@ -537,19 +532,19 @@
     "door": "Zobacz stronę",
     "roleLinks": {
       "design": "Zobacz portfolio",
-      "code": "Sprawdź na npm"
+      "code": "Zobacz na npm"
     },
     "stock": {
-      "liquid": "Kropla, hero i przejścia to jedna symulacja zrobiona dla tej strony. Reaguje na dotyk i kursor, rozdziela się i łączy, załamuje światło i tekst pod sobą.",
-      "menu": "Przycisk otwiera menu strugą tej samej cieczy. Skala ma kreskę dla każdej części strony — wybierz jedną, a ciecz zaleje ekran i odsłoni wybrane miejsce.",
-      "cursor": "Kursor zmienia kształt zależnie od tego, co wskazujesz. Link otacza tą samą ramką co klawiatura, żeby oba sposoby obsługi dawały ten sam znak.",
-      "borrowed": "Podstawę biorę ze sprawdzonych narzędzi: Next.js, React, GSAP, Lenis, next-intl.",
-      "stockLabel": "Z PÓŁKI",
-      "hold": "Przytrzymaj kroplę: wersja z półki",
-      "holdLabel": "Naciśnij i przytrzymaj kroplę, żeby zobaczyć stronę z gotowych elementów.",
-      "placeholder": "Tutaj wpisz swój nagłówek",
+      "liquid": "Na pierwszym ekranie, w kroplach i przejściach działa ta sama symulacja. Ciecz reaguje na dotyk i ruch kursora, dzieli się i łączy, załamuje światło i litery pod nią.",
+      "menu": "Po naciśnięciu przycisku ciecz wlewa się do menu. Każda kreska oznacza część strony. Wybierz kreskę, a ciecz zaleje ekran i spłynie, odsłaniając wybraną część.",
+      "cursor": "Kursor zmienia kształt zależnie od tego, co wskazuje. Gdy najedziesz na link, zobaczysz wokół niego tę samą ramkę co przy przechodzeniu klawiszem Tab.",
+      "borrowed": "Jako podstawę strony wybrałem sprawdzone narzędzia: Next.js, React, GSAP, Lenis i next-intl.",
+      "stockLabel": "Z SZABLONU",
+      "hold": "Przytrzymaj, by zobaczyć szablon",
+      "holdLabel": "Przytrzymaj kroplę, żeby zobaczyć, jak wyglądałaby ta strona z gotowych elementów.",
+      "placeholder": "Tu wpisz nagłówek",
       "cta": "Dowiedz się więcej",
-      "type": "Wybrałem krój Mattone. Kompozycję, rozmiary liter, odstępy i sposób, w jaki tekst pojawia się słowo po słowie, dobrałem tak, żeby prowadzić wzrok po tej stronie."
+      "type": "Wybrałem krój Mattone. Ułożyłem tekst, dobrałem wielkość liter i odstępy. Słowa pojawiają się po kolei w takim tempie, żeby wzrok za nimi nadążał."
     },
     "estimate": {
       "head": "Wycena",
@@ -570,12 +565,12 @@
         ["Autorska strona z animacjami i narracją", "od 10 945 zł", "za projekt"]
       ],
       "contact": "Napisz do mnie",
-      "head2": "Strony dla firm · stałe ceny",
+      "head2": "Strony dla firm z Podhala",
       "studioPrices": [
-        ["369 zł", "na start + 85 zł miesięcznie"],
-        ["1835 zł", "jednorazowo · strona na własność"]
+        ["369 zł", "Potem 85 zł miesięcznie"],
+        ["1835 zł", "Płacisz raz. Strona od razu Twoja."]
       ],
-      "studioGo": "Zobacz stronę",
+      "studioGo": "Zobacz ofertę",
       "pick": "Wybierz pozycję",
       "coversLabel": "Obejmuje",
       "covers": [
@@ -630,62 +625,62 @@
     },
     "offer": {
       "label": "Cennik",
-      "build": ["Zbuduję to", "dla Ciebie."],
-      "with": ["Pracuję", "z Tobą."],
+      "build": ["Buduję", "dla Ciebie"],
+      "with": ["Dołączam", "do zespołu"],
       "subs": [
-        "Ty wskazujesz cel. Drogę wybieram ja.",
-        "Twój zespół, Twój proces. Ja się wpasowuję."
+        "Sam wybieram, jak zbuduję i uruchomię całość.",
+        "Pracuję tak, jak przyjęło się u Ciebie."
       ],
       "more": [
         [
           ["Czas", "8–12 tygodni"],
-          ["Stos", "Next.js, TypeScript"]
+          ["Zestaw", "Next.js, TypeScript"]
         ],
         [
           ["Czas", "4–8 tygodni"],
-          ["Budowa", "od zera, bez szablonu"]
+          ["Projekt", "Bez szablonu"]
         ],
         [
-          ["Zakres", "Core Web Vitals, WCAG"],
+          ["Raport", "Lista priorytetów"],
           ["Zwykle", "4–12 godzin"]
         ],
         [
-          ["Gdzie", "zdalnie, hybrydowo"],
-          ["Jak", "Twoje narzędzia i proces"]
+          ["Tryb", "Zdalnie lub hybrydowo"],
+          ["Praca", "Twoje narzędzia i proces"]
         ]
       ],
       "offers": [
         [
-          "Aplikacja / MVP",
+          "Aplikacja internetowa / MVP",
           "od 30 000 zł",
           "",
-          "Projekt, kod w Next.js, serwer i start. Jedna osoba od początku do końca.",
+          "Projektuję i buduję aplikację od pierwszej wersji po wdrożenie.",
           "o aplikacji"
         ],
         [
-          "Strona z ruchem i narracją",
+          "Autorska strona z narracją",
           "od 10 945 zł",
           "",
-          "Koncept, projekt, animacje i kod. Strona, którą się pamięta.",
+          "Sam tworzę od zera koncepcję, projekt, kod i animacje do Twojej opowieści.",
           "o stronie"
         ],
         [
           "Konsultacje i audyty",
           "200 zł",
           "/ h",
-          "Szybkość, dostępność, przegląd kodu. Dostajesz raport z priorytetami.",
+          "Sprawdzam szybkość (Core Web Vitals), dostępność (WCAG) i jakość kodu.",
           "o konsultacji"
         ],
         [
           "Praca na kontrakcie",
           "130 zł",
           "/ h",
-          "React, Next.js, TypeScript w Twoim zespole. 1050 zł za dzień.",
+          "Pracuję w Twoim zespole (React, Next.js, TypeScript). 1050 zł za dzień.",
           "o kontrakcie"
         ]
       ],
-      "shared": "Obie z uruchomieniem i 2 h opieki co miesiąc",
-      "note": "Ceny brutto; kontrakt netto + VAT. Ostateczną cenę ustalamy po krótkiej rozmowie.",
+      "shared": "W obu: wdrożenie i 2 godziny opieki miesięcznie",
+      "note": "Ceny brutto, z wyjątkiem kontraktu (netto + VAT). Cenę ustalimy po krótkiej rozmowie.",
       "contact": "Napisz do mnie",
       "about": "Napisz do mnie {about}"
     }
