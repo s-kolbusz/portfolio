@@ -72,15 +72,19 @@ test('menu targets meet WCAG 2.2 minimum size', async ({ page }) => {
   const targets = page.locator('#site-menu a, .site-bar button[aria-controls]')
   await expect(page.getByRole('dialog', { name: /menu/i })).toBeVisible()
   await page.waitForTimeout(1600)
-  const count = await targets.count()
-  expect(count).toBeGreaterThan(0)
+  // one read of every target: a boundingBox() call per link waits on each one and, with the menu's
+  // canvas running on a slow CI machine, ran past the test timeout
+  const boxes = await targets.evaluateAll((elements) =>
+    elements
+      .map((element) => element.getBoundingClientRect())
+      .filter((rect) => rect.width > 0 || rect.height > 0)
+      .map((rect) => ({ height: rect.height, width: rect.width }))
+  )
+  expect(boxes.length).toBeGreaterThan(0)
 
-  for (let i = 0; i < count; i++) {
-    const box = await targets.nth(i).boundingBox()
-    if (box) {
-      expect(box.width).toBeGreaterThanOrEqual(24)
-      expect(box.height).toBeGreaterThanOrEqual(24)
-    }
+  for (const box of boxes) {
+    expect(box.width).toBeGreaterThanOrEqual(24)
+    expect(box.height).toBeGreaterThanOrEqual(24)
   }
 })
 
