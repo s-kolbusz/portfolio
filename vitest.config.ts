@@ -20,6 +20,9 @@ export default defineConfig({
       reporter: ['text', 'html'],
       exclude: [
         'src/**/*.test.{ts,tsx}',
+        // the old site, frozen as it was on main when the redesign moved in next to it at /v2
+        // (owner, 2026-11-26); kept until it is archived under /legacy, not developed further
+        'src/legacy/**',
         // GSAP animation components — side-effects only, no testable branches in jsdom
         // WebGL: no GL context in jsdom
         'src/components/ui/site-nav/menu-water.ts',

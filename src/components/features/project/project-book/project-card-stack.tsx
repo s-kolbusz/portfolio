@@ -55,7 +55,7 @@ export function ProjectCardStack({ projects }: ProjectCardStackProps) {
         <Button
           variant="outline-glass"
           size="md"
-          onClick={() => router.push('/')}
+          onClick={() => router.push('/#projects')}
           leftIcon={<ArrowLeftIcon weight="bold" className="size-4" />}
         >
           {tt('back')}

@@ -104,10 +104,10 @@ export function ProjectBook({ projects }: ProjectBookProps) {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [currentIndex, scrollToPanel])
 
-  // Back logic: ToC → homepage, spread → scroll to ToC
+  // Back logic: ToC → homepage #projects, spread → scroll to ToC
   const handleBack = () => {
     if (isOnToC) {
-      router.push('/')
+      router.push('/#projects')
     } else {
       scrollToPanel(0)
     }

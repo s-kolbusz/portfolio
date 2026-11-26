@@ -5,7 +5,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import { useLocale, useTranslations } from 'next-intl'
 
 import { STUDIO, STUDIO_LINK_REL } from '@/data/studio'
-import { Link, usePathname, useRouter } from '@/i18n/navigation'
+import { Link, usePathname, useRouter } from '@/i18n/navigation-v2'
 import { isHomeRoute, isProjectDetailRoute, isServicesRoute } from '@/lib/route-predicates'
 import { useScrollStore } from '@/lib/stores'
 

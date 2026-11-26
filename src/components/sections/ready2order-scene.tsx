@@ -14,7 +14,7 @@ import {
 import { Rise, riseAt } from '@/components/ui/rise'
 import { usePrefersReducedMotion } from '@/hooks/use-media'
 import { type RevealDetail, useReveal } from '@/hooks/use-reveal'
-import { Link } from '@/i18n/navigation'
+import { Link } from '@/i18n/navigation-v2'
 import { useScrollStore } from '@/lib/stores/scroll'
 
 import './ready2order-scene.css'

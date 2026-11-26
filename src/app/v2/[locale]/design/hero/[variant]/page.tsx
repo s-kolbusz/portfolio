@@ -1,5 +1,6 @@
 import { setRequestLocale } from 'next-intl/server'
 import { Bona_Nova } from 'next/font/google'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import {
@@ -12,7 +13,6 @@ import { HeroBlobLab } from '@/components/sections/hero-blob-lab'
 import { HeroFrame } from '@/components/sections/hero-frame'
 import { HeroSample } from '@/components/sections/hero-sample'
 import { requireRoutingLocale } from '@/i18n/locale'
-import { Link } from '@/i18n/navigation'
 import { routing } from '@/i18n/routing'
 
 // Candidate display face for the hero (the owner's pick to try); loaded only on this route.
@@ -79,7 +79,7 @@ export default async function HeroSamplePage({ params }: Props) {
         {HERO_SAMPLE_VARIANTS.map((candidate, index) => (
           <Link
             key={candidate}
-            href={`/design/hero/${candidate}`}
+            href={`/v2/${locale}/design/hero/${candidate}`}
             aria-current={candidate === variant ? 'page' : undefined}
             className="aria-[current=page]:text-primary underline-offset-4 hover:underline"
           >

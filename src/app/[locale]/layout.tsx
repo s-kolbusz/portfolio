@@ -7,15 +7,14 @@ import localFont from 'next/font/local'
 import { RybbitAnalytics } from '@/components/analytics/rybbit'
 import { JsonLd } from '@/components/seo/json-ld'
 import { ThemeProvider } from '@/components/theme-provider'
-import { ClientOverlays } from '@/components/ui/client-overlays'
 import { SkipToMain } from '@/components/ui/skip-to-main'
 import { getLocaleFromParams } from '@/i18n/locale'
 import { Link } from '@/i18n/navigation'
 import { routing } from '@/i18n/routing'
+import { ClientOverlays } from '@/legacy/ui/client-overlays'
 import { SITE_DESCRIPTION, SITE_ORIGIN, SITE_ROLE, SITE_TWITTER_HANDLE } from '@/lib/site'
 
 import '../globals.css'
-import '../system.css'
 
 type Props = {
   children: React.ReactNode
@@ -145,7 +144,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
-          forcedTheme="light"
+          enableSystem
           disableTransitionOnChange
         >
           <NextIntlClientProvider locale={locale} messages={messages}>

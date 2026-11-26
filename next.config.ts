@@ -27,6 +27,12 @@ const nextConfig: NextConfig = {
         destination: '/en',
         permanent: true,
       },
+      // the redesign, at /v2/<locale> until it replaces the old site (not permanent: it will move)
+      {
+        source: '/v2',
+        destination: '/v2/en',
+        permanent: false,
+      },
       ...externalProjectRedirects(),
     ]
   },

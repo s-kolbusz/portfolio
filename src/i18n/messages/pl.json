@@ -7,7 +7,9 @@
     "description": "Creative developer i full-stack engineer z Zakopanego. Animowane strony (GSAP, WebGL), aplikacje w Next.js i panele w Payload CMS. Strony dla małych firm z Podhala robię w stronypodhale.pl."
   },
   "actions": {
-    "skip_to_main": "Przejdź do treści"
+    "skip_to_main": "Przejdź do treści",
+    "toggle_theme": "Zmień motyw",
+    "switch_language": "Zmień język"
   },
   "nav": {
     "main_navigation": "Menu główne",
@@ -280,7 +282,14 @@
     "github": "GitHub",
     "x": "X",
     "location": "Zakopane, Polska · zdalnie",
-    "rights": "© {year} Sebastian Kolbusz"
+    "rights": "© {year} Sebastian Kolbusz",
+    "title": "Budujmy Razem",
+    "tagline": "Obecnie przyjmuję nowe projekty. Skontaktuj się, aby porozmawiać o Twoim wizerunku cyfrowym.",
+    "email": "Email",
+    "twitter": "X (Twitter)",
+    "city": "Zakopane, Polska",
+    "location_label": "Działam z",
+    "copyright_label": "Copyright"
   },
   "cv": {
     "title": "Curriculum Vitae",

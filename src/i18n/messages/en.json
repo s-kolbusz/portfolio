@@ -7,7 +7,9 @@
     "description": "Creative developer and full-stack engineer based in Zakopane, Poland. Animated websites (GSAP, WebGL), Next.js applications and Payload CMS. Founder of stronypodhale.pl."
   },
   "actions": {
-    "skip_to_main": "Skip to main content"
+    "skip_to_main": "Skip to main content",
+    "toggle_theme": "Toggle theme",
+    "switch_language": "Switch language"
   },
   "nav": {
     "main_navigation": "Main Navigation",
@@ -284,7 +286,14 @@
     "github": "GitHub",
     "x": "X",
     "location": "Zakopane, Poland · remote",
-    "rights": "© {year} Sebastian Kolbusz"
+    "rights": "© {year} Sebastian Kolbusz",
+    "title": "Let's Build Together",
+    "tagline": "I'm currently accepting new projects. Reach out to discuss how we can build your next high-performance digital presence.",
+    "email": "Email",
+    "twitter": "X (Twitter)",
+    "city": "Zakopane, Poland",
+    "location_label": "Operating From",
+    "copyright_label": "Copyright"
   },
   "cv": {
     "title": "Curriculum Vitae",
