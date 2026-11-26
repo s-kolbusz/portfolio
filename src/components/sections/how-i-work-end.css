@@ -72,12 +72,25 @@
   mask-size:
     100% var(--edge),
     100% 200%;
+  /* the mask stands still on the sheet and the sheet moves (a transform): nothing is repainted
+     while it rises. It reaches 2 × --edge below the screen so its foot never shows; what lies on it
+     (.cl-paper-in) moves back by as much, so the tiles stay where they are read. */
   -webkit-mask-position:
-    0 calc(var(--y) - var(--edge)),
-    0 calc(var(--y) - 1px);
+    0 0,
+    0 calc(var(--edge) - 1px);
   mask-position:
-    0 calc(var(--y) - var(--edge)),
-    0 calc(var(--y) - 1px);
+    0 0,
+    0 calc(var(--edge) - 1px);
+  bottom: calc(-2 * var(--edge));
+  transform: translateY(calc(var(--y) - var(--edge)));
+  will-change: transform;
+}
+.cl-paper-in {
+  position: absolute;
+  inset: 0 0 auto;
+  height: calc(100% - 2 * var(--edge));
+  transform: translateY(calc(var(--edge) - var(--y)));
+  will-change: transform;
 }
 /* once it has taken the screen it is a plain sheet, with its shadow along its lower edge */
 .cl-paper[data-full] {
@@ -745,5 +758,147 @@
   .cl-head2,
   .cl-two-side {
     transition: none;
+  }
+}
+
+/* Where the browser can run animations on the scroll itself (Safari 26, Chrome), the sheet's rise and
+   its lift follow the scroll there, not the script: in Low Power Mode iOS lets a page's script draw at
+   most 30 times a second while the page itself scrolls at the screen's rate, so a script-driven sheet
+   lagged behind the finger (owner, iPhone 11 Pro, 2026-11-24). The ranges are the script's own spans
+   (S.cover, the lift) in screens since the close's top reached the top of the screen; the timeline's
+   cover range starts one screen earlier. The keyframes sample the script's glide. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .cl {
+      view-timeline: --cl block;
+    }
+    .cl-paper,
+    .cl-paper-in,
+    .cl-sheet,
+    .cl-top {
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-duration: auto;
+      animation-timeline: --cl;
+    }
+    .cl-paper {
+      animation-name: cl-rise;
+      animation-range: cover 100svh cover 150svh;
+    }
+    .cl-paper-in {
+      animation-name: cl-rise-in;
+      animation-range: cover 100svh cover 150svh;
+    }
+    .cl-sheet,
+    .cl-top {
+      animation-name: cl-lift;
+      animation-range: cover 284svh cover 384svh;
+    }
+  }
+}
+/* the script's glide (smoothstep), sampled every tenth */
+@keyframes cl-rise {
+  0% {
+    transform: translateY(calc(100svh + (-2 * var(--edge) - 100svh) * 0));
+  }
+  10% {
+    transform: translateY(calc(100svh + (-2 * var(--edge) - 100svh) * 0.028));
+  }
+  20% {
+    transform: translateY(calc(100svh + (-2 * var(--edge) - 100svh) * 0.104));
+  }
+  30% {
+    transform: translateY(calc(100svh + (-2 * var(--edge) - 100svh) * 0.216));
+  }
+  40% {
+    transform: translateY(calc(100svh + (-2 * var(--edge) - 100svh) * 0.352));
+  }
+  50% {
+    transform: translateY(calc(100svh + (-2 * var(--edge) - 100svh) * 0.5));
+  }
+  60% {
+    transform: translateY(calc(100svh + (-2 * var(--edge) - 100svh) * 0.648));
+  }
+  70% {
+    transform: translateY(calc(100svh + (-2 * var(--edge) - 100svh) * 0.784));
+  }
+  80% {
+    transform: translateY(calc(100svh + (-2 * var(--edge) - 100svh) * 0.896));
+  }
+  90% {
+    transform: translateY(calc(100svh + (-2 * var(--edge) - 100svh) * 0.972));
+  }
+  100% {
+    transform: translateY(calc(100svh + (-2 * var(--edge) - 100svh) * 1));
+  }
+}
+@keyframes cl-rise-in {
+  0% {
+    transform: translateY(calc(-100svh + (2 * var(--edge) - -100svh) * 0));
+  }
+  10% {
+    transform: translateY(calc(-100svh + (2 * var(--edge) - -100svh) * 0.028));
+  }
+  20% {
+    transform: translateY(calc(-100svh + (2 * var(--edge) - -100svh) * 0.104));
+  }
+  30% {
+    transform: translateY(calc(-100svh + (2 * var(--edge) - -100svh) * 0.216));
+  }
+  40% {
+    transform: translateY(calc(-100svh + (2 * var(--edge) - -100svh) * 0.352));
+  }
+  50% {
+    transform: translateY(calc(-100svh + (2 * var(--edge) - -100svh) * 0.5));
+  }
+  60% {
+    transform: translateY(calc(-100svh + (2 * var(--edge) - -100svh) * 0.648));
+  }
+  70% {
+    transform: translateY(calc(-100svh + (2 * var(--edge) - -100svh) * 0.784));
+  }
+  80% {
+    transform: translateY(calc(-100svh + (2 * var(--edge) - -100svh) * 0.896));
+  }
+  90% {
+    transform: translateY(calc(-100svh + (2 * var(--edge) - -100svh) * 0.972));
+  }
+  100% {
+    transform: translateY(calc(-100svh + (2 * var(--edge) - -100svh) * 1));
+  }
+}
+@keyframes cl-lift {
+  0% {
+    transform: translateY(calc(0px + (var(--seam) - 100svh - 0px) * 0));
+  }
+  10% {
+    transform: translateY(calc(0px + (var(--seam) - 100svh - 0px) * 0.028));
+  }
+  20% {
+    transform: translateY(calc(0px + (var(--seam) - 100svh - 0px) * 0.104));
+  }
+  30% {
+    transform: translateY(calc(0px + (var(--seam) - 100svh - 0px) * 0.216));
+  }
+  40% {
+    transform: translateY(calc(0px + (var(--seam) - 100svh - 0px) * 0.352));
+  }
+  50% {
+    transform: translateY(calc(0px + (var(--seam) - 100svh - 0px) * 0.5));
+  }
+  60% {
+    transform: translateY(calc(0px + (var(--seam) - 100svh - 0px) * 0.648));
+  }
+  70% {
+    transform: translateY(calc(0px + (var(--seam) - 100svh - 0px) * 0.784));
+  }
+  80% {
+    transform: translateY(calc(0px + (var(--seam) - 100svh - 0px) * 0.896));
+  }
+  90% {
+    transform: translateY(calc(0px + (var(--seam) - 100svh - 0px) * 0.972));
+  }
+  100% {
+    transform: translateY(calc(0px + (var(--seam) - 100svh - 0px) * 1));
   }
 }

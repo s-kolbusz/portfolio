@@ -174,35 +174,58 @@
   margin: 0;
 }
 
-/* coming in: the line word by word (as the act 4 sentences), then the address, then the rest */
+/* coming in (once, when the address is on screen): the line rises word by word out of its own line, as the
+   act 4 sentences do; the address is then written from left to right, its underline with it; the actions
+   and the ways in follow one by one, and the footer last. With reduced motion everything simply stands. */
+.ct-word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  /* room for descenders inside the mask */
+  padding-bottom: 0.15em;
+  margin-bottom: -0.15em;
+}
+.ct-word > span {
+  display: inline-block;
+}
 @media (prefers-reduced-motion: no-preference) {
-  .ct-word,
-  .ct-mail,
+  .ct {
+    --ct-in: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .ct-word > span {
+    transform: translateY(110%);
+    transition: transform 0.8s var(--ct-in) calc(var(--i) * 70ms);
+  }
+  .ct-addr {
+    clip-path: inset(-0.2em 100% -0.45em 0);
+    transition: clip-path 1.1s var(--ct-in) 0.3s;
+  }
   .ct-row,
-  .ct-ways li {
+  .ct-ways li,
+  .ct-foot {
     opacity: 0;
-    transform: translateY(0.5em);
+    transform: translateY(var(--sys-s3));
     transition:
-      opacity 0.7s var(--ct-ease),
-      transform 0.7s var(--ct-ease);
-  }
-  .ct-word {
-    display: inline-block;
-    white-space: pre;
-    transition-delay: calc(var(--i) * 70ms);
-  }
-  .ct-mail {
-    transform: translateY(0.25em);
-    transition-duration: 0.9s;
-    transition-delay: 0.25s;
+      opacity 0.7s var(--ct-in),
+      transform 0.9s var(--ct-in);
   }
   .ct-row {
-    transition-delay: 0.5s;
+    transition-delay: 1s;
   }
   .ct-ways li {
-    transition-delay: calc(0.6s + var(--i) * 80ms);
+    transition-delay: calc(1.15s + var(--i) * 90ms);
   }
-  .ct[data-shown] :is(.ct-word, .ct-mail, .ct-row, .ct-ways li) {
+  .ct-foot {
+    transform: none;
+    transition-delay: 1.6s;
+  }
+  .ct[data-shown] .ct-word > span {
+    transform: none;
+  }
+  .ct[data-shown] .ct-addr {
+    clip-path: inset(-0.2em -0.1em -0.45em 0);
+  }
+  .ct[data-shown] :is(.ct-row, .ct-ways li, .ct-foot) {
     opacity: 1;
     transform: none;
   }

@@ -21,20 +21,29 @@ export function Contact() {
   const [local, domain] = CONTACT_EMAIL.split('@')
   const [name, tld] = domain.split('.')
 
-  // the words come in once, the first time the section reaches the screen
+  // the words come in once, when the line and the address are on screen: not when the section's top edge
+  // shows (they sit lower and would play unseen), and not under the liquid that covers a jump from the bar
   useEffect(() => {
-    const el = sectionRef.current
-    if (!el) return
+    const main = sectionRef.current?.querySelector('.ct-main')
+    if (!main) return
+    let frame = 0
+    const show = () => {
+      if (document.querySelector('.site-bar[data-menu]')) frame = requestAnimationFrame(show)
+      else setShown(true)
+    }
     const seen = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return
-        setShown(true)
         seen.disconnect()
+        show()
       },
-      { threshold: 0.2 }
+      { threshold: 0.4 }
     )
-    seen.observe(el)
-    return () => seen.disconnect()
+    seen.observe(main)
+    return () => {
+      seen.disconnect()
+      cancelAnimationFrame(frame)
+    }
   }, [])
 
   useEffect(() => {
@@ -59,8 +68,10 @@ export function Contact() {
       <div className="ct-main">
         <p className="ct-say">
           {say.map((word, i) => (
-            <span key={i} className="ct-word" style={{ '--i': i } as CSSProperties}>
-              {word}
+            <span key={i}>
+              <span className="ct-word">
+                <span style={{ '--i': i } as CSSProperties}>{word}</span>
+              </span>
               {i < say.length - 1 ? ' ' : ''}
             </span>
           ))}
