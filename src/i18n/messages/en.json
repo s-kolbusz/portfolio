@@ -14,12 +14,22 @@
   "nav": {
     "main_navigation": "Main Navigation",
     "hero": "Home",
+    "aspect": "aspect-preview",
+    "ready2order": "ready2order",
+    "how_i_work": "How I work",
+    "prices": "Prices",
     "about": "About",
     "projects": "Work",
     "services": "Services",
     "calculator": "3D Print",
     "contact": "Contact",
-    "cv": "CV"
+    "cv": "CV",
+    "menu": "Menu",
+    "short": "Shortcuts",
+    "close": "Close",
+    "elsewhere": "Elsewhere",
+    "in_progress": "in progress",
+    "here": "here"
   },
   "HomePage": {
     "title": "Sebastian Kolbusz",
@@ -38,6 +48,46 @@
     "role": "Web Architect",
     "tagline": "Building high-performance digital products with a focus on visual polish and technical excellence.",
     "cta": "Explore My Work"
+  },
+  "liquidHero": {
+    "role": "I design and build websites and web apps.",
+    "lines": {
+      "shelf": "Nothing off the shelf.",
+      "apart": "I take things apart.",
+      "together": "I put them back together myself."
+    },
+    "cta": "See the work",
+    "tilt": "TILT"
+  },
+  "signature": {
+    "lines": {
+      "first": "Websites for Podhale businesses.",
+      "second": "The design and the price before you pay."
+    },
+    "link": "Visit the site",
+    "alt": "stronypodhale.pl home page showing the piczura.com project preview",
+    "pins": {
+      "rosette": {
+        "title": "16 px",
+        "note": "The parzenica rosette still reads at this size. The name is an address you can say over the phone."
+      },
+      "price": {
+        "title": "369 zł",
+        "note": "to start, then 85 zł a month, or 1835 zł to own it outright. Every price is on the site."
+      },
+      "upfront": {
+        "title": "z góry",
+        "note": "Upfront, and from the mountains: you see the design and the price before you pay."
+      },
+      "piczura": {
+        "title": "piczura.com",
+        "note": "A model's portfolio built with no template, every animation on it written from scratch."
+      },
+      "free": {
+        "title": "0 zł",
+        "note": "if the design is not for you. You pay only once you approve it."
+      }
+    }
   },
   "about": {
     "title": "The Craft & Context",
@@ -226,11 +276,20 @@
     "disclaimer": "* Estimates based on standard settings. Complex geometries may affect final production time and cost."
   },
   "contact": {
+    "say": "Email me.",
+    "copy": "Copy address",
+    "copied": "Copied ✓",
+    "open": "Open mail app",
+    "reply": "I reply within one working day.",
+    "phone": "Phone",
+    "linkedin": "LinkedIn",
+    "github": "GitHub",
+    "x": "X",
+    "location": "Zakopane, Poland · remote",
+    "rights": "© {year} Sebastian Kolbusz",
     "title": "Let's Build Together",
     "tagline": "I'm currently accepting new projects. Reach out to discuss how we can build your next high-performance digital presence.",
     "email": "Email",
-    "linkedin": "LinkedIn",
-    "github": "GitHub",
     "twitter": "X (Twitter)",
     "city": "Zakopane, Poland",
     "location_label": "Operating From",
@@ -294,5 +353,351 @@
     "subtitle": "Page Not Found",
     "description": "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
     "returnHome": "Return to Home"
+  },
+  "navSigns": {
+    "work": "from 369 zł to start",
+    "before": "before",
+    "after": "after",
+    "crafts": ["Design", "Code", "Server", "Upkeep"],
+    "piczura": ["Runways", "Verdi Gala", "City", "Deer"],
+    "prices": [
+      ["€45/h", "contract"],
+      ["€60/h", "consulting"],
+      ["from €10,000", "web app or MVP"]
+    ],
+    "about": "building websites since",
+    "services": "From design to upkeep",
+    "calculator": "Creality, rebuilt · prints on request",
+    "contact": "Zakopane · working remotely"
+  },
+  "navFacts": {
+    "hero": "Liquid on paper, simulated live in your browser.",
+    "work": "My web studio: websites for businesses in Podhale, with the design and the price agreed up front.",
+    "aspect-preview": "My open-source Payload plugin: crop once, see every layout. Try it here.",
+    "ready2order": "Cut the POS app’s bundle size in half on first load with four small changes.",
+    "how-i-work": "This usually involves several teams. I handle every stage by myself.",
+    "piczura": "A fashion model expected a photo gallery; he got a site where every role has its own scene.",
+    "prices": "Contract work from €45 an hour, web apps from €10,000, custom websites from €4,300.",
+    "about": "Frontend engineer and designer in Zakopane. Building websites since 2016.",
+    "projects": "Cut the POS app’s bundle size in half on first load at ready2order.",
+    "services": "Design, code, server and upkeep, in one pair of hands.",
+    "calculator": "A rebuilt Creality K1. I print on request.",
+    "contact": "Zakopane, Poland. Working remotely."
+  },
+  "aspectDemo": {
+    "label": "aspect-preview · open source · Payload CMS",
+    "question": "Where will each layout cut this photo?",
+    "how": "Drag the point, draw a crop, and every ratio follows. Shaded bands mark where a site puts text over the photo. This is the plugin itself, running here without Payload.",
+    "alt": "The photo being edited",
+    "another": "Another photo",
+    "own": "Your own photo",
+    "stays": "It stays in your browser."
+  },
+  "ready2order": {
+    "label": "Front end · 2019–2025",
+    "question": "Why did the POS app take so long to start?",
+    "who": "A POS system used by 10,000+ cafés, shops and salons in Austria and Germany.",
+    "site": "ready2order.com",
+    "steps": {
+      "one": {
+        "title": "One heavy download",
+        "text": "On first load, the app downloaded the entire bundle before showing the first screen.",
+        "short": "Whole"
+      },
+      "apart": {
+        "title": "Taken apart",
+        "text": "Four parts. Only one of them had to be there at the start.",
+        "short": "Apart"
+      },
+      "fates": {
+        "title": "Slimmed, split off, thrown out",
+        "text": "Webpack config rewritten · screens split off · Redux out, Apollo already cached the data · dependencies updated.",
+        "short": "Fates"
+      },
+      "half": {
+        "title": "Half the size",
+        "text": "Four changes that added up.",
+        "short": "Half"
+      }
+    },
+    "map": {
+      "whole": "the production bundle · everything loaded before the first screen",
+      "apart": "the production bundle · taken apart",
+      "fates": "the production bundle · what happened to each part",
+      "before": "before",
+      "after": "after",
+      "illustrative": "illustrative · not to scale",
+      "metric": "bundle size on first load · production build"
+    },
+    "parts": {
+      "app": {
+        "name": "The app’s own code",
+        "fate": "stays · dead code out"
+      },
+      "deps": {
+        "name": "Dependencies",
+        "fate": "updated"
+      },
+      "screens": {
+        "name": "Screens not needed on first load",
+        "fate": ""
+      },
+      "redux": {
+        "name": "Redux: store, reducers, actions",
+        "fate": "thrown out · Apollo already cached the data"
+      },
+      "dead": {
+        "name": "dead code, scattered through both",
+        "fate": ""
+      },
+      "shelf": {
+        "name": "Screens",
+        "fate": "split off · each loads when it is opened"
+      }
+    },
+    "result": "−50%",
+    "door": "The whole story",
+    "logo": "ready2order",
+    "stepsLabel": "The story in four steps",
+    "receipt": {
+      "head": "ready2order",
+      "sub": "first-load bundle · production build",
+      "all": "Everything, before the first screen",
+      "app": "App’s own code",
+      "deps": "Dependencies",
+      "screens": "Screens",
+      "redux": "Redux",
+      "webpack": "Webpack config",
+      "kept": "kept",
+      "updated": "updated",
+      "later": "later",
+      "removed": "removed",
+      "rewritten": "rewritten",
+      "total": "Bundle size on first load",
+      "thanks": "Danke!",
+      "show": "The whole receipt"
+    }
+  },
+  "howIWork": {
+    "title": "How I work",
+    "alone": "I work alone: design, code, server and maintenance stay in one pair of hands.",
+    "shelf": "I skip templates and off-the-shelf widgets in the parts that shape how a site feels.",
+    "vision": "I bring my own vision and taste to your idea to make it the best it can be.",
+    "fixed": "Need a proven website at a fixed price? That's what <mark>stronypodhale.pl</mark> is for.",
+    "roleNames": {
+      "design": "Design",
+      "code": "Code",
+      "server": "Server",
+      "maintenance": "Maintenance",
+      "liquid": "Fluid simulation",
+      "motion": "Animation",
+      "speed": "Performance"
+    },
+    "roleProofs": {
+      "design": "I designed piczura.com for fashion model Maciek Piczura. I gave each role and shoot its own scene.",
+      "code": "I built aspect-preview, an open-source Payload CMS plugin for cropping photos, setting focal points, and previewing crops live across page layouts.",
+      "server": "Your browser received the first byte in {ms} ms on this visit. I set up and run the server myself.",
+      "maintenance": "I last updated this site on {date}. Each build fills in the date.",
+      "liquid": "I built the green fluid simulation at the top of this page: try moving it with your cursor or finger.",
+      "motion": "I designed and coded every animation on this site.",
+      "speed": "This page fully loaded for you in {s} s, measured in your browser during this visit."
+    },
+    "rolesHint": "Pick a stage for details",
+    "relay": {
+      "usual": "Typical project",
+      "mine": "With me",
+      "usualCount": "Typically 4 teams",
+      "mineCount": "Just me",
+      "people": ["Designer", "Developer", "Host", "Support"],
+      "project": "Your project",
+      "teams": ["Design team", "Engineering team", "Infrastructure team", "Maintenance team"],
+      "line": "This usually involves several teams. I handle every stage by myself."
+    },
+    "ledger": {
+      "own": "Built by me",
+      "engine": "The engine",
+      "note": "Everything on the left was built from scratch for this site. On the right, you’ll find the tools I use to build it.",
+      "map": "On this page",
+      "mapHint": "Pick an item to locate it",
+      "items": {
+        "liquid": ["Fluid", "At the top: drag or touch."],
+        "cursor": ["Cursor", "Move it around; watch it change."],
+        "menu": ["Menu", "Top right: open it, watch it fill."],
+        "r2o": ["ready2order scene", "Watch droplets, receipt printing, bundle map."],
+        "plugin": ["Payload plugin · open source", "Previous scene: compare the photo crops."]
+      }
+    },
+    "case": {
+      "text": "Maciek Piczura came to me with his modeling photos and wanted a portfolio that would stand out. I handled the creative direction, building distinct scenes to showcase his different roles and shoots.",
+      "before": "Client photos",
+      "after": "Finished site",
+      "link": "Visit piczura.com",
+      "scenes": ["Runways", "Verdi Gala", "City", "Deer"],
+      "came": "Maciek Piczura, a fashion model, came to me with photos from shows and shoots.",
+      "asked": "He wanted a striking portfolio and expected <x>a photo gallery</x>.",
+      "gave": "I proposed and built a site where each role and shoot has its own scene, motion, and typography.",
+      "files": "The client's photos",
+      "pick": "Pick a scene"
+    },
+    "end": {
+      "alone": "The server responded in {ms} ms for you.",
+      "shelf": "Liquid, cursor, menu: built from scratch.",
+      "vision": "piczura.com — see where I took Maciek’s photos."
+    },
+    "door": "Visit the site",
+    "roleLinks": {
+      "design": "Explore the portfolio",
+      "code": "View on npm"
+    },
+    "stock": {
+      "liquid": "I use one fluid simulation for the hero, drops, and transitions. The liquid responds to touch and cursor movement, splits and rejoins, and bends light and the text below.",
+      "menu": "The menu button pours the same liquid into a menu with a tick for each section. Pick a tick and the liquid fills the screen, then drains to show the section.",
+      "cursor": "The cursor changes shape to match what it points at. Around links, it draws the same frame you see on keyboard focus, so mouse and keyboard users get the same cue.",
+      "borrowed": "I built those four parts on tools I chose for their track record: Next.js, React, GSAP, Lenis, next-intl.",
+      "stockLabel": "OFF THE SHELF",
+      "hold": "Hold to see the stock version",
+      "holdLabel": "Press and hold the drop to see this page with off-the-shelf parts.",
+      "placeholder": "Your headline goes here",
+      "cta": "Learn more",
+      "type": "I chose Mattone and set the type sizes and spacing. I designed the layout and timed the text to appear word by word."
+    },
+    "estimate": {
+      "head": "Estimate",
+      "usualRows": [
+        ["Design", "Design studio", "Hourly"],
+        ["Code", "Development team", "Hourly"],
+        ["Server", "Hosting provider", "Monthly"],
+        ["Maintenance", "Support team", "Monthly"]
+      ],
+      "usualTotal": ["Total", "To be estimated"],
+      "mineRow": ["Design, code, server, and maintenance", "Rates below"],
+      "termsLabel": "Terms",
+      "pricesLabel": "Rates",
+      "prices": [
+        ["Contract development", "€45", "per hour · €360 per day"],
+        ["Consulting and audits", "€60", "per hour"],
+        ["Web app / MVP", "from €10,000", "per project"],
+        ["Custom website with motion and storytelling", "from €4,300", "per project"]
+      ],
+      "contact": "Get in touch",
+      "head2": "Websites for Podhale businesses",
+      "studioPrices": [
+        ["369 zł", "upfront, then 85 zł per month"],
+        ["1835 zł", "once. Own the site from day one."]
+      ],
+      "studioGo": "Visit the site",
+      "pick": "Pick a line",
+      "coversLabel": "Includes",
+      "covers": [
+        [
+          "React, Next.js, TypeScript",
+          "Join your team",
+          "Your tools and process",
+          "Remote preferred; hybrid possible"
+        ],
+        [
+          "Core Web Vitals",
+          "WCAG accessibility",
+          "Code and architecture review",
+          "Prioritized report"
+        ],
+        [
+          "Design",
+          "Next.js development",
+          "Server and hosting setup",
+          "Launch",
+          "Post-launch monitoring and critical fixes"
+        ],
+        [
+          "Concept and design",
+          "Motion and storytelling",
+          "Development",
+          "Setup and launch",
+          "Post-launch monitoring and critical fixes"
+        ]
+      ],
+      "dragHint": "Drag the drop",
+      "hours": "{n, plural, one {# hour} other {# hours}}",
+      "days": "{n, plural, one {# day} other {# days}}",
+      "unitSwitch": ["Hours", "Days"],
+      "estTotal": "Estimated",
+      "net": "Prices excl. VAT",
+      "fromNote": "We'll set the final price once we've talked through the scope.",
+      "yours": "Your estimate",
+      "send": "Send this estimate",
+      "mailSubject": "Estimate: {offer}",
+      "mailBody": "Hi, I’m interested in {offer}. The estimate is {amount}. I’d be happy to share more details.",
+      "sealedHint": "Estimate stamped",
+      "vatNet": "net + VAT",
+      "vatGross": "gross, VAT included",
+      "travel": "For hybrid work, travel costs are agreed separately.",
+      "careNote": "Extra maintenance on request is billed at the hourly rate.",
+      "vatEu": "Excl. VAT; reverse charge for EU businesses"
+    },
+    "level": {
+      "usual": "Usually, several teams.",
+      "here": "With me, one contact and one invoice."
+    },
+    "offer": {
+      "label": "Rates",
+      "build": ["I build it", "for you."],
+      "with": ["I work", "with you."],
+      "subs": [
+        "You set the goal. I decide how to build it.",
+        "I join your team and follow your process."
+      ],
+      "more": [
+        [
+          ["Time", "8–12 weeks"],
+          ["Stack", "Next.js, TypeScript"]
+        ],
+        [
+          ["Time", "4–8 weeks"],
+          ["Design", "No template"]
+        ],
+        [
+          ["Report", "Prioritized findings"],
+          ["Typical", "4–12 hours"]
+        ],
+        [
+          ["Where", "Remote or hybrid"],
+          ["How", "Your tools and process"]
+        ]
+      ],
+      "offers": [
+        [
+          "Web app / MVP",
+          "from €10,000",
+          "",
+          "I design the app, build it in Next.js, set up the server, and launch it.",
+          "about an app"
+        ],
+        [
+          "One-of-a-kind narrative site",
+          "from €4,300",
+          "",
+          "I design and build the site from scratch, using motion to tell your story.",
+          "about a website"
+        ],
+        [
+          "Consulting and audits",
+          "€60",
+          "/ h",
+          "I review performance, accessibility, and code, then rank fixes by priority.",
+          "about a consultation"
+        ],
+        [
+          "Contract development",
+          "€45",
+          "/ h",
+          "I work on your team using React, Next.js, and TypeScript. €360 a day.",
+          "about contract work"
+        ]
+      ],
+      "shared": "Both include launch and 2 h of care each month.",
+      "note": "Prices exclude VAT. Reverse charge applies to EU businesses. We set the price after a short call.",
+      "contact": "Get in touch",
+      "about": "Write to me {about}"
+    }
   }
 }

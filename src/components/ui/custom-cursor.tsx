@@ -7,6 +7,23 @@ import { useMedia, usePrefersReducedMotion } from '@/hooks/use-media'
 import { gsap, useGSAP } from '@/lib/gsap-core'
 import { useCursorStore } from '@/lib/stores'
 
+import './custom-cursor.css'
+
+type Shape = 'dot' | 'text' | 'cross'
+
+/** the dot's shape for what is under the pointer: a crosshair where you place a point, a text bar over selectable text */
+function shapeFor(el: Element | null): Shape {
+  if (!(el instanceof HTMLElement)) return 'dot'
+  if (el.closest('[data-cursor-shape="cross"], .focal-editor__image-wrapper')) return 'cross'
+  if (el.closest('a[href], button, [role="button"], label, input, select, textarea, [inert]'))
+    return 'dot'
+  const hasText = Array.from(el.childNodes).some(
+    (n) => n.nodeType === Node.TEXT_NODE && (n.textContent ?? '').trim().length > 0
+  )
+  if (!hasText) return 'dot'
+  return getComputedStyle(el).userSelect === 'none' ? 'dot' : 'text'
+}
+
 export function CustomCursor() {
   const prefersReducedMotion = usePrefersReducedMotion()
   const isEnabled = useMedia('(pointer: fine)') && !prefersReducedMotion
@@ -17,6 +34,8 @@ export function CustomCursor() {
 
   const cursorRef = useRef<HTMLDivElement>(null)
   const ringRef = useRef<HTMLDivElement>(null)
+  const blendLayerRef = useRef<HTMLDivElement>(null)
+  const focusLayerRef = useRef<HTMLDivElement>(null)
 
   const magneticTargetRef = useRef<HTMLElement | null>(null)
   const targetRectRef = useRef({ left: 0, top: 0, width: 0, height: 0 })
@@ -38,10 +57,11 @@ export function CustomCursor() {
     }
   }, [isEnabled])
 
+  // The ring wraps the element's whole box exactly where the keyboard focus ring sits (2 px at an 8 px offset,
+  // so 10 px out on each side), measured every frame: elements move (menus reveal, pages scroll, Lenis eases).
   const updateTargetRect = () => {
-    if (magneticTargetRef.current && magneticTargetRef.current.isConnected) {
-      targetRectRef.current = magneticTargetRef.current.getBoundingClientRect()
-    }
+    const el = magneticTargetRef.current
+    if (el && el.isConnected) targetRectRef.current = el.getBoundingClientRect()
   }
 
   useEffect(() => {
@@ -68,15 +88,23 @@ export function CustomCursor() {
 
         if (state.magneticTarget && ringRef.current) {
           const style = window.getComputedStyle(state.magneticTarget)
-          const targetRadius = parseInt(style.borderRadius)
-          const targetHeight = parseInt(style.height)
+          const targetRadius = parseFloat(style.borderRadius) || 0
+          const targetHeight = state.magneticTarget.getBoundingClientRect().height || 1
 
           const isPill = targetRadius >= targetHeight / 2
           const newRadius = isPill ? '9999px' : `${targetRadius + 10}px`
 
           gsap.to(ringRef.current, { borderRadius: newRadius, duration: 0.2 })
+          // on a target the ring is the focus ring: same colour, same weight
+          ringRef.current.style.borderColor = 'var(--color-ring)'
+          ringRef.current.style.borderWidth = '2px'
+          // into the layer without blending, so it keeps the focus ring's own colour
+          if (focusLayerRef.current) focusLayerRef.current.append(ringRef.current)
         } else if (ringRef.current) {
           gsap.to(ringRef.current, { borderRadius: '50%', duration: 0.2 })
+          ringRef.current.style.borderColor = ''
+          ringRef.current.style.borderWidth = ''
+          if (blendLayerRef.current) blendLayerRef.current.append(ringRef.current)
         }
       }
 
@@ -111,9 +139,43 @@ export function CustomCursor() {
   useGSAP(() => {
     if (!isEnabled) return
 
+    let shape: Shape = 'dot'
+    let pending: EventTarget | null = null
+    let shapeFrame = 0
+    const applyShape = () => {
+      shapeFrame = 0
+      const next = magneticTargetRef.current ? 'dot' : shapeFor(pending as Element | null)
+      if (next === shape || !cursorRef.current || !ringRef.current) return
+      shape = next
+      cursorRef.current.dataset.shape = next
+      // one cursor at a time: when the dot becomes a crosshair or a text bar, the ring steps back
+      gsap.to(ringRef.current, {
+        opacity: next === 'dot' ? 1 : 0,
+        scale: next === 'dot' ? 1 : 0.5,
+        duration: 0.22,
+        ease: 'power3.out',
+      })
+    }
+    const onMouseDown = () => {
+      if (!cursorRef.current || !ringRef.current) return
+      gsap.to(cursorRef.current, { scale: 0.7, duration: 0.12, ease: 'power2.out' })
+      if (shape === 'dot')
+        gsap.to(ringRef.current, { scale: 0.86, duration: 0.12, ease: 'power2.out' })
+    }
+    const onMouseUp = () => {
+      if (!cursorRef.current || !ringRef.current) return
+      gsap.to(cursorRef.current, { scale: 1, duration: 0.3, ease: 'back.out(3)' })
+      if (shape === 'dot')
+        gsap.to(ringRef.current, { scale: 1, duration: 0.3, ease: 'back.out(3)' })
+    }
+    window.addEventListener('mousedown', onMouseDown)
+    window.addEventListener('mouseup', onMouseUp)
+
     const onMouseMove = (e: MouseEvent) => {
       mouse.current.x = e.clientX
       mouse.current.y = e.clientY
+      pending = e.target
+      if (!shapeFrame) shapeFrame = requestAnimationFrame(applyShape)
       if (!hasMoved.current) {
         if (cursorRef.current && ringRef.current) {
           hasMoved.current = true
@@ -123,7 +185,12 @@ export function CustomCursor() {
     }
 
     window.addEventListener('mousemove', onMouseMove)
-    return () => window.removeEventListener('mousemove', onMouseMove)
+    return () => {
+      cancelAnimationFrame(shapeFrame)
+      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('mousedown', onMouseDown)
+      window.removeEventListener('mouseup', onMouseUp)
+    }
   }, [isEnabled])
 
   useGSAP(() => {
@@ -175,6 +242,7 @@ export function CustomCursor() {
         }
 
         if (magneticTargetRef.current) {
+          updateTargetRect()
           const rect = targetRectRef.current
           hasTarget = rect.width > 0
           let centerX = rect.left + rect.width / 2
@@ -262,20 +330,36 @@ export function CustomCursor() {
 
   if (!isEnabled) return null
 
+  // Two top-level layers, so the blend reaches the page: a blend inside a fixed container only
+  // mixes with that container. The dot and the free ring blend (always visible); the ring on a
+  // link moves to the second layer, which does not, and stays the keyboard focus ring.
   return (
-    <div
-      data-testid="custom-cursor"
-      className="pointer-events-none fixed inset-0 z-9998 overflow-hidden mix-blend-difference print:hidden"
-    >
+    <>
       <div
-        ref={cursorRef}
-        className="bg-cursor pointer-events-none fixed top-0 left-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0 will-change-transform"
-      />
-
+        ref={blendLayerRef}
+        data-testid="custom-cursor"
+        data-adapt-theme="pointer"
+        className="cc-blend pointer-events-none fixed inset-0 z-9998 overflow-hidden print:hidden"
+      >
+        {/* the dot is two bars that morph: both round = a dot, both tall = a text bar, crossed = a crosshair */}
+        <div
+          ref={cursorRef}
+          data-shape="dot"
+          className="cc-dot pointer-events-none fixed top-0 left-0 opacity-0 will-change-transform"
+        >
+          <i data-bar="h" />
+          <i data-bar="v" />
+        </div>
+        <div
+          ref={ringRef}
+          className="cc-ring pointer-events-none fixed top-0 left-0 h-11 w-11 -translate-x-1/2 -translate-y-1/2 rounded-full border opacity-0 transition-colors will-change-transform"
+        />
+      </div>
       <div
-        ref={ringRef}
-        className="border-cursor pointer-events-none fixed top-0 left-0 h-11 w-11 -translate-x-1/2 -translate-y-1/2 rounded-full border opacity-0 transition-colors will-change-transform"
+        ref={focusLayerRef}
+        aria-hidden="true"
+        className="cc-focus pointer-events-none fixed inset-0 z-9998 overflow-hidden print:hidden"
       />
-    </div>
+    </>
   )
 }

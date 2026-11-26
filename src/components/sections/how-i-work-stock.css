@@ -1,0 +1,432 @@
+/* Act 4, line 2: "nothing off the shelf". A pinned scene that starts as a template and turns into
+   the site (how-i-work-stock.tsx). The script sets the drop's place (--dx, --dy), its size (--R),
+   the bottom of the sentence (--lb), the type note's height (--th), and moves the words, the
+   placeholder and the button every frame. The template is drawn the way templates are: a default
+   system font, a centred container, a grey image placeholder, a blue rounded button.
+   Sizes from the size system (src/app/system.css). */
+
+.st {
+  --st-mute: rgba(43, 38, 32, 0.46);
+  --st-ease: cubic-bezier(0.35, 0, 0, 1);
+  --st-tpl-ink: #1f2937;
+  --st-tpl-blue: #2563eb;
+  --st-tpl-grey: #e5e7eb;
+  position: relative;
+  width: 100%;
+  height: 360svh;
+  background: var(--sys-paper);
+  color: var(--sys-ink);
+}
+.st-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+.st-drop,
+.st-liquid {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.st-drop {
+  pointer-events: none;
+}
+.st-stage > :not(.st-drop) {
+  z-index: 1;
+}
+
+/* ---- the template ---- */
+.st-tpl {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  /* the container templates ship with: a fixed width, centred, however wide the screen */
+  width: min(1320px, calc(100% - 2 * var(--sys-margin)));
+  translate: -50% 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  pointer-events: none;
+}
+/* a split hero: the text in the left half of the template's container, the image in the right */
+.st-stage[data-wide] .st-tpl > * {
+  max-width: 46%;
+}
+.st-stage[data-wide] .st-tpl > .st-cta {
+  max-width: none;
+}
+.st-stage:not([data-wide]) .st-tpl {
+  justify-content: flex-start;
+  align-items: center;
+  /* a tall screen: the composition starts lower, so it does not hang under the header */
+  padding-top: max(calc(var(--sys-s7) + var(--sys-s5)), 22svh);
+  text-align: center;
+}
+.st-tpl[data-gone] {
+  visibility: hidden;
+}
+.st-tpl-h,
+.st-tpl-ph {
+  margin: 0;
+  font:
+    600 clamp(26px, 2.7vw, min(4.6vh, 56px)) / 1.2 system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+  letter-spacing: -0.01em;
+  color: var(--st-tpl-ink);
+}
+.st-tw {
+  display: inline-block;
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+}
+.st-tpl-ph {
+  position: absolute;
+  visibility: hidden;
+  opacity: 0;
+}
+.st-tpl[data-words] .st-tpl-h {
+  visibility: hidden;
+}
+.st-tpl[data-words] .st-tpl-ph {
+  position: static;
+  visibility: visible;
+  opacity: 1;
+}
+.st-cta {
+  display: inline-block;
+  margin-top: var(--sys-s4);
+  padding: 13px 24px;
+  border-radius: 8px;
+  background: var(--st-tpl-blue);
+  color: #fff;
+  white-space: nowrap;
+  font:
+    500 16px / 1 system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.12);
+  will-change: transform, opacity;
+}
+/* the image placeholder, in the place the drop will take */
+.st-box {
+  --bw: min(calc(var(--R, 60px) * 4.4), 40vw, 520px);
+  --bh: calc(var(--R, 60px) * 3.2);
+  position: absolute;
+  left: calc(var(--bx, 70%) - var(--bw) / 2);
+  top: calc(var(--by, 50%) - var(--bh) / 2);
+  width: var(--bw);
+  height: var(--bh);
+  border-radius: 8px;
+  background: var(--st-tpl-grey);
+  will-change: transform, opacity;
+}
+.st-box svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.st-box path {
+  fill: none;
+  stroke: #c3c7ce;
+  stroke-width: 1.5px;
+  vector-effect: non-scaling-stroke;
+}
+.st-stage:not([data-wide]) .st-box {
+  --bw: min(calc(var(--R, 60px) * 4.4), calc(100vw - 48px));
+  --bh: calc(var(--R, 60px) * 2.6);
+}
+
+/* ---- the site's own ---- */
+.st-line {
+  position: absolute;
+  left: var(--sys-margin);
+  top: calc(var(--sys-s7) + var(--sys-s5));
+  margin: 0;
+  font:
+    700 clamp(30px, 3.6vw, 6.8vh) / 1.1 'Mattone',
+    system-ui,
+    sans-serif;
+  letter-spacing: -0.015em;
+  text-wrap: pretty;
+}
+.st-fw {
+  display: inline-block;
+  transform-origin: 50% 50%;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+/* no liquid (no WebGL): the drop is at least green */
+.st-stage:not([data-liquid]) .st-drop {
+  left: calc(var(--dx, 70%) - var(--R, 60px));
+  top: calc(var(--dy, 50%) - var(--R, 60px));
+  width: calc(var(--R, 60px) * 2);
+  height: calc(var(--R, 60px) * 2);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #3fc48a, #0f9d63 55%, #0b7a4c);
+}
+.st-hold {
+  position: absolute;
+  left: calc(var(--dx, 70%) - var(--R, 60px));
+  top: calc(var(--dy, 50%) - var(--R, 60px));
+  width: calc(var(--R, 60px) * 2);
+  height: calc(var(--R, 60px) * 2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* small mono labels: off the shelf over the placeholder, press and hold under the drop */
+.st-label,
+.st-hint {
+  position: absolute;
+  left: var(--dx, 70%);
+  translate: -50% 0;
+  font: var(--sys-label) / 1 var(--sys-mono);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--sys-ink-2);
+  transition:
+    opacity 0.4s var(--st-ease),
+    visibility 0s linear 0.4s;
+}
+.st-label {
+  left: var(--bx, 70%);
+  top: calc(var(--by, 50%) - var(--bh) / 2 - var(--sys-s4));
+  --bh: calc(var(--R, 60px) * 3.2);
+  opacity: 0;
+  visibility: hidden;
+}
+.st-stage:not([data-wide]) .st-label {
+  --bh: calc(var(--R, 60px) * 2.6);
+}
+.st-stage[data-stock] .st-label {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.4s var(--st-ease),
+    visibility 0s;
+}
+.st-hint {
+  top: calc(var(--dy, 50%) + var(--R, 60px) + var(--sys-s3));
+  opacity: 0;
+  visibility: hidden;
+}
+.st-stage[data-notes~='drop']:not([data-held]) .st-hint {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.4s var(--st-ease) 0.4s,
+    visibility 0s 0.4s;
+}
+
+/* ---- one note per part given back, where that part is ---- */
+.st-note,
+.st-borrowed {
+  position: absolute;
+  margin: 0;
+  font: clamp(13px, 0.75vw, 16px) / 1.55 var(--sys-mono);
+  color: var(--sys-ink-2);
+  opacity: 0;
+  visibility: hidden;
+  translate: 0 8px;
+  transition:
+    opacity 0.5s var(--st-ease),
+    translate 0.5s var(--st-ease),
+    visibility 0s linear 0.5s;
+}
+.st-stage[data-notes~='drop'] .st-note[data-part='drop'],
+.st-stage[data-notes~='type'] .st-note[data-part='type'],
+.st-stage[data-notes~='menu'] .st-note[data-part='menu'],
+.st-stage[data-notes~='cursor'] .st-note[data-part='cursor'],
+.st-stage[data-borrowed] .st-borrowed {
+  opacity: 1;
+  visibility: visible;
+  translate: 0 0;
+  transition:
+    opacity 0.5s var(--st-ease),
+    translate 0.5s var(--st-ease),
+    visibility 0s;
+}
+.st-note[data-part='drop'] {
+  left: calc(var(--dx, 70%) - 160px);
+  top: calc(var(--dy, 50%) + var(--R, 60px) + var(--sys-s3) + var(--sys-s4));
+  width: 320px;
+  text-align: center;
+}
+/* under the sentence: what was done with the type, then the cursor */
+.st-note[data-part='type'],
+.st-note[data-part='cursor'] {
+  left: var(--sys-margin);
+  width: min(44ch, 40vw);
+}
+.st-note[data-part='type'] {
+  top: calc(var(--lb, 50%) + var(--sys-s5));
+}
+.st-note[data-part='cursor'] {
+  top: calc(var(--lb, 50%) + var(--sys-s5) + var(--th, 80px) + var(--sys-s3));
+}
+/* under the real menu button, at the top right of the page */
+.st-note[data-part='menu'] {
+  right: var(--sys-margin);
+  top: calc(var(--sys-s7) + var(--sys-s2));
+  width: min(300px, 26vw);
+  padding-top: var(--sys-s2);
+  text-align: right;
+}
+.st-note[data-part='menu']::before {
+  content: '';
+  position: absolute;
+  right: var(--sys-s3);
+  top: calc(-1 * var(--sys-s3));
+  height: var(--sys-s4);
+  border-left: var(--sys-line) solid var(--sys-ink-2);
+}
+.st-borrowed {
+  left: var(--sys-margin);
+  bottom: var(--sys-s6);
+  max-width: min(46ch, 86vw);
+  color: var(--st-mute);
+}
+
+/* not wide (a tall tablet, a phone): one slot under the drop, the newest note only */
+.st-stage:not([data-wide]) .st-note {
+  left: var(--sys-margin);
+  right: var(--sys-margin);
+  top: calc(var(--dy, 50%) + var(--R, 60px) + var(--sys-s3) + var(--sys-s4));
+  width: auto;
+  padding: 0;
+  text-align: center;
+}
+.st-stage:not([data-wide]) .st-note[data-part='menu']::before {
+  content: '↗ ';
+  position: static;
+  border: 0;
+}
+.st-stage:not([data-wide]) .st-note[data-part] {
+  opacity: 0;
+  visibility: hidden;
+}
+.st-stage:not([data-wide])[data-last='drop'] .st-note[data-part='drop'],
+.st-stage:not([data-wide])[data-last='type'] .st-note[data-part='type'],
+.st-stage:not([data-wide])[data-last='menu'] .st-note[data-part='menu'],
+.st-stage:not([data-wide])[data-last='cursor'] .st-note[data-part='cursor'] {
+  opacity: 1;
+  visibility: visible;
+  translate: 0 0;
+}
+.st-stage:not([data-wide])[data-borrowed][data-last] .st-note[data-part] {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* ---- the page off the shelf: set on <html> while this screen holds the page ---- */
+html[data-stock~='menu'] .site-bar__toggle-wrap,
+html[data-stock~='menu'] .site-bar__where {
+  opacity: 0;
+}
+.site-bar__toggle-wrap,
+.site-bar__where {
+  transition: opacity 0.25s linear;
+}
+.site-bar__toggle {
+  position: relative;
+}
+/* a plain hamburger, the way a template ships it */
+.site-bar__toggle::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: 22px;
+  height: 2px;
+  translate: 0 -50%;
+  background: currentColor;
+  box-shadow:
+    0 -7px 0 currentColor,
+    0 7px 0 currentColor;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s linear;
+}
+html[data-stock~='menu'] .site-bar__toggle::after {
+  opacity: 1;
+}
+/* the system arrow instead of the site's cursor */
+html[data-stock~='cursor'] .cc-blend,
+html[data-stock~='cursor'] .cc-focus {
+  opacity: 0 !important;
+}
+@media (pointer: fine) {
+  html[data-stock~='cursor'],
+  html[data-stock~='cursor'] * {
+    cursor: default !important;
+  }
+  html[data-stock~='cursor'] a[href],
+  html[data-stock~='cursor'] button {
+    cursor: pointer !important;
+  }
+}
+
+/* a tall tablet: the sentence runs full width, so it can be set bigger */
+@media (min-width: 701px) and (max-aspect-ratio: 23 / 20) {
+  .st-line {
+    top: max(calc(var(--sys-s7) + var(--sys-s5)), 22svh);
+    font-size: min(5.2vw, 6.8vh);
+  }
+}
+@media (max-width: 700px) {
+  .st {
+    height: 320svh;
+  }
+  .st-line {
+    top: calc(var(--sys-s7) + var(--sys-s2));
+    font-size: clamp(24px, 7.2vw, 30px);
+  }
+  .st-line {
+    top: max(calc(var(--sys-s7) + var(--sys-s2)), 18svh);
+  }
+  .st-stage:not([data-wide]) .st-tpl {
+    padding-top: max(calc(var(--sys-s7) + var(--sys-s2)), 18svh);
+  }
+  .st-tpl-h,
+  .st-tpl-ph {
+    font-size: clamp(22px, 6.2vw, 26px);
+  }
+  .st-hint {
+    letter-spacing: 0.12em;
+  }
+  .st-note {
+    font-size: 13px;
+  }
+  .st-borrowed {
+    bottom: var(--sys-s5);
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .st {
+    height: auto;
+  }
+  .st-stage {
+    position: relative;
+    height: auto;
+    min-height: 100svh;
+  }
+}

@@ -14,12 +14,22 @@
   "nav": {
     "main_navigation": "Menu główne",
     "hero": "Start",
+    "aspect": "aspect-preview",
+    "ready2order": "ready2order",
+    "how_i_work": "Jak pracuję",
+    "prices": "Cennik",
     "about": "O mnie",
     "projects": "Projekty",
     "services": "Usługi",
     "calculator": "Druk 3D",
     "contact": "Kontakt",
-    "cv": "CV"
+    "cv": "CV",
+    "menu": "Menu",
+    "short": "Na skróty",
+    "close": "Zamknij",
+    "elsewhere": "Moje strony",
+    "in_progress": "powstaje",
+    "here": "tutaj"
   },
   "HomePage": {
     "title": "Sebastian Kolbusz",
@@ -38,6 +48,46 @@
     "role": "Web Architect",
     "tagline": "Buduję wysokowydajne produkty cyfrowe z naciskiem na dopracowanie wizualne i doskonałość techniczną.",
     "cta": "Zobacz moje projekty"
+  },
+  "liquidHero": {
+    "role": "Frontend developer i projektant",
+    "lines": {
+      "shelf": "Nie używam gotowców.",
+      "apart": "Rozbieram rzeczy na części.",
+      "together": "Sam składam wszystko z powrotem."
+    },
+    "cta": "Zobacz moje projekty",
+    "tilt": "PRZECHYL"
+  },
+  "signature": {
+    "lines": {
+      "first": "Strony dla firm z Podhala.",
+      "second": "Projekt i cenę poznasz przed zapłatą."
+    },
+    "link": "Zobacz stronę",
+    "alt": "Strona główna stronypodhale.pl z podglądem realizacji piczura.com",
+    "pins": {
+      "rosette": {
+        "title": "16 px",
+        "note": "Rozeta z parzenicy jest czytelna nawet w ikonce karty. Adres łatwo podyktować przez telefon."
+      },
+      "price": {
+        "title": "369 zł",
+        "note": "na początek i 85 zł miesięcznie. Albo 1835 zł jednorazowo i strona jest Twoja. Ceny są na stronie."
+      },
+      "upfront": {
+        "title": "z góry",
+        "note": "Pracuję na Podhalu. Najpierw oglądasz projekt i sprawdzasz cenę, potem decydujesz."
+      },
+      "piczura": {
+        "title": "piczura.com",
+        "note": "Portfolio modela. Bez szablonu, wszystkie animacje napisałem od zera."
+      },
+      "free": {
+        "title": "0 zł",
+        "note": "jeśli projekt Ci się nie spodoba. Płacisz dopiero po akceptacji."
+      }
+    }
   },
   "about": {
     "title": "Doświadczenie i Kontekst",
@@ -222,11 +272,20 @@
     "disclaimer": "* Szacunki oparte na standardowych ustawieniach. Złożona geometria może wpłynąć na czas i koszt."
   },
   "contact": {
+    "say": "Wyślij mi maila.",
+    "copy": "Kopiuj adres",
+    "copied": "Skopiowano ✓",
+    "open": "Otwórz pocztę",
+    "reply": "Odpowiem w ciągu jednego dnia roboczego.",
+    "phone": "Telefon",
+    "linkedin": "LinkedIn",
+    "github": "GitHub",
+    "x": "X",
+    "location": "Zakopane, Polska · zdalnie",
+    "rights": "© {year} Sebastian Kolbusz",
     "title": "Budujmy Razem",
     "tagline": "Obecnie przyjmuję nowe projekty. Skontaktuj się, aby porozmawiać o Twoim wizerunku cyfrowym.",
     "email": "Email",
-    "linkedin": "LinkedIn",
-    "github": "GitHub",
     "twitter": "X (Twitter)",
     "city": "Zakopane, Polska",
     "location_label": "Działam z",
@@ -290,5 +349,351 @@
     "subtitle": "Strona nie znaleziona",
     "description": "Strona, której szukasz, mogła zostać usunięta lub jest tymczasowo niedostępna.",
     "returnHome": "Powrót do strony głównej"
+  },
+  "navSigns": {
+    "work": "od 369 zł na start",
+    "before": "przed",
+    "after": "po",
+    "crafts": ["Projekt", "Kod", "Serwer", "Utrzymanie"],
+    "piczura": ["Wybiegi", "Verdi Gala", "Miasto", "Jelenie"],
+    "prices": [
+      ["130 zł/h", "kontrakt"],
+      ["200 zł/h", "konsultacje"],
+      ["od 30 000 zł", "aplikacja albo MVP"]
+    ],
+    "about": "robię strony od",
+    "services": "Od projektu po utrzymanie",
+    "calculator": "Creality, przebudowana · druk na zamówienie",
+    "contact": "Zakopane · pracuję zdalnie"
+  },
+  "navFacts": {
+    "hero": "Zielona ciecz u góry strony to symulacja liczona na żywo w przeglądarce.",
+    "work": "Prowadzę stronypodhale.pl, gdzie firmy z Podhala widzą projekt i cenę, zanim zapłacą.",
+    "aspect-preview": "Wypróbuj mój plugin open source do Payloada: kadrujesz raz, od razu widzisz wszystkie układy.",
+    "ready2order": "Wprowadziłem cztery drobne zmiany i bundle przy pierwszym ładowaniu był o połowę mniejszy.",
+    "how-i-work": "Zwykle pracują nad tym różne zespoły. Ja zajmuję się każdym etapem sam.",
+    "piczura": "Model spodziewał się galerii zdjęć; dostał stronę, w której każda rola ma własną scenę.",
+    "prices": "Kontrakt od 130 zł za godzinę, aplikacje od 30 000 zł, strony kreatywne od 10 945 zł.",
+    "about": "Jestem frontend developerem i projektantem z Zakopanego, a strony robię od 2016 roku.",
+    "projects": "W ready2order ograniczyłem o połowę ilość kodu pobieranego przed pierwszym ekranem.",
+    "services": "Sam zajmuję się projektem, kodem, serwerem i utrzymaniem strony.",
+    "calculator": "Przebudowałem drukarkę Creality K1 i drukuję na zamówienie.",
+    "contact": "Pracuję zdalnie z Zakopanego."
+  },
+  "aspectDemo": {
+    "label": "aspect-preview · open source · Payload CMS",
+    "question": "Jak to zdjęcie wypadnie w różnych układach?",
+    "how": "Przesuń punkt ostrości lub narysuj kadr, a pozostałe kadry dopasują się same. Zacienione pasy wskazują miejsce na tekst. Tu działa mój plugin bez Payloada.",
+    "alt": "Zdjęcie do kadrowania",
+    "another": "Inne zdjęcie",
+    "own": "Wgraj zdjęcie",
+    "stays": "Zdjęcie zostaje w przeglądarce."
+  },
+  "ready2order": {
+    "label": "Frontend · 2019–2025",
+    "question": "Dlaczego aplikacja POS tak długo się uruchamiała?",
+    "who": "To system POS dla ponad 10 000 kawiarni, sklepów i salonów w Austrii i Niemczech.",
+    "site": "ready2order.com",
+    "steps": {
+      "one": {
+        "title": "Jeden ciężki plik",
+        "text": "Przy pierwszym ładowaniu aplikacja pobierała cały bundle, zanim pojawił się pierwszy ekran.",
+        "short": "Całość"
+      },
+      "apart": {
+        "title": "Cztery części",
+        "text": "Rozłożyłem bundle na cztery części. Przy pierwszym ładowaniu potrzebna była tylko jedna.",
+        "short": "Podział"
+      },
+      "fates": {
+        "title": "Cztery zmiany w kodzie",
+        "text": "Przepisałem konfigurację Webpacka · wydzieliłem ekrany · usunąłem Reduxa, bo dane były w cache Apollo · zaktualizowałem zależności",
+        "short": "Zmiany"
+      },
+      "half": {
+        "title": "O połowę mniej",
+        "text": "Po czterech zmianach bundle przy pierwszym ładowaniu był o połowę mniejszy.",
+        "short": "Połowa"
+      }
+    },
+    "map": {
+      "whole": "cały bundle · kod pobierany przed pierwszym ekranem",
+      "apart": "bundle · podział na cztery części",
+      "fates": "bundle · co zrobiłem z każdą częścią",
+      "before": "przed",
+      "after": "po",
+      "illustrative": "mapa poglądowa · nie w skali",
+      "metric": "rozmiar bundla przy pierwszym ładowaniu"
+    },
+    "parts": {
+      "app": {
+        "name": "własny kod aplikacji",
+        "fate": "został · wyciąłem martwy kod"
+      },
+      "deps": {
+        "name": "zależności",
+        "fate": "zaktualizowałem"
+      },
+      "screens": {
+        "name": "ekrany poza pierwszym ładowaniem",
+        "fate": ""
+      },
+      "redux": {
+        "name": "Redux · store, reducery, akcje",
+        "fate": "usunąłem · dane były już w cache Apollo"
+      },
+      "dead": {
+        "name": "martwy kod aplikacji i bibliotek",
+        "fate": ""
+      },
+      "shelf": {
+        "name": "ekrany",
+        "fate": "wydzieliłem · każdy ładuje się po otwarciu"
+      }
+    },
+    "result": "−50%",
+    "door": "Cała historia",
+    "logo": "ready2order",
+    "stepsLabel": "Cztery kroki optymalizacji",
+    "receipt": {
+      "head": "ready2order",
+      "sub": "rozmiar bundla · pierwsze ładowanie",
+      "all": "Cały bundle",
+      "app": "Własny kod",
+      "deps": "Zależności",
+      "screens": "Ekrany",
+      "redux": "Redux",
+      "webpack": "Konfiguracja Webpacka",
+      "kept": "został",
+      "updated": "odświeżone",
+      "later": "po otwarciu",
+      "removed": "usunięty",
+      "rewritten": "przepisana",
+      "total": "Bundle: pierwsze ładowanie",
+      "thanks": "Danke!",
+      "show": "Pokaż paragon"
+    }
+  },
+  "howIWork": {
+    "title": "Jak pracuję",
+    "alone": "Pracuję sam. Projekt, kod, serwer i utrzymanie są w jednych rękach.",
+    "shelf": "Nie używam szablonów ani cudzych widgetów tam, gdzie decydują o wrażeniu.",
+    "vision": "Do Twojego pomysłu dokładam własną wizję i wyczucie, żeby wyszedł jak najlepiej.",
+    "fixed": "Potrzebujesz sprawdzonej strony w stałej cenie? Od tego jest <mark>stronypodhale.pl</mark>.",
+    "roleNames": {
+      "design": "Projekt",
+      "code": "Kod",
+      "server": "Serwer",
+      "maintenance": "Utrzymanie",
+      "liquid": "Fizyka cieczy",
+      "motion": "Animacja",
+      "speed": "Wydajność"
+    },
+    "roleProofs": {
+      "design": "W portfolio modela Maćka Piczury każdą rolę i każdą sesję pokazałem na osobnej scenie.",
+      "code": "Napisałem plugin open source aspect-preview do Payload CMS: kadruję zdjęcia, ustawiam punkt ostrości i podglądam przycięcie na żywo w każdym układzie strony.",
+      "server": "Tyle Twoja przeglądarka czekała na pierwszy bajt przy tym wejściu. Serwer sam postawiłem i utrzymuję.",
+      "maintenance": "To data ostatniej aktualizacji. Zapisuje się sama, gdy wydaję nową wersję.",
+      "liquid": "Zielona ciecz na górze strony to moja symulacja: możesz ją poruszyć kursorem albo palcem.",
+      "motion": "Każdy ruch na tej stronie sam zaprojektowałem i napisałem.",
+      "speed": "Tyle zajęło pełne załadowanie tej strony u Ciebie, według pomiaru z Twojej przeglądarki."
+    },
+    "rolesHint": "Wybierz etap i sprawdź",
+    "relay": {
+      "usual": "Zwykle",
+      "mine": "U mnie",
+      "usualCount": "Zwykle 4 zespoły",
+      "mineCount": "Tylko ja",
+      "people": ["Projektant", "Programista", "Hosting", "Serwis"],
+      "project": "Twój projekt",
+      "teams": ["Projektanci", "Programiści", "Admini", "Serwisanci"],
+      "line": "Zwykle pracują nad tym różne zespoły. Ja zajmuję się każdym etapem sam."
+    },
+    "ledger": {
+      "own": "Mój kod",
+      "engine": "Silnik",
+      "note": "To, co widzisz po lewej, powstało od zera dla tej strony. Po prawej znajdziesz narzędzia, z których korzystam przy jej budowie.",
+      "map": "Na tej stronie",
+      "mapHint": "Wskaż element z listy",
+      "items": {
+        "liquid": ["Ciecz", "Na samej górze: porusz kursorem lub palcem."],
+        "cursor": ["Kursor", "Porusz nim, sprawdź, jak zmienia kształt."],
+        "menu": ["Menu", "Prawy górny róg: otwórz, zobacz ciecz."],
+        "r2o": ["Scena ready2order", "Zobacz krople, wydruk paragonu, mapę kodu."],
+        "plugin": ["Plugin do Payload · open source", "Poprzednia scena: porównaj kadry zdjęć."]
+      }
+    },
+    "case": {
+      "text": "Maciek Piczura przyszedł ze zdjęciami i potrzebą widowiskowego portfolio modela. Wziąłem na siebie całą wizję: zamiast albumu powstała strona z osobnymi scenami pokazującymi jego role i sesje.",
+      "before": "Zdjęcia od klienta",
+      "after": "Gotowa strona",
+      "link": "Zobacz piczura.com",
+      "scenes": ["Wybiegi", "Verdi Gala", "Miasto", "Jelenie"],
+      "came": "Maciek Piczura jest modelem. Przyszedł do mnie ze zdjęciami z pokazów i sesji.",
+      "asked": "Chciał, żeby jego portfolio się wyróżniało. Spodziewał się <x>galerii zdjęć</x>.",
+      "gave": "Zaproponowałem osobne sceny dla ról i sesji. Każdą zbudowałem wokół innego ruchu i układu liter.",
+      "files": "Zdjęcia od klienta",
+      "pick": "Wybierz scenę"
+    },
+    "end": {
+      "alone": "Serwer odpowiedział Ci w {ms} ms.",
+      "shelf": "Ciecz, kursor i menu powstały od zera.",
+      "vision": "piczura.com — zobacz, co zrobiłem ze zdjęć Maćka."
+    },
+    "door": "Zobacz stronę",
+    "roleLinks": {
+      "design": "Zobacz portfolio",
+      "code": "Zobacz na npm"
+    },
+    "stock": {
+      "liquid": "Na pierwszym ekranie, w kroplach i przejściach działa ta sama symulacja. Ciecz reaguje na dotyk i ruch kursora, dzieli się i łączy, załamuje światło i litery pod nią.",
+      "menu": "Po naciśnięciu przycisku ciecz wlewa się do menu. Każda kreska oznacza część strony. Wybierz kreskę, a ciecz zaleje ekran i spłynie, odsłaniając wybraną część.",
+      "cursor": "Kursor zmienia kształt zależnie od tego, co wskazuje. Gdy najedziesz na link, zobaczysz wokół niego tę samą ramkę co przy przechodzeniu klawiszem Tab.",
+      "borrowed": "Jako podstawę strony wybrałem sprawdzone narzędzia: Next.js, React, GSAP, Lenis i next-intl.",
+      "stockLabel": "Z SZABLONU",
+      "hold": "Przytrzymaj, by zobaczyć szablon",
+      "holdLabel": "Przytrzymaj kroplę, żeby zobaczyć, jak wyglądałaby ta strona z gotowych elementów.",
+      "placeholder": "Tu wpisz nagłówek",
+      "cta": "Dowiedz się więcej",
+      "type": "Wybrałem krój Mattone. Ułożyłem tekst, dobrałem wielkość liter i odstępy. Słowa pojawiają się po kolei w takim tempie, żeby wzrok za nimi nadążał."
+    },
+    "estimate": {
+      "head": "Wycena",
+      "usualRows": [
+        ["Projekt", "Studio projektowe", "Za godzinę"],
+        ["Kod", "Zespół programistyczny", "Za godzinę"],
+        ["Serwer", "Dostawca hostingu", "Miesięcznie"],
+        ["Utrzymanie", "Zespół wsparcia", "Miesięcznie"]
+      ],
+      "usualTotal": ["Razem", "Do wyceny"],
+      "mineRow": ["Projekt, kod, serwer i utrzymanie", "Według cennika"],
+      "termsLabel": "Warunki",
+      "pricesLabel": "Cennik",
+      "prices": [
+        ["Praca programistyczna na kontrakcie", "130 zł", "za godzinę · 1050 zł za dzień"],
+        ["Konsultacje i audyty", "200 zł", "za godzinę"],
+        ["Aplikacja internetowa / MVP", "od 30 000 zł", "za projekt"],
+        ["Autorska strona z animacjami i narracją", "od 10 945 zł", "za projekt"]
+      ],
+      "contact": "Napisz do mnie",
+      "head2": "Strony dla firm z Podhala",
+      "studioPrices": [
+        ["369 zł", "Potem 85 zł miesięcznie"],
+        ["1835 zł", "Płacisz raz. Strona od razu Twoja."]
+      ],
+      "studioGo": "Zobacz ofertę",
+      "pick": "Wybierz pozycję",
+      "coversLabel": "Obejmuje",
+      "covers": [
+        [
+          "React, Next.js, TypeScript",
+          "Praca w zespole klienta",
+          "Narzędzia i proces klienta",
+          "Zdalnie, hybrydowo"
+        ],
+        [
+          "Core Web Vitals",
+          "Dostępność WCAG",
+          "Przegląd kodu i architektury",
+          "Raport z priorytetami"
+        ],
+        [
+          "Projekt i design",
+          "Kod w Next.js",
+          "Konfiguracja serwera i hostingu",
+          "Uruchomienie",
+          "Monitoring i naprawa krytycznych problemów po wdrożeniu"
+        ],
+        [
+          "Koncepcja i design",
+          "Ruch i narracja",
+          "Kod",
+          "Konfiguracja i uruchomienie",
+          "Monitoring i naprawa krytycznych problemów po wdrożeniu"
+        ]
+      ],
+      "dragHint": "Przeciągnij kroplę",
+      "hours": "{n, plural, one {# godzina} few {# godziny} many {# godzin} other {# godziny}}",
+      "days": "{n, plural, one {# dzień} few {# dni} many {# dni} other {# dnia}}",
+      "unitSwitch": ["Godziny", "Dni"],
+      "estTotal": "Szacunkowo",
+      "net": "Ceny netto",
+      "fromNote": "Końcową cenę ustalimy po rozmowie o zakresie.",
+      "yours": "Twoja wycena",
+      "send": "Wyślij wycenę",
+      "mailSubject": "Wycena: {offer}",
+      "mailBody": "Dzień dobry, interesuje mnie {offer}. Szacunkowa kwota to {amount}. Chętnie doprecyzuję szczegóły.",
+      "sealedHint": "Wycena przybita",
+      "vatNet": "netto + VAT",
+      "vatGross": "brutto, VAT w cenie",
+      "travel": "Przy pracy hybrydowej koszty dojazdu ustalamy osobno.",
+      "careNote": "Dodatkowe prace serwisowe na życzenie rozliczam według stawki godzinowej.",
+      "vatEu": ""
+    },
+    "level": {
+      "usual": "Zwykle kilka zespołów.",
+      "here": "U mnie jeden kontakt i jeden rachunek."
+    },
+    "offer": {
+      "label": "Cennik",
+      "build": ["Buduję", "dla Ciebie"],
+      "with": ["Dołączam", "do zespołu"],
+      "subs": [
+        "Sam wybieram, jak zbuduję i uruchomię całość.",
+        "Pracuję tak, jak przyjęło się u Ciebie."
+      ],
+      "more": [
+        [
+          ["Czas", "8–12 tygodni"],
+          ["Zestaw", "Next.js, TypeScript"]
+        ],
+        [
+          ["Czas", "4–8 tygodni"],
+          ["Projekt", "Bez szablonu"]
+        ],
+        [
+          ["Raport", "Lista priorytetów"],
+          ["Zwykle", "4–12 godzin"]
+        ],
+        [
+          ["Tryb", "Zdalnie lub hybrydowo"],
+          ["Praca", "Twoje narzędzia i proces"]
+        ]
+      ],
+      "offers": [
+        [
+          "Aplikacja internetowa / MVP",
+          "od 30 000 zł",
+          "",
+          "Projektuję i buduję aplikację od pierwszej wersji po wdrożenie.",
+          "o aplikacji"
+        ],
+        [
+          "Autorska strona z narracją",
+          "od 10 945 zł",
+          "",
+          "Sam tworzę od zera koncepcję, projekt, kod i animacje do Twojej opowieści.",
+          "o stronie"
+        ],
+        [
+          "Konsultacje i audyty",
+          "200 zł",
+          "/ h",
+          "Sprawdzam szybkość (Core Web Vitals), dostępność (WCAG) i jakość kodu.",
+          "o konsultacji"
+        ],
+        [
+          "Praca na kontrakcie",
+          "130 zł",
+          "/ h",
+          "Pracuję w Twoim zespole (React, Next.js, TypeScript). 1050 zł za dzień.",
+          "o kontrakcie"
+        ]
+      ],
+      "shared": "W obu: wdrożenie i 2 godziny opieki miesięcznie",
+      "note": "Ceny brutto, z wyjątkiem kontraktu (netto + VAT). Cenę ustalimy po krótkiej rozmowie.",
+      "contact": "Napisz do mnie",
+      "about": "Napisz do mnie {about}"
+    }
   }
 }

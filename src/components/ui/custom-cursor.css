@@ -1,0 +1,59 @@
+/* Always visible: the dot and the free ring are white in a layer with a difference blend, so they
+   turn dark on paper and light on ink, the dark sheet or a photo. The blend sits on the layer, not
+   on the dot: the cursor's fixed container is its own stacking context, and a blend inside it only
+   mixes with the container. On a link the ring moves to a layer without blending and is the
+   keyboard focus ring (custom-cursor.tsx). */
+.cc-blend {
+  mix-blend-mode: difference;
+}
+.cc-dot {
+  color: #fff;
+}
+.cc-ring {
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+/* The cursor dot: two bars centred on the pointer, so one element can morph between shapes. */
+.cc-dot {
+  width: 0;
+  height: 0;
+}
+.cc-dot i {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background: currentColor;
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.24s cubic-bezier(0.2, 0.8, 0.2, 1),
+    height 0.24s cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-radius 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.cc-dot[data-shape='text'] i {
+  width: 2px;
+  height: 22px;
+  border-radius: 1px;
+}
+.cc-dot[data-shape='cross'] i {
+  border-radius: 1px;
+}
+.cc-dot[data-shape='cross'] [data-bar='h'] {
+  width: 22px;
+  height: 2px;
+}
+.cc-dot[data-shape='cross'] [data-bar='v'] {
+  width: 2px;
+  height: 22px;
+}
+
+/* everything: this cursor takes every shape itself (dot, text, crosshair), so no system cursor may
+   show through anywhere, e.g. the plugin editor's crosshair (deferred.css hides it only on links,
+   buttons and fields, which is all the old site's cursor needs) */
+@media (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .custom-cursor-active * {
+    cursor: none !important;
+  }
+}

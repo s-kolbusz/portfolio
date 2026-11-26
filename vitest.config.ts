@@ -20,8 +20,12 @@ export default defineConfig({
       reporter: ['text', 'html'],
       exclude: [
         'src/**/*.test.{ts,tsx}',
+        // the old site, frozen as it was on main when the redesign moved in next to it at /v2
+        // (owner, 2026-11-26); kept until it is archived under /legacy, not developed further
+        'src/legacy/**',
         // GSAP animation components — side-effects only, no testable branches in jsdom
-        'src/components/ui/dock-tooltip.tsx',
+        // WebGL: no GL context in jsdom
+        'src/components/ui/site-nav/menu-water.ts',
         'src/components/ui/custom-cursor.tsx',
         'src/components/ui/smooth-scroller.tsx',
         // Non-JS assets, type declarations, and entry points that export no logic

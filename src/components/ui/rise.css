@@ -1,0 +1,74 @@
+/* The site's reveal, as in the stronypodhale.pl scene (liquid-hero.css .scene .m): text rises from
+   under its own line, 0.8 s with the ease of ease3 (1 - (1 - x)^3), one after another (--d, seconds).
+   Going back it leaves 1.4x faster, the last one in first out (--dr, set by useReveal).
+   Hidden only once a scene is armed by script ([data-rv]), so without JavaScript everything shows. */
+
+.rv-m {
+  display: inline-block;
+  /* clipped only along the bottom edge the word rises from: overhangs and descenders stay whole */
+  clip-path: inset(-1em -0.5em -0.12em -0.5em);
+  vertical-align: top;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+.rv-i {
+  display: inline-block;
+}
+
+/* a block (a button, a logo, a sentence kept whole) rises the same way, uncovered from its bottom edge */
+[data-rv] .rv-i,
+[data-rv] .rv-b,
+[data-rv] .rv-l {
+  transition:
+    transform 0.57s cubic-bezier(0.33, 1, 0.68, 1) calc(var(--dr, 0) * 1s),
+    translate 0.57s cubic-bezier(0.33, 1, 0.68, 1) calc(var(--dr, 0) * 1s),
+    clip-path 0.57s cubic-bezier(0.33, 1, 0.68, 1) calc(var(--dr, 0) * 1s);
+}
+[data-rv] .rv-i {
+  transform: translateY(135%);
+}
+[data-rv] .rv-b {
+  translate: 0 0.8em;
+  clip-path: inset(-0.5em -1em 100% -1em);
+}
+[data-rv][data-in] .rv-i,
+[data-rv][data-in] .rv-b,
+[data-rv][data-in] .rv-l {
+  transition-duration: 0.8s;
+  transition-delay: calc(var(--d, 0) * 1s);
+}
+[data-rv][data-in] .rv-i,
+[data-rv][data-in] .rv-l {
+  transform: none;
+}
+/* a line draws from its left end */
+[data-rv] .rv-l {
+  transform: scaleX(0);
+  transform-origin: left;
+}
+[data-rv][data-in] .rv-b {
+  translate: none;
+  clip-path: inset(-0.5em -1em -0.5em -1em);
+}
+/* once everything stands, nothing is clipped: focus rings and the cursor's ring show whole */
+[data-rv][data-rv-done] .rv-m,
+[data-rv][data-rv-done] .rv-b {
+  clip-path: none;
+}
+/* a reload or a jump past the scene: set in place at once, nothing plays */
+[data-rv][data-rv-now] .rv-i,
+[data-rv][data-rv-now] .rv-b,
+[data-rv][data-rv-now] .rv-l {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-rv] .rv-i,
+  [data-rv] .rv-b,
+  [data-rv] .rv-l {
+    transform: none;
+    translate: none;
+    clip-path: none;
+    transition: none;
+  }
+}

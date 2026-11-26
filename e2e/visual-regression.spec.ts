@@ -98,4 +98,20 @@ test.describe('visual regression', () => {
       maxDiffPixelRatio: 0.1,
     })
   })
+
+  // The redesign at /v2 is a long run of pinned canvas scenes: a full-page screenshot of it times out
+  // and shows no real state. Its contact section is static, so that is what is compared.
+  test('v2 home contact section matches baseline', async ({ page }) => {
+    await page.goto('/v2/en')
+    await page.evaluate(() => document.fonts.ready)
+    const contact = page.locator('#contact')
+    await contact.scrollIntoViewIfNeeded()
+    await expect(contact.getByText('office')).toBeVisible()
+    await page.waitForTimeout(1000)
+
+    await expect(contact).toHaveScreenshot('v2-home-contact-en.png', {
+      timeout: 30000,
+      maxDiffPixelRatio: 0.02,
+    })
+  })
 })

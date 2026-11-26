@@ -18,3 +18,9 @@ pnpm-lock.yaml
 
 # System files
 .DS_Store
+
+# Trail learnings (tool-managed, never edited by hand)
+.trail/
+
+# Design prototypes and lab files (not shipped)
+cook/

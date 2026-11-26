@@ -1,0 +1,1042 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ciecz z cząstek — próba</title>
+<link href="../fonts/mattone/mattone-black.css" rel="stylesheet">
+<link href="../fonts/mattone/mattone-text.css" rel="stylesheet">
+<style>
+  html, body { margin: 0; background: #fbf9f4; color: #2b2620; }
+  body { height: 400vh; } /* miejsce na scroll: poziomice płyną, hero stoi (tylko na potrzeby próby) */
+  canvas { position: fixed; left: 0; top: 0; width: 100vw; display: block; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  #ld { z-index: 1; pointer-events: none; background: #2b2620; } /* plansza ładowania od pierwszej chwili */
+  /* przechylenie: tylko na dotyku, włączane przyciskiem (iOS i tak wymaga zgody, a samo z siebie było nieczytelne) */
+  #tilt { position: fixed; top: max(14px, env(safe-area-inset-top)); right: 16px; z-index: 2; display: none; align-items: center; gap: 8px;
+    padding: 8px 12px; border: 1px solid rgba(43,38,32,.35); border-radius: 999px; background: rgba(251,249,244,.7);
+    font: 11px ui-monospace, monospace; letter-spacing: .2em; color: #2b2620; -webkit-tap-highlight-color: transparent; }
+  #tilt i { width: 7px; height: 7px; border-radius: 50%; border: 1px solid currentColor; }
+  #tilt[aria-pressed="true"] i { background: #0f9d63; border-color: #0f9d63; }
+  @font-face { font-family: "Cabinet Grotesk"; src: url("../fonts/cabinet/cabinet-grotesk-variable.woff2") format("woff2"); font-weight: 100 900; }
+  #sel { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  #sel span { position: absolute; white-space: pre; color: transparent; pointer-events: auto; cursor: text; }
+  #sel span::selection { background: rgba(15,157,99,.28); color: transparent; }
+  #scene { position: fixed; z-index: 1; color: #f3efe6; visibility: hidden; pointer-events: none; }
+  #scene ::selection { background: rgba(240,150,100,.35); }
+  #pins ::selection { background: rgba(15,157,99,.28); }
+  #scene p, #scene h2 { margin: 0; }
+  #scene .m { display: inline-block; clip-path: inset(-1em -.5em -.12em -.5em); vertical-align: top; padding-bottom: .14em; margin-bottom: -.14em; }  /* maska: wiersz wyjeżdża spod krawędzi */
+  #scene .i { display: inline-block; will-change: transform; }
+  /* znak = logo stronypodhale.pl: Cabinet Grotesk, „strony” i „.pl” w akcencie (500), „podhale” w kolorze tekstu (800); na całą szerokość bloku */
+  #scene .wm { position: absolute; left: 0; font: 500 64px/0.86 "Cabinet Grotesk", system-ui, sans-serif; letter-spacing: -0.035em; white-space: nowrap; pointer-events: auto; }
+  #scene .wm .acc { color: oklch(0.8 0.125 47); font-weight: 500; }
+  #scene .wm .str { font-weight: 800; }
+  #scene .row { position: absolute; left: 0; right: 0; display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; }
+  #scene .say { font: 500 clamp(16px, 1.4vw, 21px)/1.35 "Cabinet Grotesk", system-ui, sans-serif; color: #f3efe6; pointer-events: auto; }
+  #scene a { font: 700 clamp(15px, 1.2vw, 18px)/1.35 "Cabinet Grotesk", system-ui, sans-serif; color: oklch(0.8 0.125 47); text-decoration: none; white-space: nowrap; pointer-events: auto; }
+  #scene a b { display: inline-block; font-weight: 400; transition: transform .3s cubic-bezier(.22,1,.36,1); }
+  #scene a:hover b { transform: translate(3px, -3px); }
+  /* pinezki na zrzucie: numerowane, w akcencie marki. Kliknięcie przypina notatkę na stałe (drugie ją odpina),
+     najechanie tylko podświetla pinezkę. Notatka mówi naszym językiem: cienka linia od pinezki, etykieta jak „See the work”,
+     tekst krojem z hero, na kawałku tej samej wody, więc czyta się także nad zrzutem. */
+  #pins { position: fixed; inset: 0; z-index: 2; pointer-events: none; }
+  .pin { position: absolute; width: 0; height: 0; z-index: 1; }
+  .pin.open { z-index: 3; }
+  .pin i { position: absolute; left: -18px; top: -18px; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
+    background: #fbf9f4; color: #2b2620; font: 900 16px/1 "Mattone", system-ui, sans-serif; font-style: normal;
+    box-shadow: 0 0 0 3px #2b2620, 0 0 0 5px #fbf9f4, 0 8px 22px rgba(0,0,0,.45); transform: scale(0); cursor: pointer; pointer-events: auto;
+    transition: transform .5s cubic-bezier(.34,1.56,.64,1), background .25s ease; }
+  .pin.on i { transform: scale(1); }
+  .pin.on i:hover { transform: scale(1.18); }
+  .pin.open i { background: #2b2620; color: #fbf9f4; box-shadow: 0 0 0 3px #fbf9f4, 0 0 0 5px #2b2620, 0 8px 22px rgba(0,0,0,.45); }
+  .pin i::before, .pin i::after { content: ""; position: absolute; inset: -5px; border-radius: 50%; border: 2.5px solid #fbf9f4; animation: ping 2.2s cubic-bezier(.22,1,.36,1) infinite; pointer-events: none; }
+  .pin i::before { animation-delay: .55s; }
+  .pin.open i::before, .pin.open i::after { animation: none; opacity: 0; }
+  @keyframes ping { from { transform: scale(1); opacity: .9 } to { transform: scale(2.2); opacity: 0 } }
+  .pin .ln { position: absolute; background: #fbf9f4; transform-origin: 0 0; transition: transform .45s cubic-bezier(.22,1,.36,1); }
+  .pin p { position: absolute; margin: 0; width: max-content; padding: 16px 18px 17px; background: #fbf9f4; color: #2b2620;
+    box-shadow: 0 18px 44px rgba(0,0,0,.42); border-radius: 2px; opacity: 0; pointer-events: none;
+    transition: opacity .3s ease .1s, transform .5s cubic-bezier(.22,1,.36,1) .06s; }
+  /* fakt: duży, ciężki, w akcencie — to on ma zostać w głowie; zdanie pod nim jasne i spokojne */
+  .pin p strong { display: block; font: 900 clamp(26px, 2.3vw, 36px)/0.95 "Mattone", system-ui, sans-serif; letter-spacing: -0.02em; color: #2b2620; margin: 0 0 10px; white-space: nowrap; }
+  .pin p span { display: block; max-width: 24ch; font: 400 15px/1.45 "Mattone", system-ui, sans-serif; color: rgba(43,38,32,.78); }   /* szerokość notatki = większe z: fakt albo zdanie */
+  .pin.open p, .pin.peek p { opacity: 1; transform: none; pointer-events: auto; }
+  .pin.open .ln, .pin.peek .ln { transform: none; }
+  .pin.peek { z-index: 4; }
+  /* kierunki: l (w lewo), r (w prawo), b (w dół) */
+  .pin[data-d="r"] .ln { left: 18px; top: 0; width: 34px; height: 1px; transform: scaleX(0); }
+  .pin[data-d="r"] p { left: 52px; top: -24px; transform: translateX(-8px); }
+  .pin[data-d="l"] .ln { right: 18px; top: 0; width: 34px; height: 1px; transform: scaleX(0); transform-origin: 100% 0; }
+  .pin[data-d="l"] p { right: 52px; top: -24px; text-align: right; transform: translateX(8px); }
+  .pin[data-d="b"] .ln { left: 0; top: 18px; width: 1px; height: 28px; transform: scaleY(0); }
+  .pin[data-d="b"] p { left: -18px; top: 46px; transform: translateY(-8px); }
+  .pin.open .ln { transform: none; }
+  #info { position: fixed; top: 10px; right: 12px; font: 12px ui-monospace, monospace; color: rgba(43,38,32,.62); }
+</style>
+</head>
+<body>
+<canvas id="gl" aria-hidden="true"></canvas>
+<canvas id="ld" aria-hidden="true"></canvas>
+<div id="sel" aria-hidden="true"></div>
+<div class="sr">
+  <h1>Sebastian Kolbusz</h1>
+  <p>I design and build websites and web apps.</p>
+  <p>Nothing off the shelf. I take things apart. I put them back together myself.</p>
+  <a href="#work">See the work</a>
+</div>
+ <div id="scene">
+  <h2 class="wm" aria-label="stronypodhale.pl"><span class="acc">strony</span><span class="str">podhale</span><span class="acc">.pl</span></h2>
+  <div class="row">
+    <p class="say"><span class="m"><span class="i">Websites for Podhale businesses.</span></span><br><span class="m"><span class="i">The design and the price before you pay.</span></span></p>
+    <a href="https://stronypodhale.pl" target="_blank" rel="noopener"><span class="m"><span class="i">Visit the site <b>↗</b></span></span></a>
+  </div>
+</div>
+<div id="pins"></div>
+<button id="tilt" type="button" aria-pressed="false"><i></i>TILT</button>
+<div id="info" aria-hidden="true">ruch, szybki ruch, klik, przytrzymanie · scroll: poziomice</div>
+<script type="module">
+import { STEPS_PER_SECOND } from './sim.js'
+
+const FG = '#2b2620'
+const canvas = document.getElementById('gl')
+// pomiar na urządzeniach: ?dpr=1 wymusza rozdzielczość renderu, ?fps pokazuje klatki na sekundę (tylko próba)
+const qs = new URLSearchParams(location.search)
+const dpr = +qs.get('dpr') || Math.min(window.devicePixelRatio || 1, 2)
+// wysokość zapamiętana przy wczytaniu: na telefonie pasek adresu chowa się przy scrollu i zmienia innerHeight,
+// a strona ma wtedy zostać taka sama (bez przeliczania i bez przeładowania)
+// kanwa ma wysokość ekranu ze schowanym paskiem (100lvh), a tekst siedzi w części widocznej także z paskiem (INSET od dołu)
+const lvhProbe = Object.assign(document.createElement('div'), { style: 'position:absolute;top:0;height:100lvh;width:1px;visibility:hidden' })
+document.body.append(lvhProbe)
+// INSET to tylko pasek przeglądarki (do ~15% wysokości); większa różnica znaczy, że okno było chwilowo ściśnięte, i wtedy jej nie ufamy
+const VW = innerWidth, VH0 = Math.max(innerHeight, lvhProbe.offsetHeight)
+const VH = VH0 - innerHeight > 0.15 * VH0 ? innerHeight : VH0, INSET = VH - innerHeight
+lvhProbe.remove()
+const W = Math.round(VW * dpr), H = Math.round(VH * dpr)
+canvas.width = W; canvas.height = H
+for (const c of document.querySelectorAll('canvas')) c.style.height = VH + 'px'
+const A = VW / VH
+const PORTRAIT = A < 0.9   // telefon w pionie: blok tekstu nad „Kolbusz”, mniejsza kropla
+if (matchMedia('(hover: none)').matches && !qs.has('fps')) document.getElementById('info').style.display = 'none'
+// lekki tryb dla przeglądarek bez kompilatora JIT (np. Safari na iPadzie w niektórych ustawieniach): fizyka jest tam ~30× wolniejsza.
+// Prosta pętla mierzy to od razu: z JIT kilka–kilkanaście ms, bez JIT ponad 30. ?lekko wymusza ten tryb.
+const jitMs = (() => { const t = performance.now(); let a = 0; for (let i = 0; i < 3e6; i++) a += (i & 7) * 0.5; window.__jitSink = a; return performance.now() - t })()
+const LIGHT = qs.has('lekko') || jitMs > 24
+// w lekkim trybie cząstki są większe (promień 0.03 zamiast 0.021), więc jest ich około połowa, a ciecz ma ten sam kształt
+const Hq = LIGHT ? 0.03 : 0.021, SPACING = 0.42  // promień oddziaływania cząstek w jednostkach wysokości ekranu
+
+await Promise.all([document.fonts.load('500 40px "Cabinet Grotesk"'), document.fonts.load('800 40px "Cabinet Grotesk"'), document.fonts.load('900 40px "Mattone"'), document.fonts.load('700 20px "Mattone"'), document.fonts.load('400 20px "Mattone"')])
+
+// --- Cały tekst w obrazie (żeby ciecz go załamywała). Dwie tekstury-maski na czarnym tle:
+// stała: imię, rola, kreska, przycisk (R); zdania: każde w swoim kanale (R, G, B), bo podświetlenie się zmienia.
+const vw = W / 100, vh = H / 100
+function textures() {
+  const s = document.createElement('canvas'); s.width = W; s.height = H
+  const g = s.getContext('2d'); g.fillStyle = '#000'; g.fillRect(0, 0, W, H)
+  let S = Math.min(11.4 * vw, 20 * vh)
+  g.font = `900 ${S}px "Mattone"`; g.letterSpacing = `${-0.02 * S}px`
+  const bx = 6.67 * vw, bw = PORTRAIT ? W - 2 * bx : Math.min(30 * vw, 52 * vh)
+  const room = PORTRAIT ? W - 2 * bx : W - 10.4 * vw - (bx + bw + 3 * vw)
+  if (PORTRAIT) { S = W; g.font = `900 ${S}px "Mattone"`; g.letterSpacing = `${-0.02 * S}px`; S = Math.min(S * room / g.measureText('Sebastian').width, 13 * vh); g.font = `900 ${S}px "Mattone"`; g.letterSpacing = `${-0.02 * S}px` }
+  S = Math.min(S, S * room / g.measureText('Kolbusz').width)
+  g.font = `900 ${S}px "Mattone"`; g.letterSpacing = `${-0.02 * S}px`
+  g.fillStyle = '#0f0'                     // imię w kanale G: strona pokazuje je dopiero, gdy loader je odda
+  const asc = g.measureText('Sebastian').actualBoundingBoxAscent
+  const name = { font: g.font, ls: g.letterSpacing, S, asc,
+    sx: bx, sy: 6 * vh + S * 0.45 + asc * 0.5, sw: g.measureText('Sebastian').width, s1: g.measureText('S').width,
+    kx: W - (PORTRAIT ? bx : 10.4 * vw) - g.measureText('Kolbusz').width, ky: H - INSET * dpr - 5.5 * vh - S * 0.2, kw: g.measureText('Kolbusz').width, k1: g.measureText('K').width }
+  g.fillText('Sebastian', name.sx, name.sy)
+  if (!PORTRAIT) g.fillText('Kolbusz', name.kx, name.ky)   // w pionie dopiero nad blokiem, gdy znana jest jego wysokość
+  g.fillStyle = '#fff'
+  g.letterSpacing = '0px'
+
+  // blok: od dołu w górę
+  const role = Math.max(13 * dpr, Math.min(20 * dpr, 1.55 * vh))
+  let big = PORTRAIT ? 15 * dpr : Math.min(2.45 * vh, 1.37 * vw)
+  const lines = ['Nothing off the shelf.', 'I take things apart.', 'I put them back together myself.']
+  g.font = `700 ${big}px "Mattone"`
+  big = Math.min(big, big * bw / Math.max(...lines.map((l) => g.measureText(l).width)))
+  const ctaY = PORTRAIT ? H - INSET * dpr - 5 * vh : H - INSET * dpr - 7 * vh
+  const linesBottom = ctaY - 22 * dpr - 12 * dpr
+  const firstBase = PORTRAIT ? linesBottom : linesBottom - big * 1.3 * 2   // w pionie jedno zdanie naraz, wszystkie w tym samym miejscu
+  const roleBase = firstBase - big * 1.3 - 14 * dpr
+  const ruleY = roleBase - role - 14 * dpr
+  if (PORTRAIT) { // imię i nazwisko rozdziela tylko kropla: „Kolbusz” tuż nad blokiem tekstu
+    name.ky = ruleY - 4.5 * vh
+    const f = g.font, ls = g.letterSpacing, fs = g.fillStyle
+    g.font = name.font; g.letterSpacing = name.ls; g.fillStyle = '#0f0'; g.fillText('Kolbusz', name.kx, name.ky)
+    g.font = f; g.letterSpacing = ls; g.fillStyle = fs
+  }
+  g.fillStyle = 'rgba(255,255,255,0.2)'; g.fillRect(bx, ruleY, bw, dpr)
+  g.font = `400 ${role}px "Mattone"`; g.fillStyle = 'rgba(255,255,255,0.7)'; g.fillText('I design and build websites and web apps.', bx, roleBase)
+  g.font = `${12 * dpr}px ui-monospace, Menlo, monospace`; g.letterSpacing = `${3.6 * dpr}px`; g.fillStyle = '#fff'
+  g.fillText('SEE THE WORK ↓', bx, ctaY)
+
+  const l = document.createElement('canvas'); l.width = W; l.height = H
+  const h = l.getContext('2d'); h.fillStyle = '#000'; h.fillRect(0, 0, W, H)
+  h.font = `700 ${big}px "Mattone"`; h.globalCompositeOperation = 'lighter'
+  ;['#f00', '#0f0', '#00f'].forEach((c, i) => { h.fillStyle = c; h.fillText(lines[i], bx, firstBase + (PORTRAIT ? 0 : i * big * 1.3)) })
+  // prostokąt bloku (pod nim poziomice gasną), w jednostkach q (y od dołu)
+  const fade = [(bx - 20 * dpr) / H, (H - ctaY - 16 * dpr) / H, (bx + bw + 10 * dpr) / H, (H - ruleY + 24 * dpr) / H]
+  // skala fali: imię jest tyle razy większe od zdania (fala ma mieć na literze ten sam rytm)
+  // te same napisy jako tekst DOM (przezroczysty, do zaznaczania): czcionka i linia bazowa z tego samego pomiaru
+  const sel = []
+  const put = (text, font, ls, x, y) => { g.font = font; g.letterSpacing = ls; const m = g.measureText(text); sel.push({ text, font, ls, x, y, a: m.fontBoundingBoxAscent, d: m.fontBoundingBoxDescent }) }
+  put('Sebastian', name.font, name.ls, name.sx, name.sy)
+  put('Kolbusz', name.font, name.ls, name.kx, name.ky)
+  put('I design and build websites and web apps.', `400 ${role}px "Mattone"`, '0px', bx, roleBase)
+  ;(PORTRAIT ? lines.slice(0, 1) : lines).forEach((t, i) => put(t, `700 ${big}px "Mattone"`, '0px', bx, firstBase + i * big * 1.3))
+  return { s, l, fade, name, sel }
+}
+
+const vs = `#version 300 es
+in vec2 aPos; void main(){ gl_Position = vec4(aPos,0.,1.); }`
+
+// cząstki rozmazane w pole gęstości (połowa rozdzielczości)
+const splatVs = `#version 300 es
+in vec2 aP; uniform float uA, uSize;
+void main(){ gl_Position = vec4(aP.x/uA*2.-1., aP.y*2.-1., 0., 1.); gl_PointSize = uSize; }`
+const splatFs = `#version 300 es
+precision highp float; uniform float uNorm; uniform vec2 uMask; out vec4 o;
+void main(){ vec2 c = gl_PointCoord*2.-1.; float r2 = dot(c,c); if (r2>1.) discard; float w = 1.-r2; w = w*w*w*uNorm; o = vec4(w*uMask.x, w*uMask.y, 0., 1.); }`
+
+const fs = `#version 300 es
+precision highp float;
+uniform sampler2D uStatic, uLines, uTer, uDens, uDome, uDist, uHgt;
+uniform vec2 uHgtSize;
+uniform float uDH;
+uniform vec2 uRes, uTerSize, uTerOff;
+uniform float uTerSc, uDpr, uTime, uMorph;
+uniform vec4 uFade;
+uniform vec3 uInk;   // zdania: ile tuszu ma każde (0.28…1)
+uniform vec3 uWave;  // zdania: fala w chwili zdarzenia
+uniform float uNameOn; // imię na stronie: 0, dopóki pokazuje je loader (inicjały), potem 1
+uniform float uBoardT;  // plansza ładowania: <0 pełna, potem sekundy chudnięcia do poziomic, >3 nie ma jej
+uniform vec2 uHRange;   // wysokości terenu w kadrze (najniższa, najwyższa): plansza schodzi od dolin w górę
+uniform vec2 uDomeSize;
+uniform float uBlockRight;
+// przejście do stronypodhale: ciecz rozlewa się w taflę, ciemnieje do koloru strony, spod tafli wyłania się zrzut
+uniform float uSpread, uDark, uImageIn, uClarity;
+uniform vec3 uDarkCol;
+uniform vec4 uImgRect;   // x, y (dół), szerokość, wysokość w jednostkach q
+uniform float uImgR;
+uniform sampler2D uImg;
+out vec4 o;
+
+const vec3 BG = vec3(0.984,0.976,0.957);
+const vec3 INK = vec3(0.169,0.149,0.125);
+const vec3 TINT = vec3(0.03,0.575,0.363);
+const float ISO = 0.38;
+
+vec2 suv(vec2 q){ return vec2(q.x*uRes.y/uRes.x, q.y); }
+
+// strona za cieczą: tło, poziomice prawdziwego terenu, cały tekst
+vec3 page(vec2 q){
+  vec2 px = vec2(q.x, 1.-q.y)*uRes.y;
+  // poziomice lekko płyną: wolne, szerokie odkształcenie mapy zależne od scrolla
+  px += vec2(sin(px.y/uRes.y*3.1 + uMorph*1.3 + uTime*0.05), cos(px.x/uRes.y*2.7 - uMorph*1.1 + uTime*0.04))*uRes.y*0.014;
+  float h = texture(uTer, ((px + uTerOff)/uTerSc)/uTerSize).r;
+  float v = h/50.;
+  float dist = abs(fract(v+0.5)-0.5)/max(fwidth(v), 1e-5);
+  bool major = mod(floor(v+0.5), 5.) < 0.5;
+  float line = clamp(1. - dist/(0.8*uDpr), 0., 1.) * (major ? 0.15 : 0.065);
+  vec2 fd = max(max(uFade.xy - q, q - uFade.zw), 0.);
+  line *= mix(smoothstep(0.0, 0.05, length(fd)), 1., uDark);
+  // pod ciemniejącą taflą hero tonie (tekst gaśnie szybciej niż woda ciemnieje),
+  // a poziomice z ciemnych robią się jaśniejsze od wody: wytłoczone w zieleni
+  float sink = 1. - smoothstep(0., 0.7, uDark);
+  vec3 lineCol = mix(INK, BG*3.2, smoothstep(0.35, 0.95, uDark));
+  vec3 col = mix(BG, lineCol, line*(1. + 0.6*uDark));
+  // stały tekst (R) i imię (G bez R), imię dopiero po przekazaniu z loadera
+  vec4 st = texture(uStatic, suv(q));
+  col = mix(col, INK, clamp(st.r + max(st.g - st.r, 0.)*uNameOn, 0., 1.)*sink);
+  const vec2 iw = vec2(0.); const float ia = 1.;
+  // zdania: każde z falą, która przechodzi przez nie w chwili zdarzenia
+  vec2 w0 = vec2(sin(q.y*260.+uTime*18.)*0.004*uWave.x, 0.);
+  vec2 w1 = vec2(sin(q.y*260.+uTime*18.)*0.004*uWave.y, 0.);
+  vec2 w2 = vec2(sin(q.y*260.+uTime*18.)*0.004*uWave.z, 0.);
+  float a = (texture(uLines, suv(q+w0+iw)).r*uInk.x + texture(uLines, suv(q+w1+iw)).g*uInk.y + texture(uLines, suv(q+w2+iw)).b*uInk.z)*ia;
+  return mix(col, INK, a*sink);
+}
+float dens(vec2 q){ return texture(uDens, suv(q)).r; }
+float boxD(vec2 q);
+// to, co leży pod powierzchnią tafli: ciemna woda z wytłoczonymi poziomicami, a w kadrze zrzut (mętny, aż się sklaruje)
+vec3 sheetBase(vec2 q){
+  vec3 c = page(q)*(uDarkCol/BG);
+  if (uImageIn > 0.) {
+    vec2 iuv = clamp((q - uImgRect.xy)/uImgRect.zw, 0., 1.);
+    float soft = mix(0.0015, 0.06, (1. - uClarity)*(1. - uClarity));
+    float inBox = smoothstep(soft, -soft, boxD(q))*uImageIn;
+    c = mix(c, mix(texture(uImg, iuv).rgb, c, (1. - uClarity)*0.7), inBox);
+  }
+  return c;
+}
+float boxD(vec2 q){ vec2 h = uImgRect.zw*0.5, d = abs(q - uImgRect.xy - h) - h + uImgR; return length(max(d,0.)) + min(max(d.x,d.y),0.) - uImgR; }
+// plansza ładowania: ciemne tło chudnie do linii poziomic, najpierw w dolinach, na końcu na grzbietach;
+// grube poziomice (co 250 m) zostają ciemne najdłużej. Te same poziomice co na stronie (to samo odkształcenie).
+float boardMask(vec2 q){
+  if (uBoardT > 3.) return 0.;
+  vec2 px = vec2(q.x, 1.-q.y)*uRes.y;
+  px += vec2(sin(px.y/uRes.y*3.1 + uMorph*1.3 + uTime*0.05), cos(px.x/uRes.y*2.7 - uMorph*1.1 + uTime*0.04))*uRes.y*0.014;
+  float h = texture(uTer, ((px + uTerOff)/uTerSc)/uTerSize).r;
+  float v = h/50.;
+  float hn = clamp((h - uHRange.x)/max(uHRange.y - uHRange.x, 1.), 0., 1.);
+  float p = clamp((uBoardT - hn*1.1)/1.4, 0., 1.); p = p*p*p*(p*(p*6.-15.)+10.);
+  bool major = mod(floor(v+0.5), 5.) < 0.5;
+  float k = (major ? 0.75 : 0.56)*(1. - p);
+  float a = abs(fract(v+0.5)-0.5), aa = fwidth(v)*1.2;
+  return (1. - smoothstep(k - aa, k + aa, a))*(1. - smoothstep(0.7, 1., p));
+}
+// wysokość: brzeg z gęstości (stromy) + kopuła z szerokiego rozmycia (wypukłość całej kropli)
+// wysokość tylko z gładkich, szerokich pól: brzeg (miękki próg), średnia kopuła (krople), szeroka kopuła (ciało)
+// i kilka łagodnych fal: na całym ciele mieści się ich kilkanaście, nie setki
+// szum wartości: nieregularne fale zamiast trzech równych sinusów
+float hsh(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453); }
+float vnoise(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f*f*(3.-2.*f);
+  return mix(mix(hsh(i), hsh(i+vec2(1,0)), u.x), mix(hsh(i+vec2(0,1)), hsh(i+vec2(1,1)), u.x), u.y); }
+float waveField(vec2 q, float t){
+  vec2 w = vec2(vnoise(q*3.1 + vec2(t*0.11, -t*0.07)), vnoise(q*3.1 + vec2(5.2 - t*0.09, 1.3 + t*0.1))) - 0.5;
+  vec2 p = q*9. + w*2.2;                                   // zawinięcie przestrzeni: fale się wyginają i zmieniają szerokość
+  float n = vnoise(p + vec2(t*0.35, -t*0.22))*0.65 + vnoise(p*1.9 - vec2(t*0.28, t*0.31))*0.35;
+  float amp = 0.5 + 0.5*vnoise(q*2.3 - vec2(t*0.05));       // w jednych miejscach falują mocniej, w innych prawie wcale
+  return (n - 0.5)*amp;
+}
+// próbkowanie dwusześcienne (4 odczyty): gładkie pochodne, bez „siatki” z interpolacji liniowej
+vec4 bicubic(sampler2D t, vec2 uv, vec2 size){
+  uv = uv*size - 0.5; vec2 f = fract(uv); uv -= f;
+  vec2 f2 = f*f, f3 = f2*f;
+  vec2 w0 = (1.-f)*(1.-f)*(1.-f)/6., w1 = (4.-6.*f2+3.*f3)/6., w2 = (1.+3.*f+3.*f2-3.*f3)/6., w3 = f3/6.;
+  vec2 s0 = w0+w1, s1 = w2+w3;
+  vec2 c0 = (uv - 0.5 + w1/s0)/size, c1 = (uv + 1.5 + w3/s1)/size;
+  return (texture(t, vec2(c0.x,c0.y))*s0.x + texture(t, vec2(c1.x,c0.y))*s1.x)*s0.y + (texture(t, vec2(c0.x,c1.y))*s0.x + texture(t, vec2(c1.x,c1.y))*s1.x)*s1.y;
+}
+// wysokość tylko z gładkich pól (bez osobnego brzegu, który robił „pączka”) + kilka łagodnych fal
+// wysokość czytana z tekstury liczonej raz na klatkę (przebieg hgtPass) — wcześniej liczona 5× na piksel, za drogo na iPadzie
+float hgt(vec2 q){ return bicubic(uHgt, suv(q), uHgtSize).r; }
+float hgtOld(vec2 q){
+  vec2 dome = bicubic(uDome, suv(q), uDomeSize).rg;
+  float m = smoothstep(0.04, 0.35, dome.r + dome.g);
+  float waves = 0.26*waveField(q, uTime);
+  // profil czaszy kuli (pierwiastek): płaski wierzch i stromy brzeg, bez wypukłego „sutka” na środku małych kropli
+  // małe krople: czasza kuli (bez „sutka”); duże ciało: pół czaszy, pół kopuły, żeby całe łapało światło jak szkło
+  float big = clamp(dome.r, 0., 1.2);
+  // łagodniejszy brzeg: potęga 0.7 zamiast pierwiastka (mniej stromo przy samej krawędzi)
+  // brzeg ma szerokość zależną od wielkości kropli: w dużym ciele średnie pole (stała szerokość ~0.05) wygasa,
+  // a kształt brzegu daje szerokie pole, więc nie ma pierścienia o zawsze tej samej grubości
+  float small = 1. - smoothstep(0.25, 0.75, big);
+  return 0.6*small*pow(clamp(dome.g, 0., 1.2), 0.85) + 1.0*big + waves*m;
+}
+
+// otoczenie: kierunek okna lekko „pływa” po powierzchni, więc każda kropla łapie światło inaczej
+vec3 env(vec3 r, vec2 q){
+  vec3 L = normalize(vec3(-0.55 + 0.12*sin(q.y*7.+uTime*0.21), 0.62 + 0.08*cos(q.x*5.3-uTime*0.17), 0.56));
+  vec3 c = mix(vec3(0.70,0.72,0.68), vec3(0.99,0.98,0.95), smoothstep(-0.35,0.45,r.y));
+  c += vec3(1.25)*smoothstep(0.8,0.92, dot(r, L)) + vec3(0.25)*smoothstep(0.5,0.9, dot(r, L));
+  c += vec3(0.5)*pow(max(dot(r, normalize(vec3(0.7,0.25,0.6))),0.),24.);
+  return c;
+}
+
+void main(){
+  vec2 q = gl_FragCoord.xy/uRes.y;
+  // cień i skupione światło za cieczą
+  float sd = dens(q - vec2(0.012,-0.018));
+  vec3 wall = page(q)*(1. - 0.14*smoothstep(ISO*0.4, ISO*1.4, sd)) + TINT*smoothstep(ISO*1.4, 1.6, sd)*0.25;
+  float f = dens(q);
+  float fw = fwidth(f);
+  // miękki brzeg: przejście na kilka pikseli zamiast jednego
+  float cover = smoothstep(ISO - max(fw*2., 0.02), ISO + max(fw*2., 0.02), f);
+  float dU = texture(uDist, suv(q)).r / uDH;
+  if (uSpread > 0.) cover = max(cover, smoothstep(0.0015, 0.005, dU));
+  float rebelF = texture(uDens, suv(q)).g;
+  float rebelness = smoothstep(ISO*0.7, ISO*1.3, rebelF);
+  if (cover <= 0.) { o = vec4(mix(wall, INK, boardMask(q)),1.); return; }
+
+  // wysokość cieczy z gęstości: przy brzegu stromo, w środku płasko
+  float e = 4.0/uRes.y;
+  float hC = hgt(q);
+  float hx = hgt(q+vec2(e,0.)) - hgt(q-vec2(e,0.));
+  float hy = hgt(q+vec2(0.,e)) - hgt(q-vec2(0.,e));
+  vec3 n = normalize(vec3(-hx/(2.*e)*0.14, -hy/(2.*e)*0.14, 1.));
+  // brzeg podwija się pod spód: w wąskim pasie przy krawędzi powierzchnia schodzi do pionu i dalej,
+  // więc odbija otoczenie (jasno od strony światła, ciemniej od cienia) zamiast leżeć płasko.
+  // Szerokość pasa lekko się zmienia wzdłuż brzegu, żeby nie był jednolitą obwódką.
+  float dE = dU;
+  float wE = 0.011*(0.65 + 0.7*vnoise(q*7. + vec2(uTime*0.07, -uTime*0.05)));
+  float curl = 1. - smoothstep(0., wE, dE);
+  curl *= curl;
+  n = normalize(vec3(n.xy*(1. + curl*7.), n.z*(1. - curl*0.92)));
+  if (uDark > 0. && rebelness > 0.) {
+    // na tafli kropla nie ma własnego brzegu w polu odległości (tafla jest wszędzie), więc kształt bierze z własnego pola
+    float eg = 7.0/uRes.y;
+    float gx = texture(uDens, suv(q+vec2(eg,0.))).g - texture(uDens, suv(q-vec2(eg,0.))).g;
+    float gy = texture(uDens, suv(q+vec2(0.,eg))).g - texture(uDens, suv(q-vec2(0.,eg))).g;
+    vec3 nd = normalize(vec3(-gx/(2.*eg)*0.022, -gy/(2.*eg)*0.022, 1.));
+    float rim = 1. - smoothstep(ISO, ISO*1.8, rebelF); rim *= rim;
+    nd = normalize(vec3(nd.xy*(1. + rim*4.), nd.z*(1. - rim*0.75)));
+    n = normalize(mix(n, nd, rebelness*uDark));
+    curl = mix(curl, rim*0.6, rebelness*uDark);
+  }
+
+  // przesunięcie załamania ograniczone: kropla wygina to, co pod nią, zamiast pokazywać puste tło z daleka
+  // + stała część: nawet łagodne fale (małe nachylenie) wyraźnie wyginają poziomice i tekst pod spodem
+  float k = min(0.04 + 0.1*pow(1.-max(n.z,0.),1.6), 0.08);
+  vec3 refr = vec3(page(q - n.xy*k*0.97).r, page(q - n.xy*k).g, page(q - n.xy*k*1.03).b);
+  refr *= 1. - 0.12*smoothstep(0.3,0.0,n.z);
+  vec3 tint = mix(mix(TINT, uDarkCol, uDark), TINT, rebelness*uDark);
+  vec3 body = refr*(tint/BG) + tint*0.04*(1. - uDark*(1. - rebelness));
+  // zrzut strony spod tafli: najpierw mętny, wygięty i bez krawędzi, potem coraz czystszy, na końcu dokładnie taki, jak jest
+  if (uImageIn > 0.) {
+    vec2 bq = q - n.xy*k*(1. - uClarity*0.98);
+    vec2 iuv = clamp((bq - uImgRect.xy)/uImgRect.zw, 0., 1.);
+    vec3 seen = texture(uImg, iuv).rgb;
+    float soft = mix(0.0015, 0.06, (1. - uClarity)*(1. - uClarity));
+    float inBox = smoothstep(soft, -soft, boxD(bq))*uImageIn*(1. - rebelness);
+    body = mix(body, mix(seen, body, (1. - uClarity)*0.7), inBox);
+  }
+  body *= 1. - 0.35*curl;   // przy podwiniętym brzegu mniej światła przechodzi na wprost
+  // kropla na tafli to szkło nad wodą: widać przez nią poziomice i zrzut, wygięte i lekko zabarwione na zielono
+  if (uDark > 0. && rebelness > 0.) {
+    vec3 seen = sheetBase(q - n.xy*0.028);
+    vec3 glass = seen*vec3(0.55, 1.0, 0.76) + TINT*0.2;   // zielone szkło: to, co pod spodem, zabarwione jak przez kroplę na hero
+    body = mix(body, glass*(1. - 0.25*curl), rebelness*uDark);
+  }
+  float F = 0.02 + 0.98*pow(1.-max(n.z,0.),5.);
+  vec3 rd = vec3(0.,0.,-1.), r = reflect(rd, n);
+  // bez cieniowania rozproszonego: to ono robiło z cieczy plastelinę; szkło pokazuje fale załamaniem i odbiciem
+  vec3 envC = env(r,q);
+  envC = mix(envC, envC*vec3(0.42, 0.8, 0.6), uDark*rebelness);   // na ciemnej wodzie kropla odbija zielono, nie szaro
+  vec3 col = body*(1.-F*(1. - 0.55*uDark*rebelness)) + envC*F*0.7*(1. - 0.9*uClarity*(1. - rebelness))*(1. - 0.45*uDark*rebelness);
+  vec3 L = normalize(vec3(-0.55 + 0.12*sin(q.y*7.+uTime*0.21), 0.62 + 0.08*cos(q.x*5.3-uTime*0.17), 0.56));
+  float sp = max(dot(r, L), 0.);
+  col += vec3(1.)*(pow(sp, 5.)*0.07 + pow(sp, 24.)*0.08 + pow(sp, 220.)*0.6)*(1. - 0.85*uClarity*(1. - rebelness));  // szeroki połysk pokazuje fale jako jaśniejsze pasma  // odblask okna: miękka poświata + ostre jądro jak na szkle
+  o = vec4(mix(mix(wall, col, cover), INK, boardMask(q)),1.);
+}`
+
+const gl = canvas.getContext('webgl2', { antialias: false, premultipliedAlpha: false })
+if (!gl.getExtension('EXT_color_buffer_float')) console.error('brak EXT_color_buffer_float')
+function program(v, f) {
+  const p = gl.createProgram()
+  for (const [type, src] of [[gl.VERTEX_SHADER, v], [gl.FRAGMENT_SHADER, f]]) {
+    const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s)
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(s))
+    gl.attachShader(p, s)
+  }
+  gl.linkProgram(p); if (!gl.getProgramParameter(p, gl.LINK_STATUS)) console.error(gl.getProgramInfoLog(p))
+  return p
+}
+const main = program(vs, fs), splat = program(splatVs, splatFs)
+const fade = program(vs, `#version 300 es
+precision highp float; out vec4 o; void main(){ o = vec4(0.); }`)
+let firstFrame = true
+const tex = (unit, filter = gl.LINEAR) => { const t = gl.createTexture(); gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, t); for (const [p, v] of [[gl.TEXTURE_MIN_FILTER, filter], [gl.TEXTURE_MAG_FILTER, filter], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, p, v); return t }
+
+const T = textures()
+const selLayer = document.getElementById('sel')
+for (const t of T.sel) {
+  const el = document.createElement('span'); el.textContent = t.text
+  const px = (v) => v / dpr + 'px'
+  el.style.cssText = `left:${px(t.x)};top:${px(t.y - t.a)};line-height:${px(t.a + t.d)};font:${t.font.replace(/([\d.]+)px/, (_, n) => n / dpr + 'px')};letter-spacing:${parseFloat(t.ls) / dpr}px`
+  selLayer.append(el)
+}
+gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
+tex(0); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, T.s)
+tex(1); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, T.l)
+gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false)
+// teren (1,2 MB) wczytywany z prawdziwym postępem; loader pokazuje go wypełnianiem inicjałów
+const loader = startLoader(T.name)
+await loadTerrain((f) => { loader.progress = f })
+const TER = window.TEREN_CALY
+tex(2); gl.texImage2D(gl.TEXTURE_2D, 0, gl.R16F, TER.w, TER.h, 0, gl.RED, gl.FLOAT, new Float32Array(TER.data))
+// pole gęstości
+const DW = Math.round(W / 2), DH = Math.round(H / 2)
+const dTex = tex(3); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, DW, DH, 0, gl.RGBA, gl.HALF_FLOAT, null)
+const fbo = gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER, fbo)
+gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, dTex, 0)
+if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) console.error('FBO gęstości niekompletne')
+// kopuła: szerokie rozmycie w 1/4 rozdzielczości
+const KW = Math.round(W / 4), KH = Math.round(H / 4)
+// kopuła w pełnej precyzji (32 bity), jeśli karta pozwala na mieszanie takich tekstur: 16 bitów dawało schodki widoczne w świetle jak siatka
+const f32 = gl.getExtension('EXT_float_blend') && gl.getExtension('OES_texture_float_linear')
+const kTex = tex(4); gl.texImage2D(gl.TEXTURE_2D, 0, f32 ? gl.RGBA32F : gl.RGBA16F, KW, KH, 0, gl.RGBA, f32 ? gl.FLOAT : gl.HALF_FLOAT, null)
+if (!f32) console.warn('kopuła w 16 bitach: możliwe schodki w świetle')
+gl.useProgram(main); gl.uniform2f(gl.getUniformLocation(main, 'uDomeSize'), KW, KH)
+const fbo2 = gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER, fbo2)
+gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, kTex, 0)
+gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+
+// pole odległości od brzegu cieczy (jump flooding) w rozdzielczości gęstości, potem rozmycie, żeby grzbiet w środku nie robił kantu
+const jfaInit = program(vs, `#version 300 es
+precision highp float; uniform sampler2D uD; uniform float uIso, uInv; out vec2 o;
+uniform vec2 uJ; void main(){ float f = texture(uD, gl_FragCoord.xy/uJ).r; o = (uInv > 0.5 ? f >= uIso : f < uIso) ? gl_FragCoord.xy : vec2(-1.); }`)
+// front tafli: rozlewa się od brzegu cieczy, nierówno (płaty idą szybciej, inne zostają w tyle), więc zalewa kadr jak rozlana woda
+const flood = program(vs, `#version 300 es
+precision highp float; uniform sampler2D uIn, uOut; uniform float uR, uTime; uniform vec2 uJ; out vec4 o;
+float hsh(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453); }
+float vnoise(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f*f*(3.-2.*f);
+  return mix(mix(hsh(i), hsh(i+vec2(1,0)), u.x), mix(hsh(i+vec2(0,1)), hsh(i+vec2(1,1)), u.x), u.y); }
+void main(){ vec2 uv = gl_FragCoord.xy/uJ; vec2 q = vec2(uv.x*uJ.x/uJ.y, uv.y);
+  float n = vnoise(q*2.3 + vec2(uTime*0.06, -uTime*0.05))*0.65 + vnoise(q*5.7 - vec2(uTime*0.09))*0.35;
+  float front = uR*(0.62 + 0.76*n) - texture(uOut, uv).r;
+  o = vec4(max(texture(uIn, uv).r, front), 0., 0., 1.); }`)
+const jfaStep = program(vs, `#version 300 es
+precision highp float; uniform sampler2D uS; uniform int uStep; uniform ivec2 uSize; out vec2 o;
+void main(){ vec2 p = gl_FragCoord.xy; vec2 best = vec2(-1.); float bd = 1e20;
+  for (int y=-1;y<=1;y++) for (int x=-1;x<=1;x++){ ivec2 c = ivec2(p) + ivec2(x,y)*uStep;
+    if (c.x<0||c.y<0||c.x>=uSize.x||c.y>=uSize.y) continue;
+    vec2 s = texelFetch(uS, c, 0).xy; if (s.x < 0.) continue;
+    float d = dot(s-p, s-p); if (d < bd) { bd = d; best = s; } }
+  o = best; }`)
+const jfaDist = program(vs, `#version 300 es
+precision highp float; uniform sampler2D uS; out vec4 o;
+void main(){ vec2 s = texelFetch(uS, ivec2(gl_FragCoord.xy), 0).xy; o = vec4(s.x < 0. ? 400. : length(s - gl_FragCoord.xy), 0., 0., 1.); }`)
+const blur = program(vs, `#version 300 es
+precision highp float; uniform sampler2D uS; uniform vec2 uDir; out vec4 o;
+void main(){ ivec2 p = ivec2(gl_FragCoord.xy); ivec2 sz = textureSize(uS, 0); float a = 0., w = 0.;
+  for (int i=-8;i<=8;i++){ float g = exp(-float(i*i)/32.); ivec2 c = clamp(p + ivec2(uDir)*i, ivec2(0), sz-1); a += texelFetch(uS, c, 0).r*g; w += g; }
+  o = vec4(a/w, 0., 0., 1.); }`)
+const fl = f32 ? gl.FLOAT : gl.HALF_FLOAT
+const JW = Math.round(DW / 2), JH = Math.round(DH / 2)   // pole odległości w 1/4 rozdzielczości: dość dokładne i tanie
+const mkTarget = (unit, fmt, filter) => {
+  const t = tex(unit, filter); gl.texImage2D(gl.TEXTURE_2D, 0, fmt, JW, JH, 0, fmt === gl.RG32F || fmt === gl.RG16F ? gl.RG : gl.RED, fl, null)
+  const f = gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER, f); gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0)
+  if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) console.error('FBO pola odległości niekompletne')
+  return { t, f }
+}
+const jA = mkTarget(6, f32 ? gl.RG32F : gl.RG16F, gl.NEAREST), jB = mkTarget(6, f32 ? gl.RG32F : gl.RG16F, gl.NEAREST)
+const dRaw = mkTarget(6, f32 ? gl.R32F : gl.R16F, gl.NEAREST), dTmp = mkTarget(6, f32 ? gl.R32F : gl.R16F, gl.NEAREST)
+const dOut = mkTarget(5, f32 ? gl.R32F : gl.R16F, gl.LINEAR), dU = mkTarget(5, f32 ? gl.R32F : gl.R16F, gl.LINEAR)
+let floodR = 0
+gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+const hgtPass = program(vs, `#version 300 es
+precision highp float; uniform sampler2D uDist, uDens; uniform float uDH, uTime, uSpread, uClarity; uniform vec2 uJ, uRes; out vec4 o;
+float hsh(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453); }
+float vnoise(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f*f*(3.-2.*f);
+  return mix(mix(hsh(i), hsh(i+vec2(1,0)), u.x), mix(hsh(i+vec2(0,1)), hsh(i+vec2(1,1)), u.x), u.y); }
+float waveField(vec2 q, float t){
+  vec2 w = vec2(vnoise(q*3.1 + vec2(t*0.11, -t*0.07)), vnoise(q*3.1 + vec2(5.2 - t*0.09, 1.3 + t*0.1))) - 0.5;
+  vec2 p = q*9. + w*2.2;                                   // zawinięcie przestrzeni: fale się wyginają i zmieniają szerokość
+  float n = vnoise(p + vec2(t*0.35, -t*0.22))*0.65 + vnoise(p*1.9 - vec2(t*0.28, t*0.31))*0.35;
+  float amp = 0.5 + 0.5*vnoise(q*2.3 - vec2(t*0.05));       // w jednych miejscach falują mocniej, w innych prawie wcale
+  return (n - 0.5)*amp;
+}
+float hgt(vec2 q){
+  // wysokość z odległości od brzegu (pole odległości liczone co klatkę): profil bez stałej szerokości,
+  // więc brzeg wąskiego ramienia jest wąski, dużego ciała szeroki, i nie powstaje pierścień
+  float d = texture(uDist, (gl_FragCoord.xy/uJ)).r / uDH;
+  float m = smoothstep(0., 0.03, d);
+  float waves = 0.26*waveField(q, uTime);
+  // drobniejsze fale dla małych kropli (duże fale są większe niż one same i dawały tylko pochylenie)
+  float fine = 0.05*(vnoise(q*26. + vec2(uTime*0.5, -uTime*0.4)) - 0.5)*m*(1. - smoothstep(0.035, 0.09, d));
+  float rebel = smoothstep(0.25, 0.6, texture(uDens, gl_FragCoord.xy/uJ).g);
+  return (0.5*sqrt(d) + fine)*(1. - uSpread) + waves*m*(1. + 0.7*uSpread)*(1. - uClarity) + 0.06*uSpread*rebel;
+}
+void main(){ vec2 uv = gl_FragCoord.xy/uJ; vec2 q = vec2(uv.x*uRes.x/uRes.y, uv.y); o = vec4(hgt(q), 0., 0., 1.); }`)
+const hOut = mkTarget(7, f32 ? gl.R32F : gl.R16F, gl.LINEAR)
+function distanceField() {
+  gl.disable(gl.BLEND); gl.viewport(0, 0, JW, JH); gl.bindVertexArray(vao)
+  const pass = (prog, target, src, setup) => { gl.useProgram(prog); gl.bindFramebuffer(gl.FRAMEBUFFER, target.f); gl.activeTexture(gl.TEXTURE6); gl.bindTexture(gl.TEXTURE_2D, src); gl.uniform1i(gl.getUniformLocation(prog, prog === jfaInit ? 'uD' : 'uS'), 6); setup && setup(prog); gl.drawArrays(gl.TRIANGLES, 0, 3) }
+  const jfa = (inv) => {
+    pass(jfaInit, jA, dTex, (p) => { gl.uniform1f(gl.getUniformLocation(p, 'uIso'), 0.38); gl.uniform1f(gl.getUniformLocation(p, 'uInv'), inv); gl.uniform2f(gl.getUniformLocation(p, 'uJ'), JW, JH) })
+    let src = jA, dst = jB
+    for (let st = 1 << Math.ceil(Math.log2(Math.max(JW, JH))) - 1; st >= 1; st >>= 1) {
+      pass(jfaStep, dst, src.t, (p) => { gl.uniform1i(gl.getUniformLocation(p, 'uStep'), st); gl.uniform2i(gl.getUniformLocation(p, 'uSize'), JW, JH) })
+      ;[src, dst] = [dst, src]
+    }
+    pass(jfaDist, dRaw, src.t)
+  }
+  jfa(0)
+  pass(blur, dTmp, dRaw.t, (p) => gl.uniform2f(gl.getUniformLocation(p, 'uDir'), 1, 0))
+  pass(blur, dOut, dTmp.t, (p) => gl.uniform2f(gl.getUniformLocation(p, 'uDir'), 0, 1))
+  let dist = dOut
+  if (floodR > 0) {
+    // tafla: odległość od cieczy na zewnątrz, a z niej front, który zalewa kadr
+    jfa(1)
+    gl.useProgram(flood); gl.bindFramebuffer(gl.FRAMEBUFFER, dU.f)
+    gl.activeTexture(gl.TEXTURE5); gl.bindTexture(gl.TEXTURE_2D, dOut.t); gl.uniform1i(gl.getUniformLocation(flood, 'uIn'), 5)
+    gl.activeTexture(gl.TEXTURE9); gl.bindTexture(gl.TEXTURE_2D, dRaw.t); gl.uniform1i(gl.getUniformLocation(flood, 'uOut'), 9)
+    gl.uniform1f(gl.getUniformLocation(flood, 'uR'), floodR); gl.uniform1f(gl.getUniformLocation(flood, 'uTime'), time); gl.uniform2f(gl.getUniformLocation(flood, 'uJ'), JW, JH)
+    gl.drawArrays(gl.TRIANGLES, 0, 3)
+    dist = dU
+  }
+  gl.activeTexture(gl.TEXTURE5); gl.bindTexture(gl.TEXTURE_2D, dist.t)
+  // wysokość cieczy raz na klatkę, w rozdzielczości pola odległości
+  gl.useProgram(hgtPass); gl.bindFramebuffer(gl.FRAMEBUFFER, hOut.f)
+  gl.uniform1i(gl.getUniformLocation(hgtPass, 'uDist'), 5); gl.uniform1f(gl.getUniformLocation(hgtPass, 'uDH'), JH)
+  gl.uniform1f(gl.getUniformLocation(hgtPass, 'uTime'), time)
+  gl.uniform1f(gl.getUniformLocation(hgtPass, 'uSpread'), tr.spread); gl.uniform1f(gl.getUniformLocation(hgtPass, 'uClarity'), tr.clarity)
+  gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D, dTex); gl.uniform1i(gl.getUniformLocation(hgtPass, 'uDens'), 3); gl.uniform2f(gl.getUniformLocation(hgtPass, 'uJ'), JW, JH); gl.uniform2f(gl.getUniformLocation(hgtPass, 'uRes'), W, H)
+  gl.drawArrays(gl.TRIANGLES, 0, 3)
+  gl.activeTexture(gl.TEXTURE7); gl.bindTexture(gl.TEXTURE_2D, hOut.t)
+}
+
+gl.useProgram(main)
+const U = (n) => gl.getUniformLocation(main, n)
+;['uStatic', 'uLines', 'uTer', 'uDens', 'uDome', 'uDist'].forEach((n, i) => gl.uniform1i(U(n), i))
+gl.uniform1i(U('uHgt'), 7)
+gl.uniform1f(U('uDH'), Math.round(Math.round(H / 2) / 2))
+gl.uniform2f(U('uHgtSize'), JW, JH)
+// teren: na starcie wycinek o równej gęstości poziomic; scroll przesuwa widok po mapie (w górę stoku) i lekko przybliża
+const [sx0, sy0, sw0, sh0] = TER.start
+const sc0 = Math.max(W / sw0, H / sh0)
+gl.uniform2f(U('uTerSize'), TER.w, TER.h); gl.uniform2f(U('uRes'), W, H); gl.uniform1f(U('uDpr'), dpr)
+function terrainView(s) {           // s = przewinięcie w px
+  const pan = Math.min(s * 0.075, 300)                 // piksele terenu
+  const sc = sc0 * (1 + Math.min(s, 4000) * 0.00004)
+  const cx = sx0 + sw0 / 2 - pan * 0.18, cy = sy0 + sh0 / 2 - pan
+  gl.uniform1f(U('uTerSc'), sc); gl.uniform2f(U('uTerOff'), cx * sc - W / 2, cy * sc - H / 2)
+}
+gl.uniform4f(U('uFade'), ...T.fade)
+gl.uniform1f(U('uBlockRight'), T.fade[2] + 0.02)
+gl.uniform1f(U('uNameOn'), 0)
+let signed = false
+// zrzut stronypodhale.pl: na środku kadru, 16:9, tam gdzie potem stanie w scenie
+{
+  const img = new Image(); img.src = './stronypodhale.avif'
+  img.decode().then(() => {
+    tex(8); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false)
+    gl.useProgram(main); gl.uniform1i(U('uImg'), 8)
+  })
+  // kolor tafli: tło strony ze zrzutu, liczone jak na obecnej stronie (mediana kanałów z lewej, prawej i dolnej krawędzi)
+  img.decode().then(() => {
+    const c = Object.assign(document.createElement('canvas'), { width: 64, height: 36 }), g = c.getContext('2d', { willReadFrequently: true })
+    g.drawImage(img, 0, 0, 64, 36); const d = g.getImageData(0, 0, 64, 36).data, ch = [[], [], []]
+    const take = (x, y) => { const i = (y * 64 + x) * 4; for (let k = 0; k < 3; k++) ch[k].push(d[i + k]) }
+    for (let y = 0; y < 36; y++) for (const x of [1, 2, 61, 62]) take(x, y)
+    for (let x = 0; x < 64; x++) take(x, 34)
+    const med = (v) => v.sort((a, b) => a - b)[v.length >> 1] / 255
+    gl.useProgram(main); gl.uniform3f(U('uDarkCol'), med(ch[0]), med(ch[1]), med(ch[2])); window.__darkCol = ch.map(med)
+    document.documentElement.style.setProperty('--scene', `rgb(${ch.map((v) => Math.round(med(v) * 255)).join(' ')})`)
+  })
+}
+gl.uniform3f(U('uDarkCol'), 21 / 255, 48 / 255, 31 / 255)
+// --- scena stronypodhale. Póki zrzut jest sam, stoi na środku; gdy woda się uspokoi, rusza akt (w czasie, jak
+// reveal na reszcie strony, a przy cofnięciu scrolla wstecz): kadr jedzie na miejsce, wielki znak marki wyjeżdża
+// litera po literze, potem zdanie i link, a na końcu w zrzut wbijają się pinezki z notatkami.
+const VIS = VH - INSET
+const scene = document.getElementById('scene'), wm = scene.querySelector('.wm'), row = scene.querySelector('.row'), link = scene.querySelector('a')
+const pad = Math.max(24, 0.0667 * VW)
+const cw = Math.min(VW - 2 * pad, 1240)
+scene.style.left = (VW - cw) / 2 + 'px'; scene.style.width = cw + 'px'
+// znak na całą szerokość bloku (to marka, która ma zostać w pamięci)
+wm.style.fontSize = '100px'; wm.style.fontSize = Math.min(100 * cw / wm.scrollWidth, 0.3 * VIS) + 'px'
+for (const part of wm.children) { const t = part.textContent; part.textContent = ''; for (const c of t) part.insertAdjacentHTML('beforeend', `<span class="m"><span class="i ch">${c}</span></span>`) }
+if (VW < 700) { row.style.flexDirection = 'column'; row.style.gap = '14px' }
+const wmH = wm.offsetHeight, rowH = row.offsetHeight
+const overlap = wmH * 0.16                 // kadr wsuwa się lekko pod znak: znak leży na wierzchu, jak naklejony na wodę
+const gapY = PORTRAIT ? 18 : 26, vpad = 2 * Math.min(pad, 36)
+const fw = Math.min(cw, (VIS - (wmH - overlap) - gapY - rowH - vpad) * 16 / 9), fh = fw * 9 / 16
+const stackTop = (VIS - (wmH - overlap + fh + gapY + rowH)) / 2
+const placed = { x: (VW - fw) / 2, y: stackTop + wmH - overlap }
+scene.style.top = stackTop + 'px'
+row.style.top = (wmH - overlap + fh + gapY) + 'px'
+if (fw < cw) { row.style.left = (cw - fw) / 2 + 'px'; row.style.right = (cw - fw) / 2 + 'px' }
+
+// pinezki: miejsca na zrzucie (ułamki szerokości i wysokości) i notatki o decyzjach w tym projekcie
+const PINS = [   // u, v, tytuł, notatka, kierunek notatki
+  [0.13, 0.05, '16 px', 'The parzenica rosette still reads at this size. The name is an address you can say over the phone.', 'b'],
+  [0.372, 0.05, '369 zł', 'to start, then 85 zł a month, or 1835 zł to own it outright. Every price is on the site.', 'r'],
+  [0.39, 0.43, 'z góry', 'Upfront, and from the mountains: you see the design and the price before you pay.', 'r'],
+  [0.66, 0.4, 'piczura.com', 'A model\'s portfolio built with no template, every animation on it written from scratch.', 'r'],
+  [0.215, 0.745, '0 zł', 'if the design is not for you. You pay only once you approve it.', 'b'],
+]
+const pinsEl = document.getElementById('pins')
+const pins = PINS.map(([u, v, t, txt, dir], n) => {
+  const el = document.createElement('div'); el.className = 'pin'; el.dataset.d = dir
+  const x = placed.x + u * fw, y = placed.y + v * fh
+  el.style.left = x + 'px'; el.style.top = y + 'px'
+  el.innerHTML = `<i role="button" tabindex="0" aria-expanded="false" aria-label="${t}: ${txt}">${n + 1}</i><span class="ln"></span><p><strong>${t}</strong><span>${txt}</span></p>`
+  pinsEl.append(el)
+  // notatka nie może wyjść poza ekran: wtedy idzie w dół i przesuwa się do środka
+  const fit = () => { const r = el.querySelector('p').getBoundingClientRect(); return r.left >= 12 && r.right <= VW - 12 }
+  if (!fit()) { el.dataset.d = 'b' }
+  { const pr = el.querySelector('p'), r = pr.getBoundingClientRect(); if (r.right > VW - 12) pr.style.left = (VW - 12 - r.width - x) + 'px'; if (r.left < 12) pr.style.left = (12 - x) + 'px' }
+  const btn = el.querySelector('i')
+  const toggle = () => {
+    const open = !el.classList.contains('open')
+    // na wąskim ekranie notatka zasłania sąsiednie pinezki, więc otwarta jest jedna naraz (dalej zostaje, aż ją zamkniesz)
+    if (open && VW < 700) for (const o of pinsEl.querySelectorAll('.pin.open')) { o.classList.remove('open'); o.querySelector('i').setAttribute('aria-expanded', 'false') }
+    el.classList.toggle('open', open); btn.setAttribute('aria-expanded', open)
+  }
+  if (!matchMedia('(hover: none)').matches) {
+    el.addEventListener('mouseenter', () => el.classList.add('peek'))
+    el.addEventListener('mouseleave', () => el.classList.remove('peek'))
+  }
+  btn.addEventListener('click', toggle); btn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle() } })
+  return { el }
+})
+
+let actT = 0, actOn = false   // sekundy aktu (0…ACT_LEN), w przód albo wstecz
+const ACT_LEN = 2.8
+const ease3 = (x) => 1 - (1 - x) ** 3
+const chars = [...wm.querySelectorAll('.ch')], rest = [...row.querySelectorAll('.i')]
+const masks = [...chars, ...rest]
+const startAt = [...chars.map((_, i) => 0.45 + i * 0.035), ...rest.map((_, i) => 1.15 + i * 0.1)]
+function imgRect(zoom) {
+  const mv = ease3(cl01(actT / 1.0))   // kadr jedzie na miejsce przez pierwszą sekundę aktu
+  const cx0 = VW / 2, cy0 = VIS / 2, cx1 = placed.x + fw / 2, cy1 = placed.y + fh / 2
+  const cx = cx0 + (cx1 - cx0) * mv, cy = cy0 + (cy1 - cy0) * mv
+  const w = fw * zoom, h = w * 9 / 16
+  gl.useProgram(main)
+  gl.uniform4f(U('uImgRect'), (cx - w / 2) / VH, 1 - (cy + h / 2) / VH, w / VH, h / VH)
+  gl.uniform1f(U('uImgR'), 16 * zoom / VH)
+}
+function act(dt, P) {
+  actOn = P > 0.86 ? true : P < 0.84 ? false : actOn
+  actT = Math.min(Math.max(actT + (actOn ? dt : -dt * 1.4), 0), ACT_LEN)
+  scene.style.visibility = actT > 0 ? 'visible' : 'hidden'
+  masks.forEach((el, i) => { const k = ease3(cl01((actT - startAt[i]) / 0.8)); el.style.transform = `translateY(${(1 - k) * 135}%)` })
+  // pinezki wbijają się po kolei, gdy wszystko stoi; przy cofaniu chowają się razem z notatkami
+  pins.forEach((p, i) => { const on = actT > 1.9 + i * 0.12; p.el.classList.toggle('on', on); if (!on) p.el.classList.remove('open') })
+}
+
+const quad = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, quad)
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW)
+const vao = gl.createVertexArray(); gl.bindVertexArray(vao)
+gl.enableVertexAttribArray(gl.getAttribLocation(main, 'aPos')); gl.vertexAttribPointer(gl.getAttribLocation(main, 'aPos'), 2, gl.FLOAT, false, 0, 0)
+
+// --- symulacja
+// w pionie kropla siedzi w wolnym pasie między „Sebastian” a kreską bloku (q liczone od dołu)
+const gapTop = 1 - (T.name.sy + T.name.S * 0.12) / H, gapBot = 1 - (T.name.ky - T.name.asc) / H
+const blobY = PORTRAIT ? (gapTop + gapBot) / 2 : INSET / VH + 0.5 * (1 - INSET / VH)
+const blobR = PORTRAIT ? Math.min(0.44 * A, (gapTop - gapBot) * 0.6) : 0.235
+// fizyka liczy się w osobnym wątku (worker.js); tu tylko rysujemy jej wynik, wygładzony między dwoma ostatnimi stanami
+// na dotyku nie ma kursora, więc nie ma też jego kropli: palec chwyta ciecz z ciała, a ona sama tworzy kroplę pod palcem
+const physics = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' })
+const cur = { x: -99, y: -99, vx: 0, vy: 0, inside: false, down: false, impulse: 0 }
+let snapA = null, snapB = null, tA = 0, tB = 0, gapMs = 1000 / 60, physMs = 0, physSteps = 0, physN = 0
+const simState = { mainMass: 0, pieces: 0, pieceList: [] }
+let rebelN = 0
+const N = await new Promise((ok) => {
+  let n = 0
+  physics.onmessage = ({ data }) => {
+    if (data.ready) { n = data.N; rebelN = data.rebelN; return }
+    const now = performance.now()
+    if (snapA && snapA !== snapB) physics.postMessage({ buf: snapA }, [snapA.buffer])   // stary bufor wraca do wątku
+    snapA = snapB || data.pos; snapB = data.pos
+    if (tB) gapMs += (Math.min(now - tB, 100) - gapMs) * 0.2   // średni odstęp między stanami
+    tA = tB || now; tB = now
+    Object.assign(simState, data.state); physMs += data.ms; physSteps += data.steps; physN++
+    if (n) ok(n)
+  }
+  physics.postMessage({ light: LIGHT, init: { width: A / Hq, height: 1 / Hq, center: { x: A / 2 / Hq, y: blobY / Hq }, radius: blobR / Hq, spacing: SPACING, rebelAt: matchMedia('(hover: none)').matches ? null : { x: A * 0.245 / Hq, y: 0.57 / Hq }, rebelRadius: 2.3 * 0.021 / Hq } })
+})
+window.__physics = physics   // do diagnostyki w konsoli
+const pos = new Float32Array(N * 2)
+const pBuf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, pBuf); gl.bufferData(gl.ARRAY_BUFFER, pos.byteLength, gl.DYNAMIC_DRAW)
+const pVao = gl.createVertexArray(); gl.bindVertexArray(pVao)
+gl.enableVertexAttribArray(gl.getAttribLocation(splat, 'aP')); gl.vertexAttribPointer(gl.getAttribLocation(splat, 'aP'), 2, gl.FLOAT, false, 0, 0)
+gl.useProgram(splat)
+const splatR = 3.3 * SPACING * Hq                         // promień plamki w jednostkach q
+gl.uniform1f(gl.getUniformLocation(splat, 'uA'), A)
+const perParticle = (SPACING * Hq) ** 2 * Math.sqrt(3) / 2
+const splatR2 = 0.2                                       // szeroka plamka: kopuła
+const norm1 = 1 / ((Math.PI * splatR * splatR / 4) / perParticle)
+const norm2 = 1 / ((Math.PI * splatR2 * splatR2 / 4) / perParticle)
+const splatR3 = 0.05                                       // średnia kopuła: małe krople i kropla kursora
+const norm3 = 1 / ((Math.PI * splatR3 * splatR3 / 4) / perParticle)
+const sMask = gl.getUniformLocation(splat, 'uMask'), sSize = gl.getUniformLocation(splat, 'uSize'), sNorm = gl.getUniformLocation(splat, 'uNorm')
+
+// --- kursor i dotyk (jednostki h, prędkość w h na krok)
+let last = null
+const toSim = (e) => ({ x: e.clientX / VH / Hq, y: (1 - e.clientY / VH) / Hq, t: performance.now() })
+addEventListener('pointermove', (e) => {
+  if (e.pointerType !== 'mouse') return
+  const p = toSim(e); cur.inside = true
+  // przeskok (np. kursor wraca do okna w innym miejscu) to nie ruch
+  if (selecting) { cur.vx = 0; cur.vy = 0; cur.x = p.x; cur.y = p.y; last = p; return }   // przy zaznaczaniu kursor nie porywa cieczy
+  if (last && Math.hypot(p.x - last.x, p.y - last.y) < 8) { const dt = Math.max((p.t - last.t) / 1000 * STEPS_PER_SECOND, 0.5); cur.vx = cur.vx * 0.5 + (p.x - last.x) / dt * 0.5; cur.vy = cur.vy * 0.5 + (p.y - last.y) / dt * 0.5 }
+  cur.x = p.x; cur.y = p.y; last = p
+})
+// --- mysz: jak dotąd (najechanie, ruch, klik, przytrzymanie)
+let selecting = false
+const onText = (e) => !!e.target.closest?.('#sel span, #scene .wm, #scene .say, #scene a, .pin')
+addEventListener('pointerdown', (e) => {
+  if (e.pointerType !== 'mouse') return
+  if (onText(e)) { selecting = true; return }   // zaznaczanie tekstu ma pierwszeństwo przed rozbijaniem kropli
+  const p = toSim(e); cur.x = p.x; cur.y = p.y; cur.inside = true; cur.down = true; cur.impulse = 1.1 * 0.021 / Hq
+})
+addEventListener('pointerup', (e) => { if (e.pointerType === 'mouse') { cur.down = false; selecting = false } })
+
+// --- dotyk: własne zasady. Palec poza cieczą przewija stronę i nie rusza cieczy.
+// Palec na cieczy chwyta ją (strona się wtedy nie przewija): przeciągnięcie ciągnie, szybkie machnięcie odrywa,
+// krótkie stuknięcie rozchlapuje. Kropla kursora jest pod palcem tylko w czasie dotyku, potem spływa do ciała.
+const isTouch = matchMedia('(hover: none)').matches
+if (isTouch) { cur.grabR = 5.5; cur.grabK = 0.1 }   // palec chwyta szerzej i mocniej niż mysz: nie ma najechania, jest tylko chwyt
+function onLiquid(clientX, clientY) {
+  const x = clientX / VH / Hq, y = (1 - clientY / VH) / Hq
+  let n = 0
+  for (let i = 0; i < N; i++) { const dx = snapB[i * 2] - x, dy = snapB[i * 2 + 1] - y; if (dx * dx + dy * dy < 2.5) { if (++n > 2) return true } }
+  return false
+}
+let touchId = null, touchStart = null
+addEventListener('touchstart', (e) => {
+  if (touchId !== null) return
+  const t = e.changedTouches[0]
+  if (onText(e) || !onLiquid(t.clientX, t.clientY)) return   // na tekście: zaznaczanie; poza cieczą: zwykłe przewijanie
+  e.preventDefault()                                     // na cieczy: palec należy do cieczy
+  touchId = t.identifier
+  const p = { x: t.clientX / VH / Hq, y: (1 - t.clientY / VH) / Hq, t: performance.now() }
+  touchStart = { ...p, cx: t.clientX, cy: t.clientY }
+  cur.x = p.x; cur.y = p.y; cur.vx = 0; cur.vy = 0; cur.inside = true; cur.down = true; last = p
+}, { passive: false })
+addEventListener('touchmove', (e) => {
+  if (touchId === null) return
+  const t = [...e.changedTouches].find((c) => c.identifier === touchId); if (!t) return
+  e.preventDefault()
+  const p = { x: t.clientX / VH / Hq, y: (1 - t.clientY / VH) / Hq, t: performance.now() }
+  if (last) { const dt = Math.max((p.t - last.t) / 1000 * STEPS_PER_SECOND, 0.5); cur.vx = cur.vx * 0.5 + (p.x - last.x) / dt * 0.5; cur.vy = cur.vy * 0.5 + (p.y - last.y) / dt * 0.5 }
+  cur.x = p.x; cur.y = p.y; last = p
+}, { passive: false })
+function endTouch(e) {
+  if (touchId === null) return
+  const t = [...e.changedTouches].find((c) => c.identifier === touchId); if (!t) return
+  // krótkie stuknięcie bez przesunięcia: rozchlapanie
+  if (performance.now() - touchStart.t < 250 && Math.hypot(t.clientX - touchStart.cx, t.clientY - touchStart.cy) < 12) cur.impulse = 1.1 * 0.021 / Hq
+  touchId = null; cur.down = false
+  setTimeout(() => { if (touchId === null) cur.inside = false }, 60)   // impuls zdąży zadziałać
+}
+addEventListener('touchend', endTouch); addEventListener('touchcancel', endTouch)
+// myszowy ruch nie dotyczy dotyku (pointermove z palca ignorujemy niżej)
+
+// --- przechylenie: włączane przyciskiem. „Poziomo” to pozycja, w której trzymasz urządzenie w chwili włączenia,
+// mały ruch dłoni nic nie robi (martwa strefa), a reakcja jest wygładzona, więc przechył czuć przewidywalnie.
+const tiltBtn = document.getElementById('tilt')
+const D = window.DeviceOrientationEvent
+if (isTouch && D && isSecureContext) tiltBtn.style.display = 'flex'   // iOS daje czujnik tylko stronom na HTTPS
+// w pionie u góry stoi imię na całą szerokość, więc przycisk siada w wierszu „See the work”, po prawej
+if (PORTRAIT) { tiltBtn.style.top = `${VH - INSET - 0.05 * VH - 21}px`; tiltBtn.style.right = `${0.0667 * VW}px` }
+let tiltOn = false, tgx = 0, tgy = 0, tiltListening = false, tiltBase = null
+function sendTilt(gx, gy, on) { physics.postMessage({ P: on ? { gx, gy, anchor: 0.00002, anchorDamp: 0.003 } : { gx: 0, gy: 0, anchor: 0.00008, anchorDamp: 0.02 } }) }
+// kierunek „w dół” w układzie urządzenia (x w prawo, y do góry ekranu, z z ekranu) z kątów beta/gamma
+// (kolejność Z-X'-Y'' ze specyfikacji): dół = (sin γ · cos β, −sin β, −cos γ · cos β).
+// Pozycja z chwili włączenia to „prosto”: ciecz płynie tam, dokąd przesunął się dół względem niej,
+// tym szybciej, im większy przechył (różnica 0…~1 to 0…~60°).
+function down(o) {
+  const b = o.beta * Math.PI / 180, g = (o.gamma || 0) * Math.PI / 180
+  return [Math.sin(g) * Math.cos(b), -Math.sin(b), -Math.cos(g) * Math.cos(b)]
+}
+function onOrient(o) {
+  if (!tiltOn || o.beta == null) return
+  const d = down(o)
+  if (!tiltBase) { tiltBase = d; return }
+  const dx = d[0] - tiltBase[0], dy = d[1] - tiltBase[1]
+  // obrót ekranu: urządzenie obrócone o kąt a przeciwnie do wskazówek zegara
+  const a = (window.orientation ?? screen.orientation?.angle ?? 0) * Math.PI / 180
+  let sx = dx * Math.cos(a) - dy * Math.sin(a), sy = dx * Math.sin(a) + dy * Math.cos(a)
+  const m = Math.hypot(sx, sy), DZ = 0.05                          // drżenie dłoni (~3°) nic nie robi
+  const k = m < DZ ? 0 : (m - DZ) / m
+  sx *= k; sy *= k
+  tgx += (sx - tgx) * 0.25; tgy += (sy - tgy) * 0.25
+  sendTilt(tgx * 0.006, tgy * 0.006, true)
+}
+function setTilt(on) {
+  tiltOn = on; tiltBase = null; tgx = tgy = 0
+  tiltBtn.setAttribute('aria-pressed', on ? 'true' : 'false')
+  if (!on) sendTilt(0, 0, false)
+  else if (!tiltListening) { tiltListening = true; addEventListener('deviceorientation', onOrient) }
+}
+tiltBtn.addEventListener('click', () => {
+  if (tiltOn) return setTilt(false)
+  if (typeof D.requestPermission === 'function') D.requestPermission().then((r) => { if (r === 'granted') setTilt(true) }).catch(() => {})
+  else setTilt(true)
+})
+document.documentElement.addEventListener('pointerleave', (e) => { if (e.pointerType !== 'mouse') return; cur.inside = false; last = null })
+let shift = 0, shiftTarget = 0
+addEventListener('scroll', () => { shiftTarget = scrollY }, { passive: true })
+
+// --- zdania: zmieniają się w chwili zdarzenia (pęknięcie, pierwsze zetknięcie, całość z powrotem)
+// 0 „Nothing off the shelf.” (spoczynek), 1 „I take things apart.” (rozrywanie), 2 „I put them back…” (zrastanie), całość → znowu 0
+// w pionie widać tylko bieżące zdanie (pozostałe całkiem gasną), na szerokim ekranie pozostałe są przygaszone
+const DIM = PORTRAIT ? 0 : 0.28
+const ink = [1, DIM, DIM], wave = [0, 0, 0]
+let active = 0, prevPieces = 0, wholeSince = 0, lastTear = -9, lastFast = -9
+function setLine(i) { if (i === active) return; active = i; wave[i] = 1 }
+
+// --- przejście: wszystko jest funkcją przewinięcia (P 0…1 przez 2,4 ekranu), więc działa tak samo wstecz i po przerwaniu
+const cl01 = (x) => Math.min(Math.max(x, 0), 1)
+const ss = (a, b, x) => { const t = cl01((x - a) / (b - a)); return t * t * (3 - 2 * t) }
+const p2out = (x) => 1 - (1 - x) ** 2
+const tr = { spread: 0, dark: 0, imageIn: 0, clarity: 0 }
+let sentSpread = -1
+function transition(scroll) {
+  const P = cl01((scroll - 0.1 * VH) / (2.4 * VH))
+  tr.spread = ss(0, 0.42, P)
+  tr.dark = ss(0.08, 0.42, P)
+  tr.imageIn = p2out(cl01((P - 0.4) / 0.28))
+  tr.clarity = p2out(cl01((P - 0.52) / 0.32))
+  // zrzut wypływa z głębi: rośnie, gdy się wyłania, a potem przesuwa na swoje miejsce w scenie, gdy wjeżdża nagłówek
+  const zoom = 0.62 + 0.38 * p2out(cl01((P - 0.4) / 0.44))
+  tr.P = P
+  imgRect(zoom)
+  // front tafli w pikselach pola odległości: do przekątnej kadru (z zapasem na nierówny front)
+  floodR = Math.hypot(JW, JH) * 1.25 * ss(0.1, 0.56, P) ** 1.7
+  if (Math.abs(tr.spread - sentSpread) > 0.003) { sentSpread = tr.spread; physics.postMessage({ P: { spread: tr.spread } }) }
+}
+let tPrev = performance.now(), time = 0
+function frame(now) {
+  const dt = Math.min((now - tPrev) / 1000, 0.05); tPrev = now; time += dt
+  // ruch kursora/palca do wątku fizyki; uderzenie wysyłamy raz
+  physics.postMessage({ cur }); cur.impulse = 0
+  cur.vx *= 0.85; cur.vy *= 0.85   // kursor, który stoi, nie ma prędkości
+
+  const big = simState.pieceList.filter((s) => s >= 12).length
+  // „składam” dopiero, gdy niszczenie ustało: nic nowego się nie oderwało i kursor zwolnił
+  const cs = Math.hypot(cur.vx, cur.vy)
+  if (cs > 0.06) lastFast = time
+  if (big > prevPieces) { lastTear = time; setLine(1) }
+  if (big > 0 && time - lastTear > 0.9 && time - lastFast > 0.5) setLine(2)
+  if (big !== 0) wholeSince = time
+  if (big === 0 && active === 2 && time - wholeSince > 1.2) setLine(0)
+  prevPieces = big
+  for (let i = 0; i < 3; i++) { ink[i] += ((i === active ? 1 : DIM) - ink[i]) * Math.min(dt * 6, 1); wave[i] *= Math.exp(-dt * 2.5) }
+
+  // obraz między dwoma ostatnimi stanami fizyki (o jeden stan w tyle), więc ruch jest płynny przy każdym tempie fizyki
+  const k = Math.min(Math.max((now - tB) / gapMs, 0), 1)
+  for (let i = 0; i < N * 2; i++) pos[i] = (snapA[i] + (snapB[i] - snapA[i]) * k) * Hq
+  // podpis: gdy imię jest już na miejscu, przez aktywne zdanie przechodzi zwykła fala zmiany
+  if (!signed && loader.done) { signed = true; wave[active] = 1 }
+  // 1) gęstość
+  gl.bindFramebuffer(gl.FRAMEBUFFER, fbo); gl.viewport(0, 0, DW, DH)
+  gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT)
+  gl.useProgram(splat); gl.bindVertexArray(pVao)
+  gl.bindBuffer(gl.ARRAY_BUFFER, pBuf); gl.bufferSubData(gl.ARRAY_BUFFER, 0, pos)
+  gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE)
+  gl.uniform1f(sSize, splatR * 2 * DH); gl.uniform1f(sNorm, norm1)
+  // kropla kursora (ostatnie rebelN cząstek) także w kanale G: na tafli zostaje zielona i wypukła
+  gl.uniform2f(sMask, 1, 0); gl.drawArrays(gl.POINTS, 0, N - rebelN)
+  if (rebelN) { gl.uniform2f(sMask, 1, 1); gl.drawArrays(gl.POINTS, N - rebelN, rebelN) }
+  // kopuła uśredniana w czasie (75% poprzedniej klatki + 25% nowej): światło nie migocze od pojedynczych cząstek
+  // (stara kopuła z szerokich plamek wyłączona: wysokość daje teraz pole odległości)
+  gl.disable(gl.BLEND)
+  transition(shift)
+  act(dt, tr.P)
+  // warstwa zaznaczania hero tylko wtedy, gdy hero jest widoczne
+  selLayer.style.visibility = loader.handoff && tr.dark < 0.5 ? 'visible' : 'hidden'
+  distanceField()
+  // 2) obraz
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, W, H)
+  gl.useProgram(main); gl.bindVertexArray(vao)
+  shift += (shiftTarget - shift) * Math.min(dt * 4, 1)
+  terrainView(shift); gl.uniform1f(U('uMorph'), shift * 0.0015); gl.uniform1f(U('uTime'), time)
+  gl.uniform3f(U('uInk'), ...ink); gl.uniform3f(U('uWave'), ...wave); gl.uniform1f(U('uNameOn'), loader.handoff ? 1 : 0)
+  gl.uniform1f(U('uBoardT'), loader.boardT); gl.uniform2f(U('uHRange'), ...loader.hRange)
+  gl.uniform1f(U('uSpread'), floodR > 0 ? 1 : 0); gl.uniform1f(U('uDark'), tr.dark); gl.uniform1f(U('uImageIn'), tr.imageIn); gl.uniform1f(U('uClarity'), tr.clarity)
+  gl.drawArrays(gl.TRIANGLES, 0, 3)
+  loader.glFrame()                       // w tej samej klatce: loader znika dokładnie, gdy strona pokaże imię
+  document.documentElement.dataset.ready = '1'
+  if (qs.has('fps')) { fpsN++; if (now - fpsT > 1000) { document.getElementById('info').textContent = `${Math.round(fpsN * 1000 / (now - fpsT))} fps · fizyka ${(physMs / Math.max(physN, 1)).toFixed(1)} ms · ${Math.round(physN * 1000 / (now - fpsT))} stanów/s · ${Math.round(physSteps * 1000 / (now - fpsT))}/${STEPS_PER_SECOND} kroków/s · ${W}×${H} px · dpr ${dpr} · ${f32 ? 'f32' : 'f16'} · test JIT ${jitMs.toFixed(1)} ms${LIGHT ? ' (lekki tryb)' : ''} · cząstki ${N} · ${particleStats()} · ${navigator.userAgent.match(/(Version|Chrome|CriOS|FxiOS)\/[\d.]+/)?.[0] ?? '?'}`; fpsN = 0; fpsT = now; physMs = 0; physSteps = 0; physN = 0 } }
+  requestAnimationFrame(frame)
+}
+let fpsN = 0, fpsT = performance.now()
+// diagnostyka do ?fps: test JIT (prosta pętla; bez JIT jest ~30–60× wolniejsza) i stan cząstek
+function particleStats() {
+  let nan = 0, minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9
+  for (let i = 0; i < N; i++) { const x = snapB[i * 2], y = snapB[i * 2 + 1]; if (!(x === x) || !(y === y)) { nan++; continue } if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y }
+  return `NaN ${nan} · zasięg ${(maxX - minX).toFixed(0)}×${(maxY - minY).toFixed(0)}h · masa ${simState.mainMass}`
+}
+requestAnimationFrame(frame)
+// przeładuj tylko przy zmianie szerokości (obrót); sama wysokość zmienia się przy chowaniu paska przeglądarki
+addEventListener('resize', () => { if (Math.abs(innerWidth - VW) > 2 || Math.abs(innerHeight - (VH - INSET)) > 0.2 * VH) location.reload() })
+
+// --- Loader: ciemna plansza ładowania przykrywa stronę od pierwszej chwili. Na niej jasne kontury „SK”,
+// które wypełniają się w tempie prawdziwego wczytywania. Potem plansza podnosi się i odkrywa stronę,
+// S jedzie na miejsce w „Sebastian”, K w „Kolbusz”, a reszta każdego słowa wysuwa się spod inicjału.
+// Litera nad planszą jest jasna, pod nią (na stronie) ciemna, więc kolor zmienia się dokładnie na krawędzi.
+// Rysowane tym samym fillText co tekstura strony, więc przekazanie imienia stronie jest niewidoczne.
+function startLoader(n) {
+  const el = document.getElementById('ld'); el.width = W; el.height = H
+  const c = el.getContext('2d')
+  const LIGHT = '#fbf9f4'
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches
+  const gap = n.S * 0.06, pair = n.s1 + gap + n.k1
+  const c0 = { sx: W / 2 - pair / 2, kx: W / 2 - pair / 2 + n.s1 + gap, y: H / 2 + n.asc / 2 }
+  c.font = n.font; c.letterSpacing = n.ls
+  // położenie każdej litery w słowie (z odstępami i podcięciami całego słowa)
+  const rest = (t) => [...t].map((_, i) => c.measureText(t).width - c.measureText(t.slice(i)).width).concat(c.measureText(t).width)
+  const rS = rest('Sebastian'), rK = rest('Kolbusz')
+  const st = { progress: 0, shown: 0, open: -1, handoff: false, done: false, glReady: false, boardT: -1, hRange: [0, 1] }
+  // teren pod kadrem (do koloru liter: jasne nad planszą, ciemne, gdy plansza pod nimi już schudła)
+  let terr = null
+  function terrain() {
+    const T = window.TEREN_CALY; if (!T) return null
+    const [x0, y0, w0, h0] = T.start, sc = Math.max(W / w0, H / h0)
+    const ox = (x0 + w0 / 2) * sc - W / 2, oy = (y0 + h0 / 2) * sc - H / 2
+    const at = (x, y) => T.data[Math.min(T.h - 1, Math.max(0, Math.round((y + oy) / sc))) * T.w + Math.min(T.w - 1, Math.max(0, Math.round((x + ox) / sc)))]
+    let lo = Infinity, hi = -Infinity
+    for (let y = 0; y < H; y += H / 60) for (let x = 0; x < W; x += W / 90) { const h = at(x, y); lo = Math.min(lo, h); hi = Math.max(hi, h) }
+    st.hRange = [lo, hi]
+    return { at, lo, hi }
+  }
+  // ile planszy już schudło w danym punkcie (ten sam wzór co w shaderze)
+  function thinned(x, y, bt) {
+    terr ||= terrain(); if (!terr) return 0
+    const hn = cl((terr.at(x, y) - terr.lo) / Math.max(terr.hi - terr.lo, 1))
+    const p = cl((bt - hn * 1.1) / 1.4); return p * p * p * (p * (p * 6 - 15) + 10)
+  }
+  const mixHex = (a, b, t) => '#' + [0, 2, 4].map((i) => Math.round(parseInt(a.substr(i + 1, 2), 16) * (1 - t) + parseInt(b.substr(i + 1, 2), 16) * t).toString(16).padStart(2, '0')).join('')
+  const t0 = performance.now()
+  const io = (x) => x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2
+  const out = (x) => 1 - (1 - x) ** 3
+  const cl = (x) => Math.min(Math.max(x, 0), 1)
+  // jedno słowo: kolejne litery rozkładają się spod inicjału jak wachlarz (najpierw najbliższe), jadą jako kontury
+  // (ten sam kontur co „SK” na planszy), a gdy staną na miejscu, wypełniają się od dołu jak inicjały w loaderze
+  const smoother = (x) => x * x * x * (x * (x * 6 - 15) + 10)
+  function glyphs(text, x, y, first, r, rr) {
+    if (r >= 1) { c.fillText(text, x, y); return }
+    const L = text.length - 1
+    for (let i = L; i >= 1; i--) {                       // od ostatniej: bliższe litery przykrywają dalsze
+      const st0 = (i - 1) / L * 0.38                       // opóźnienie: najpierw litery tuż przy inicjale
+      const go = smoother(cl((r - st0) / 0.55))            // droga spod inicjału na miejsce
+      if (go <= 0) continue
+      const fill = cl((r - st0 - 0.35) / 0.3)              // wypełnienie po dojechaniu
+      const lx = x + first * 0.25 + (rr[i] - first * 0.25) * go
+      if (fill < 1) { c.save(); c.globalAlpha = Math.min(go * 3, 1) * 0.8; c.lineWidth = 1.3 * dpr; c.strokeText(text[i], lx, y); c.restore() }
+      if (fill > 0) { c.save(); c.beginPath(); c.rect(lx - n.S, y - (n.asc + 2) * smoother(fill) + 1, n.S * 3, n.S); c.clip(); c.fillText(text[i], lx, y); c.restore() }
+    }
+    c.fillText(text[0], x, y)                            // inicjał na wierzchu: litery wychodzą spod niego
+  }
+  function word(text, x, y, first, r, rr, fill, color) {
+    c.fillStyle = color; c.strokeStyle = color
+    if (fill >= 1) { glyphs(text, x, y, first, r, rr); return }
+    c.save(); c.globalAlpha = 0.55; c.lineWidth = 1.2 * dpr; c.strokeText(text[0], x, y); c.restore()
+    c.save(); c.beginPath(); c.rect(0, y - (n.asc + 2) * fill + 1, W, H); c.clip(); glyphs(text, x, y, first, r, rr); c.restore()
+  }
+  function draw(now) {
+    const t = (now - t0) / 1000
+    // wypełnienie: nie szybciej niż prawdziwy postęp i nie szybciej niż 1,1 s na całość
+    const target = Math.min(st.progress, still ? 1 : t / 1.1)
+    st.shown += (target - st.shown) * 0.12; if (target >= 1 && st.shown > 0.996) st.shown = 1
+    if (st.open < 0 && st.shown === 1 && st.glReady) st.open = now + 180   // krótki oddech po pełnym wypełnieniu
+    const o = st.open < 0 || now < st.open ? 0 : still ? 1 : cl((now - st.open) / 1000 / 2.6)
+    const bt = st.open < 0 || now < st.open ? -1 : (now - st.open) / 1000; st.boardT = still && bt >= 0 ? 99 : bt
+    const m = smoother(cl(o / 0.72))             // ruch inicjałów: długi, miękki start i lądowanie
+    const r = cl((o - 0.12) / 0.86)              // rozkładanie reszty słowa (każda litera ma własne wygładzenie)
+    el.style.background = 'none'
+    c.clearRect(0, 0, W, H); c.font = n.font; c.letterSpacing = n.ls
+    // plansza 2D tylko do chwili odkrycia; potem tę samą ciemną planszę rysuje shader i ona chudnie do poziomic
+    if (bt < 0) { c.fillStyle = FG; c.fillRect(0, 0, W, H) }
+    const S = [c0.sx + (n.sx - c0.sx) * m, c0.y + (n.sy - c0.y) * m], K = [c0.kx + (n.kx - c0.kx) * m, c0.y + (n.ky - c0.y) * m]
+    // kolor litery: jasny na planszy, ciemny, gdy plansza pod nią schudła (liczone pod środkiem słowa)
+    const tone = (x, y, w) => bt < 0 ? LIGHT : mixHex(LIGHT, FG, cl((thinned(x + w / 2, y - n.asc / 2, bt) - 0.3) / 0.4))
+    word('Sebastian', S[0], S[1], n.s1, r, rS, st.shown, tone(S[0], S[1], n.sw * Math.max(r, 0.15)))
+    word('Kolbusz', K[0], K[1], n.k1, r, rK, st.shown, tone(K[0], K[1], n.kw * Math.max(r, 0.15)))
+    if (o >= 1 && bt > 2.55) { st.handoff = true; st.boardT = 99; return }
+    requestAnimationFrame(draw)
+  }
+  st.glFrame = () => { st.glReady = true; if (st.handoff && !st.done) { st.done = true; el.remove() } }
+  requestAnimationFrame(draw)
+  return st
+}
+
+async function loadTerrain(onProgress) {
+  const res = await fetch('../teren/teren-caly.js')
+  const total = +res.headers.get('content-length') || 1.25e6
+  const reader = res.body.getReader(); const parts = []; let got = 0
+  for (;;) { const { done, value } = await reader.read(); if (done) break; parts.push(value); got += value.length; onProgress(Math.min(got / total, 0.98)) }
+  const url = URL.createObjectURL(new Blob(parts, { type: 'text/javascript' }))
+  await new Promise((ok, err) => { const sc = document.createElement('script'); sc.src = url; sc.onload = ok; sc.onerror = err; document.head.append(sc) })
+  onProgress(1)
+}
+</script>
+</body>
+</html>

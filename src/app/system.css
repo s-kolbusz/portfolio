@@ -1,0 +1,34 @@
+/* The site's size system (v1, 17.11): one margin, one spacing scale, five text roles, two line weights.
+   Derived from the accepted hero (hero-textures.ts) so new parts line up with it. New UI uses only these. */
+:root {
+  --sys-margin: 6.67vw; /* page margin = the hero's margin */
+
+  /* spacing: multiples of 8 px */
+  --sys-s1: 8px;
+  --sys-s2: 16px;
+  --sys-s3: 24px;
+  --sys-s4: 32px;
+  --sys-s5: 48px;
+  --sys-s6: 64px;
+  --sys-s7: 96px;
+  --sys-s8: 128px;
+  --sys-touch: 44px; /* smallest touch target */
+
+  /* text roles */
+  --sys-xl: min(11.4vw, 20vh); /* the hero name; the menu's word */
+  --sys-l: calc(var(--sys-xl) * 0.72); /* lists, section titles */
+  --sys-lead: clamp(15px, 1.37vw, 2.45vh); /* the hero's sentences (Mattone 700) */
+  --sys-label: 12px; /* mono, uppercase, 0.3em: SEE THE WORK, MENU */
+  --sys-micro: 10px; /* mono, 0.12em: scale ticks */
+
+  --sys-line: 1px;
+  --sys-line-2: 3px;
+
+  --sys-paper: #fbf9f4;
+  --sys-ink: #2b2620;
+  --sys-ink-2: rgba(43, 38, 32, 0.72);
+  --sys-light: #f3efe6;
+  --sys-liquid: #0f9d63;
+  --sys-mono: ui-monospace, Menlo, monospace;
+  --sys-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+}

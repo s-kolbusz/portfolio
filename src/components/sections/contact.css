@@ -1,0 +1,291 @@
+/* Contact: the page's last part (owner, 2026-11-24). Paper, Mattone and the mono of the bar, as in the
+   price list's cards; mock and stills in cook/kontakt/.
+   Every size and gap comes from the site's system (system.css): the page margin, the 8 px scale and the
+   text roles. Rhythm, top to bottom: line → s3 → address → s4 → actions → s8 → the ways in, on four equal
+   columns of the content width (their left edges fall on quarters, not wherever the words end). */
+
+.ct {
+  --ct-mute: rgba(43, 38, 32, 0.58);
+  --ct-ease: cubic-bezier(0.33, 1, 0.68, 1);
+  --ct-mono: ui-monospace, Menlo, monospace;
+  position: relative;
+  width: 100%;
+  min-height: 100svh;
+  padding: var(--sys-s8) var(--sys-margin) 0;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  background: var(--sys-paper);
+  color: var(--sys-ink);
+}
+
+.ct-main {
+  align-self: center;
+}
+
+/* the line: the hero's sentence role */
+.ct-say {
+  margin: 0 0 var(--sys-s3);
+  font:
+    700 var(--sys-lead) / 1.15 'Mattone',
+    system-ui,
+    sans-serif;
+  letter-spacing: -0.01em;
+  color: var(--sys-ink-2);
+}
+
+.ct-mail {
+  display: inline-block;
+  color: var(--sys-ink);
+  text-decoration: none;
+}
+.ct-addr {
+  /* 12.9 em wide in Mattone Black: one line across the content width, never taller than 15vh */
+  font:
+    900 min(calc((100vw - 2 * var(--sys-margin)) / 12.95), 15vh) / 0.95 'Mattone',
+    system-ui,
+    sans-serif;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+  text-decoration: underline;
+  text-decoration-color: var(--sys-liquid);
+  text-decoration-thickness: var(--sys-line-2);
+  text-underline-offset: 0.2em;
+  text-decoration-skip-ink: auto;
+}
+.ct-at {
+  color: var(--ct-mute);
+  font-weight: 700;
+}
+.ct-dot {
+  color: var(--sys-liquid);
+}
+
+/* actions and the reply time on one line, all in the label role */
+.ct-row {
+  margin-top: var(--sys-s4);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sys-s2) var(--sys-s4);
+}
+.ct-copy,
+.ct-open,
+.ct-note,
+.ct-k,
+.ct-foot {
+  font: 400 var(--sys-label) / 1.4 var(--ct-mono);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+.ct-copy {
+  height: var(--sys-touch);
+  padding: 0 var(--sys-s2);
+  border: var(--sys-line) solid var(--sys-ink);
+  background: none;
+  color: var(--sys-ink);
+  cursor: pointer;
+  transition:
+    background-color 0.25s var(--ct-ease),
+    border-color 0.25s var(--ct-ease),
+    color 0.25s var(--ct-ease);
+}
+.ct-copy[data-done] {
+  background: var(--sys-liquid);
+  border-color: var(--sys-liquid);
+  color: var(--sys-paper);
+}
+.ct-open {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sys-s1);
+  height: var(--sys-touch);
+  color: var(--sys-ink);
+  text-decoration: none;
+}
+.ct-note {
+  margin: 0;
+  color: var(--sys-ink-2);
+  text-transform: none;
+  letter-spacing: 0.04em;
+}
+
+.ct-ways {
+  list-style: none;
+  margin: var(--sys-s8) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sys-s5) var(--sys-s4);
+}
+.ct-way {
+  display: block;
+  color: var(--sys-ink);
+  text-decoration: none;
+}
+.ct-k {
+  display: block;
+  margin-bottom: var(--sys-s2);
+  color: var(--sys-ink-2);
+}
+.ct-v {
+  /* the phone number, the widest, is 11.4 em: it must fit one column */
+  --ct-fit: calc((100vw - 2 * var(--sys-margin) - 3 * var(--sys-s4)) / 4 / 11.6);
+  /* 1.4 × the line: plainly readable, still under the address; the phone number fits a quarter */
+  font:
+    700 min(calc(var(--sys-lead) * 1.4), var(--ct-fit)) / 1.1 'Mattone',
+    system-ui,
+    sans-serif;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+.ct-v i {
+  display: inline-block;
+  margin-left: 0.25em;
+  font-size: 0.7em;
+  font-style: normal;
+  color: var(--sys-liquid);
+  transition: transform 0.3s var(--ct-ease);
+}
+
+@media (hover: hover) {
+  .ct-way:hover .ct-v i {
+    transform: translate(3px, -3px);
+  }
+  .ct-way:hover .ct-v,
+  .ct-open:hover {
+    color: var(--sys-liquid);
+  }
+  .ct-copy:not([data-done]):hover {
+    background: var(--sys-ink);
+    color: var(--sys-paper);
+  }
+}
+
+.ct-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sys-s1) var(--sys-s4);
+  flex-wrap: wrap;
+  margin-top: var(--sys-s7);
+  padding-bottom: var(--sys-s5);
+  color: var(--sys-ink-2);
+}
+.ct-foot p {
+  margin: 0;
+}
+
+/* coming in (once, when the address is on screen): the line rises word by word out of its own line, as the
+   act 4 sentences do; the address is then written from left to right, its underline with it; the actions
+   and the ways in follow one by one, and the footer last. With reduced motion everything simply stands. */
+.ct-word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  /* room for descenders inside the mask */
+  padding-bottom: 0.15em;
+  margin-bottom: -0.15em;
+}
+.ct-word > span {
+  display: inline-block;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ct {
+    --ct-in: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .ct-word > span {
+    transform: translateY(110%);
+    transition: transform 0.8s var(--ct-in) calc(var(--i) * 70ms);
+  }
+  .ct-addr {
+    clip-path: inset(-0.2em 100% -0.45em 0);
+    transition: clip-path 1.1s var(--ct-in) 0.3s;
+  }
+  .ct-row,
+  .ct-ways li,
+  .ct-foot {
+    opacity: 0;
+    transform: translateY(var(--sys-s3));
+    transition:
+      opacity 0.7s var(--ct-in),
+      transform 0.9s var(--ct-in);
+  }
+  .ct-row {
+    transition-delay: 1s;
+  }
+  .ct-ways li {
+    transition-delay: calc(1.15s + var(--i) * 90ms);
+  }
+  .ct-foot {
+    transform: none;
+    transition-delay: 1.6s;
+  }
+  .ct[data-shown] .ct-word > span {
+    transform: none;
+  }
+  .ct[data-shown] .ct-addr {
+    clip-path: inset(-0.2em -0.1em -0.45em 0);
+  }
+  .ct[data-shown] :is(.ct-row, .ct-ways li, .ct-foot) {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* tablets: the four ways in two rows of two */
+@media (max-width: 1100px) {
+  .ct-ways {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .ct-v {
+    --ct-fit: calc((100vw - 2 * var(--sys-margin) - var(--sys-s4)) / 2 / 11.6);
+  }
+}
+
+@media (max-width: 700px) {
+  .ct {
+    padding-top: var(--sys-s7);
+  }
+  .ct-main {
+    align-self: start;
+  }
+  .ct-say {
+    margin-bottom: var(--sys-s2);
+  }
+  .ct-addr {
+    /* two lines: the name, then the domain */
+    font-size: calc((100vw - 2 * var(--sys-margin)) / 8.3);
+    line-height: 1;
+    white-space: normal;
+  }
+  .ct-dom {
+    display: block;
+  }
+  .ct-row {
+    margin-top: var(--sys-s3);
+    column-gap: var(--sys-s3);
+  }
+  /* the two actions keep one line at 390 */
+  .ct-copy,
+  .ct-open {
+    letter-spacing: 0.2em;
+  }
+  .ct-note {
+    flex-basis: 100%;
+  }
+  .ct-ways {
+    grid-template-columns: 1fr;
+    gap: var(--sys-s4);
+    margin-top: var(--sys-s6);
+  }
+  .ct-k {
+    margin-bottom: var(--sys-s1);
+  }
+  .ct-v {
+    font-size: calc(var(--sys-lead) * 1.45);
+  }
+  .ct-foot {
+    flex-direction: column;
+    margin-top: var(--sys-s6);
+    padding-bottom: var(--sys-s4);
+  }
+}

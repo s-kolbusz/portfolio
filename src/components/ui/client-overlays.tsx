@@ -17,21 +17,15 @@ const SmoothScroller = dynamic(
   () => import('@/components/ui/smooth-scroller').then((mod) => ({ default: mod.SmoothScroller })),
   { ssr: false }
 )
-const DockNav = dynamic(
-  () => import('@/components/ui/dock-nav').then((mod) => ({ default: mod.DockNav })),
-  {
-    ssr: false,
-  }
-)
-const SettingsDock = dynamic(
-  () => import('@/components/ui/settings-dock').then((mod) => ({ default: mod.SettingsDock })),
+const SiteNav = dynamic(
+  () => import('@/components/ui/site-nav/site-nav').then((mod) => ({ default: mod.SiteNav })),
   { ssr: false }
 )
 
 // Load overlays in three staggered phases to avoid a synchronized burst on the main thread.
-// Phase 1 (300ms):  SmoothScroller + back buttons — needed early for scroll/navigation
-// Phase 2 (700ms):  CustomCursor — interactive, but not blocking
-// Phase 3 (1200ms): DockNav + SettingsDock — decorative UI, load last
+// Phase 1 (300ms):  SmoothScroller + CustomCursor
+// Phase 2 (700ms):  SiteNav — on the home page it stays hidden until the hero's loader is gone
+// Phase 3 (1200ms): back buttons
 export function ClientOverlays() {
   const [phase, setPhase] = useState(0)
 
@@ -50,8 +44,7 @@ export function ClientOverlays() {
     <>
       {phase >= 1 && <SmoothScroller />}
       {phase >= 1 && <CustomCursor />}
-      {phase >= 2 && <DockNav />}
-      {phase >= 2 && <SettingsDock />}
+      {phase >= 2 && <SiteNav />}
       {phase >= 3 && <CaseStudyBackButton />}
       {phase >= 3 && <ServicesBackButton />}
     </>
