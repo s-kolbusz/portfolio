@@ -282,6 +282,7 @@ export function HowIWorkEnd() {
       }
     }
 
+    const onScroll = CSS.supports('animation-timeline: view()')
     let frame = 0
     let near = true
     let alive = true
@@ -296,8 +297,11 @@ export function HowIWorkEnd() {
       const s = -rect.top / Math.max(1, window.innerHeight)
       // paper over screen 3
       const a = glide(span(s, S.cover))
-      const y = H + edge - (H + edge * 2) * a
-      paper!.style.setProperty('--y', `${y.toFixed(1)}px`)
+      // where the scroll itself runs the rise and the lift (how-i-work-end.css), the script leaves them
+      if (!onScroll) {
+        const y = H + edge - (H + edge * 2) * a
+        paper!.style.setProperty('--y', `${y.toFixed(1)}px`)
+      }
       paper!.toggleAttribute('data-full', a >= 1)
       stage!.toggleAttribute('data-over', a > 0.5)
       stage!.toggleAttribute('data-covered', a >= 1)
@@ -308,7 +312,7 @@ export function HowIWorkEnd() {
       groups!.dataset.g = shown
       // the sheet lifts off what lies under it; the offers fold only as far as they must
       const l = glide(span(s, liftSpan))
-      set('--lift', -(H - seam) * l)
+      if (!onScroll) set('--lift', -(H - seam) * l)
       const g = glide(span(l, [0, 0.6]))
       stage!.style.setProperty('--c', (g * foldTo).toFixed(3))
       stage!.style.setProperty('--c2', (g * foldHeads).toFixed(3))
@@ -412,7 +416,9 @@ export function HowIWorkEnd() {
         {/* the sheet: paper with its drawn ground, rising over screen 3; at the end it lifts */}
         <div className="cl-sheet">
           <div className="cl-paper" aria-hidden="true">
-            <canvas ref={canvasRef} className="cl-ground" />
+            <div className="cl-paper-in">
+              <canvas ref={canvasRef} className="cl-ground" />
+            </div>
           </div>
         </div>
         {/* what is written on the sheet moves with it and fades under the site's bar */}
