@@ -961,3 +961,29 @@ html.site-menu-open [data-adapt-theme='pointer'] {
     display: none;
   }
 }
+
+/* ---------- subpages (2026-11-27): the bar names the page and its current part; the menu lists the
+   built subpages under the home page's parts, after a quiet label, with the page you are on marked ---------- */
+.site-bar__page {
+  color: var(--sys-ink-2);
+}
+.ruler__group {
+  position: absolute;
+  left: 0;
+  top: calc(var(--i) * var(--row));
+  height: var(--row);
+  display: flex;
+  align-items: flex-end;
+  padding: 0 0 calc(var(--row) * 0.18) var(--sys-s3);
+  list-style: none;
+  font: var(--sys-micro) / 1 var(--sys-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--sys-ink-2);
+}
+@media (hover: hover) and (min-width: 701px) {
+  .ruler__group {
+    padding-left: var(--sys-s4);
+  }
+}

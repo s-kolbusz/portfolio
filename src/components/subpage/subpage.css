@@ -1,0 +1,334 @@
+/* The shared frame of the redesign's subpages (owner, 2026-11-26; board in the session notes, podstrona-kadr).
+   Only the first screen's grammar and the ending are shared; the middle belongs to each page. Sizes come
+   from the site's system (system.css) and the approved frame: Mattone for titles, Satoshi for reading,
+   the bar's mono for labels and facts. Each page may set its own paper and ink with --sp-bg / --sp-fg. */
+
+@font-face {
+  font-family: 'Mattone';
+  font-weight: 900;
+  font-display: swap;
+  src: url('/fonts/mattone/Mattone-Black.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Mattone';
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/mattone/Mattone-Bold.woff2') format('woff2');
+}
+
+.sp {
+  --sp-bg: var(--sys-paper);
+  --sp-fg: var(--sys-ink);
+  --sp-fg-2: rgba(43, 38, 32, 0.72);
+  --sp-fg-3: rgba(43, 38, 32, 0.42);
+  --sp-mono: ui-monospace, Menlo, monospace;
+  --sp-in: cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  width: 100%;
+  background: var(--sp-bg);
+  color: var(--sp-fg);
+  overflow-x: clip;
+}
+
+.sp-label {
+  margin: 0;
+  font: 400 var(--sys-micro) / 1.4 var(--sp-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sp-fg-2);
+}
+
+/* ---------- first screen ---------- */
+.sp-open {
+  position: relative;
+  min-height: max(100svh, 720px);
+  padding: calc(var(--sys-s8) + var(--sys-s3)) var(--sys-margin) var(--sys-s6);
+  display: grid;
+  grid-template-columns: minmax(0, 620px) 1fr;
+  grid-template-rows: auto 1fr auto;
+  column-gap: var(--sys-s5);
+}
+.sp-open__text {
+  grid-column: 1;
+  grid-row: 1;
+}
+.sp-title {
+  margin: var(--sys-s4) 0 0;
+  max-width: 600px;
+  font:
+    900 clamp(34px, 4.13vw, 80px) / 1.04 'Mattone',
+    system-ui,
+    sans-serif;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.sp-line {
+  margin: var(--sys-s4) 0 0;
+  max-width: 44ch;
+  font: 400 14px / 1.6 var(--sp-mono);
+  color: var(--sp-fg-2);
+}
+.sp-open__obj {
+  grid-column: 2;
+  grid-row: 1 / 4;
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 0;
+}
+.sp-facts {
+  grid-column: 1;
+  grid-row: 3;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sys-s4) var(--sys-s5);
+  max-width: 600px;
+}
+.sp-facts dt {
+  margin-bottom: 10px;
+  font: 400 var(--sys-micro) / 1 var(--sp-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sp-fg-3);
+}
+.sp-facts dd {
+  margin: 0;
+  font:
+    700 15px / 1.35 'Mattone',
+    system-ui,
+    sans-serif;
+}
+.sp-facts small {
+  display: block;
+  margin-top: 4px;
+  font: 400 12px / 1.5 var(--sp-mono);
+  color: var(--sp-fg-2);
+}
+
+/* words rise out of their own line (as on the home page) */
+.sp-word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+.sp-word > span {
+  display: inline-block;
+}
+
+/* entry: the frame grows in. CSS only, so it plays on the first paint, before any script. */
+@media (prefers-reduced-motion: no-preference) {
+  .sp-open .sp-word > span {
+    animation: sp-rise 0.9s var(--sp-in) both;
+    animation-delay: calc(0.15s + var(--i) * 70ms);
+  }
+  .sp-open .sp-in {
+    animation: sp-up 0.8s var(--sp-in) both;
+    animation-delay: calc(0.15s + var(--i) * 70ms);
+  }
+  .sp-open__obj > * {
+    animation: sp-swell 1.3s var(--sp-in) 0.25s both;
+  }
+}
+@keyframes sp-rise {
+  from {
+    transform: translateY(110%);
+  }
+}
+@keyframes sp-up {
+  from {
+    opacity: 0;
+    transform: translateY(var(--sys-s3));
+  }
+}
+@keyframes sp-swell {
+  from {
+    opacity: 0;
+    transform: scale(0.55);
+  }
+  60% {
+    opacity: 1;
+  }
+}
+
+/* parts further down come in when they reach the screen (reveal.tsx) */
+@media (prefers-reduced-motion: no-preference) {
+  .sp-reveal[data-rv-ready] [data-rv]:not([data-in]) .sp-word > span {
+    transform: translateY(110%);
+  }
+  .sp-reveal[data-rv-ready] [data-rv] .sp-word > span {
+    transition: transform 0.9s var(--sp-in) calc(var(--i, 0) * 60ms);
+  }
+  .sp-reveal[data-rv-ready] [data-rv='up']:not([data-in]) {
+    opacity: 0;
+    transform: translateY(var(--sys-s5));
+  }
+  .sp-reveal[data-rv-ready] [data-rv='up'] {
+    transition:
+      opacity 0.9s var(--sp-in) var(--d, 0s),
+      transform 1.1s var(--sp-in) var(--d, 0s);
+  }
+}
+
+/* ---------- ending: contact (from the home page), then the door ---------- */
+.sp-end {
+  position: relative;
+  background: var(--sys-paper);
+  color: var(--sys-ink);
+}
+
+/* the runway: the band stretches over it, the door itself sticks to the bottom of the screen */
+.sp-door-run {
+  --door-h: max(520px, 58svh);
+  position: relative;
+  height: calc(var(--door-h) + var(--run) * 100svh);
+  border-top: 1px solid rgba(43, 38, 32, 0.13);
+  background: var(--sys-paper);
+}
+/* the stretch shows as a widening green seam under the band's top edge */
+.sp-door-run::before {
+  content: '';
+  position: absolute;
+  left: var(--sys-margin);
+  top: -1px;
+  height: 3px;
+  width: calc((100% - 2 * var(--sys-margin)) * var(--pull));
+  background: var(--sys-liquid);
+}
+.sp-door {
+  position: sticky;
+  top: calc(100svh - var(--door-h));
+  height: var(--door-h);
+  overflow: hidden;
+  padding: var(--sys-s6) var(--sys-margin) 0;
+}
+.sp-door__next {
+  display: inline-block;
+  margin-top: var(--sys-s3);
+  font:
+    900 clamp(34px, calc((100vw - 2 * var(--sys-margin)) * 0.033), 104px) / 1 'Mattone',
+    system-ui,
+    sans-serif;
+  letter-spacing: -0.03em;
+  color: var(--sys-ink);
+  text-decoration: none;
+  transform-origin: 0 100%;
+  transform: scale(calc(1 + var(--pull) * 0.25));
+}
+.sp-door__tail {
+  color: #b5b0a7;
+  transition: color 0.4s ease;
+}
+.sp-door[data-pulled] .sp-door__tail {
+  color: var(--sys-ink);
+}
+.sp-door__line {
+  margin: var(--sys-s3) 0 0;
+  max-width: 40ch;
+  font:
+    400 19px / 1.5 var(--font-sans),
+    system-ui,
+    sans-serif;
+  color: var(--sp-fg-2, rgba(43, 38, 32, 0.72));
+  opacity: calc(1 - var(--pull) * 1.6);
+}
+/* a glimpse of the next page's first screen: it rises and straightens as the band is pulled */
+.sp-door__peek {
+  position: absolute;
+  right: var(--sys-margin);
+  top: calc(200px - var(--pull) * 120px);
+  width: min(560px, 38vw);
+  height: 420px;
+  overflow: hidden;
+  transform: translateX(calc(var(--pull) * 60px)) rotate(calc(2.2deg - var(--pull) * 2.2deg));
+  box-shadow: 0 30px 60px rgba(43, 38, 32, 0.18);
+}
+.sp-door__pull {
+  position: absolute;
+  left: var(--sys-margin);
+  bottom: 40px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font: 400 10.5px / 1 var(--sp-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(43, 38, 32, 0.72);
+}
+.sp-door__pull b {
+  position: relative;
+  width: 120px;
+  height: 1px;
+  background: var(--sys-ink);
+}
+.sp-door__pull b::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -1px;
+  height: 3px;
+  width: calc(34px + var(--pull) * 86px);
+  background: var(--sys-liquid);
+}
+
+/* ---------- phones ---------- */
+@media (max-width: 700px) {
+  .sp-open {
+    min-height: 0;
+    padding: calc(var(--sys-s7) + var(--sys-s1)) var(--sys-margin) var(--sys-s5);
+    display: block;
+  }
+  .sp-title {
+    margin-top: 20px;
+    font-size: 33px;
+  }
+  .sp-line {
+    margin-top: 18px;
+    font-size: 13px;
+  }
+  .sp-open__obj {
+    margin-top: var(--sys-s4);
+  }
+  .sp-facts {
+    margin-top: var(--sys-s4);
+    gap: 26px 20px;
+  }
+  .sp-door-run {
+    --door-h: max(470px, 62svh);
+  }
+  .sp-door {
+    padding-top: 44px;
+  }
+  .sp-door__next {
+    font-size: calc((100vw - 2 * var(--sys-margin)) / 8.6);
+    white-space: normal;
+  }
+  .sp-door__line {
+    font-size: 16px;
+  }
+  .sp-door__peek {
+    top: auto;
+    bottom: calc(-40px + var(--pull) * 90px);
+    right: -30px;
+    width: 300px;
+    height: 240px;
+  }
+}
+
+/* reduced motion: the door is a plain section, its title a link */
+@media (prefers-reduced-motion: reduce) {
+  .sp-door-run {
+    height: auto;
+  }
+  .sp-door {
+    position: relative;
+    top: auto;
+  }
+  .sp-door__pull {
+    display: none;
+  }
+}

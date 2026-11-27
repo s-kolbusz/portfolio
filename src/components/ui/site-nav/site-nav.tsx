@@ -5,14 +5,16 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import { useLocale, useTranslations } from 'next-intl'
 
 import { STUDIO, STUDIO_LINK_REL } from '@/data/studio'
+import { SUBPAGES } from '@/data/subpages'
 import { Link, usePathname, useRouter } from '@/i18n/navigation-v2'
+import { isV2Page } from '@/i18n/v2-pages'
 import { isHomeRoute, isProjectDetailRoute, isServicesRoute } from '@/lib/route-predicates'
 import { useScrollStore } from '@/lib/stores'
 
 import { createMenuWater, type MenuWater } from './menu-water'
 import { NavSign } from './nav-sign'
 import { useSkFlight } from './sk-flight'
-import { STOPS, locate, stopBounds, stopShares } from './stops'
+import { READING_LINE, STOPS, locate, stopBounds, stopShares } from './stops'
 
 import './site-nav.css'
 
@@ -34,6 +36,9 @@ const ELSEWHERE = [
 
 type Phase = 'closed' | 'open' | 'closing' | 'leaving'
 
+/** the subpages built in the new design, listed in the menu under the home page's parts */
+const PAGES = SUBPAGES.filter((page) => isV2Page(page.href))
+
 /** the stronypodhale.pl wordmark exactly as its logo */
 function Wordmark() {
   return (
@@ -48,6 +53,7 @@ function Wordmark() {
 export function SiteNav() {
   const t = useTranslations('nav')
   const tf = useTranslations('navFacts')
+  const tp = useTranslations('subpages')
   const locale = useLocale()
   const pathname = usePathname()
   const router = useRouter()
@@ -62,6 +68,12 @@ export function SiteNav() {
   const [shares, setShares] = useState<number[]>(() => STOPS.map(() => 1 / STOPS.length))
   const [solid, setSolid] = useState(!isHome)
   const [flat, setFlat] = useState(false)
+  // a subpage of the redesign (subpage-frame.tsx): its own name and its own scale in the bar
+  const [subpage, setSubpage] = useState<string | null>(null)
+  const [subIndex, setSubIndex] = useState(0)
+  const [subShares, setSubShares] = useState<number[]>([1])
+  // the subpage's current part, named by its data-sp-name (none on the first screen)
+  const [subPart, setSubPart] = useState<string | null>(null)
 
   const toggleRef = useRef<HTMLButtonElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -72,8 +84,15 @@ export function SiteNav() {
   const openFrom = useRef({ x: 0, y: 0 })
 
   const open = phase === 'open'
-  const active = hover ?? index
   const label = (i: number) => (STOPS[i].brand ? STOPS[i].label : t(STOPS[i].label))
+  // the menu's rows: the home page's parts, a labelled gap, then the subpages
+  const pageRow = (j: number) => STOPS.length + 1 + j
+  const pageAt = (i: number) => (i >= STOPS.length + 1 ? PAGES[i - STOPS.length - 1] : null)
+  const pageHere = PAGES.findIndex((page) => page.href === pathname)
+  const hereRow = isHome ? index : pageHere >= 0 ? pageRow(pageHere) : -1
+  const active = hover ?? Math.max(hereRow, 0)
+  const activePage = pageAt(active)
+  const pageTitle = (key: string) => `${tp(`${key}.title`)}${tp(`${key}.tail`)}`
 
   // --- where we are on the page: the scale (bar and menu) follows the scroll
   useEffect(() => {
@@ -117,6 +136,58 @@ export function SiteNav() {
       window.clearInterval(late)
     }
   }, [isHome])
+
+  // --- on a subpage the scale follows that page: one tick per part marked data-sp-stop
+  useEffect(() => {
+    if (isHome) return
+    const page = document.querySelector<HTMLElement>('[data-subpage]')
+    if (!page) return
+    let raf = 0
+    const measure = () => {
+      raf = 0
+      setSubpage(page.dataset.name ?? null)
+      const vh = window.innerHeight
+      const max = document.documentElement.scrollHeight - vh
+      const parts = Array.from(page.querySelectorAll<HTMLElement>('[data-sp-stop]'))
+      const tops = parts.map((el, i) =>
+        i === 0 ? 0 : el.getBoundingClientRect().top + window.scrollY - READING_LINE * vh
+      )
+      if (!tops.length) return
+      const bounds = [...tops, Math.max(max, tops[tops.length - 1] + 1)]
+      for (let i = 1; i < bounds.length; i++) bounds[i] = Math.max(bounds[i], bounds[i - 1] + 1)
+      const pos = locate(window.scrollY, bounds)
+      const next = stopShares(bounds)
+      const before = next.slice(0, pos.index).reduce((a, b) => a + b, 0)
+      page.ownerDocument
+        .querySelectorAll<HTMLElement>('.site-bar [data-scale]')
+        .forEach((scale) => {
+          scale.style.setProperty('--pos', (before + next[pos.index] * pos.progress).toFixed(4))
+        })
+      setSubIndex(pos.index)
+      const part = parts[pos.index]
+      setSubPart(part?.dataset.spName ?? (part?.classList.contains('sp-end') ? t('contact') : null))
+      setSubShares((prev) =>
+        prev.length === next.length && prev.every((s, i) => Math.abs(s - next[i]) < 0.002)
+          ? prev
+          : next
+      )
+    }
+    const schedule = () => {
+      if (!raf) raf = requestAnimationFrame(measure)
+    }
+    measure()
+    window.addEventListener('scroll', schedule, { passive: true })
+    window.addEventListener('resize', schedule)
+    const late = window.setInterval(schedule, 1500)
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('scroll', schedule)
+      window.removeEventListener('resize', schedule)
+      window.clearInterval(late)
+      setSubpage(null)
+      setSubPart(null)
+    }
+  }, [isHome, pathname, t])
 
   // --- the bar waits for the loader: nothing sits on the dark loading board
   useEffect(() => {
@@ -330,7 +401,8 @@ export function SiteNav() {
   // the word, the page moves while covered, so no pinned scene has to be scrolled through on the way
   const SHORT = ['prices', 'contact'].map((id) => STOPS.findIndex((stop) => stop.id === id))
   const jump = (e: React.MouseEvent, i: number) => {
-    if (!isHome) return
+    // a subpage that has the part itself (the contact) is not left for the home page
+    if (!isHome && !document.getElementById(STOPS[i].id)) return
     e.preventDefault()
     const id = STOPS[i].id
     const water = ensureWater()
@@ -357,6 +429,8 @@ export function SiteNav() {
   }
 
   const starts = shares.map((_, i) => shares.slice(0, i).reduce((a, b) => a + b, 0))
+  const barShares = subpage ? subShares : shares
+  const barStarts = barShares.map((_, i) => barShares.slice(0, i).reduce((a, b) => a + b, 0))
 
   return (
     <>
@@ -381,7 +455,7 @@ export function SiteNav() {
         </Link>
         {sk.node}
         <div className="site-bar__right">
-          {isHome && (
+          {(isHome || subpage) && (
             <button
               type="button"
               className="site-bar__where"
@@ -389,21 +463,30 @@ export function SiteNav() {
               aria-hidden="true"
               onClick={() => (open ? closeMenu() : openMenu())}
             >
-              <span className="site-bar__no">{String(index + 1).padStart(2, '0')}</span>
+              <span className="site-bar__no">
+                {String((subpage ? subIndex : index) + 1).padStart(2, '0')}
+              </span>
               <span className="site-bar__name">
-                <span key={index} className="site-bar__name-in">
-                  {label(index)}
+                <span
+                  key={subpage ? `${subpage}-${subIndex}` : index}
+                  className="site-bar__name-in"
+                >
+                  {subpage && subPart ? (
+                    <>
+                      <span className="site-bar__page">{subpage}</span> · {subPart}
+                    </>
+                  ) : subpage ? (
+                    subpage
+                  ) : (
+                    label(index)
+                  )}
                 </span>
               </span>
               <span className="scale" data-scale aria-hidden="true">
                 <span className="scale__line">
                   <span className="scale__done" />
-                  {starts.map((start, i) => (
-                    <span
-                      key={STOPS[i].id}
-                      className="scale__tick"
-                      style={{ left: `${start * 100}%` }}
-                    />
+                  {barStarts.map((start, i) => (
+                    <span key={i} className="scale__tick" style={{ left: `${start * 100}%` }} />
                   ))}
                   <span className="scale__tick scale__tick--end" />
                   <span className="scale__here" />
@@ -460,8 +543,17 @@ export function SiteNav() {
         {/* the part you are on, or the one you point at: its sign and its sentence (desktop only) */}
         <div className="site-menu__word" aria-hidden="true" data-surface>
           <span key={active} className="site-menu__word-in">
-            <NavSign id={STOPS[active].id} wordmark={<Wordmark />} />
-            <span className="f">{tf(STOPS[active].id)}</span>
+            {activePage ? (
+              <>
+                <span className="sign sign--name">{pageTitle(activePage.key)}</span>
+                <span className="f">{tp(`${activePage.key}.line`)}</span>
+              </>
+            ) : (
+              <>
+                <NavSign id={STOPS[active].id} wordmark={<Wordmark />} />
+                <span className="f">{tf(STOPS[active].id)}</span>
+              </>
+            )}
           </span>
         </div>
 
@@ -470,7 +562,11 @@ export function SiteNav() {
             className="ruler"
             data-scale
             style={
-              { '--here': index, '--to': active, '--stops': STOPS.length } as React.CSSProperties
+              {
+                '--here': index,
+                '--to': active,
+                '--stops': STOPS.length + (PAGES.length ? 1 + PAGES.length : 0),
+              } as React.CSSProperties
             }
           >
             <li className="ruler__done" aria-hidden="true" />
@@ -511,11 +607,55 @@ export function SiteNav() {
                 </li>
               )
             })}
+            {PAGES.length > 0 && (
+              <li
+                className="ruler__group"
+                aria-hidden="true"
+                style={{ '--i': STOPS.length } as React.CSSProperties}
+              >
+                {t('pages')}
+              </li>
+            )}
+            {PAGES.map((page, j) => {
+              const i = pageRow(j)
+              const here = j === pageHere
+              return (
+                // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
+                <li
+                  key={page.key}
+                  className="ruler__stop ruler__stop--page"
+                  onClick={(e) => {
+                    if (!(e.target as HTMLElement).closest('a')) router.push(page.href)
+                    closeMenu(false)
+                  }}
+                  onPointerEnter={() => setHover(i)}
+                  onPointerLeave={() => setHover((h) => (h === i ? null : h))}
+                  data-here={here || undefined}
+                  data-active={i === active || undefined}
+                  style={{ '--start': 0, '--share': 0, '--i': i } as React.CSSProperties}
+                >
+                  <Link
+                    href={page.href}
+                    data-stop
+                    onFocus={() => setHover(i)}
+                    onBlur={() => setHover((h) => (h === i ? null : h))}
+                    aria-current={here ? 'page' : undefined}
+                  >
+                    <span className="ruler__name">{pageTitle(page.key)}</span>
+                    {here && (
+                      <span className="ruler__mark" aria-hidden="true">
+                        ← {t('here')}
+                      </span>
+                    )}
+                  </Link>
+                </li>
+              )
+            })}
           </ol>
         </nav>
 
         <p className="site-menu__fact" aria-hidden="true" data-surface>
-          {tf(STOPS[active].id)}
+          {activePage ? tp(`${activePage.key}.line`) : tf(STOPS[active].id)}
         </p>
 
         <div className="site-menu__foot" data-surface>

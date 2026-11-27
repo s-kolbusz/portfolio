@@ -1,0 +1,925 @@
+/* About ("Kim jestem"), scenario 2 (owner, 2026-11-27): how I learn. Each path: a heading, the story
+   with its own proof, and how it stands today. Each moves the way its own thing works: the hardware
+   and my own screen at two speeds (home), the photo printed in from the bottom up (printer), the names
+   come in as doors (work); in home the vendors' app tiles run together into one Home Assistant
+   dashboard. Until the owner's photos come, stand-ins say what goes where (2026-11-27: a sample
+   readout and a drawn parts stack read as AI-made and were removed; the tiles and the long headings
+   with photo capsules stay, the owner liked them).
+   The motion runs on the scroll itself (animation-timeline), with no script per frame; where the
+   browser cannot do that, and with reduced motion, everything simply stands in its final place.
+
+   One content width (--ab-w): the page's width less its margins, up to 1440 px, or more on a tall
+   screen (1.5 screen heights), so on an ultrawide 1440p nothing stretches and the type does not
+   shrink against the screen. Every size inside is a share of it (--u is a hundredth). */
+
+.ab {
+  --ab-w: min(100vw - 2 * var(--sys-margin), max(1440px, 150svh));
+  --u: calc(var(--ab-w) / 100);
+}
+.ab b {
+  font-weight: 500;
+  color: var(--sp-fg);
+}
+
+/* ---------- the first screen: one paragraph (Fable's board B, owner 2026-11-27) ----------
+   The title runs on into the four facts; the paragraph starts on the content's left edge, the same
+   edge as every part below, and its lines take the content's full width. Its size follows the width,
+   held under the screen's height so the longer English still fits one screen, and over a share of it
+   so a tall tablet is not left half empty. */
+.ab-open {
+  position: relative;
+  box-sizing: border-box;
+  width: var(--ab-w);
+  min-height: max(100svh, 680px);
+  margin-inline: auto;
+  padding: calc(var(--sys-s8) + var(--sys-s2)) 0 var(--sys-s6);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--sys-s6);
+}
+.ab-para {
+  font:
+    900 clamp(30px, max(min(calc(var(--u) * 5.75), 7.8svh), 4.6svh), 132px) / 1.28 'Mattone',
+    system-ui,
+    sans-serif;
+  letter-spacing: -0.022em;
+  color: #a39d92;
+}
+/* ultrawide: the width allows more, so the paragraph takes more of the screen's height */
+@media (min-aspect-ratio: 2/1) {
+  .ab-para {
+    font-size: clamp(30px, min(calc(var(--u) * 6), 8.4svh), 140px);
+  }
+}
+.ab-para__t,
+.ab-para__f {
+  display: inline;
+  margin: 0;
+  font: inherit;
+}
+.ab-para__t {
+  color: var(--sp-fg);
+}
+/* a fact's old label, hung small beside its word */
+.ab-note {
+  display: inline-block;
+  vertical-align: top;
+  margin: 0.62em 0 0 0.55em;
+  font: 400 clamp(8.5px, calc(var(--u) * 0.72), 15px) / 1.5 var(--sp-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: left;
+  white-space: nowrap;
+  color: var(--sp-fg-2);
+}
+.ab-note b {
+  display: block;
+  font-weight: 400;
+  color: var(--sp-fg-3);
+}
+/* the pills: what each part below shows, in the sentence */
+.ab-pp,
+.ab-pha,
+.ab-prd {
+  position: relative;
+  display: inline-block;
+  height: 0.78em;
+  margin: 0 0.06em;
+  vertical-align: -0.06em;
+  border-radius: 0.39em;
+  overflow: hidden;
+  rotate: -2deg;
+}
+.ab-pp {
+  width: 2.1em;
+  background:
+    repeating-linear-gradient(-45deg, transparent 0 9px, rgba(43, 38, 32, 0.06) 9px 10px), #e8e2d6;
+}
+.ab-pp[data-tilt='r'],
+.ab-pha {
+  rotate: 1.6deg;
+}
+.ab-pp span {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.45em;
+  font: 400 clamp(7px, calc(var(--u) * 0.72), 14px) / 1.25 var(--sp-mono);
+  letter-spacing: 0;
+  text-align: center;
+  color: var(--sp-fg-2);
+}
+.ab-pha {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.07em;
+  width: 2.4em;
+  background: var(--sys-ink);
+}
+.ab-pha i {
+  width: 0.32em;
+  height: 0.32em;
+  border-radius: 0.08em;
+}
+.ab-prd {
+  width: 2.9em;
+  background: #1f1c18;
+}
+.ab-prd > span {
+  position: absolute;
+  left: 0.4em;
+  top: 0.16em;
+  display: flex;
+  flex-direction: column;
+  font: 400 clamp(5px, calc(var(--u) * 0.7), 14px) / 1.55 var(--sp-mono);
+  letter-spacing: 0;
+  white-space: nowrap;
+  color: rgba(251, 249, 244, 0.75);
+}
+.ab-prd [data-row='0'] {
+  color: #5fd3a0;
+}
+.ab-prd [data-row='1'] {
+  color: #fbf9f4;
+  font-weight: 700;
+}
+.ab-pn {
+  display: inline-block;
+  margin: 0 0.12em;
+  padding: 0.22em 0.55em 0.24em;
+  vertical-align: 0.5em;
+  border: 2px solid var(--sp-fg);
+  border-radius: 99px;
+  font: 400 0.3em/1 var(--sp-mono);
+  letter-spacing: 0;
+  color: var(--sp-fg);
+  text-decoration: none;
+  rotate: -1.5deg;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+.ab-pn:hover,
+.ab-pn:focus-visible {
+  background: var(--sp-fg);
+  color: var(--sys-paper);
+}
+.ab-pn:focus-visible {
+  outline: 2px solid var(--sys-liquid);
+  outline-offset: 4px;
+}
+.ab-open__foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--sys-s4);
+}
+.ab-open__line {
+  margin: 0;
+  max-width: 44ch;
+  font:
+    500 clamp(15px, calc(var(--u) * 1.35), 28px) / 1.5 var(--font-sans),
+    system-ui,
+    sans-serif;
+  color: var(--sp-fg-2);
+}
+.ab-open__label {
+  white-space: nowrap;
+}
+
+/* entry: the title rises word by word, the facts follow, then each pill opens in its place */
+@media (prefers-reduced-motion: no-preference) {
+  .ab-para__t .sp-word > span {
+    animation: sp-rise 0.9s var(--sp-in) both;
+    animation-delay: calc(0.1s + var(--i) * 70ms);
+  }
+  .ab-para__f {
+    animation: sp-up 1s var(--sp-in) 0.45s both;
+  }
+  .ab-pp,
+  .ab-pha,
+  .ab-prd,
+  .ab-pn {
+    animation: ab-pill 0.8s var(--sp-in) both;
+    animation-delay: calc(0.9s + var(--n) * 110ms);
+    transform-origin: 0 50%;
+  }
+  .ab-open__foot {
+    animation: sp-up 0.9s var(--sp-in) 1.1s both;
+  }
+}
+@keyframes ab-pill {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+}
+
+/* ---------- a path: question, path, decision ---------- */
+.ab-path {
+  width: var(--ab-w);
+  margin-inline: auto;
+  padding-top: calc(var(--u) * 17);
+}
+.ab-home {
+  padding-top: calc(var(--u) * 11);
+}
+.ab-q {
+  margin: 0;
+  max-width: 17ch;
+  font:
+    900 clamp(30px, calc(var(--u) * 5.2), 120px) / 1.06 'Mattone',
+    system-ui,
+    sans-serif;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+.ab-tx {
+  margin: 0;
+  max-width: 40ch;
+  font:
+    400 clamp(16px, calc(var(--u) * 1.3), 28px) / 1.6 var(--font-sans),
+    system-ui,
+    sans-serif;
+  color: var(--sp-fg-2);
+}
+.ab-tx + .ab-tx {
+  margin-top: 1em;
+}
+/* the long headings: a sentence with photo capsules inside it */
+.ab-say {
+  max-width: none;
+  font-size: clamp(28px, calc(var(--u) * 4.1), 92px);
+  line-height: 1.16;
+  text-wrap: pretty;
+}
+.ab-pill {
+  position: relative;
+  display: inline-block;
+  width: 3.5em;
+  height: 0.98em;
+  margin: 0 0.06em;
+  vertical-align: -0.16em;
+  border-radius: 0.5em;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(-45deg, transparent 0 7px, rgba(43, 38, 32, 0.07) 7px 8px), #e8e2d6;
+  rotate: -2deg;
+}
+.ab-pill[data-tilt='r'] {
+  rotate: 1.6deg;
+}
+
+/* how the path stands today: a plain closing paragraph, not a punchline */
+.ab-dec {
+  margin: calc(var(--u) * 3) 0 0;
+  max-width: 40ch;
+  font:
+    500 clamp(16px, calc(var(--u) * 1.3), 28px) / 1.6 var(--font-sans),
+    system-ui,
+    sans-serif;
+  color: var(--sp-fg);
+}
+
+/* a stand-in for a photo the owner will send: says what goes there */
+.ab-stand {
+  position: relative;
+  display: grid;
+  place-items: end start;
+  padding: calc(var(--u) * 1.2);
+  background:
+    repeating-linear-gradient(-45deg, transparent 0 9px, rgba(43, 38, 32, 0.05) 9px 10px), #ece6da;
+  overflow: hidden;
+}
+.ab-stand span {
+  max-width: 30ch;
+  font: 400 clamp(10px, calc(var(--u) * 0.75), 15px) / 1.45 var(--sp-mono);
+  letter-spacing: 0.04em;
+  color: var(--sp-fg-2);
+}
+
+/* ---------- home: the hardware and my own screen over it ---------- */
+.ab-home__body {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: calc(var(--u) * 6);
+  align-items: start;
+  margin-top: calc(var(--u) * 5);
+}
+.ab-home__text {
+  padding-top: calc(var(--u) * 3);
+}
+.ab-merge {
+  position: relative;
+  aspect-ratio: 7 / 5.4;
+}
+.ab-fence {
+  position: absolute;
+  left: 0;
+  top: 18%;
+  width: 42%;
+  aspect-ratio: 4 / 5;
+  rotate: -2deg;
+}
+.ab-screen {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 70%;
+  aspect-ratio: 16 / 10.5;
+  padding: calc(var(--u) * 0.7);
+  border-radius: calc(var(--u) * 0.9);
+  background: var(--sys-ink);
+  box-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 4) rgba(43, 38, 32, 0.18);
+}
+.ab-screen__shot {
+  width: 100%;
+  height: 100%;
+  border-radius: calc(var(--u) * 0.4);
+}
+/* the vendors' apps, each its own tile; in the final state they are gone into the one dashboard */
+.ab-apps {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  pointer-events: none;
+}
+.ab-apps li {
+  --tx: 0;
+  --ty: 0;
+  --r: 0deg;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  place-items: end center;
+  width: calc(var(--u) * 8.5);
+  aspect-ratio: 1;
+  margin: calc(var(--u) * -4.25) 0 0 calc(var(--u) * -4.25);
+  padding-bottom: calc(var(--u) * 0.9);
+  border-radius: 22%;
+  opacity: 0;
+  box-shadow: 0 calc(var(--u) * 0.8) calc(var(--u) * 1.6) rgba(43, 38, 32, 0.16);
+}
+.ab-apps li span {
+  font: 400 clamp(9px, calc(var(--u) * 0.7), 14px) / 1.2 var(--sp-mono);
+  letter-spacing: 0.03em;
+  text-align: center;
+}
+.ab-apps li:nth-child(1) {
+  --tx: -118%;
+  --ty: -150%;
+  --r: -8deg;
+  background: #f2a53a;
+  color: #2b2620;
+}
+.ab-apps li:nth-child(2) {
+  --tx: 140%;
+  --ty: -120%;
+  --r: 6deg;
+  background: #3d6fd6;
+  color: #fff;
+}
+.ab-apps li:nth-child(3) {
+  --tx: -250%;
+  --ty: 40%;
+  --r: 4deg;
+  background: #fbf9f4;
+  color: #2b2620;
+}
+.ab-apps li:nth-child(4) {
+  --tx: 210%;
+  --ty: 110%;
+  --r: -5deg;
+  background: #e04f3e;
+  color: #fff;
+}
+.ab-apps li:nth-child(5) {
+  --tx: -30%;
+  --ty: 170%;
+  --r: 9deg;
+  background: #2f9e8f;
+  color: #fff;
+}
+/* ---------- printer: the photo printed in ---------- */
+.ab-prn {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  column-gap: calc(var(--u) * 6);
+}
+.ab-prn__layers {
+  grid-column: 1;
+  grid-row: 1 / 4;
+}
+.ab-prn__photo {
+  aspect-ratio: 4 / 4.6;
+}
+.ab-prn__text {
+  grid-column: 2;
+  grid-row: 1;
+}
+.ab-prn__text .ab-q {
+  margin-bottom: calc(var(--u) * 4);
+}
+.ab-calc {
+  grid-column: 2;
+  grid-row: 3;
+  margin-top: calc(var(--u) * 4);
+}
+.ab-quote {
+  margin: 0;
+  font:
+    700 clamp(18px, calc(var(--u) * 1.7), 38px) / 1.55 'Mattone',
+    system-ui,
+    sans-serif;
+  letter-spacing: -0.01em;
+}
+.ab-nw {
+  white-space: nowrap;
+}
+.ab-u {
+  display: inline-block;
+  border-bottom: 3px solid var(--sys-liquid);
+  padding: 0 0.06em 0.04em;
+  line-height: 1.1;
+}
+.ab-u input,
+.ab-u select {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  appearance: none;
+  -moz-appearance: textfield;
+}
+.ab-u input {
+  cursor: ns-resize;
+}
+.ab-u input:focus {
+  cursor: text;
+}
+.ab-u input::-webkit-outer-spin-button,
+.ab-u input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.ab-u select {
+  field-sizing: content;
+  cursor: pointer;
+  text-align: left;
+}
+.ab-u :focus-visible {
+  outline: 2px solid var(--sys-liquid);
+  outline-offset: 4px;
+}
+.ab-price {
+  display: inline-block;
+  padding: 0.02em 0.22em 0.06em;
+  background: var(--sys-liquid);
+  color: var(--sys-paper);
+  white-space: nowrap;
+}
+.ab-hint {
+  margin: 18px 0 0;
+  font: 400 13px / 1.6 var(--sp-mono);
+  color: var(--sp-fg-2);
+}
+.ab-dec--prn {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+/* ---------- cars: a screenshot from the diagnostic software ---------- */
+.ab-cars__body {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: calc(var(--u) * 6);
+  align-items: start;
+  margin-top: calc(var(--u) * 5);
+}
+.ab-cars__body .ab-tx {
+  padding-top: calc(var(--u) * 2);
+}
+.ab-read {
+  margin: 0;
+}
+.ab-read__win {
+  position: relative;
+  height: calc(var(--u) * 21);
+  min-height: 220px;
+  overflow: hidden;
+  padding: 0 calc(var(--u) * 2.2);
+  border-radius: calc(var(--u) * 0.6);
+  background: #1f1c18;
+  color: #d9d3c7;
+}
+/* rows fade in and out at the window's edges (a mask would scroll with the rows) */
+.ab-read__win::before,
+.ab-read__win::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  height: 22%;
+  pointer-events: none;
+}
+.ab-read__win::before {
+  top: 0;
+  background: linear-gradient(#1f1c18, rgba(31, 28, 24, 0));
+}
+.ab-read__win::after {
+  bottom: 0;
+  background: linear-gradient(rgba(31, 28, 24, 0), #1f1c18);
+}
+.ab-read__rows {
+  margin: 0;
+  padding: calc(var(--u) * 5) 0;
+  list-style: none;
+  font: 400 clamp(11px, calc(var(--u) * 1), 21px) / 2 var(--sp-mono);
+  white-space: pre;
+}
+.ab-read__rows li[data-head] {
+  margin-top: 0.8em;
+  color: #5fd3a0;
+}
+.ab-read__rows li:nth-child(3) {
+  color: #fbf9f4;
+  font-weight: 700;
+}
+.ab-read figcaption {
+  margin-top: 12px;
+  font: 400 11px / 1.5 var(--sp-mono);
+  letter-spacing: 0.06em;
+  color: var(--sp-fg-3);
+}
+/* ---------- work: the names are doors to their pages ---------- */
+.ab-jobs {
+  margin: calc(var(--u) * 5) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.ab-job {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  grid-template-rows: auto 1fr;
+  column-gap: calc(var(--u) * 6);
+  padding: calc(var(--u) * 2.6) 0 calc(var(--u) * 3);
+  border-top: 1px solid rgba(43, 38, 32, 0.16);
+}
+.ab-job__n {
+  grid-row: 1 / 3;
+  justify-self: start;
+  margin: 0;
+  font:
+    900 clamp(26px, calc(var(--u) * 3.4), 80px) / 1.05 'Mattone',
+    system-ui,
+    sans-serif;
+  letter-spacing: -0.02em;
+  color: var(--sp-fg);
+  text-decoration: none;
+  background: linear-gradient(var(--sys-liquid), var(--sys-liquid)) 0 100% / 0 3px no-repeat;
+  transition: background-size 0.45s var(--sp-in);
+}
+/* a package name is set as code: Mattone's hyphen reads as a dash ("aspect–preview") */
+.ab-job__n--code {
+  font: 700 clamp(22px, calc(var(--u) * 2.6), 60px) / 1.1 var(--sp-mono);
+  letter-spacing: -0.03em;
+}
+a.ab-job__n:hover,
+a.ab-job__n:focus-visible {
+  background-size: 100% 3px;
+}
+a.ab-job__n:focus-visible {
+  outline: 2px solid var(--sys-liquid);
+  outline-offset: 6px;
+}
+.ab-job .ab-tx {
+  color: var(--sp-fg);
+}
+.ab-job__s {
+  margin: 0.8em 0 0;
+  font: 400 clamp(11px, calc(var(--u) * 0.85), 17px) / 1.5 var(--sp-mono);
+  letter-spacing: 0.04em;
+  color: var(--sp-fg-2);
+}
+.ab-job--open .ab-job__s {
+  font-style: italic;
+  color: var(--sys-liquid);
+}
+.ab-dec--work {
+  margin-bottom: calc(var(--u) * 12);
+}
+
+/* the door's glimpse of the next page */
+.ab-peek {
+  height: 100%;
+  padding: 36px;
+  background: #efeadf;
+}
+.ab-peek__q {
+  margin: 20px 0 0;
+  font:
+    900 clamp(22px, 2.5vw, 48px) / 1.05 'Mattone',
+    system-ui,
+    sans-serif;
+}
+
+/* ---------- motion ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  /* how each path stands today comes in last */
+  .sp-reveal[data-rv-ready] [data-rv='dec']:not([data-in]) {
+    opacity: 0;
+    transform: translateY(var(--sys-s4));
+  }
+  .sp-reveal[data-rv-ready] [data-rv='dec'] {
+    transition:
+      opacity 1s var(--sp-in) 0.2s,
+      transform 1.2s var(--sp-in) 0.2s;
+  }
+  /* the printer's calculator is printed in, the price printed again when it changes */
+  .sp-reveal[data-rv-ready] [data-rv='print']:not([data-in]) {
+    clip-path: inset(100% -0.3em -0.3em -0.3em);
+  }
+  .sp-reveal[data-rv-ready] [data-rv='print'] {
+    transition: clip-path 0.9s steps(9, end);
+  }
+  .ab-price {
+    animation: ab-reprint 0.5s steps(6, end);
+  }
+
+  /* longhands only: the build's CSS minifier drops an `animation` shorthand written next to
+     animation-timeline, leaving the rule with no animation at all */
+  @supports (animation-timeline: view()) {
+    /* home: the apps gather into the screen, which lights up as the Home Assistant dashboard */
+    .ab-merge {
+      view-timeline: --ab-merge block;
+    }
+    .ab-apps li,
+    .ab-screen__shot,
+    .ab-fence,
+    .ab-screen {
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-duration: auto;
+      animation-timeline: --ab-merge;
+    }
+    .ab-apps li {
+      animation-name: ab-gather;
+      animation-range: entry 30% cover 58%;
+    }
+    .ab-screen__shot {
+      animation-name: ab-light;
+      animation-range: cover 40% cover 60%;
+    }
+    /* the hardware and the software at different speeds, till one corner covers the other */
+    .ab-fence {
+      animation-name: ab-fence;
+      animation-range: cover 0% cover 100%;
+    }
+    .ab-screen {
+      animation-name: ab-screen;
+      animation-range: cover 0% cover 100%;
+    }
+    /* the names in the text get wired up one by one as they are read */
+    .ab-home b {
+      background: linear-gradient(var(--sys-liquid), var(--sys-liquid)) 0 100% / 0 2px no-repeat;
+      animation-name: ab-wire;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-duration: auto;
+      animation-timeline: view();
+      animation-range: entry 100% cover 42%;
+    }
+
+    /* cars: the readout scrolls by as the cable reads it */
+    .ab-read__rows {
+      animation-name: ab-scroll;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-duration: auto;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+
+    /* printer: the photo is printed from the bottom up, in short hard steps */
+    .ab-prn__layers {
+      view-timeline: --ab-layers block;
+    }
+    .ab-prn__photo {
+      animation-name: ab-print-up;
+      animation-timing-function: steps(10, end);
+      animation-fill-mode: both;
+      animation-duration: auto;
+      animation-timeline: --ab-layers;
+      animation-range: entry 10% cover 34%;
+    }
+
+    /* work: each name comes in like the door's title, from its own baseline */
+    .ab-job__n {
+      animation-name: ab-door;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-duration: auto;
+      animation-timeline: view();
+      animation-range: entry 20% entry 100%;
+      transform-origin: 0 100%;
+    }
+  }
+}
+@keyframes ab-reprint {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+}
+@keyframes ab-gather {
+  0% {
+    opacity: 1;
+    transform: translate(var(--tx), var(--ty)) rotate(var(--r));
+  }
+  70% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0deg) scale(0.6);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.2);
+  }
+}
+@keyframes ab-light {
+  from {
+    opacity: 0;
+    scale: 0.94;
+  }
+}
+@keyframes ab-scroll {
+  from {
+    translate: 0 30%;
+  }
+  to {
+    translate: 0 -45%;
+  }
+}
+@keyframes ab-fence {
+  from {
+    translate: 0 calc(var(--u) * 7);
+  }
+  to {
+    translate: calc(var(--u) * 3) calc(var(--u) * -3);
+  }
+}
+@keyframes ab-screen {
+  from {
+    translate: 0 calc(var(--u) * -3);
+  }
+  to {
+    translate: 0 calc(var(--u) * 4);
+  }
+}
+@keyframes ab-wire {
+  to {
+    background-size: 100% 2px;
+  }
+}
+@keyframes ab-print-up {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+}
+@keyframes ab-door {
+  from {
+    clip-path: inset(0 100% 0 0);
+    transform: scale(0.94);
+  }
+  to {
+    clip-path: inset(0 0 -0.2em 0);
+    transform: none;
+  }
+}
+
+/* ---------- phones ---------- */
+@media (max-width: 700px) {
+  /* the first screen fills the phone like it fills the desktop: the line sits on the bottom edge,
+     so the part below cannot leave a lopsided empty band before it scrolls in */
+  .ab-open {
+    min-height: 100svh;
+    padding: calc(var(--sys-s7) + var(--sys-s1)) 0 var(--sys-s6);
+    gap: var(--sys-s4);
+  }
+  .ab-para {
+    font-size: clamp(28px, min(9.4vw, 5.1svh), 44px);
+    line-height: 1.24;
+  }
+  .ab-note {
+    margin: 0.5em 0 0 0.4em;
+  }
+  /* the stand-in captions are unreadable at this size; the pill keeps its label for screen readers */
+  .ab-pp span,
+  .ab-prd > span {
+    display: none;
+  }
+  .ab-pn {
+    border-width: 1.5px;
+    font-size: 0.36em;
+  }
+  .ab-open__foot {
+    display: block;
+  }
+  .ab-open__label {
+    display: none;
+  }
+  .ab-path {
+    padding-top: 110px;
+  }
+  .ab-home {
+    padding-top: 72px;
+  }
+  .ab-home__body,
+  .ab-cars__body,
+  .ab-prn,
+  .ab-job {
+    display: block;
+  }
+  .ab-home__body,
+  .ab-cars__body {
+    margin-top: 28px;
+  }
+  .ab-home__text {
+    padding-top: 0;
+  }
+  /* too narrow for the two pictures to overlap: the fence, then the screen the apps gather into */
+  .ab-merge {
+    aspect-ratio: auto;
+    margin-top: 40px;
+    display: grid;
+    gap: 28px;
+  }
+  .ab-fence,
+  .ab-screen {
+    position: relative;
+    left: auto;
+    right: auto;
+    top: auto;
+    width: 100%;
+    rotate: none;
+  }
+  .ab-fence {
+    width: 70%;
+  }
+  .ab-apps li {
+    width: 60px;
+    margin: -30px 0 0 -30px;
+  }
+  .ab-apps li:nth-child(3) {
+    --tx: -150%;
+  }
+  .ab-apps li:nth-child(4) {
+    --tx: 140%;
+  }
+  .ab-prn__text .ab-q {
+    margin-bottom: 24px;
+  }
+  .ab-prn__layers {
+    margin-top: 32px;
+  }
+  .ab-calc {
+    margin-top: 48px;
+  }
+  .ab-u {
+    border-bottom-width: 2px;
+  }
+  .ab-hint {
+    font-size: 11px;
+  }
+  .ab-read {
+    margin-top: 28px;
+  }
+  .ab-read__rows {
+    font-size: 11px;
+  }
+  .ab-cars__body .ab-tx {
+    padding-top: 0;
+  }
+  .ab-dec {
+    margin-top: 20px;
+  }
+  .ab-job {
+    padding: 22px 0 28px;
+  }
+  .ab-job .ab-tx {
+    margin-top: 12px;
+  }
+  .ab-peek {
+    padding: 24px;
+  }
+}

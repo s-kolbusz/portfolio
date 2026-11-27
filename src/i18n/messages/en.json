@@ -29,7 +29,8 @@
     "close": "Close",
     "elsewhere": "Elsewhere",
     "in_progress": "in progress",
-    "here": "here"
+    "here": "here",
+    "pages": "Pages"
   },
   "HomePage": {
     "title": "Sebastian Kolbusz",
@@ -698,6 +699,106 @@
       "note": "Prices exclude VAT. Reverse charge applies to EU businesses. We set the price after a short call.",
       "contact": "Get in touch",
       "about": "Write to me {about}"
+    }
+  },
+  "subpage": {
+    "next": "Next",
+    "pull": "Keep scrolling",
+    "soon": "This page is still being built"
+  },
+  "subpages": {
+    "about": {
+      "title": "About",
+      "tail": " me",
+      "line": "Everything I do starts with a question.",
+      "peek": "I don't take things on trust."
+    },
+    "agents": {
+      "title": "How I work",
+      "tail": " with agents",
+      "line": "Six rules I follow when I work with AI. Each one came from a specific mistake.",
+      "peek": "How do I know an agent is done?"
+    },
+    "ready2order": {
+      "title": "ready2order",
+      "tail": "",
+      "line": "Why did the POS app take so long to start?",
+      "peek": "Why did the POS app take so long to start?"
+    }
+  },
+  "aboutPage": {
+    "meta_title": "About me",
+    "meta_description": "I'm Sebastian Kolbusz, a frontend developer and designer in Zakopane. I work remotely and have built websites since 2016. Here are some things I've made.",
+    "name": "About me",
+    "label": "About · Sebastian Kolbusz",
+    "title": "I don't take things on trust.",
+    "line": "Here are a few things I've built and tested for myself, both at work and in my own time.",
+    "facts": {
+      "from": "Based in",
+      "from_v": "Zakopane, Poland",
+      "from_n": "working remotely",
+      "job": "Job",
+      "job_v": "Frontend developer",
+      "job_n": "since 2016",
+      "off": "Away from code",
+      "off_v": "Home · printer · cars",
+      "off_n": "three paths",
+      "work": "Projects",
+      "work_v": "Plugin · Airchos",
+      "work_n": "two projects"
+    },
+    "home": {
+      "p1": "I started with a fence made from solar panels. My smart devices each had their own app, so I brought them into <b>Home Assistant</b>. The house is now in one place, and I can choose any brand.",
+      "p2": "I connected two inverters, including a <b>Fronius</b>, and an old heat pump through a <b>Shelly</b> relay for hot water on demand. I made my own energy dashboards too. I really enjoyed working with hardware and software together.",
+      "photo1": "photo: the solar panel fence",
+      "photo2": "screenshot: my energy dashboard",
+      "dec": "I use Home Assistant every day to manage the house.",
+      "say": "I build an idea physically <nw><pill>photo: the solar panel fence</pill>,</nw> then take it over in software <pill>screenshot: my energy dashboard</pill> so that I have full control of it.",
+      "apps": "Fronius|second inverter|Shelly|sockets|lights"
+    },
+    "printer": {
+      "photo": "photo: the rebuilt Creality K1, print head in view",
+      "p1": "I bought a <b>Creality K1</b> out of curiosity. Being able to make everyday objects at home, as well as software, was pretty exciting.",
+      "p2": "I rebuilt it with a new board, processor, motors, and X and Y mechanism. The print head got a new nozzle and extruder, plus a processor. Eventually, my interest faded.",
+      "quote": "Something <nw><w></w> × <d></d> × <h></h> cm,</nw> in <m></m>, with <f></f> infill, takes {hours, plural, one {about an hour} other {about # hours}} to print and costs <price></price>",
+      "hint": "Change an underlined value and the price updates.",
+      "width": "Width in centimeters",
+      "depth": "Depth in centimeters",
+      "height": "Height in centimeters",
+      "material": "Material",
+      "infill": "Infill in percent",
+      "dec": "These days I print when I need something or someone asks. I'm also available for custom print orders.",
+      "say": "At home I can make <pill>photo: a print</pill> more than software."
+    },
+    "cars": {
+      "p1": "A problem with my car led me to buy a cable and install <b>VCDS</b>. I started running diagnostics on other cars in the family too. Over time, I got into oil and filter changes, along with minor repairs.",
+      "dec": "I'm still working on the family cars, with no particular idea of how far I'll take it.",
+      "say": "I use VCDS to figure out what’s wrong with the family cars <nw><pill>screenshot: a VCDS readout</pill>,</nw> and I’ve started doing small repairs too.",
+      "read": "Address 01: Engine|Status: 1 fault|P0420  Catalyst efficiency below threshold|  intermittent · count 3|Coolant temp  88 °C|Engine speed  780 rpm|Voltage  14.1 V|Address 03: ABS|Status: no faults",
+      "read_label": "sample readout"
+    },
+    "work": {
+      "aspect": "I built a Payload CMS plugin to crop a photo once, set its focal point, and preview the crop across every page layout.",
+      "aspect_s": "Open source and available on npm.",
+      "airchos": "I'm building my own project about working with AI, with the same habit of checking things for myself.",
+      "airchos_s": "Currently in development.",
+      "dec": "Get in touch if you'd like to talk about a project.",
+      "say": "I use my own projects <pill>screenshot: aspect-preview</pill> to try things out and figure out how I want them to work <pill>screenshot: Airchos</pill>."
+    },
+    "parts": {
+      "home": "Home",
+      "printer": "Printer",
+      "cars": "Cars",
+      "work": "Projects"
+    },
+    "open": {
+      "home": "Home",
+      "printer": "printer",
+      "cars": "cars",
+      "plugin": "Plugin",
+      "airchos": "Airchos",
+      "fence": "photo: the solar fence",
+      "k1": "photo: Creality K1"
     }
   }
 }

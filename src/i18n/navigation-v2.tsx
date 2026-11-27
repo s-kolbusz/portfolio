@@ -7,11 +7,13 @@ import NextLink from 'next/link'
 import { usePathname as useNextPathname, useRouter as useNextRouter } from 'next/navigation'
 
 import { type Locale } from './routing'
+import { isV2Page } from './v2-pages'
 
 /**
  * Navigation for the redesign while it lives at /v2/<locale> next to the old site (owner, 2026-11-26).
- * The redesign is only the home page, so the home and its #parts stay under /v2; every other page
- * (CV, projects, services) still exists only in the old design and is linked at its usual address.
+ * The home, its #parts and the subpages already built in the new design (V2_PAGES) stay under /v2;
+ * every other page (CV, projects, services) still exists only in the old design and is linked at its
+ * usual address.
  * Same surface as `@/i18n/navigation` (Link, usePathname, useRouter), so the swap later is an import.
  */
 export const V2_BASE = '/v2'
@@ -20,6 +22,7 @@ export function v2Href(href: string, locale: string) {
   if (href === '/' || href.startsWith('/#')) {
     return `${V2_BASE}/${locale}${href.slice(1)}`
   }
+  if (isV2Page(href)) return `${V2_BASE}/${locale}${href}`
   return `/${locale}${href}`
 }
 

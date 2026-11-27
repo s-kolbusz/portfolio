@@ -29,7 +29,8 @@
     "close": "Zamknij",
     "elsewhere": "Moje strony",
     "in_progress": "powstaje",
-    "here": "tutaj"
+    "here": "tutaj",
+    "pages": "Podstrony"
   },
   "HomePage": {
     "title": "Sebastian Kolbusz",
@@ -694,6 +695,106 @@
       "note": "Ceny brutto, z wyjątkiem kontraktu (netto + VAT). Cenę ustalimy po krótkiej rozmowie.",
       "contact": "Napisz do mnie",
       "about": "Napisz do mnie {about}"
+    }
+  },
+  "subpage": {
+    "next": "Dalej",
+    "pull": "Przewiń dalej",
+    "soon": "Ta strona jeszcze powstaje"
+  },
+  "subpages": {
+    "about": {
+      "title": "Kim",
+      "tail": " jestem",
+      "line": "Każda rzecz zaczyna się u mnie od pytania.",
+      "peek": "Nie wierzę na słowo."
+    },
+    "agents": {
+      "title": "Jak pracuję",
+      "tail": " z agentami",
+      "line": "Sześć reguł, według których pracuję z AI. Każda powstała po konkretnym błędzie.",
+      "peek": "Skąd wiem, że agent skończył?"
+    },
+    "ready2order": {
+      "title": "ready2order",
+      "tail": "",
+      "line": "Dlaczego aplikacja POS tak długo się uruchamiała?",
+      "peek": "Dlaczego aplikacja POS tak długo się uruchamiała?"
+    }
+  },
+  "aboutPage": {
+    "meta_title": "Kim jestem",
+    "meta_description": "Jestem Sebastian Kolbusz, frontend developer i projektant z Zakopanego. Pracuję zdalnie, robię strony od 2016 roku. Tu pokazuję też projekty po godzinach.",
+    "name": "Kim jestem",
+    "label": "Kim jestem · Sebastian Kolbusz",
+    "title": "Nie wierzę na słowo.",
+    "line": "Poniżej kilka rzeczy, które zrobiłem po swojemu i sam sprawdziłem. Po pracy i w pracy.",
+    "facts": {
+      "from": "Skąd",
+      "from_v": "Zakopane",
+      "from_n": "pracuję zdalnie",
+      "job": "Zawód",
+      "job_v": "Frontend developer",
+      "job_n": "od 2016",
+      "off": "Poza kodem",
+      "off_v": "Dom · drukarka · auta",
+      "off_n": "trzy drogi",
+      "work": "Projekty",
+      "work_v": "Plugin · Airchos",
+      "work_n": "dwa projekty"
+    },
+    "home": {
+      "p1": "Zacząłem od płotu z paneli PV. Sprzęt różnych firm, każdy z własną aplikacją, spiąłem w <b>Home Assistant</b>. Teraz mam dom w jednym miejscu i mogę dobierać urządzenia dowolnych producentów.",
+      "p2": "Podłączyłem dwa falowniki, w tym <b>Froniusa</b>, i starą pompę ciepła przez przekaźnik <b>Shelly</b>. Dogrzewam wodę na żądanie i mam własne ekrany z danymi o energii. Mega mi się podobało połączenie sprzętu z oprogramowaniem.",
+      "photo1": "zdjęcie: płot z paneli fotowoltaicznych",
+      "photo2": "zrzut: mój ekran z danymi o energii",
+      "dec": "Korzystam z tego codziennie, cały dom mam teraz w Home Assistant.",
+      "say": "Realizuję pomysł fizycznie <nw><pill>zdjęcie: płot z paneli</pill>,</nw> a potem ogarniam go programowo <pill>zrzut: ekran z danymi o energii</pill> tak, żebym miał nad nim pełną kontrolę.",
+      "apps": "Fronius|drugi falownik|Shelly|gniazdka|oświetlenie"
+    },
+    "printer": {
+      "photo": "zdjęcie: Creality K1 po przebudowie, widać głowicę",
+      "p1": "Kupiłem <b>Creality K1</b> z ciekawości. Podobało mi się, że w domu mogę robić też coś poza oprogramowaniem, choćby gadżety i rzeczy codziennego użytku.",
+      "p2": "Rozebrałem ją i wymieniłem płytę, procesor, silniki oraz mechanizm osi X i Y. W głowicy zmieniłem dyszę i extruder, a także procesor. Potem zainteresowanie trochę mi przeszło.",
+      "quote": "Coś o wymiarach <nw><w></w> × <d></d> × <h></h> cm,</nw> z <m></m>, z wypełnieniem <nw><f></f>,</nw> to {hours, plural, one {około godziny} other {około # godzin}} druku i <price></price>",
+      "hint": "Zmień podkreśloną wartość, a cena policzy się od nowa.",
+      "width": "Szerokość w centymetrach",
+      "depth": "Głębokość w centymetrach",
+      "height": "Wysokość w centymetrach",
+      "material": "Materiał",
+      "infill": "Wypełnienie w procentach",
+      "dec": "Dziś drukuję, gdy sam czegoś potrzebuję albo ktoś poprosi. Mogę też drukować na zamówienie.",
+      "say": "W domu mogę sam zrobić <pill>zdjęcie: wydruk</pill> nie tylko oprogramowanie."
+    },
+    "cars": {
+      "p1": "Po usterce w aucie kupiłem kabel i zainstalowałem <b>VCDS</b>. Zacząłem diagnozować też auta w rodzinie. Z czasem doszła wymiana oleju i filtrów oraz drobne naprawy.",
+      "dec": "Nadal zajmuję się autami w rodzinie i na razie nie wiem, co jeszcze z tego wyjdzie.",
+      "say": "Zacząłem od diagnozy własnego auta <nw><pill>zrzut: odczyt z VCDS</pill>,</nw> a teraz wymieniam też olej i robię drobne naprawy.",
+      "read": "Adres 01: Silnik|Stan: 1 usterka|P0420  Sprawność katalizatora poniżej progu|  sporadyczna · licznik 3|Temp. płynu  88 °C|Obroty  780 /min|Napięcie  14,1 V|Adres 03: ABS|Stan: brak usterek",
+      "read_label": "przykładowy odczyt"
+    },
+    "work": {
+      "aspect": "Zrobiłem plugin do Payload CMS, w którym kadruję zdjęcie raz, ustawiam punkt ostrości i widzę przycięcia we wszystkich układach.",
+      "aspect_s": "Open source, dostępny w npm.",
+      "airchos": "Pracuję nad własnym projektem o pracy z AI, w którym też trzymam się zasady „nie wierzę na słowo”.",
+      "airchos_s": "Projekt jest w trakcie.",
+      "dec": "Jeśli chcesz porozmawiać o swoim projekcie, napisz do mnie.",
+      "say": "W swoich projektach <pill>zrzut: aspect-preview</pill> też sprawdzam, co działa, i robię rzeczy po swojemu <pill>zrzut: Airchos</pill>."
+    },
+    "parts": {
+      "home": "Dom",
+      "printer": "Drukarka",
+      "cars": "Auta",
+      "work": "Projekty"
+    },
+    "open": {
+      "home": "Dom",
+      "printer": "drukarka",
+      "cars": "auta",
+      "plugin": "Plugin",
+      "airchos": "Airchos",
+      "fence": "zdjęcie: płot z paneli",
+      "k1": "zdjęcie: Creality K1"
     }
   }
 }
